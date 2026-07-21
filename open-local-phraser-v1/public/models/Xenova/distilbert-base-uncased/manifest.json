@@ -1,0 +1,15 @@
+{
+  "modelId": "Xenova/distilbert-base-uncased",
+  "task": "fill-mask",
+  "role": "mask-suggestions",
+  "dtype": "q8",
+  "downloadedAt": "2026-07-02T02:36:24.112Z",
+  "files": [
+    "config.json",
+    "onnx/model_quantized.onnx",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "special_tokens_map.json",
+    "vocab.txt"
+  ]
+}

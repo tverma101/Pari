@@ -1,0 +1,15 @@
+{
+  "modelId": "Xenova/bge-base-en-v1.5",
+  "task": "feature-extraction",
+  "role": "retrieval-meaning",
+  "dtype": "q8",
+  "downloadedAt": "2026-06-30T23:18:57.831Z",
+  "files": [
+    "config.json",
+    "onnx/model_quantized.onnx",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "special_tokens_map.json",
+    "vocab.txt"
+  ]
+}

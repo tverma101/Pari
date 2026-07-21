@@ -1,0 +1,15 @@
+{
+  "modelId": "Xenova/bert-base-NER",
+  "task": "token-classification",
+  "role": "entity-guard",
+  "dtype": "q8",
+  "downloadedAt": "2026-06-30T23:19:05.981Z",
+  "files": [
+    "config.json",
+    "onnx/model_quantized.onnx",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "special_tokens_map.json",
+    "vocab.txt"
+  ]
+}

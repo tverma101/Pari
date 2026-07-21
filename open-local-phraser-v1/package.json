@@ -1,0 +1,32 @@
+{
+  "name": "open-local-phraser-v2",
+  "private": true,
+  "version": "0.2.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "models:download": "node scripts/download-models.mjs",
+    "models:check": "node scripts/check-models.mjs",
+    "qa:paraphrase": "node scripts/qa-paraphrase.mjs",
+    "build": "tsc -p tsconfig.json && vite build",
+    "build:desktop": "bash build_dmg.sh",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "4.2.0",
+    "clsx": "2.1.1",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "tailwind-merge": "3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.17",
+    "@types/node": "22.19.17",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.1",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3",
+    "vite": "7.3.2"
+  }
+}

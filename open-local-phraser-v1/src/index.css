@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin-slow {
+  animation: spin-slow 0.8s linear infinite;
+}
+
+.output-word-btn {
+  display: inline;
+  border: none;
+  background: transparent;
+  padding: 0 1px;
+  margin: 0;
+  border-radius: 4px;
+  color: #24342c;
+  cursor: pointer;
+  transition: background-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.output-word-btn:hover {
+  background: #f2f7f3;
+}
+
+.output-word-btn.candidate {
+  background: #eef7f1;
+  color: #214834;
+  box-shadow: inset 0 -1px 0 rgba(73, 149, 87, 0.28);
+}
+
+.output-word-btn.candidate:hover {
+  background: #def0e5;
+}
+
+.output-word-btn.changed {
+  background: #fff0b4;
+  color: #3d3520;
+}
+
+.output-word-btn.changed:hover {
+  background: #ffe27a;
+}
+
+.output-word-btn.active {
+  background: #e9f5ec;
+  box-shadow: 0 0 0 2px rgba(73, 149, 87, 0.35);
+}
+
+.output-word-btn.frozen {
+  background: #f2f7f4;
+  color: #476157;
+  cursor: default;
+}
+
+.badge-muted {
+  border-color: #d7e2da;
+  background: #f5f9f6;
+  color: #74857c;
+}
+
+.badge-info {
+  border-color: #d6e5f6;
+  background: #f2f7fc;
+  color: #4d6f95;
+}
+
+.badge-status-ready,
+.badge-risk-low {
+  border-color: #d5e7d8;
+  background: #edf6ef;
+  color: #2f7b4c;
+}
+
+.badge-risk-medium {
+  border-color: #f1ddb4;
+  background: #fff7e8;
+  color: #a56d1f;
+}
+
+.badge-risk-high,
+.inline-error {
+  border-color: #efd2d6;
+  background: #fff5f6;
+  color: #b34a60;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.16s ease-out;
+}

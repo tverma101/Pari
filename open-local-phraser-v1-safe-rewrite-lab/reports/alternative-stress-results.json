@@ -1,0 +1,170 @@
+{
+  "timestamp": "2026-07-08T00:35:17.709Z",
+  "totalTokenTests": 14,
+  "passed": 14,
+  "failed": 0,
+  "passRate": "100%",
+  "testGroups": 4,
+  "results": [
+    {
+      "sentence": "This demonstrates the significant role of communication in h",
+      "tokenTests": [
+        {
+          "token": "demonstrates",
+          "expectedEditable": true,
+          "expectedProtected": false,
+          "expectedAlternativesCount": 5,
+          "actualAlternativesCount": 30,
+          "hasTopAlternatives": true,
+          "passed": true,
+          "failures": []
+        },
+        {
+          "token": "significant",
+          "expectedEditable": true,
+          "expectedProtected": false,
+          "expectedAlternativesCount": 5,
+          "actualAlternativesCount": 30,
+          "hasTopAlternatives": true,
+          "passed": true,
+          "failures": []
+        },
+        {
+          "token": "individuals",
+          "expectedEditable": true,
+          "expectedProtected": false,
+          "expectedAlternativesCount": 5,
+          "actualAlternativesCount": 30,
+          "hasTopAlternatives": true,
+          "passed": true,
+          "failures": []
+        },
+        {
+          "token": "communication",
+          "expectedEditable": true,
+          "expectedProtected": false,
+          "expectedAlternativesCount": 3,
+          "actualAlternativesCount": 30,
+          "hasTopAlternatives": true,
+          "passed": true,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "sentence": "Dr. Rodin cast 'The Cathedral' in 1955.",
+      "tokenTests": [
+        {
+          "token": "Rodin",
+          "expectedEditable": false,
+          "expectedProtected": true,
+          "expectedAlternativesCount": 0,
+          "actualAlternativesCount": 0,
+          "hasTopAlternatives": false,
+          "passed": true,
+          "failures": []
+        },
+        {
+          "token": "The Cathedral",
+          "expectedEditable": false,
+          "expectedProtected": true,
+          "expectedAlternativesCount": 0,
+          "actualAlternativesCount": 0,
+          "hasTopAlternatives": false,
+          "passed": true,
+          "failures": []
+        },
+        {
+          "token": "1955",
+          "expectedEditable": false,
+          "expectedProtected": true,
+          "expectedAlternativesCount": 0,
+          "actualAlternativesCount": 0,
+          "hasTopAlternatives": false,
+          "passed": true,
+          "failures": []
+        },
+        {
+          "token": "cast",
+          "expectedEditable": true,
+          "expectedProtected": false,
+          "expectedAlternativesCount": 1,
+          "actualAlternativesCount": 7,
+          "hasTopAlternatives": false,
+          "passed": true,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "sentence": "The role of communication in how people understand themselve",
+      "tokenTests": [
+        {
+          "token": "The",
+          "expectedEditable": false,
+          "expectedProtected": false,
+          "expectedAlternativesCount": 0,
+          "actualAlternativesCount": 0,
+          "hasTopAlternatives": false,
+          "passed": true,
+          "failures": []
+        },
+        {
+          "token": "of",
+          "expectedEditable": false,
+          "expectedProtected": false,
+          "expectedAlternativesCount": 0,
+          "actualAlternativesCount": 0,
+          "hasTopAlternatives": false,
+          "passed": true,
+          "failures": []
+        },
+        {
+          "token": "in",
+          "expectedEditable": false,
+          "expectedProtected": false,
+          "expectedAlternativesCount": 0,
+          "actualAlternativesCount": 0,
+          "hasTopAlternatives": false,
+          "passed": true,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "sentence": "In 2026, the survey showed that 42% of students preferred on",
+      "tokenTests": [
+        {
+          "token": "2026",
+          "expectedEditable": false,
+          "expectedProtected": true,
+          "expectedAlternativesCount": 0,
+          "actualAlternativesCount": 0,
+          "hasTopAlternatives": false,
+          "passed": true,
+          "failures": []
+        },
+        {
+          "token": "42%",
+          "expectedEditable": false,
+          "expectedProtected": true,
+          "expectedAlternativesCount": 0,
+          "actualAlternativesCount": 0,
+          "hasTopAlternatives": false,
+          "passed": true,
+          "failures": []
+        },
+        {
+          "token": "students",
+          "expectedEditable": true,
+          "expectedProtected": false,
+          "expectedAlternativesCount": 3,
+          "actualAlternativesCount": 7,
+          "hasTopAlternatives": false,
+          "passed": true,
+          "failures": []
+        }
+      ]
+    }
+  ]
+}

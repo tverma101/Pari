@@ -1,0 +1,15 @@
+{
+  "modelId": "Xenova/all-MiniLM-L12-v2",
+  "task": "feature-extraction",
+  "role": "secondary-meaning",
+  "dtype": "q8",
+  "downloadedAt": "2026-06-30T23:19:02.152Z",
+  "files": [
+    "config.json",
+    "onnx/model_quantized.onnx",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "special_tokens_map.json",
+    "vocab.txt"
+  ]
+}
