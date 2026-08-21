@@ -26,6 +26,7 @@ import {
   nativeParaphraseAvailable,
   type NativeStyleContext,
 } from "@/lib/platform/nativeParaphrase";
+import { rankNativeCandidates } from "@/lib/generation/nativeCandidateRanker";
 import {
   preferredCandidate,
   retrieveRelevantExamples,
@@ -496,20 +497,71 @@ export async function generateLocalParaphrase(
         mode,
         strength,
         maxTokens: Math.min(1536, Math.max(256, Math.ceil(preparedSource.length / 2))),
+        candidates: 4,
         styleInstructions: customStyle?.instructions,
         styleTweaks: customStyle?.tweaks,
         ...(nativeStyleContext ? { styleContext: nativeStyleContext } : {}),
       }, request.signal);
       throwIfAborted(request.signal);
 
-      const inspection = await inspectNativeDraft(
-        native.text,
-        originalText,
-        protectedSpans,
-        mode,
-        structuralRepair,
-        warmthPolish,
-      );
+      // Best-of-N: rank every candidate with the same gates a single draft
+      // must pass. If the ranker itself fails, fall back to inspecting every
+      // candidate individually so generation never degrades to one draft.
+      let inspection: { text: string; safe: boolean; reason?: string };
+      const candidateList = native.candidates ?? [{ text: native.text }];
+      try {
+        const ranked = await rankNativeCandidates(candidateList, {
+          originalText,
+          protectedSpans,
+          mode,
+          structuralRepair,
+          finalizeDraft,
+          warmthPolish,
+        });
+        const winner = ranked.find((candidate) => candidate.safe);
+        if (winner) {
+          return {
+            text: winner.text,
+            protectedSpans,
+            source: "native-mlx",
+            durationMs: Math.round(performance.now() - startedAt),
+            retryCount: 0,
+            retrievedExampleCount: retrievedExamples.length,
+            safe: true,
+            notice: `Generated locally with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
+          };
+        }
+        inspection = { text: ranked[0]?.text ?? native.text, safe: false, reason: `No candidate passed Pari's meaning and grammar checks (ranked=${ranked.length}, requested=${candidateList.length}).` };
+      } catch (rankError) {
+        if (rankError instanceof DOMException && rankError.name === "AbortError") throw rankError;
+        // Ranker unavailable: still use best-of-N via the single-draft inspector.
+        inspection = { text: native.text, safe: false, reason: `Candidate ranking was unavailable (${candidateList.length} candidates): ${rankError instanceof Error ? rankError.message : String(rankError)}` };
+        for (const candidate of candidateList) {
+          if (!candidate.text.trim()) continue;
+          throwIfAborted(request.signal);
+          const single = await inspectNativeDraft(
+            candidate.text,
+            originalText,
+            protectedSpans,
+            mode,
+            structuralRepair,
+            warmthPolish,
+          );
+          if (single.safe) {
+            return {
+              text: single.text,
+              protectedSpans,
+              source: "native-mlx",
+              durationMs: Math.round(performance.now() - startedAt),
+              retryCount: 0,
+              retrievedExampleCount: retrievedExamples.length,
+              safe: true,
+              notice: `Generated locally with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
+            };
+          }
+          inspection = { ...inspection, reason: single.reason ?? inspection.reason };
+        }
+      }
       if (inspection.safe) {
         return {
           text: inspection.text,

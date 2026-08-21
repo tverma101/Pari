@@ -3,7 +3,7 @@ import path from "path";
 import { spawn } from "child_process";
 
 const ROOT_DIR = path.resolve(new URL("..", import.meta.url).pathname);
-const MODEL_DIR = path.join(ROOT_DIR, "native-models", "Qwen", "Qwen3-4B-MLX-4bit");
+const MODEL_DIR = path.join(ROOT_DIR, "native-models", "Qwen", "Qwen3.5-4B-MLX-4bit");
 const WORKER = path.join(ROOT_DIR, "native-runtime", "paraphrase_worker.py");
 const PYTHON = [
   "/opt/homebrew/bin/python3",

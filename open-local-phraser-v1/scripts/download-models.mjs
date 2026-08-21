@@ -15,16 +15,15 @@ const DEFAULT_DTYPE = "q8";
 const NATIVE_ONLY = process.argv.includes("--native-only");
 const INSTALL_NATIVE = process.argv.includes("--install-native");
 const NATIVE_GENERATIVE_MODEL = {
-  id: "Qwen/Qwen3-4B-MLX-4bit",
+  id: "mlx-community/Qwen3.5-4B-MLX-4bit",
   task: "mlx-generation",
   role: "paragraph-generation",
   storage: "native-models",
-  localPath: "native-models/Qwen/Qwen3-4B-MLX-4bit",
+  localPath: "native-models/Qwen/Qwen3.5-4B-MLX-4bit",
   requiredFiles: [
-    "LICENSE",
     "README.md",
+    "chat_template.jinja",
     "config.json",
-    "merges.txt",
     "model.safetensors",
     "model.safetensors.index.json",
     "tokenizer.json",

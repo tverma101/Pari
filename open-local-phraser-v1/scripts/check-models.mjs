@@ -15,10 +15,10 @@ const MODEL_ROOT = path.join(ROOT_DIR, "public", "models");
 const MEMORY_CEILING_MB = 6 * 1024;
 const FILES_ONLY = process.argv.includes("--files-only");
 const NATIVE_GENERATIVE_MODEL = {
-  id: "Qwen/Qwen3-4B-MLX-4bit",
+  id: "mlx-community/Qwen3.5-4B-MLX-4bit",
   task: "mlx-generation",
   storage: "native-models",
-  localPath: "native-models/Qwen/Qwen3-4B-MLX-4bit",
+  localPath: "native-models/Qwen/Qwen3.5-4B-MLX-4bit",
   role: "paragraph-generation",
 };
 
@@ -30,10 +30,9 @@ function getModelDtype(model) {
 function getRequiredFiles(model) {
   if (model.storage === "native-models") {
     return [
-      "LICENSE",
       "README.md",
+      "chat_template.jinja",
       "config.json",
-      "merges.txt",
       "model.safetensors",
       "model.safetensors.index.json",
       "tokenizer.json",

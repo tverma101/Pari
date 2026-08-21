@@ -6,8 +6,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODEL_ID = "Qwen/Qwen3-4B-MLX-4bit";
-const MODEL_RELATIVE_PATH = "native-models/Qwen/Qwen3-4B-MLX-4bit";
+const MODEL_ID = "mlx-community/Qwen3.5-4B-MLX-4bit";
+const MODEL_RELATIVE_PATH = "native-models/mlx-community/Qwen3.5-4B-MLX-4bit";
 const SOURCE_DIR = path.join(ROOT_DIR, MODEL_RELATIVE_PATH);
 const configuredTarget = process.env.PARI_NATIVE_MODEL_PATH?.trim();
 const TARGET_DIR = configuredTarget

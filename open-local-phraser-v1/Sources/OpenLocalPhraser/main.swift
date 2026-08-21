@@ -365,8 +365,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     private let scheme = "app"
     private let approvalPersistence = ApprovalPersistence()
     private let agentStyleStore = AgentStyleStore()
-    private let nativeModelID = "Qwen/Qwen3-4B-MLX-4bit"
-    private let nativeModelRelativePath = "native-models/Qwen/Qwen3-4B-MLX-4bit"
+    private let nativeModelID = "mlx-community/Qwen3.5-4B-MLX-4bit"
+    private let nativeModelRelativePath = "native-models/Qwen/Qwen3.5-4B-MLX-4bit"
     private let nativeWorkerRelativePath = "native-runtime/paraphrase_worker.py"
     private let nativeModelRequiredFiles = [
         "manifest.json",
@@ -1292,6 +1292,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
             "max_tokens": maxTokens,
         ]
         if repairPass { request["repair_pass"] = true }
+        // Best-of-N: extra candidates are cheap once the model is loaded; the
+        // web layer ranks them with its meaning/grammar gates.
+        if let candidateCount = (payload["candidates"] as? NSNumber)?.intValue, candidateCount > 1 {
+            request["candidates"] = max(1, min(candidateCount, 4))
+        }
         if let temperature { request["temperature"] = temperature }
         if let styleInstructions, !styleInstructions.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             request["custom_instructions"] = styleInstructions
@@ -1337,12 +1342,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
                response["ok"] as? Bool == true,
                let text = response["text"] as? String,
                !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                replyToGeneration(requestID: requestID, result: [
+                var reply: [String: Any] = [
                     "ok": true,
                     "text": text,
                     "durationMs": elapsedMs,
                     "modelId": nativeModelID,
-                ])
+                ]
+                // Forward every candidate so the web layer can rank them.
+                if let candidates = response["candidates"] as? [[String: Any]] {
+                    reply["candidates"] = candidates
+                }
+                replyToGeneration(requestID: requestID, result: reply)
                 return
             }
 
