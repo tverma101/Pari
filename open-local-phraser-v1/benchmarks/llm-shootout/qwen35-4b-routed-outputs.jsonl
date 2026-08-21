@@ -1,0 +1,64 @@
+{"id": "bw-01", "output": "I don't know what happened, but it looked like the meeting went badly.", "seconds": 1.48}
+{"id": "bw-02", "output": "I can't make it tomorrow; something came up. Sorry.", "seconds": 1.11}
+{"id": "bw-03", "output": "I will definitely be there at 8; don't worry about the rest.", "seconds": 1.15}
+{"id": "bw-04", "output": "The package arrived yesterday but was damaged, so I called customer service.", "seconds": 1.07}
+{"id": "bw-05", "output": "We should have left earlier because the traffic was terrible.", "seconds": 0.96}
+{"id": "bw-06", "output": "He has been working on the report all night, and it is almost done.", "seconds": 1.2}
+{"id": "bw-07", "output": "I appreciate your help a lot with this project.", "seconds": 0.9}
+{"id": "bw-08", "output": "They didn't tell me anything about the schedule change.", "seconds": 0.84}
+{"id": "fr-01", "output": "I'm not sure yet, but maybe Friday could work; if that doesn't work, we could meet sometime next week.", "seconds": 1.34}
+{"id": "fr-02", "output": "Because of the deadline situation.", "seconds": 0.74}
+{"id": "fr-03", "output": "Honestly, it is the best pizza in town; there is no contest.", "seconds": 1.05}
+{"id": "fr-04", "output": "Which explains the delay and the extra cost, sort of.", "seconds": 0.94}
+{"id": "fr-05", "output": "A difficult conversation, one that nobody wanted to have, especially on Monday.", "seconds": 1.09}
+{"id": "fr-06", "output": "I am still waiting on the numbers from finance, again.", "seconds": 0.87}
+{"id": "fr-07", "output": "If the weather holds, which it might not.", "seconds": 0.89}
+{"id": "fr-08", "output": "I have no idea where the file went, but it's probably on the shared drive, maybe.", "seconds": 1.19}
+{"id": "vg-01", "output": "The situation with the previous guy did not proceed as I had hoped.", "seconds": 1.13}
+{"id": "vg-02", "output": "We should address the situation soon before it escalates into a larger issue.", "seconds": 1.23}
+{"id": "vg-03", "output": "The entire situation collapsed due to unforeseen circumstances.", "seconds": 1.12}
+{"id": "vg-04", "output": "You were right about the situation with the man.", "seconds": 1.06}
+{"id": "vg-05", "output": "The situation last week was not great, and we need to handle it.", "seconds": 1.15}
+{"id": "vg-06", "output": "The meeting proceeded without major issues, though some unexpected matters arose, and we will observe the outcome.", "seconds": 1.34}
+{"id": "vg-07", "output": "There are concerns about how the situation is being handled lately, and people are expressing their opinions.", "seconds": 1.29}
+{"id": "vg-08", "output": "It ultimately worked out despite some issues occurring along the way.", "seconds": 1.16}
+{"id": "ro-01", "output": "I woke up late, missed the bus, and forgot my laptop, so the meeting started without me and nobody told me anything.", "seconds": 1.5}
+{"id": "ro-02", "output": "We met the team, the deadline was missed, and nobody said anything, and it kept happening.", "seconds": 1.32}
+{"id": "ro-03", "output": "The report was due on Friday; I sent it on Saturday, my manager noticed it on Monday, and the client heard about it on Tuesday.", "seconds": 1.64}
+{"id": "ro-04", "output": "She finished the slides. He ordered the food. We booked the room. Everyone arrived early. The demo still failed.", "seconds": 1.53}
+{"id": "ro-05", "output": "I called support twice, and I was put on hold both times. The issue is still open, and nobody has followed up.", "seconds": 1.52}
+{"id": "ro-06", "output": "The course covers grammar and style. There are weekly assignments, and the final project is a portfolio.", "seconds": 1.18}
+{"id": "ro-07", "output": "First, we draft the outline. Then, we split the sections. After that, we merge everything. Finally, someone proofreads the whole document.", "seconds": 1.49}
+{"id": "ro-08", "output": "The app runs offline, so your notes never leave the laptop. Updates are optional, and support is provided by email only.", "seconds": 1.37}
+{"id": "ws-01", "output": "The deadline was moved because the project delay was caused by late client feedback.", "seconds": 1.03}
+{"id": "ws-02", "output": "The decision implementation progress review is pending completion status.", "seconds": 0.85}
+{"id": "ws-03", "output": "A schedule conflict exists regarding the meeting room booking for the double calendar invite.", "seconds": 1.01}
+{"id": "ws-04", "output": "Budget approval pending status update email thread reply waiting for manager response.", "seconds": 0.97}
+{"id": "ws-05", "output": "The data analysis results interpretation confusion team discussion clarification requirement has been identified.", "seconds": 0.99}
+{"id": "ws-06", "output": "Negative feedback was received on the client presentation, and a second revision was requested. A scope change was also requested.", "seconds": 1.22}
+{"id": "ws-07", "output": "Training session attendance is low; participation improvement plan creation and responsibility assignment are completed.", "seconds": 1.0}
+{"id": "ws-08", "output": "The system migration downtime window, weekend notification, user communication preparation, and finalization checklist are all ongoing.", "seconds": 1.25}
+{"id": "ta-01", "output": "Last week she said she would call me back, but she never did.", "seconds": 1.06}
+{"id": "ta-02", "output": "The results were not good, and nobody was happy about it.", "seconds": 1.02}
+{"id": "ta-03", "output": "Yesterday they announced the new policy, and everyone complained immediately.", "seconds": 0.98}
+{"id": "ta-04", "output": "He doesn't think the numbers are right, but she believes they are.", "seconds": 0.95}
+{"id": "ta-05", "output": "We were planning to ship on time, but the bug keeps delaying us.", "seconds": 0.92}
+{"id": "ta-06", "output": "When I arrived, she had already left without saying goodbye.", "seconds": 0.84}
+{"id": "ta-07", "output": "The team has finished their part, but the vendor has not delivered theirs yet.", "seconds": 0.95}
+{"id": "ta-08", "output": "Next month, we will launch the feature we have been working on since January.", "seconds": 0.99}
+{"id": "rs-01", "output": "The results came back and were somewhat mixed, but mostly fine, I think.", "seconds": 0.99}
+{"id": "rs-02", "output": "I'm kinda over it, tbh. Like, why bother anymore?", "seconds": 1.03}
+{"id": "rs-03", "output": "lol the demo crashed again, classic. Anyway, I'm sure we'll fix it eventually.", "seconds": 1.15}
+{"id": "rs-04", "output": "The onboarding was confusing, taking me about three hours to figure out the basics.", "seconds": 1.14}
+{"id": "rs-05", "output": "Okay, so the thing is we can't really afford the upgrade right now; maybe next quarter, I don't know.", "seconds": 1.48}
+{"id": "rs-06", "output": "To be honest, the whole process feels a bit rigged; I'm wondering why we even have to fill out these forms.", "seconds": 1.6}
+{"id": "rs-07", "output": "Yeah, the update bricked my laptop lol; I spent all night fixing it, which was super fun times.", "seconds": 1.26}
+{"id": "rs-08", "output": "IMO, the proposal is solid, but the budget part is a bit sketchy; we should double-check it.", "seconds": 1.35}
+{"id": "cn-01", "output": "I never said the report was wrong; I said the numbers were not final.", "seconds": 1.04}
+{"id": "cn-02", "output": "Send the 42.5% summary to Maya Chen by 2026-08-25 or call +1-555-0142.", "seconds": 1.8}
+{"id": "cn-03", "output": "The doctor prescribed 50 mg twice daily after meals.", "seconds": 0.98}
+{"id": "cn-04", "output": "Payment is due within 30 days of invoice receipt; otherwise, service will be suspended.", "seconds": 1.2}
+{"id": "cn-05", "output": "I don't think we should ignore this feedback, even if it is hard to hear.", "seconds": 1.15}
+{"id": "cn-06", "output": "Neither the manager nor the team lead approved the refund of $1,240.50.", "seconds": 1.29}
+{"id": "cn-07", "output": "Do not share the draft outside the company until legal signs off on 12 August.", "seconds": 1.23}
+{"id": "cn-08", "output": "Without the permit, construction cannot legally begin before March 2027.", "seconds": 1.02}
