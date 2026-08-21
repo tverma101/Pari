@@ -1,0 +1,58 @@
+[
+  {
+    "id": "broken-words",
+    "why": "typos + missing apostrophes",
+    "input": "i dont knwo waht happned but it lookd liek the meetign went badlly",
+    "output": "I don't know what happened, but it looked like the meeting went badly.",
+    "seconds": 1.48
+  },
+  {
+    "id": "word-salad",
+    "why": "scrambled syntax",
+    "input": "deadline moved because client feedback late was the reason project delay happened",
+    "output": "Deadline moved because client feedback was late, which was the reason project delay happened.",
+    "seconds": 1.1
+  },
+  {
+    "id": "vague",
+    "why": "vague referents",
+    "input": "the thing with the guy from before didnt really go how i wanted it to go honestly",
+    "output": "The thing with the guy from before didn't really go how I wanted it to go, honestly.",
+    "seconds": 1.25
+  },
+  {
+    "id": "runon",
+    "why": "run-on chain",
+    "input": "I woke up late and I missed the bus and then I forgot my laptop and the meeting started without me and nobody told me anything",
+    "output": "I woke up late, missed the bus, forgot my laptop, and the meeting started without me. Nobody told me anything.",
+    "seconds": 1.4
+  },
+  {
+    "id": "fragment",
+    "why": "fragments",
+    "input": "Not sure. Maybe Friday. If that works. Otherwise next week sometime.",
+    "output": "Not sure. Maybe Friday. If that works. Otherwise, next week sometime.",
+    "seconds": 1.07
+  },
+  {
+    "id": "negation-guard",
+    "why": "must preserve negation",
+    "input": "I never said the report was wrong, I said the numbers were not final.",
+    "output": "I never said the report was wrong. I said the numbers were not final.",
+    "seconds": 1.08
+  },
+  {
+    "id": "anchor-guard",
+    "why": "numbers/names/dates must survive",
+    "input": "Send the 42.5% summary to Maya Chen by 2026-08-25 or call +1-555-0142.",
+    "output": "Send the 42.5% summary to Maya Chen by 2026-08-25 or call +1-555-0142.",
+    "seconds": 1.93
+  },
+  {
+    "id": "formal-shift",
+    "why": "register cleanup",
+    "input": "hey so basically the results came back and they were kinda mixed but mostly fine i think",
+    "output": "So, basically, the results came back and they were kind of mixed but mostly fine, I think.",
+    "seconds": 1.36
+  }
+]
