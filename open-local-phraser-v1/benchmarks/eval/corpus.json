@@ -13,11 +13,11 @@
   },
   "cases": [
     { "id": "bw-01", "category": "broken_words", "input": "i dont knwo waht happned but it lookd liek the meetign went badlly" },
-    { "id": "bw-02", "category": "broken_words", "input": "cant make it tmrw, smth came up sry" },
-    { "id": "bw-03", "category": "broken_words", "input": "i will defiantly be there at 8, dont wory about the rest" },
+    { "id": "bw-02", "category": "broken_words", "input": "cant make it tmrw, smth came up sry", "reference": "I can't make it tomorrow; something came up. Sorry." },
+    { "id": "bw-03", "category": "broken_words", "input": "i will defiantly be there at 8, dont wory about the rest", "reference": "I will definitely be there at 8, so don't worry about the rest." },
     { "id": "bw-04", "category": "broken_words", "input": "the package arived yesturday but it was dammaged so i called costumer service" },
-    { "id": "bw-05", "category": "broken_words", "input": "we shoudl of left eariler becuase the trafic was teribble" },
-    { "id": "bw-06", "category": "broken_words", "input": "hes been workin on teh report all nite, its almost done" },
+    { "id": "bw-05", "category": "broken_words", "input": "we shoudl of left eariler becuase the trafic was teribble", "reference": "We should have left earlier because the traffic was terrible." },
+    { "id": "bw-06", "category": "broken_words", "input": "hes been workin on teh report all nite, its almost done", "reference": "He has been working on the report all night; it's almost done." },
     { "id": "bw-07", "category": "broken_words", "input": "i appriciate ur help alot withnthis project" },
     { "id": "bw-08", "category": "broken_words", "input": "thye didnt tell me nothin about the schdule chnage" },
 
