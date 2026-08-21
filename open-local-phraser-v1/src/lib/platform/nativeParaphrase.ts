@@ -30,9 +30,16 @@ export interface NativeParaphraseRequest {
   /** Ask the native worker for a stricter second editorial pass. */
   repairPass?: boolean;
   temperature?: number;
+  /** Best-of-N: generate up to 4 candidates in one model load; ranked by gates. */
+  candidates?: number;
   styleInstructions?: string;
   styleTweaks?: CustomStyleTweaks;
   styleContext?: NativeStyleContext;
+}
+
+export interface NativeCandidate {
+  text: string;
+  temperature?: number;
 }
 
 interface NativeBridge {
@@ -49,6 +56,7 @@ interface NativeParaphraseResponse {
   text?: unknown;
   durationMs?: unknown;
   modelId?: unknown;
+  candidates?: unknown;
 }
 
 declare global {
@@ -157,7 +165,7 @@ export function nativeParaphraseAvailable(): boolean {
 export async function generateNativeParaphrase(
   request: NativeParaphraseRequest,
   signal?: AbortSignal
-): Promise<{ text: string; durationMs: number; modelId: string }> {
+): Promise<{ text: string; durationMs: number; modelId: string; candidates?: NativeCandidate[] }> {
   const result = await requestNative(request, signal);
   if (result.ok === false) {
     throw new Error(typeof result.error === "string" ? result.error : "The local generative model failed to load.");
@@ -167,9 +175,16 @@ export async function generateNativeParaphrase(
     throw new Error("The local generative model returned no usable paragraph.");
   }
 
+  const candidates = Array.isArray(result.candidates)
+    ? result.candidates
+        .map((candidate) => candidate as NativeCandidate)
+        .filter((candidate) => typeof candidate?.text === "string" && candidate.text.trim())
+    : undefined;
+
   return {
     text: result.text.trim(),
     durationMs: typeof result.durationMs === "number" ? result.durationMs : 0,
-    modelId: typeof result.modelId === "string" ? result.modelId : "Qwen/Qwen3-4B-MLX-4bit",
+    modelId: typeof result.modelId === "string" ? result.modelId : "mlx-community/Qwen3.5-4B-MLX-4bit",
+    ...(candidates && candidates.length > 1 ? { candidates } : {}),
   };
 }

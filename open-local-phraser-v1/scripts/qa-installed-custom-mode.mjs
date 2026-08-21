@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const APP_BINARY = path.join(ROOT_DIR, "release", "Pari.app", "Contents", "MacOS", "OpenLocalPhraserV2");
-const NATIVE_MODEL_DIR = path.join(ROOT_DIR, "native-models", "Qwen", "Qwen3-4B-MLX-4bit");
+const NATIVE_MODEL_DIR = path.join(ROOT_DIR, "native-models", "Qwen", "Qwen3.5-4B-MLX-4bit");
 const BACKEND_TIMEOUT_MS = 30_000;
 const HEADLESS_TIMEOUT_MS = 180_000;
 

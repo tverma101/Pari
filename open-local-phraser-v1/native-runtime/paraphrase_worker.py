@@ -958,6 +958,21 @@ def repair_point_of_view(value: str, request: dict[str, Any]) -> str:
     return repaired
 
 
+def postprocess(text: str, request: dict[str, Any]) -> str:
+    """Shared repair pipeline applied to every candidate."""
+    if looks_like_control_echo(text):
+        raise ValueError("The native model returned editing instructions instead of the rewrite; Pari will use its safe local repair.")
+    text = repair_fragmentary_prose(text, request)
+    text = repair_direct_english(text, request)
+    text = repair_english_grammar(text, request)
+    text = repair_safe_lexical_choices(text)
+    text = repair_discourse_relations(text, request)
+    text = repair_point_of_view(text, request)
+    text = restore_missing_modal_markers(text, request)
+    text = warmth_polish(restore_protected_variants(text, request), request)
+    return text
+
+
 def generate(request: dict[str, Any]) -> None:
     from mlx_lm import load
     from mlx_lm.generate import generate_step
@@ -977,6 +992,10 @@ def generate(request: dict[str, Any]) -> None:
     )
     top_p = 0.86 if strength < 72 else 0.9
     max_tokens = max(96, min(int(request.get("max_tokens", 768)), 1536))
+    # Best-of-N: extra candidates reuse the loaded model, so each additional
+    # generation costs inference only (~1s on M4). The TypeScript layer ranks
+    # them with its meaning/grammar gates and falls back to candidate 0.
+    candidate_count = max(1, min(int(request.get("candidates", 1)), 4))
     started = time.perf_counter()
     model = tokenizer = tokens = sampler = None
 
@@ -984,40 +1003,47 @@ def generate(request: dict[str, Any]) -> None:
         model, tokenizer = load(model_path)
         prompt = render_prompt(tokenizer, build_instruction(request))
         tokens = mx.array(tokenizer.encode(prompt))
-        sampler = make_sampler(temp=temperature, top_p=top_p)
         eos_token_id = getattr(tokenizer, "eos_token_id", None)
-        pieces: list[str] = []
 
-        for token_id, _logprobs in generate_step(
-            tokens,
-            model,
-            sampler=sampler,
-            max_tokens=max_tokens,
-        ):
-            if eos_token_id is not None and int(token_id) == eos_token_id:
-                break
-            piece = tokenizer.decode([int(token_id)], skip_special_tokens=True)
-            if piece:
-                pieces.append(piece)
+        candidates: list[dict[str, Any]] = []
+        for index in range(candidate_count):
+            cand_temp = temperature if index == 0 else min(1.0, round(temperature + 0.22 * index, 2))
+            sampler = make_sampler(temp=cand_temp, top_p=top_p)
+            pieces: list[str] = []
+            for token_id, _logprobs in generate_step(
+                tokens,
+                model,
+                sampler=sampler,
+                max_tokens=max_tokens,
+            ):
+                if eos_token_id is not None and int(token_id) == eos_token_id:
+                    break
+                piece = tokenizer.decode([int(token_id)], skip_special_tokens=True)
+                if piece:
+                    pieces.append(piece)
 
-        text = clean_output("".join(pieces))
-        if looks_like_control_echo(text):
-            raise ValueError("The native model returned editing instructions instead of the rewrite; Pari will use its safe local repair.")
-        text = repair_fragmentary_prose(text, request)
-        text = repair_direct_english(text, request)
-        text = repair_english_grammar(text, request)
-        text = repair_safe_lexical_choices(text)
-        text = repair_discourse_relations(text, request)
-        text = repair_point_of_view(text, request)
-        text = restore_missing_modal_markers(text, request)
-        text = warmth_polish(restore_protected_variants(text, request), request)
-        if not text:
-            raise ValueError("The native generator returned an empty paragraph.")
+            raw_text = clean_output("".join(pieces))
+            try:
+                text = postprocess(raw_text, request)
+            except ValueError as error:
+                if index == 0 and candidate_count == 1:
+                    raise
+                candidates.append({"text": "", "temperature": cand_temp, "error": str(error)})
+                continue
+            if not text:
+                candidates.append({"text": "", "temperature": cand_temp})
+                continue
+            candidates.append({"text": text, "temperature": cand_temp})
+
+        primary = next((c for c in candidates if c.get("text")), None)
+        if primary is None:
+            raise ValueError("The native generator returned no usable paragraph.")
         emit({
             "ok": True,
-            "text": text,
+            "text": primary["text"],
             "duration_ms": round((time.perf_counter() - started) * 1000),
-            "temperature": temperature,
+            "temperature": primary["temperature"],
+            "candidates": candidates,
         })
     finally:
         try:
