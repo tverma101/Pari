@@ -1,165 +1,122 @@
-# Open Local Phraser V2.1
+# Pari
 
-Open Local Phraser V2.1 is a compact macOS phrasing tool with:
+Pari is a local-first paraphrasing tool with shared Personal and Warmth styles. It produces one editable rewrite, offers compact contextual suggestions, repairs malformed prose, and learns only from text the user explicitly approves.
 
-- A local rule-based rewrite engine
-- A static synonym and phrase bank
-- Optional sentence-embedding ranking with `Xenova/all-MiniLM-L6-v2`
-- A bundled macOS desktop wrapper that packages the full web app and local model files
+## Product behavior
 
-This app does not include a generative LLM.
+- One `Paraphrase` action produces one stable draft.
+- The draft is directly editable and can be pasted over.
+- Highlighted words expose up to ten local contextual alternatives.
+- `Save & learn` validates protected content, stores the original/final pair, and updates preference memory.
+- `Discard`, copy, abandoned drafts, and failed approvals save and learn nothing.
+- Generation requests can be cancelled, and stale requests cannot replace newer output.
+- Personal keeps the writer's voice warm, clear, and explanatory. Warmth makes robotic, cynical, or unnecessarily cold wording noticeably more human while preserving honest negative facts and the writer's intent. Both styles use the same learned approval memory and grammar/protection gates.
+- The four-level Rewrite amount control bounds how much wording changes without exposing technical ranking controls.
+- The packaged macOS app includes standard Edit and Window menus, native Command-C/V/X/A shortcuts, Undo/Redo, and an NSPasteboard bridge for the in-app Copy and Paste actions.
 
-## V2.1 Hardening Summary
+## Local persistence
 
-- Vite now builds relative asset URLs so the packaged app can load under `file://`
-- The desktop wrapper loads `Contents/Resources/web/index.html` with directory-wide read access
-- The packaged app logs startup diagnostics for `Resources`, `web/index.html`, `assets/`, and the bundled model directory
-- The frontend shows a visible startup error card if React crashes during boot instead of failing to a blank white screen
-- `Xenova/all-MiniLM-L6-v2` is bundled under `public/models/...` and copied into the packaged app
-- Semantic ranking still lazy-loads and remains optional
-- The app keeps working if semantic loading fails; alternatives fall back to rule-based ranking
+The packaged WKWebView sends approved records and preference memory to the Swift wrapper. The wrapper stores one atomically-written state file under:
 
-## Dev
+```text
+~/Library/Application Support/Open Local Phraser/approved-state.json
+```
+
+Browser development uses IndexedDB only as a local fallback when the native bridge is unavailable. Approved text is never stored in `localStorage`.
+
+## Safety
+
+The protection layer snapshots URLs, email addresses, numbers, dates, times, currency, percentages, citations, quotes, names, list markers, negation, and modality. Generated and edited text must preserve those spans before approval. A candidate that fails validation falls back to the original text.
+
+## Build and verify
 
 ```bash
 npm ci
 npm run models:download
-npm run models:check
-npm run dev
-```
-
-## Model Download And Validation
-
-```bash
-npm run models:download
-npm run models:check
-```
-
-`npm run models:download`:
-
-- Resolves the required Transformers.js files for `Xenova/all-MiniLM-L6-v2`
-- Downloads them into `public/models/Xenova/all-MiniLM-L6-v2/`
-- Writes `manifest.json` for bundled-model detection
-- Skips existing files unless `--force` is passed to `scripts/download-models.mjs`
-
-`npm run models:check`:
-
-- Loads the local bundled model from `public/models/`
-- Runs a real embedding pass on three test sentences
-- Verifies the related-sentence similarity is higher than the unrelated-sentence similarity
-
-Latest local check result:
-
-- Vector length: `384`
-- `similarity(sentence1, sentence2)`: `0.933664`
-- `similarity(sentence1, sentence3)`: `0.058350`
-- Result: `PASS`
-
-## Build The DMG
-
-```bash
-npm ci
-npm run models:download
+npm run models:install                 # optional: connect Qwen outside Pari.app
 npm run models:check
 npm run build
+npm run qa:approval
+npm run qa:native:model
+npm run qa:native:prompt
+npm run benchmark:quality
+npm run research:grammar:download
+npm run research:grammar:check
 npm run build:desktop
 ```
 
-`npm run build:desktop` rebuilds the frontend, validates the bundled MiniLM model again, creates `release/Open Local Phraser V2.app`, and then creates `release/Open Local Phraser V2.dmg`.
+The model downloader restores the eleven pinned local bundles in the
+development checkout: ten ONNX models used for semantic checks, entity
+protection, and contextual word suggestions, plus the Apache-2.0 Qwen3 4B MLX
+4-bit paragraph generator. `npm run models:download` transfers the bundles in
+parallel, writes manifests with SHA-256 hashes, and repairs incomplete or
+corrupt files. `npm run models:download:native` is the explicit opt-in command
+that downloads only Qwen into
+`~/Library/Application Support/Open Local Phraser/Models/`, outside the app.
+`npm run models:install` copies a previously verified checkout model to that
+same external location without downloading it again.
 
-## Model Behavior
+`npm run build` verifies the checkout models before copying the browser models
+into the web bundle. `build:desktop` deliberately does not copy the Qwen
+checkpoint into `Pari.app` or the DMG; it ships only the one-shot native worker.
+At runtime Pari discovers a complete external model through
+`PARI_NATIVE_MODEL_PATH` or the Application Support location above. If it is
+missing, incomplete, unreadable, or the Python/MLX runtime is absent, Pari keeps
+the deterministic local-safe engine active and displays an actionable
+connection message. The packaged app makes no remote model requests by itself.
 
-- Rule-based ranking is the default mode and does not load any embedding model on startup.
-- Semantic ranking only loads when the user enables semantic ranking or runs the model self-test.
-- The app prefers bundled local files first:
-  - `models/Xenova/all-MiniLM-L6-v2/tokenizer.json`
-  - `models/Xenova/all-MiniLM-L6-v2/tokenizer_config.json`
-  - `models/Xenova/all-MiniLM-L6-v2/config.json`
-  - `models/Xenova/all-MiniLM-L6-v2/onnx/model_quantized.onnx`
-- When bundled files are present, the app fetches tokenizer/model artifacts from the local packaged path and uses local ONNX wasm assets from `dist/assets`.
-- If bundled files are missing, the app attempts a remote/cache fallback.
-- If semantic ranking cannot load, the app stays up and the alternatives popup falls back to rule-based ordering.
+`qa:approval` covers protected content, 6–10 synonym choices, grouped edit compression, approval-only preference learning, approved-example retrieval, safe local generation, cancellation-safe APIs, and five warm latency samples.
 
-Offline behavior:
+`qa:native:model` runs local MLX fixtures through the bundled generator: the screenshot-style Personal paragraph, a Warmth register probe, severely broken prose, adversarial “nuclear” notes, protected dates/URLs/emails/currency, meaning-marker guardrails, direct-English filler repair, bookish-negation repair, and quantifier/sentence-boundary repair. One fixture also carries bounded approved style context through the worker. It checks output hygiene, grammar repair, protected anchors, sentence-flow behavior, and noticeable Warmth transformation.
 
-- With bundled model files present, packaged semantic ranking works without downloading from Hugging Face.
-- The preferred and validated V2.1 path is the bundled local model.
-- If bundled files are absent, remote fallback depends on network availability and browser cache state.
+`qa:native:prompt` checks the native prompt contract without loading the checkpoint. It verifies that approved local examples, learned wording preferences, contraction/sentence-shape preferences, and reverted phrases cross the Swift bridge as bounded style context, while the current paragraph remains the only source of facts.
 
-## Troubleshooting
+`benchmark:quality` runs the supplied communication reflection as a 747-word regression fixture alongside 12 varied samples through Personal at four rewrite amounts. It checks protected anchors, sentence-count preservation, obvious collocation/grammar artifacts, lexical change rate, and per-sample latency.
 
-### White Screen In The Packaged App
+`qa:grammar:harper` exercises the bundled offline Harper WASM grammar checker
+against representative agreement and article errors. Harper runs only on the
+edited text, adds diagnostics to Pari's existing hard-rule checks, and fails
+closed to those built-in checks if its optional runtime cannot initialize.
 
-The V2 white-screen root cause was Vite emitting absolute `/assets/...` paths into `dist/index.html`. Under packaged `file://` loading, the app bundle contained the assets, but `WKWebView` could not resolve absolute paths.
+`qa:grammar:ewt` runs the hard grammar validator against 2,000 held-out
+sentences from the pinned UD English EWT test split and enforces bounded
+high/medium-severity rates so new rules do not over-warn clean natural English.
 
-V2.1 fixes:
+`build:desktop` builds the Vite bundle, compiles the Swift/WKWebView wrapper, creates an ad-hoc signed `.app`, and creates a DMG without embedding Qwen, downloading a model, or contacting a remote model service.
 
-- `vite.config.ts` sets `base: "./"`
-- The app bundle copies the full `dist/` folder into `Contents/Resources/web/`
-- `WKWebView` loads `index.html` with:
+`npm run qa:installed` runs the fresh lean packaged app with a hidden,
+accessory-only window. It exercises the real installed UI, the screenshot-style
+paragraph, the disconnected-model fallback, contextual model choices, and
+grammar highlighting without activating, closing, or taking focus from a
+visible Pari window. `npm run qa:installed:connected` runs the same packaged
+app with `PARI_NATIVE_MODEL_PATH` pointed at the separately stored checkout
+model and requires native MLX generation. The wrapper serves the bundle from a
+loopback-only local HTTP origin; its CSP allows only that private origin and the
+app makes no remote model requests.
 
-```swift
-webView.loadFileURL(indexURL, allowingReadAccessTo: webDirectory)
-```
+`npm run qa:installed:missing-model` runs the same hidden installed workflow
+with a deliberately absent native path. It verifies that Pari selects the
+deterministic local-safe-engine fallback and exposes an actionable “model is
+not connected” recovery notice instead of leaving the Paraphrase action dead.
 
-If the packaged app still fails:
+Pari also ships a separate local agent style backend. Run `npm run backend:styles` or `./script/build_and_run.sh --agent-style-backend` to start only the loopback API; it prints an ephemeral `127.0.0.1` URL, persists validated custom styles to `~/Library/Application Support/Open Local Phraser/custom-styles.json`, and exits after ten minutes without activity. Set `PARI_AGENT_STYLE_IDLE_TIMEOUT_SECONDS=60` for a shorter session. This mode does not create a WebKit window or change the visible app's rewrite behavior. The API supports `GET /health`, `GET /v1/styles`, `POST /v1/styles`, `PATCH /v1/styles/:id`, `DELETE /v1/styles/:id`, and `POST /v1/shutdown`. A style body contains `name`, `description`, `instructions`, `baseMode` (`personal` or `warmth`), `strength` (0–100), and optional bounded `tweaks` (`strengthOffset` -24…24, `warmthPolish`, and `preserveSentenceCount`). Saved styles appear as custom modes in Pari on the next load/focus refresh. Every custom mode routes through the same shared protection, grammar, flow, native-model, critic, fallback, and approval-learning engine; custom instructions and tweaks only add bounded preferences. `npm run qa:agent:styles` verifies headless startup, CRUD persistence, validation boundaries, and idle shutdown against the packaged binary. `npm run qa:installed:custom` additionally creates an agent style, launches the installed app headlessly, connects the separately stored model, selects that saved mode, and verifies native MLX generation plus the existing UI probes before cleaning it up.
 
-- Check `Contents/Resources/web/index.html`
-- Check `Contents/Resources/web/assets/`
-- Launch the app binary directly and inspect the startup logs printed by `main.swift`
+The rewrite quality gates also check sentence-flow preservation, known-to-new information order, parallel verb series (including conservative repair of simple mixed gerund lists), vague sentence openings, safe concision of padded phrases, protected spans, approval-only learning, model control-text echoes, duplicate punctuation, note-fragment repair, direct-English filler removal, collocations/verb frames, broad plural-noun and determiner-led sentence-boundary agreement, and a conservative meaning contract for negation, modality, quantity, discourse relationships, and point of view. High-severity hard grammar defects are never accepted in a generated candidate, even when the source already contains a defect of the same class. A rejected native draft receives one stricter local critic/repair pass before the deterministic fallback is used. These checks follow established revision guidance on sentence clarity and purposeful variety from [Purdue OWL](https://owl.purdue.edu/owl/graduate_writing/introduction_to_writing/documents/revising-and-editing/sentence-clarity-transcript.pdf) and cohesion/parallel structure from the [George Mason University Writing Center](https://writingcenter.gmu.edu/writing-resources/grammar-style/improving-cohesion-the-known-new-contract).
 
-### Missing Assets
+`research:grammar:download` fetches four pinned, license-tracked development snapshots in parallel: Harper for rule research alongside the bundled `harper.js` runtime, LanguageTool for broad rule coverage research, GECToR for edit-tagging correction research, and UD English EWT for held-out grammar-flow evaluation. They live under `research/grammar-sources/`, do not receive user text, and the research snapshots are not themselves bundled into the app. See [`research/quality-roadmap.md`](research/quality-roadmap.md) and [`research/grammar-sources/README.md`](research/grammar-sources/README.md) for the 80/20 quality plan and shipping constraints.
 
-Confirm these paths exist in the built app bundle:
+The output editor also runs a local grammar/flow diagnostic after generation and after manual edits. Agreement, quantifier-head agreement, sentence boundaries, article, modal-verb, pronoun-case, repetition, common forms such as “could have”/“a lot,” and similar hard issues receive warning underlines and a short status count; contextual word choices, citation-safe sentence revert, and direct editing remain available.
 
-```text
-Open Local Phraser V2.app/
-  Contents/
-    Resources/
-      web/
-        index.html
-        assets/
-        models/
-```
+## Current backend boundary
 
-### Model Download Failure
-
-- Re-run `npm run models:download`
-- Re-run `npm run models:check`
-- Confirm `public/models/Xenova/all-MiniLM-L6-v2/manifest.json` exists
-- Confirm the packaged app contains `Contents/Resources/web/models/Xenova/all-MiniLM-L6-v2/`
-
-### Semantic Fallback
-
-If semantic ranking fails:
-
-- The app keeps rendering
-- Settings show the failure status and error message
-- Popup alternatives fall back to rule-based ranking instead of crashing
-
-## RAM Budget And Measurements
-
-Targets:
-
-- Base app under `1 GB`
-- Semantic mode under `6 GB`
-
-Measured with local process RSS tooling:
-
-- Packaged app idle, rule-based startup: about `67-69 MB RSS`
-- Headless browser smoke harness, built `dist/` bundle, rule-based after rewrite: about `1.00 GB RSS`
-- Headless browser smoke harness, semantic model ready with bundled MiniLM: about `1.36 GB RSS`
-- Headless browser smoke harness, repeated semantic popup reranking: about `1.31 GB RSS`
-
-Notes:
-
-- The packaged app idle number is from the release `.app` binary launched directly.
-- The semantic-path numbers are from a headless Firefox smoke harness running the exact built `dist/` bundle and bundled MiniLM assets. This terminal session could not surface an onscreen `WKWebView` window, so direct packaged-app semantic RSS could not be sampled here.
-- The measured semantic path stayed well below the `6 GB` cap.
-
-## Known Limitations
-
-- No generative model support
-- No OpenAI, Ollama, LM Studio, RAG, training, or document import/export features
-- Remote fallback is best-effort when bundled files are absent; the bundled local path is the validated production path
-- The footer keeps showing semantic status even when popup ranking has fallen back to rule-based ordering after a model failure
+The primary desktop path is an optional external Qwen/Qwen3-4B-MLX-4bit
+checkpoint launched through the one-shot local MLX worker. The worker is
+isolated from WebKit, receives the selected style, repairs malformed prose, and
+never receives remote requests. The packaged app contains no Qwen weights. It
+looks first at `PARI_NATIVE_MODEL_PATH`, then at
+`~/Library/Application Support/Open Local Phraser/Models/native-models/Qwen/Qwen3-4B-MLX-4bit`,
+and retains compatibility with older development bundles. If the model is not
+connected, Python/MLX is absent, generation times out, or a draft fails
+protected-content/grammar/flow gates, Pari explains the failure and uses the
+bounded `local-safe-engine` fallback. The fallback remains intentionally
+conservative and cannot match the native model on open-ended structural repair.

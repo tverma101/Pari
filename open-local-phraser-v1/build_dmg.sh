@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-APP_NAME="Open Local Phraser V2"
+APP_NAME="Pari"
 EXECUTABLE="OpenLocalPhraserV2"
 BUNDLE_ID="com.tejas.openlocalphraser"
-APP_VERSION="0.2.1"
+APP_VERSION="0.3.0"
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 FRONTEND_DIST="$ROOT_DIR/dist"
 PACKAGING_DIR="$ROOT_DIR/.mac-build"
@@ -19,21 +19,11 @@ CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
 WEB_DIR="$RESOURCES_DIR/web"
+NATIVE_RUNTIME_DIR="$ROOT_DIR/native-runtime"
 
 echo "==> Installing frontend dependencies"
 cd "$ROOT_DIR"
 npm ci
-
-echo "==> Checking bundled local model stack"
-if npm run models:check; then
-  echo "==> Using existing bundled local model stack"
-else
-  echo "==> Existing model check failed; downloading bundled local model stack"
-  npm run models:download
-
-  echo "==> Validating bundled local model stack"
-  npm run models:check
-fi
 
 echo "==> Building frontend"
 npm run build
@@ -49,12 +39,22 @@ mkdir -p "$BUILD_DIR" "$MACOS_DIR" "$WEB_DIR"
 
 echo "==> Compiling Swift wrapper"
 /usr/bin/swiftc -O \
-  -framework AppKit -framework Foundation -framework WebKit \
+  -framework AppKit -framework Foundation -framework Network -framework WebKit \
   "$ROOT_DIR/Sources/OpenLocalPhraser/main.swift" \
+  "$ROOT_DIR/Sources/OpenLocalPhraser/AgentStyleBackend.swift" \
   -o "$BUILD_DIR/$EXECUTABLE"
 
 echo "==> Copying web bundle"
 cp -R "$FRONTEND_DIST/." "$WEB_DIR/"
+
+echo "==> Copying native paraphrase worker (model connects after install)"
+mkdir -p "$RESOURCES_DIR/native-runtime"
+cp "$NATIVE_RUNTIME_DIR/paraphrase_worker.py" "$RESOURCES_DIR/native-runtime/"
+
+echo "==> Generating Pari app icon"
+ICONSET_DIR="$BUILD_DIR/Pari.iconset"
+/usr/bin/swift "$ROOT_DIR/scripts/generate-app-icon.swift" "$ICONSET_DIR"
+/usr/bin/iconutil -c icns -o "$RESOURCES_DIR/Pari.icns" "$ICONSET_DIR"
 
 echo "==> Writing Info.plist"
 cat > "$CONTENTS_DIR/Info.plist" <<EOF
@@ -71,6 +71,8 @@ cat > "$CONTENTS_DIR/Info.plist" <<EOF
     <string>$APP_NAME</string>
     <key>CFBundleDisplayName</key>
     <string>$APP_NAME</string>
+    <key>CFBundleIconFile</key>
+    <string>Pari.icns</string>
     <key>CFBundleVersion</key>
     <string>$APP_VERSION</string>
     <key>CFBundleShortVersionString</key>
@@ -81,6 +83,8 @@ cat > "$CONTENTS_DIR/Info.plist" <<EOF
     <string>13.0</string>
     <key>NSHighResolutionCapable</key>
     <true/>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
 </dict>
 </plist>
 EOF

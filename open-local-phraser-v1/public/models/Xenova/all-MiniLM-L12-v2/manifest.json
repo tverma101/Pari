@@ -3,7 +3,7 @@
   "task": "feature-extraction",
   "role": "secondary-meaning",
   "dtype": "q8",
-  "downloadedAt": "2026-06-30T23:19:02.152Z",
+  "downloadedAt": "2026-08-09T19:25:44.740Z",
   "files": [
     "config.json",
     "onnx/model_quantized.onnx",
@@ -11,5 +11,13 @@
     "tokenizer_config.json",
     "special_tokens_map.json",
     "vocab.txt"
-  ]
+  ],
+  "sha256": {
+    "config.json": "98cfb098e4f623321632b32b3e62d58ea49601e90dd3c13736c42812b4533ab7",
+    "onnx/model_quantized.onnx": "f51725bc66b2bf5335cacb5c005763b57bcd741172372795819741cd945a9dd9",
+    "tokenizer.json": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0",
+    "tokenizer_config.json": "9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3",
+    "special_tokens_map.json": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+    "vocab.txt": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+  }
 }

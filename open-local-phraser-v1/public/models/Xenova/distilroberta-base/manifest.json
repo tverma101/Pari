@@ -3,7 +3,7 @@
   "task": "fill-mask",
   "role": "mask-suggestions",
   "dtype": "q8",
-  "downloadedAt": "2026-06-30T23:21:01.164Z",
+  "downloadedAt": "2026-08-09T19:25:53.982Z",
   "files": [
     "config.json",
     "onnx/model_quantized.onnx",
@@ -12,5 +12,14 @@
     "special_tokens_map.json",
     "merges.txt",
     "vocab.json"
-  ]
+  ],
+  "sha256": {
+    "config.json": "0810a13fb22e93f12d878c7ae578199987960899c82d47809f18090c824b3c87",
+    "onnx/model_quantized.onnx": "83ace14b3376ef74309dc5d4703471ebe1946fe796c93a0e8fc892f455ffb473",
+    "tokenizer.json": "1649e42e2e4cc707159be564b62216cd3c21a0225fad65b04bed94477dd79083",
+    "tokenizer_config.json": "f64a0b9cc0e15d4c5db67d76c8bdd6bfa414c68a4f355e90116b109fe0bde972",
+    "special_tokens_map.json": "06e405a36dfe4b9604f484f6a1e619af1a7f7d09e34a8555eb0b77b66318067f",
+    "merges.txt": "1ce1664773c50f3e0cc8842619a93edc4624525b728b188a9e0be33b7726adc5",
+    "vocab.json": "ed19656ea1707df69134c4af35c8ceda2cc9860bf2c3495026153a133670ab5e"
+  }
 }

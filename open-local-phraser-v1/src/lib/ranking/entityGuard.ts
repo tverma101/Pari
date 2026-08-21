@@ -32,6 +32,7 @@ const asyncifyWasmBinaryUrl = new URL(
   "../../../node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm",
   import.meta.url
 ).href;
+let localWasmModuleURL: string | null = null;
 
 let classifier: TokenClassifier | null = null;
 let pendingLoad: Promise<TokenClassifier> | null = null;
@@ -80,12 +81,24 @@ function isSafariBrowser(): boolean {
   );
 }
 
-function getBrowserModelRoot(): string {
-  return new URL("./models/", window.location.href).href;
+function isLocalNativeRuntime(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 }
 
-function getWasmPaths(): { mjs: string; wasm: string } {
-  return isSafariBrowser()
+function getBrowserModelRoot(): string {
+  const modelRoot = new URL("./models/", window.location.href);
+  return modelRoot.protocol === "app:" ? modelRoot.href : modelRoot.pathname;
+}
+
+function getBrowserModelPath(modelId: string): string {
+  if (typeof window === "undefined") return modelId;
+  const modelPath = new URL(`./models/${modelId}/`, window.location.href);
+  return modelPath.protocol === "app:" ? modelPath.href : modelPath.pathname;
+}
+
+async function getWasmPaths(): Promise<{ mjs: string; wasm: string }> {
+  const paths = isSafariBrowser() && !isLocalNativeRuntime()
     ? {
         mjs: safariWasmModuleUrl,
         wasm: safariWasmBinaryUrl,
@@ -94,6 +107,24 @@ function getWasmPaths(): { mjs: string; wasm: string } {
         mjs: asyncifyWasmModuleUrl,
         wasm: asyncifyWasmBinaryUrl,
       };
+
+  if (!isLocalNativeRuntime() || localWasmModuleURL) {
+    return { ...paths, ...(localWasmModuleURL ? { mjs: localWasmModuleURL } : {}) };
+  }
+
+  try {
+    const response = await fetch(paths.mjs, { cache: "no-store" });
+    if (response.ok) {
+      localWasmModuleURL = URL.createObjectURL(
+        new Blob([await response.text()], { type: "text/javascript" })
+      );
+      return { ...paths, mjs: localWasmModuleURL };
+    }
+  } catch {
+    // Keep the direct bundle URL so the runtime can report its normal failure.
+  }
+
+  return paths;
 }
 
 async function configureEnvironment(transformers: TransformersModule): Promise<void> {
@@ -101,15 +132,22 @@ async function configureEnvironment(transformers: TransformersModule): Promise<v
   env.logLevel = LogLevel.ERROR;
   env.allowLocalModels = true;
   env.allowRemoteModels = false;
-  env.useBrowserCache = true;
+  env.useBrowserCache = window.location.hostname !== "127.0.0.1";
   env.localModelPath = getBrowserModelRoot();
+  if (typeof window.fetch === "function") {
+    const nativeFetch = window.fetch.bind(window);
+    env.fetch = (input, init) => nativeFetch(
+      typeof input === "string" ? new URL(input, window.location.href) : input,
+      init
+    );
+  }
   const onnxEnvironment = env.backends.onnx as {
     wasm?: {
       wasmPaths?: { mjs: string; wasm: string };
     };
   };
   onnxEnvironment.wasm ??= {};
-  onnxEnvironment.wasm.wasmPaths = getWasmPaths();
+  onnxEnvironment.wasm.wasmPaths = await getWasmPaths();
 }
 
 async function loadClassifier(): Promise<TokenClassifier> {
@@ -119,7 +157,7 @@ async function loadClassifier(): Promise<TokenClassifier> {
   pendingLoad = (async () => {
     const transformers = await import("@huggingface/transformers");
     await configureEnvironment(transformers);
-    const loaded = await transformers.pipeline("token-classification", ENTITY_GUARD_MODEL_ID, {
+    const loaded = await transformers.pipeline("token-classification", getBrowserModelPath(ENTITY_GUARD_MODEL_ID), {
       dtype: "q8",
       local_files_only: true,
     });

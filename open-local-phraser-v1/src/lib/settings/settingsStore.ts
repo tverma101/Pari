@@ -1,73 +1,18 @@
-import type { RankingProvider, SemanticModelId } from "@/lib/ranking/types";
-import type { RewriteMode, ThemePreference } from "@/lib/types";
-
-export const STRENGTH_STEPS = [
-  { id: "minimal", label: "Minimal", value: 12 },
-  { id: "light", label: "Light", value: 28 },
-  { id: "balanced", label: "Balanced", value: 48 },
-  { id: "strong", label: "Strong", value: 72 },
-  { id: "max", label: "Max", value: 94 },
-] as const;
+import type { AppMode, RewriteMode, ThemePreference } from "@/lib/types";
 
 export interface AppSettings {
   theme: ThemePreference;
-  mode: RewriteMode;
+  mode: AppMode;
   strength: number;
-  freezeWords: string;
-  rememberFreezeWords: boolean;
-  rankingProvider: RankingProvider;
-  semanticModel: SemanticModelId;
-  compactMode: boolean;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: "light",
-  mode: "standard",
-  strength: 45,
-  freezeWords: "",
-  rememberFreezeWords: true,
-  rankingProvider: "embedding",
-  semanticModel: "Xenova/paraphrase-MiniLM-L6-v2",
-  compactMode: true,
+  mode: "personal",
+  strength: 56,
 };
 
 const STORAGE_KEY = "open-local-phraser-v2.settings";
-
-function isMode(value: unknown): value is RewriteMode {
-  return (
-    value === "standard" ||
-    value === "fluency" ||
-    value === "formal" ||
-    value === "simple" ||
-    value === "creative" ||
-    value === "shorten"
-  );
-}
-
-function isRankingProvider(value: unknown): value is RankingProvider {
-  return value === "rule-based" || value === "embedding";
-}
-
-function isSemanticModel(value: unknown): value is SemanticModelId {
-  return (
-    value === "Xenova/paraphrase-mpnet-base-v2" ||
-    value === "Xenova/paraphrase-MiniLM-L6-v2" ||
-    value === "Xenova/all-mpnet-base-v2" ||
-    value === "Xenova/bge-base-en-v1.5" ||
-    value === "Xenova/bge-small-en-v1.5" ||
-    value === "Xenova/all-MiniLM-L6-v2" ||
-    value === "Xenova/all-MiniLM-L12-v2"
-  );
-}
-
-function normalizeStrength(value: unknown): number {
-  const numeric = typeof value === "number" ? value : Number(value);
-  if (!Number.isFinite(numeric)) return DEFAULT_SETTINGS.strength;
-  const clamped = Math.min(100, Math.max(0, Math.round(numeric)));
-  return STRENGTH_STEPS.reduce((best, step) => {
-    return Math.abs(step.value - clamped) < Math.abs(best.value - clamped) ? step : best;
-  }, STRENGTH_STEPS[0]).value;
-}
 
 function readRaw(): Partial<AppSettings> | null {
   if (typeof window === "undefined") return null;
@@ -80,14 +25,32 @@ function readRaw(): Partial<AppSettings> | null {
   }
 }
 
+const LEGACY_REWRITE_MODES: AppMode[] = [
+  "personal",
+  "warmth",
+  "standard",
+  "fluency",
+  "warm",
+  "formal",
+  "simple",
+  "creative",
+  "expand",
+  "shorten",
+];
+
+export function normalizeStoredRewriteMode(value: unknown): AppMode {
+  if (value === "warmth") return "warmth";
+  if (typeof value === "string" && /^custom:[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(value)) {
+    return value as AppMode;
+  }
+  return typeof value === "string" && LEGACY_REWRITE_MODES.includes(value as RewriteMode)
+    ? "personal"
+    : DEFAULT_SETTINGS.mode;
+}
+
 export function loadSettings(): AppSettings {
   const raw = readRaw();
   if (!raw) return DEFAULT_SETTINGS;
-
-  const rememberFreezeWords =
-    typeof raw.rememberFreezeWords === "boolean"
-      ? raw.rememberFreezeWords
-      : DEFAULT_SETTINGS.rememberFreezeWords;
 
   return {
     theme:
@@ -96,20 +59,11 @@ export function loadSettings(): AppSettings {
         : raw.theme === "light"
           ? "light"
           : DEFAULT_SETTINGS.theme,
-    mode: isMode(raw.mode) ? raw.mode : DEFAULT_SETTINGS.mode,
-    strength: normalizeStrength(raw.strength),
-    freezeWords:
-      rememberFreezeWords && typeof raw.freezeWords === "string" ? raw.freezeWords : "",
-    rememberFreezeWords,
-    rankingProvider: isRankingProvider(raw.rankingProvider)
-      ? raw.rankingProvider
-      : DEFAULT_SETTINGS.rankingProvider,
-    semanticModel:
-      isSemanticModel(raw.semanticModel) &&
-      raw.semanticModel === DEFAULT_SETTINGS.semanticModel
-        ? raw.semanticModel
-        : DEFAULT_SETTINGS.semanticModel,
-    compactMode: typeof raw.compactMode === "boolean" ? raw.compactMode : DEFAULT_SETTINGS.compactMode,
+    mode: normalizeStoredRewriteMode(raw.mode),
+    strength:
+      typeof raw.strength === "number"
+        ? Math.min(100, Math.max(0, raw.strength))
+        : DEFAULT_SETTINGS.strength,
   };
 }
 
@@ -119,10 +73,7 @@ export function saveSettings(settings: AppSettings): void {
   try {
     window.localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({
-        ...settings,
-        freezeWords: settings.rememberFreezeWords ? settings.freezeWords : "",
-      })
+      JSON.stringify(settings)
     );
   } catch {
     // localStorage remains best-effort in the desktop shell.

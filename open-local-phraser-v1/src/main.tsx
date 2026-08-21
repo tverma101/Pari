@@ -15,6 +15,15 @@ function formatErrorDetails(error: unknown): string {
     return error.stack || error.message;
   }
 
+  if (error && typeof error === "object") {
+    try {
+      const serialized = JSON.stringify(error, Object.getOwnPropertyNames(error));
+      if (serialized && serialized !== "{}") return serialized;
+    } catch {
+      // Fall through to a safe string representation for host objects.
+    }
+  }
+
   return String(error);
 }
 
@@ -77,7 +86,7 @@ class StartupErrorBoundary extends Component<{ children: ReactNode }, { error: E
     if (this.state.error) {
       return (
         <StartupErrorCard
-          title="Open Local Phraser could not start"
+          title="Pari could not start"
           details={formatErrorDetails(this.state.error)}
         />
       );
@@ -90,7 +99,7 @@ class StartupErrorBoundary extends Component<{ children: ReactNode }, { error: E
 window.addEventListener("error", (event) => {
   const error = event.error ?? new Error(event.message);
   if (startupGuardActive) {
-    renderStartupError("Open Local Phraser could not start", formatErrorDetails(error));
+    renderStartupError("Pari could not start", formatErrorDetails(error));
     return;
   }
 
@@ -101,13 +110,13 @@ window.addEventListener("unhandledrejection", (event) => {
   const reason = event.reason ?? "Unhandled promise rejection";
   if (startupGuardActive) {
     renderStartupError(
-      "Open Local Phraser could not start",
+      "Pari could not start",
       formatErrorDetails(reason)
     );
     return;
   }
 
-  console.error("Unhandled runtime rejection", reason);
+  console.error("Unhandled runtime rejection", formatErrorDetails(reason));
 });
 
 const rootElement = document.getElementById("root");
@@ -128,5 +137,5 @@ try {
     startupGuardActive = false;
   }, 0);
 } catch (error) {
-  renderStartupError("Open Local Phraser could not start", formatErrorDetails(error));
+  renderStartupError("Pari could not start", formatErrorDetails(error));
 }

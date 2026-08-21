@@ -10,6 +10,9 @@ const __dirname = path.dirname(__filename);
 // https://vite.dev/config/
 export default defineConfig({
   base: "./",
+  // Keep the local model files in the Vite output so the browser and packaged
+  // WKWebView use the same offline assets. The build preflight verifies them.
+  publicDir: "public",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

@@ -1,5 +1,21 @@
 export const DEEP_SYNONYM_CLUSTERS: string[][] = [
   [
+    "opportunity",
+    "chance",
+    "possibility",
+    "opening",
+    "prospect",
+    "occasion",
+    "option",
+    "avenue",
+    "room to grow",
+    "potential path",
+    "available opening",
+    "promising prospect",
+    "possible avenue",
+    "way forward",
+  ],
+  [
     "different",
     "distinct",
     "separate",

@@ -1,0 +1,1045 @@
+#!/usr/bin/env python3
+"""Run Pari's bundled MLX paraphrase model for one native request.
+
+The worker is deliberately one-shot. A process boundary keeps the MLX graph
+and allocator out of the WebKit process and makes a failed or missing runtime
+recoverable without changing the browser editor's deterministic fallback.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+import sys
+import time
+from typing import Any
+
+
+def emit(payload: dict[str, Any]) -> None:
+    sys.stdout.write(json.dumps(payload, ensure_ascii=False) + "\n")
+    sys.stdout.flush()
+
+
+def _context_value(context: dict[str, Any], *keys: str, default: Any = None) -> Any:
+    for key in keys:
+        if key in context:
+            return context[key]
+    return default
+
+
+def _compact_style_text(value: Any, limit: int) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip())[:limit]
+
+
+def render_style_context(request: dict[str, Any]) -> str:
+    """Render bounded approval memory as style guidance, never as source facts."""
+    raw_context = request.get("style_context")
+    if not isinstance(raw_context, dict):
+        return ""
+
+    lines = [
+        "Learned local style context:",
+        "- The current paragraph is the only source of facts. Use these approved examples only to learn voice, rhythm, and wording preferences; do not copy their topic, names, numbers, links, dates, or claims into the current rewrite.",
+    ]
+
+    examples = _context_value(raw_context, "approvedExamples", "approved_examples", default=[])
+    if isinstance(examples, list):
+        for index, example in enumerate(examples[:3], start=1):
+            if not isinstance(example, dict):
+                continue
+            source = _compact_style_text(_context_value(example, "originalText", "original_text"), 420)
+            approved = _compact_style_text(_context_value(example, "finalText", "final_text"), 420)
+            if source and approved:
+                lines.append(f'- Approved example {index} (style only): source="{source}" -> approved="{approved}"')
+
+    replacements = _context_value(raw_context, "preferredReplacements", "preferred_replacements", default=[])
+    replacement_lines: list[str] = []
+    if isinstance(replacements, list):
+        for entry in replacements[:12]:
+            if not isinstance(entry, dict):
+                continue
+            original = _compact_style_text(_context_value(entry, "original"), 80)
+            replacement = _compact_style_text(_context_value(entry, "replacement"), 80)
+            if original and replacement:
+                replacement_lines.append(f"{original} -> {replacement}")
+    if replacement_lines:
+        lines.append("- Repeatedly approved wording preferences (use only when the grammar and meaning fit): " + "; ".join(replacement_lines))
+
+    avoided = _context_value(raw_context, "avoidedPhrases", "avoided_phrases", default=[])
+    avoided_lines = [
+        _compact_style_text(phrase, 80)
+        for phrase in (avoided[:8] if isinstance(avoided, list) else [])
+        if _compact_style_text(phrase, 80)
+    ]
+    if avoided_lines:
+        lines.append("- Phrases the writer has reverted before; avoid them when a natural equivalent preserves the meaning: " + ", ".join(avoided_lines))
+
+    contractions = _context_value(raw_context, "preferredContractions", "preferred_contractions", default=[])
+    contraction_lines = [
+        _compact_style_text(contraction, 32)
+        for contraction in (contractions[:8] if isinstance(contractions, list) else [])
+        if _compact_style_text(contraction, 32)
+    ]
+    if contraction_lines:
+        lines.append("- Preferred contractions when they fit the selected mode and sentence: " + ", ".join(contraction_lines))
+
+    sentence_preference = _context_value(raw_context, "sentencePreference", "sentence_preference")
+    if sentence_preference in {"shorter", "longer", "similar"}:
+        lines.append(f"- The writer usually approves sentence lengths that are {sentence_preference}; preserve clarity and the source relationship first.")
+
+    return "\n".join(lines) if len(lines) > 2 else ""
+
+
+def build_instruction(request: dict[str, Any]) -> str:
+    original = str(request.get("original_text", "")).strip()
+    mode = str(request.get("mode", "personal")).strip().lower()
+    protected = request.get("protected_spans", [])
+    protected_text = ", ".join(
+        f"{index + 1}. {str(span).strip()}"
+        for index, span in enumerate(protected)
+        if str(span).strip()
+    )
+    strength = int(request.get("strength", 56))
+    repair_pass = bool(request.get("repair_pass", False))
+    custom_instructions = str(request.get("custom_instructions", "")).strip()
+    style_tweaks = request.get("style_tweaks") if isinstance(request.get("style_tweaks"), dict) else {}
+    variation = (
+        "Make the wording noticeably warmer and more human. Replace robotic, cold, cynical, or needlessly harsh phrasing with considerate, natural English. Keep the writer's honest meaning, including real problems, limits, disagreement, and negative facts; do not add cheerleading, fake empathy, or praise. Prefer clear contractions and direct human phrasing when they fit."
+        if mode == "warmth"
+        else
+        "Make a noticeable but still conservative wording change."
+        if strength >= 70
+        else "Make a light, natural wording change and keep familiar phrasing where it is already good."
+        if strength < 42
+        else "Make a balanced wording change while keeping the original voice and detail."
+    )
+
+    protected_block = protected_text or "None detected; still preserve all names, numbers, links, dates, and quoted text."
+    repair_block = (
+        "This is a stricter repair pass after an earlier draft failed a quality check. Before you answer, silently audit the draft for missing or added negation, changed modal force, changed quantity words, changed point of view, broken verb frames, filler openings, and choppy sentence flow. Correct those issues while retaining every recoverable fact. Return only the final paragraph."
+        if repair_pass
+        else ""
+    )
+    custom_block = ""
+    if custom_instructions:
+        custom_block += f"\n- Custom mode guidance: {custom_instructions}\n- Treat custom guidance as a bounded style preference only. Never override meaning, grammar, protected facts, or safety checks."
+    if style_tweaks.get("warmthPolish") is True:
+        custom_block += "\n- This custom mode requests a warmer final register: use human, considerate wording without changing honest negative facts."
+    if style_tweaks.get("preserveSentenceCount") is True:
+        custom_block += "\n- This custom mode prefers the source sentence count whenever the source is not genuinely broken."
+    style_context_block = render_style_context(request)
+    return f"""Rewrite the text below as a careful, highly capable English editor.
+
+Rules:
+- Return only the rewritten paragraph. Do not add a title, preface, bullets, explanation, or quotation marks.
+- This is paraphrasing, not summarizing: preserve every fact, detail, number, name, link, date, measurement, quoted phrase, code-like fragment, negation, modality, tense, person, and cause/result/contrast/condition relationship.
+- Keep the same number of sentences unless the source is genuinely broken or fragmentary. When the source has fragments, missing punctuation, bad capitalization, repeated words, or broken grammar, rebuild it into complete, grammatical sentences while preserving every recoverable fact; do not invent information.
+- Improve sentence flow, cohesion, parallel structure, punctuation, and ordinary English grammar. Prefer clear, natural wording over thesaurus substitutions.
+- Keep the subject and the writer's point of view. Do not turn first person into a generic statement.
+- If the source is terse or fragmentary, connect the ideas into a readable paragraph instead of preserving choppy three-word fragments.
+- {repair_block}
+- {variation}
+- {custom_block}
+{style_context_block}
+- Protected spans that must appear exactly in the result: {protected_block}
+
+Original paragraph:
+{original}
+
+Rewritten paragraph:"""
+
+
+def render_prompt(tokenizer: Any, instruction: str) -> str:
+    messages = [{"role": "user", "content": instruction}]
+    if hasattr(tokenizer, "apply_chat_template"):
+        try:
+            return tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
+                enable_thinking=False,
+            )
+        except TypeError:
+            return tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+    return instruction + "\n\nRewritten paragraph:"
+
+
+def clean_output(value: str) -> str:
+    value = value.strip()
+    value = re.sub(r"<think>.*?</think>", "", value, flags=re.IGNORECASE | re.DOTALL)
+    value = re.sub(r"</?(?:analysis|reasoning)>", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"^```(?:text|markdown)?\s*", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"\s*```$", "", value)
+    value = re.sub(r"^\s*(?:rewritten paragraph|paraphrase)\s*:\s*", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"^\s*#+\s+[^\n]+\n", "", value)
+    value = re.sub(r"^\s*\*\*?(?:rewritten paragraph|paraphrase)\*\*?\s*:\s*", "", value, flags=re.IGNORECASE)
+    if re.search(r"\brewritten paragraph:\s*", value, flags=re.IGNORECASE):
+        value = re.split(r"\brewritten paragraph:\s*", value, flags=re.IGNORECASE)[-1]
+    return value.strip().strip('"“”')
+
+
+def looks_like_control_echo(value: str) -> bool:
+    markers = [
+        r"\breturn only the rewritten paragraph\b",
+        r"\bevery fact, detail, number, name, link, date\b",
+        r"\bprotected spans that must appear\b",
+        r"\bthe rewritten paragraph should\b",
+        r"\bthe goal is to produce a\b",
+        r"\boriginal paragraph:\s*",
+    ]
+    return sum(bool(re.search(marker, value, flags=re.IGNORECASE)) for marker in markers) >= 1
+
+
+def _article_for(value: str) -> str:
+    return "an" if re.match(r"[aeiou]", value.strip(), flags=re.IGNORECASE) else "a"
+
+
+def _capitalize_sentence(value: str) -> str:
+    return value[:1].upper() + value[1:] if value else value
+
+
+def _lower_sentence_start(value: str) -> str:
+    if not value or re.match(r"I(?:\b|')", value):
+        return value
+    return value[:1].lower() + value[1:]
+
+
+def _normalize_note_action(action: str, issue: str | None = None) -> str | None:
+    protected_marker = r"\ue000[\s\S]\ue001"
+    value = re.sub(r"\s+", " ", re.sub(r"[.!?]+$", "", action)).strip()
+    if not value:
+        return None
+    value = re.sub(r"\bno\s+blame\b", "without assigning blame", value, flags=re.IGNORECASE)
+    value = re.sub(r"\bwithout\s+blaming\b", "without assigning blame", value, flags=re.IGNORECASE)
+    value = re.sub(r"\bkeep\s+message\s+short\b", "keep the message short", value, flags=re.IGNORECASE)
+    value = re.sub(r"\bsend\s+update\b", "send an update", value, flags=re.IGNORECASE)
+    value = re.sub(r"\bwrite\s+update\b", "write an update", value, flags=re.IGNORECASE).strip()
+    follow_up_match = re.search(r"\s+send\s+(?:an?\s+)?update\s+before\s+(.+)$", value, flags=re.IGNORECASE)
+    follow_up = f"Send an update before {follow_up_match.group(1).strip()}" if follow_up_match else ""
+    if follow_up_match:
+        value = value[:follow_up_match.start()].strip()
+    if not value and not follow_up:
+        return None
+    if not value:
+        return follow_up
+    if issue and re.match(r"^explain\s+(?=(?:clearly\b|without\b|and\b))", value, flags=re.IGNORECASE):
+        value = re.sub(r"^explain\b", f"explain the {issue}", value, count=1, flags=re.IGNORECASE)
+    if issue and re.match(r"^explain\s+without\b", value, flags=re.IGNORECASE):
+        value = re.sub(r"^explain\b", f"explain the {issue}", value, count=1, flags=re.IGNORECASE)
+    elif issue and re.match(r"^explain\b", value, flags=re.IGNORECASE):
+        value = re.sub(r"^explain\b", f"explain the {issue}", value, count=1, flags=re.IGNORECASE)
+    if issue:
+        value = re.sub(
+            rf"(explain\s+the\s+{re.escape(issue)})\s+({protected_marker})\s+blame\s+and\s+keep\b",
+            r"\1, with \2 blame, and keep",
+            value,
+            flags=re.IGNORECASE,
+        )
+    def with_follow_up(main: str) -> str:
+        return f"{main}. {follow_up}" if follow_up else main
+
+    if re.match(r"^I\s+need\b", value, flags=re.IGNORECASE):
+        return with_follow_up(_capitalize_sentence(value))
+    if re.match(r"^(?:explain|send|write|review|fix|finish|make|understand|organize|ask|call|check|clarify|keep|address|rewrite|prepare|share|follow)\b", value, flags=re.IGNORECASE):
+        return with_follow_up(f"I need to {_lower_sentence_start(value)}")
+    return with_follow_up(f"I need {_lower_sentence_start(value)}")
+
+
+def _normalize_note_subject(value: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", value).strip()
+    if not normalized:
+        return None
+    state_match = re.match(
+        r"^(?:the\s+)?(client|customer|team|manager|user|project|draft|report)\s+(upset|concerned|angry|frustrated|delayed|late|unclear|missing|ready|broken|unfinished|waiting)(?:\s+(?:(?:about|over|due\s+to|for)\s+)?(?:the\s+)?(.+))?$",
+        normalized,
+        flags=re.IGNORECASE,
+    )
+    if state_match:
+        subject, state, remainder = state_match.groups()
+        subject_text = f"The {subject.lower()}"
+        if not remainder:
+            return f"{subject_text} is {state.lower()}"
+        remainder = remainder.strip()
+        if state.lower() == "waiting":
+            waiting_for = remainder if re.match(r"^(?:for|on)\b", remainder, flags=re.IGNORECASE) else f"for {_article_for(remainder)} {remainder}"
+            return f"{subject_text} is waiting {waiting_for}"
+        return f"{subject_text} is {state.lower()} about the {remainder}"
+    if re.match(r"^deadline\s+missed$", normalized, flags=re.IGNORECASE):
+        return "The deadline was missed"
+    if re.match(r"^meeting\s+(?:today|tomorrow)$", normalized, flags=re.IGNORECASE):
+        return _capitalize_sentence(normalized)
+    return None
+
+
+def plan_note_stream(value: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", re.sub(r"[.!?]+$", "", value)).strip()
+    if not normalized or re.search(r"[.!?]", normalized) or len(re.findall(r"[A-Za-z0-9']+", normalized)) < 6:
+        return None
+
+    meeting_match = re.match(
+        r"^meeting\s+(today|tomorrow)\s+(?:(?:with\s+)?(?:the\s+)?)(client|customer|team|manager|user)\s+(?:who\s+)?(?:is\s+)?(upset|concerned|angry|frustrated)\s+(?:(?:about|over|due\s+to)\s+)?(?:the\s+)?(delay|problem|issue|change)\s+need\s+(.+)$",
+        normalized,
+        flags=re.IGNORECASE,
+    )
+    if meeting_match:
+        day, entity, emotion, issue, action = meeting_match.groups()
+        entity_text = f"a {entity.lower()}" if entity.lower() in {"client", "customer"} else f"the {entity.lower()}"
+        action_sentence = _normalize_note_action(action, issue.lower())
+        if action_sentence:
+            return f"{_capitalize_sentence(day)}'s meeting is with {entity_text} who is {emotion.lower()} about the {issue.lower()}. {action_sentence}."
+
+    paired_status = re.match(
+        r"^(?:the\s+)?(deadline)\s+missed\s+(?:the\s+)?(client|customer|team|manager|user)\s+waiting\s+(?:for\s+)?(?:the\s+)?(.+)$",
+        normalized,
+        flags=re.IGNORECASE,
+    )
+    if paired_status:
+        subject, entity, remainder = paired_status.groups()
+        return f"The {subject.lower()} was missed, and the {entity.lower()} is waiting for {_article_for(remainder)} {remainder}."
+
+    tokens = normalized.split()
+    action_index = next((index for index, token in enumerate(tokens) if index > 1 and re.match(r"^(?:need|must|should)$", token, flags=re.IGNORECASE)), None)
+    if action_index is not None:
+        subject = _normalize_note_subject(" ".join(tokens[:action_index]))
+        action = _normalize_note_action(" ".join(tokens[action_index + 1:]))
+        if subject and action:
+            return f"{_capitalize_sentence(subject)}. {action}."
+    return None
+
+
+def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
+    """Repair obvious note fragments after generation without inventing facts."""
+    protected = [str(span).strip() for span in request.get("protected_spans", []) if str(span).strip()]
+    masked = value
+    for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
+        masked = masked.replace(span, f"\ue000{index}\ue001")
+
+    def plural_subject(subject: str) -> bool:
+        last = subject.strip().split()[-1].lower() if subject.strip() else ""
+        if last in {"people", "children", "men", "women", "they", "we", "you", "these", "those"}:
+            return True
+        return last.endswith("s") and not last.endswith(("ss", "us", "is"))
+
+    def normalize(fragment: str) -> str:
+        item = re.sub(r"^[-*•]+\s*", "", re.sub(r"\s+", " ", re.sub(r"\.{2,}", ".", fragment))).strip()
+        if not item:
+            return item
+        item = re.sub(r"\bthey\s+is\b", "they are", item, flags=re.IGNORECASE)
+        item = re.sub(r"\b(we|you|these|those|people|students|writers|users)\s+was\b", r"\1 were", item, flags=re.IGNORECASE)
+        item = re.sub(r"\b(he|she|it|this|that)\s+are\b", r"\1 is", item, flags=re.IGNORECASE)
+        item = re.sub(r"\b(the team|the manager|the client|the project|the system|the user)\s+(say|want|need|have)\b", lambda match: f"{match.group(1)} { {'say':'says','want':'wants','need':'needs','have':'has'}[match.group(2).lower()] }", item, flags=re.IGNORECASE)
+        item = re.sub(r"\b(can|could|may|might|must|shall|should|will|would)\s+(explains?|helps?|shows?|makes?|improves?|affects?)\b", lambda match: f"{match.group(1)} {re.sub(r's$', '', match.group(2), flags=re.IGNORECASE)}", item, flags=re.IGNORECASE)
+        item = re.sub(r"\bi\b", "I", item)
+        item = re.sub(r"^no\s+grammar$", "The grammar needs work", item, flags=re.IGNORECASE)
+        item = re.sub(r"^ideas?\s+missing$", "Ideas are missing", item, flags=re.IGNORECASE)
+        item = re.sub(r"^reason(?:s)?\s+unclear$", "The reasons are unclear", item, flags=re.IGNORECASE)
+        item = re.sub(r"^deadline\s+missed$", "The deadline was missed", item, flags=re.IGNORECASE)
+        item = re.sub(r"^(.+?)\s+performance\s+unacceptable$", r"The \1's performance is unacceptable", item, flags=re.IGNORECASE)
+        item = re.sub(r"^meeting\s+(today|tomorrow)\s+with\s+(.+)$", r"The meeting with \2 is \1", item, flags=re.IGNORECASE)
+        item = re.sub(r"^(.+?)\s+not\s+(finished|ready|clear|complete)$", r"\1 is not \2", item, flags=re.IGNORECASE)
+        item = re.sub(r"^(.+?)\s+(hard|difficult|easy|important|unclear|missing|gone|ready|late|broken|obvious|unacceptable)$", lambda match: f"{match.group(1).strip()} {'are' if plural_subject(match.group(1)) else 'is'} {match.group(2).lower()}", item, flags=re.IGNORECASE)
+        item = re.sub(r"^need\s+to\s+(.+)$", r"I need to \1", item, flags=re.IGNORECASE)
+        def normalize_need(match: re.Match[str]) -> str:
+            remainder = match.group(1)
+            prefix = "to " if re.match(r"(explain|send|write|review|fix|finish|make|understand|organize|ask|call|check|clarify)\b", remainder, flags=re.IGNORECASE) else ""
+            return f"I need {prefix}{remainder}"
+        item = re.sub(r"^need\s+(.+)$", normalize_need, item, flags=re.IGNORECASE)
+        item = re.sub(r"^send\s+update\b", "Send an update", item, flags=re.IGNORECASE)
+        return item[:1].upper() + item[1:]
+
+    planned = plan_note_stream(masked)
+    if planned:
+        masked = planned
+    masked = re.sub(r"\b(?:the\s+)?reasons?\s+unclear\b", "the reasons are unclear", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bteam\s+say\b", "the team says", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bmanager\s+want\b", "the manager wants", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bthe manager wants answer\b", "the manager wants an answer", masked, flags=re.IGNORECASE)
+    fragments = [part.strip() for part in re.split(r"(?<=[.!?])\s+|(?<=[.!?])(?=[A-Za-z])", masked) if part.strip()]
+    repaired = ". ".join(normalize(fragment).rstrip(".!?") for fragment in fragments)
+    repaired = re.sub(r"\s+([,.;!?])", r"\1", repaired).strip()
+    if repaired and not re.search(r"[.!?][\"'”’)]?$", repaired):
+        repaired += "."
+
+    for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
+        repaired = repaired.replace(f"\ue000{index}\ue001", span)
+    repaired = re.sub(r"\bno\s+grammar\b", "there is no clear grammar", repaired, flags=re.IGNORECASE)
+    repaired = re.sub(r"\.\s+(is|are|was|were)\s+", r" \1 ", repaired, flags=re.IGNORECASE)
+    repaired = re.sub(r"(\bwho is [^.!?]+?)(?:,)?\s+(is\s+(?:today|tomorrow)\b)", r"\1, \2", repaired, flags=re.IGNORECASE)
+    return re.sub(r"\.{2,}", ".", repaired)
+
+
+def repair_direct_english(value: str, request: dict[str, Any]) -> str:
+    """Remove high-confidence filler while preserving protected markers."""
+    protected = [str(span).strip() for span in request.get("protected_spans", []) if str(span).strip()]
+    masked = value
+    for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
+        masked = masked.replace(span, f"\ue000{index}\ue001")
+
+    masked = re.sub(r"\bit\s+is\s+(?:important|worth)\s+to\s+note\s+that\s+", "", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bit\s+should\s+be\s+noted\s+that\s+", "", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bit\s+is\s+useful\s+to\s+remember\s+that\s+", "", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bthere\s+are\s+(?:a\s+number|an\s+umber)\s+of\s+", "several ", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bnotwithstanding\s+the\s+fact\s+that\b", "although", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bdue\s+to\s+the\s+fact\s+that\b", "because", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bin\s+order\s+to\b", "to", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bin\s+the\s+event\s+that\b", "if", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bat\s+(?:this|the\s+present)\s+point\s+in\s+time\b", "now", masked, flags=re.IGNORECASE)
+    gerund_base_forms = {
+        "being": "be",
+        "doing": "do",
+        "going": "go",
+        "making": "make",
+        "using": "use",
+        "writing": "write",
+        "taking": "take",
+        "giving": "give",
+        "having": "have",
+        "seeing": "see",
+        "coming": "come",
+        "becoming": "become",
+        "moving": "move",
+        "living": "live",
+        "driving": "drive",
+        "improving": "improve",
+        "proving": "prove",
+        "lying": "lie",
+        "tying": "tie",
+        "dying": "die",
+    }
+
+    def infinitive_from_gerund(value: str) -> str:
+        known = gerund_base_forms.get(value.lower())
+        if known:
+            return known.capitalize() if value[:1].isupper() else known
+        if not value.lower().endswith("ing") or len(value) <= 4:
+            return value
+        stem = value[:-3]
+        if re.search(r"([b-df-hj-np-tv-z])\1$", stem, flags=re.IGNORECASE):
+            stem = stem[:-1]
+        return stem
+
+    masked = re.sub(
+        r"\bfor\s+the\s+purpose\s+of\s+([A-Za-z]+ing)\b",
+        lambda match: f"to {infinitive_from_gerund(match.group(1))}",
+        masked,
+        flags=re.IGNORECASE,
+    )
+
+    negation = r"(?:no|not|never|without|\ue000.\ue001)"
+    masked = re.sub(
+        rf"\bthere\s+is\s+({negation})\s+indication\s+that\s+",
+        r"\1 evidence shows that ",
+        masked,
+        flags=re.IGNORECASE,
+    )
+
+    def direct_negation(match: re.Match[str]) -> str:
+        clause = match.group(2).strip()
+        copula = re.match(r"(.+?)\s+(is|are|was|were)\s+(.+)", clause, flags=re.IGNORECASE)
+        if not copula:
+            return match.group(0)
+        return f"{copula.group(1).strip().capitalize()} {copula.group(2)} {match.group(1)} {copula.group(3).strip()}"
+
+    masked = re.sub(
+        rf"\bit\s+is\s+({negation})\s+the\s+case\s+that\s+(.+?)\s+(is|are|was|were)\s+([^.!?]+)",
+        lambda match: f"{match.group(2).strip().capitalize()} {match.group(3)} {match.group(1)} {match.group(4).strip()}",
+        masked,
+        flags=re.IGNORECASE,
+    )
+
+    def direct_reason(match: re.Match[str]) -> str:
+        marker, clause, punctuation = match.groups()
+        lacking = re.match(r"^(.+?)\s+(?:is|was)\s+lacking\s+in\s+(.+)$", clause.strip(), flags=re.IGNORECASE)
+        if not lacking:
+            return match.group(0)
+        subject, complement = lacking.groups()
+        possessive = f"{subject.strip()}'s"
+        return f"{possessive.capitalize()} lack of {complement.strip()} {'is not' if marker else 'is'} the reason{punctuation}"
+
+    masked = re.sub(
+        r"\bthe\s+reason\s+is\s+(not\s+)?because\s+([^.!?]+)([.!?])",
+        direct_reason,
+        masked,
+        flags=re.IGNORECASE,
+    )
+    def direct_need(match: re.Match[str]) -> str:
+        action = re.sub(r"\bmake\s+improvements\b", "improve", match.group(1).strip(), flags=re.IGNORECASE)
+        return f"We need to {action}{match.group(2)}"
+
+    masked = re.sub(
+        r"\bthere\s+is\s+a\s+need\s+for\s+us\s+to\s+([^.!?]+)([.!?])",
+        direct_need,
+        masked,
+        flags=re.IGNORECASE,
+    )
+    masked = re.sub(r"\s{2,}", " ", masked)
+    masked = re.sub(r"\s+([,.;!?])", r"\1", masked)
+    masked = re.sub(r"([,.;!?])(?=[A-Za-z])", r"\1 ", masked).strip()
+
+    repaired = masked
+    for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
+        repaired = repaired.replace(f"\ue000{index}\ue001", span)
+    repaired = re.sub(r"(^|[.!?]\s+)([a-z])", lambda match: f"{match.group(1)}{match.group(2).upper()}", repaired)
+    return repaired
+
+
+def repair_quantifier_agreement(value: str) -> str:
+    """Repair high-confidence agreement around quantifier phrases."""
+    plural_quantifier = r"(?:a number of|a lot of|lots of|plenty of|a few|many|several|both|numerous)"
+    plural_noun = r"[A-Za-z][A-Za-z'-]*s"
+    repaired = value
+    repaired = re.sub(rf"\b({plural_quantifier})\s+({plural_noun})\s+is\b", r"\1 \2 are", repaired, flags=re.IGNORECASE)
+    repaired = re.sub(rf"\b({plural_quantifier})\s+({plural_noun})\s+was\b", r"\1 \2 were", repaired, flags=re.IGNORECASE)
+    repaired = re.sub(rf"\b({plural_quantifier})\s+({plural_noun})\s+has\b", r"\1 \2 have", repaired, flags=re.IGNORECASE)
+    repaired = re.sub(rf"\b({plural_quantifier})\s+({plural_noun})\s+does\b", r"\1 \2 do", repaired, flags=re.IGNORECASE)
+
+    def singularize(match: re.Match[str]) -> str:
+        verb = match.group(2).lower()
+        replacement = {"are": "is", "were": "was", "have": "has", "do": "does"}[verb]
+        return f"the number of {match.group(1)} {replacement}"
+
+    repaired = re.sub(
+        r"\bthe\s+number\s+of\s+([A-Za-z][A-Za-z'-]*s)\s+(are|were|have|do)\b",
+        singularize,
+        repaired,
+        flags=re.IGNORECASE,
+    )
+
+    def singular_head(match: re.Match[str]) -> str:
+        verb = match.group(2).lower()
+        replacement = {"are": "is", "were": "was", "have": "has", "do": "does"}[verb]
+        return f"{match.group(1)} {replacement}"
+
+    repaired = re.sub(
+        r"\b((?:one|each|every|either|neither)\s+of\s+(?:the\s+)?[A-Za-z][A-Za-z'-]*s)\s+(are|were|have|do)\b",
+        singular_head,
+        repaired,
+        flags=re.IGNORECASE,
+    )
+
+    def pluralize_head(match: re.Match[str]) -> str:
+        verb = match.group(2).lower()
+        replacement = {"is": "are", "was": "were", "has": "have", "does": "do"}[verb]
+        return f"{match.group(1)} {replacement}"
+
+    repaired = re.sub(
+        r"\b((?:both)\s+of\s+(?:the\s+)?[A-Za-z][A-Za-z'-]*)\s+(is|was|has|does)\b",
+        pluralize_head,
+        repaired,
+        flags=re.IGNORECASE,
+    )
+    repaired = re.sub(
+        r"\bthere\s+(is|was)\s+(?=(?:two|three|four|five|many|several|multiple|both|these|those)\b)",
+        lambda match: "there were " if match.group(1).lower() == "was" else "there are ",
+        repaired,
+        flags=re.IGNORECASE,
+    )
+    return re.sub(
+        r"\bthere's\s+(?=(?:two|three|four|five|many|several|multiple|both|these|those)\b)",
+        "there are ",
+        repaired,
+        flags=re.IGNORECASE,
+    )
+
+
+def repair_sentence_boundaries(value: str) -> str:
+    """Repair clear comma splices without disturbing introductory clauses."""
+    clause_subject = r"(?:I|we|you|he|she|they|it|this|that|there|people|students|users|(?:the|a|an|my|your|our|their|some|any|no|each|every|one|both|many|several)\s+[A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,2})"
+    finite_verb = r"(?:is|are|was|were|has|have|had|can|could|may|might|must|should|will|would|do|does|did|[A-Za-z]+(?:s|ed)(?!['’]))"
+    pattern = re.compile(rf",\s+(?={clause_subject}\s+{finite_verb}\b)", flags=re.IGNORECASE)
+    independent_clause = re.compile(rf"^(?:{clause_subject})\s+[^,.;!?]*\b{finite_verb}\b", flags=re.IGNORECASE)
+
+    def replace_splice(match: re.Match[str]) -> str:
+        start = match.start()
+        sentence_start = max(value.rfind(".", 0, start), value.rfind("!", 0, start), value.rfind("?", 0, start)) + 1
+        left_clause = value[sentence_start:start].strip()
+        if re.match(r"^(?:because|although|when|if|while|since|unless|after|before|even though|even if|given that)\b", left_clause, flags=re.IGNORECASE):
+            return ", "
+        if re.search(r"\b(?:because|although|when|if|while|since|unless|after|before|even though|even if|given that)\b[^,.;!?]*$", left_clause, flags=re.IGNORECASE):
+            return ", "
+        if not independent_clause.search(left_clause):
+            return ", "
+        return "; "
+
+    repaired = pattern.sub(replace_splice, value)
+    return re.sub(
+        r"(^|(?<=[.!?]\s))(\s*(?:because|although|when|if|while|since|unless|after|before|even though|even if|given that)\b[^,.;!?]+?)\s+(?=(?:I|we|you|he|she|they|it|this|that|people|students|users)\s+)",
+        r"\1\2, ",
+        repaired,
+        flags=re.IGNORECASE,
+    )
+
+
+GERUND_DOUBLING = {
+    "begin": "beginning",
+    "get": "getting",
+    "plan": "planning",
+    "put": "putting",
+    "run": "running",
+    "sit": "sitting",
+    "stop": "stopping",
+    "swim": "swimming",
+    "win": "winning",
+}
+
+
+def to_gerund(value: str) -> str:
+    normalized = value.lower()
+    if normalized in GERUND_DOUBLING:
+        replacement = GERUND_DOUBLING[normalized]
+    elif normalized.endswith("ing"):
+        return value
+    elif normalized.endswith("ie"):
+        replacement = f"{value[:-2]}ying"
+    elif normalized.endswith("e") and not normalized.endswith(("ee", "ye", "oe")):
+        replacement = f"{value[:-1]}ing"
+    else:
+        replacement = f"{value}ing"
+    return replacement.capitalize() if value[:1].isupper() else replacement
+
+
+def repair_parallel_verb_series(value: str) -> str:
+    """Repair a narrow gerund-complement list with one stray base verb."""
+    pattern = re.compile(
+        r"\b((?:likes?|enjoys?|keeps?|starts?|stops?|avoids?|finishes?|continues?|prefers?)\s+)([A-Za-z]+ing),\s+([A-Za-z]+ing),\s+and\s+([A-Za-z]+)\b",
+        flags=re.IGNORECASE,
+    )
+    return pattern.sub(lambda match: f"{match.group(1)}{match.group(2)}, {match.group(3)}, and {to_gerund(match.group(4))}", value)
+
+
+def repair_english_grammar(value: str, request: dict[str, Any]) -> str:
+    """Apply high-confidence agreement, modal, article, and case repairs."""
+    protected = [str(span).strip() for span in request.get("protected_spans", []) if str(span).strip()]
+    masked = value
+    ordered_protected = sorted(set(protected), key=len, reverse=True)
+    for index, span in enumerate(ordered_protected):
+        masked = masked.replace(span, f"\ue000{index}\ue001")
+
+    plural = r"(?:we|they|these|those|people|children|men|women|students|writers|users|sentences|ideas|tools|results|problems|tasks|assignments)"
+    singular = r"(?:he|she|it|this|that|someone|everyone|each|every|either|neither|nothing|something)"
+    masked = re.sub(rf"\b({plural})\s+is\b", r"\1 are", masked, flags=re.IGNORECASE)
+    masked = re.sub(rf"\b({plural})\s+was\b", r"\1 were", masked, flags=re.IGNORECASE)
+    masked = re.sub(rf"\b({plural})\s+has\b", r"\1 have", masked, flags=re.IGNORECASE)
+    masked = re.sub(rf"\b({plural})\s+does\b", r"\1 do", masked, flags=re.IGNORECASE)
+    masked = re.sub(rf"\b({singular})\s+are\b", r"\1 is", masked, flags=re.IGNORECASE)
+    masked = re.sub(rf"\b({singular})\s+were\b", r"\1 was", masked, flags=re.IGNORECASE)
+    masked = re.sub(rf"\b({singular})\s+have\b", r"\1 has", masked, flags=re.IGNORECASE)
+    masked = re.sub(rf"\b({singular})\s+do\b", r"\1 does", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bI\s+is\b", "I am", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\byou\s+is\b", "you are", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\byou\s+was\b", "you were", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\b(I|you)\s+has\b", r"\1 have", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\b(I|you)\s+does\b", r"\1 do", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\b(we|they|these|those|people|students|writers|users)\s+doesn't\b", r"\1 don't", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\b(he|she|it|this|that|someone|everyone|each|every)\s+don't\b", r"\1 doesn't", masked, flags=re.IGNORECASE)
+    singular_s_words = {
+        "analysis", "basis", "business", "crisis", "economics", "gas", "news", "physics",
+        "politics", "process", "status", "series", "species", "thesis",
+    }
+
+    def plural_noun_agreement(match: re.Match[str]) -> str:
+        noun = match.group(1)
+        verb = match.group(2).lower()
+        normalized = noun.lower()
+        if normalized in singular_s_words or re.search(r"(?:ss|us|is)$", normalized):
+            return match.group(0)
+        replacement = {"is": "are", "was": "were", "has": "have", "does": "do"}[verb]
+        return f"{noun} {replacement}"
+
+    masked = re.sub(
+        r"\b([A-Za-z][A-Za-z'-]*s)\s+(is|was|has|does)\b",
+        plural_noun_agreement,
+        masked,
+        flags=re.IGNORECASE,
+    )
+    masked = re.sub(
+        rf"\bthere\s+(is|was)\s+(?=(?:the|these|those|many|several)\s+[A-Za-z][A-Za-z'-]*s\b)",
+        lambda match: "there were " if match.group(1).lower() == "was" else "there are ",
+        masked,
+        flags=re.IGNORECASE,
+    )
+    masked = re.sub(
+        rf"\bthere\s+(are|were)\s+(?=(?:a|an|each|every|one)\s+[A-Za-z][A-Za-z'-]*\b)",
+        lambda match: "there was " if match.group(1).lower() == "were" else "there is ",
+        masked,
+        flags=re.IGNORECASE,
+    )
+    masked = repair_quantifier_agreement(masked)
+
+    modal = r"(?:can|could|may|might|must|shall|should|will|would)"
+    for bad, base in (
+        (r"explains?", "explain"),
+        (r"helps?", "help"),
+        (r"shows?", "show"),
+        (r"makes?", "make"),
+        (r"improves?", "improve"),
+        (r"affects?", "affect"),
+        (r"uses?", "use"),
+        (r"gives?", "give"),
+        (r"needs?", "need"),
+        (r"has", "have"),
+        (r"does", "do"),
+    ):
+        masked = re.sub(
+            rf"\b({modal})\s+{bad}\b",
+            lambda match, replacement=base: f"{match.group(1)} {replacement}",
+            masked,
+            flags=re.IGNORECASE,
+        )
+
+    masked = re.sub(r"\bbetween\s+((?:you|he|she|they|we))\s+and\s+I\b", r"between \1 and me", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bbetween\s+you\s+and\s+he\b", "between you and him", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bbetween\s+you\s+and\s+she\b", "between you and her", masked, flags=re.IGNORECASE)
+
+    masked = re.sub(r"\b(could|should|would|might|must)\s+of\b", r"\1 have", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\balot\b", "a lot", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bmore\s+(better|worse|easier|harder|simpler)\b", r"\1", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bmost\s+(best|worst|easiest|hardest|simplest)\b", r"\1", masked, flags=re.IGNORECASE)
+    masked = repair_sentence_boundaries(masked)
+    masked = repair_parallel_verb_series(masked)
+
+    def article(match: re.Match[str]) -> str:
+        article_word = match.group(1)
+        word = match.group(2)
+        lowered = word.lower()
+        vowel = bool(re.match(r"[aeiou]", lowered))
+        if re.match(r"^(?:honest|honor|honour|hour|heir|herb)\b", lowered):
+            vowel = True
+        if re.match(r"^(?:ewe|euro|one|once|uniform|unique|unit|united|university|use|useful|user|usual)\b", lowered):
+            vowel = False
+        expected = "an" if vowel else "a"
+        if article_word.isupper():
+            expected = expected.upper()
+        elif article_word[:1].isupper():
+            expected = expected.capitalize()
+        return f"{expected} {word}"
+
+    masked = re.sub(r"\b(a|an)\s+([A-Za-z][A-Za-z'-]*)\b", article, masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\s+([,.;!?])", r"\1", masked)
+    masked = re.sub(r"([,.;!?])(?=[A-Za-z])", r"\1 ", masked)
+    masked = re.sub(r"(^|[.!?]\s+)([a-z])", lambda match: f"{match.group(1)}{match.group(2).upper()}", masked)
+    masked = re.sub(r"\s{2,}", " ", masked).strip()
+
+    for index, span in enumerate(ordered_protected):
+        masked = masked.replace(f"\ue000{index}\ue001", span)
+    return masked
+
+
+def repair_safe_lexical_choices(value: str) -> str:
+    """Use a few high-confidence everyday alternatives when decoding is inert."""
+    repaired = re.sub(r"\bapproved\s+the\s+plan\b", "accepted the plan", value, flags=re.IGNORECASE)
+    return re.sub(r"\breviewed\s+the\s+draft\b", "examined the draft", repaired, flags=re.IGNORECASE)
+
+
+def warmth_polish(value: str, request: dict[str, Any]) -> str:
+    if str(request.get("mode", "personal")).strip().lower() != "warmth":
+        return value
+
+    protected = [str(span).strip() for span in request.get("protected_spans", []) if str(span).strip()]
+    masked = value
+    for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
+        masked = masked.replace(span, f"\ue000{index}\ue001")
+
+    protected_placeholder = r"\ue000[\s\S]\ue001"
+    warm_conditional_refusal = re.compile(
+        rf"(^|\s)((?:no|{protected_placeholder}))\s+further\s+(?:assistance|help|guide)\s+((?:will|{protected_placeholder}))\s+be\s+(?:provided|given|available)\s+until\s+([^.!?]+)",
+        flags=re.IGNORECASE,
+    )
+    warm_absolute_refusal = re.compile(
+        rf"(^|\s)((?:no|{protected_placeholder}))\s+further\s+(?:assistance|help|guide)\s+((?:will|{protected_placeholder}))\s+be\s+(?:provided|given|available)\b(?!\s+until)",
+        flags=re.IGNORECASE,
+    )
+    warm_no_excuses = re.compile(
+        rf"(^|\s)((?:no|{protected_placeholder}))\s+excuses\b",
+        flags=re.IGNORECASE,
+    )
+
+    def warm_conditional(match: re.Match[str]) -> str:
+        prefix, no_word, will_word, condition = match.groups()
+        return f"{prefix}{no_word} further help {will_word} be available until {condition.strip()}, and clarification about the next step is welcome"
+
+    def warm_absolute(match: re.Match[str]) -> str:
+        prefix, no_word, will_word = match.groups()
+        return f"{prefix}{no_word} further help {will_word} be available; clarification about the next step is welcome"
+
+    def warm_excuses(match: re.Match[str]) -> str:
+        prefix, no_word = match.groups()
+        return f"{prefix}{no_word} valid excuses are needed; let's focus on the next step"
+
+    def inflected_use(match: re.Match[str]) -> str:
+        word = match.group(0).lower()
+        if word.endswith("ing"):
+            return "using"
+        if word.endswith("ed"):
+            return "used"
+        if word.endswith("es"):
+            return "uses"
+        return "use"
+
+    polished = warm_conditional_refusal.sub(warm_conditional, masked)
+    polished = warm_absolute_refusal.sub(warm_absolute, polished)
+    polished = warm_no_excuses.sub(warm_excuses, polished)
+    polished = (polished
+        .replace("individuals", "people")
+        .replace("Individuals", "People")
+        .replace("persons", "people")
+        .replace("Persons", "People")
+    )
+    polished = re.sub(r"\butili[sz](?:e|ed|es|ing)\b", inflected_use, polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bassist(?:s|ed|ing)?\b", lambda match: {
+        "assists": "helps",
+        "assisted": "helped",
+        "assisting": "helping",
+    }.get(match.group(0).lower(), "help"), polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bassistance\b", "help", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bfails to provide\b", "doesn't offer", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bfailed to provide\b", "didn't offer", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bis unable to\b", "can't", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bcannot\b", "can't", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bfailed to comply\b", "didn't follow the instructions", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\brequest is invalid\b", "request doesn't meet the requirements", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bthis is your responsibility\b", "you'll need to handle the next step", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bfix immediately\b", "please address this as soon as possible", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bthe problem is obvious\b", "the problem is clear", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bI am disappointed\b", "I'm concerned", polished)
+    polished = re.sub(r"\b(team(?:'s)? performance)\s+unacceptable\b", r"\1 is not where it needs to be", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bis unacceptable\b", "is not where it needs to be", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bunacceptable\b", "not where it needs to be", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\bcan't help\b(?!\s+with)", "can't help with this", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\b(the user) (?:didn't|did not) meet the requirements\b", r"\1 didn't meet the requirements. The missing pieces can be worked through", polished, flags=re.IGNORECASE)
+    polished = re.sub(r"\b(the deadline) was missed\b", r"\1 was missed. Let's focus on the next step", polished, flags=re.IGNORECASE)
+
+    for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
+        polished = polished.replace(f"\ue000{index}\ue001", span)
+    polished = re.sub(
+        r"\b(no valid excuses are needed;\s+let's focus on what we can do next)(?:\s+will be accepted)?\b",
+        r"\1",
+        polished,
+        flags=re.IGNORECASE,
+    )
+    return polished
+
+
+def restore_protected_variants(value: str, request: dict[str, Any]) -> str:
+    """Put exact anchors back when a generative model reformats a date or number.
+
+    The browser still runs the final protected-content validator. This small
+    repair lets the native draft pass without trusting the model to preserve a
+    date's presentation, while leaving ordinary prose untouched.
+    """
+    protected = [str(span).strip() for span in request.get("protected_spans", []) if str(span).strip()]
+    patterns = [
+        (re.compile(r"https?://[^\s<>)\]]+", re.IGNORECASE), lambda span: span.startswith(("http://", "https://"))),
+        (re.compile(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.IGNORECASE), lambda span: "@" in span),
+        (re.compile(r"(?:\d{1,4}[-/]\d{1,2}[-/]\d{1,4}|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:,\s*\d{4})?)", re.IGNORECASE), lambda span: bool(re.search(r"[-/]\d{1,2}[-/]\d{1,4}\b|\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)", span, re.IGNORECASE))),
+        (re.compile(r"(?:[$€£¥]\s*\d[\d,]*(?:\.\d+)?|\b\d[\d,]*(?:\.\d+)?\s*(?:USD|EUR|GBP|JPY)\b)", re.IGNORECASE), lambda span: bool(re.search(r"[$€£¥]|\b(?:USD|EUR|GBP|JPY)\b", span, re.IGNORECASE))),
+    ]
+
+    repaired = value
+    for span in protected:
+        if span in repaired:
+            continue
+        for pattern, matches_span in patterns:
+            if not matches_span(span):
+                continue
+            match = pattern.search(repaired)
+            if match:
+                repaired = repaired[:match.start()] + span + repaired[match.end():]
+                break
+    return repaired
+
+
+def restore_missing_modal_markers(value: str, request: dict[str, Any]) -> str:
+    """Repair a narrow, meaning-preserving modal rewrite before browser validation.
+
+    Qwen sometimes turns a source clause such as “I can have difficulty” into
+    “I find it difficult.” When the source modal is protected, restore only a
+    clearly equivalent local form; do not invent a modal for an unrelated
+    clause. The browser still performs the final exact-span and meaning gates.
+    """
+    original = str(request.get("original_text", "")).strip()
+    protected = [str(span).strip() for span in request.get("protected_spans", []) if str(span).strip()]
+    repaired = value
+
+    modal_pattern = re.compile(r"\b(?:may|might|could|can|must|should|will|would|shall)\b", re.IGNORECASE)
+    original_modals = [match.group(0) for match in modal_pattern.finditer(original)]
+    for modal in original_modals:
+        if modal not in protected:
+            continue
+        expected = sum(1 for span in protected if span.lower() == modal.lower())
+        actual = len(re.findall(rf"\b{re.escape(modal)}\b", repaired, flags=re.IGNORECASE))
+        missing = expected - actual
+        if missing <= 0:
+            continue
+
+        if modal.lower() == "can":
+            # “is/are able to” carries the same capability force and can be
+            # safely shortened when the exact protected marker is required.
+            for pattern in (r"\bis\s+able\s+to\b", r"\bare\s+able\s+to\b"):
+                if missing <= 0:
+                    break
+                updated, replacements = re.subn(pattern, "can", repaired, count=missing, flags=re.IGNORECASE)
+                repaired = updated
+                missing -= replacements
+
+            if missing > 0:
+                # Prefer the unambiguous “find it difficult” paraphrase over
+                # a generic insertion after any first-person subject.
+                patterns = (
+                    r"\b(I)\s+((?:(?:also|often|sometimes|still)\s+)?find\s+it\s+difficult\b)",
+                    r"\b(I)\s+((?:(?:also|often|sometimes|still)\s+)?(?:have|experience|face)\s+(?:difficulty|trouble)\b)",
+                )
+                for pattern in patterns:
+                    if missing <= 0:
+                        break
+                    repaired, replacements = re.subn(pattern, rf"\1 {modal.lower()} \2", repaired, count=missing, flags=re.IGNORECASE)
+                    missing -= replacements
+
+    return repaired
+
+
+def repair_discourse_relations(value: str, request: dict[str, Any]) -> str:
+    """Keep an explicit source relationship when the model uses a vague frame."""
+    original = str(request.get("original_text", ""))
+    repaired = value
+
+    # “When there are distractions” and “in the presence of distractions” can
+    # be close in ordinary prose, but the latter drops the source's explicit
+    # time/condition relationship. Restore it only when the source supplies
+    # the matching clause and the candidate supplies the recognizable frame.
+    if re.search(r"\bwhen\s+there\s+are\b", original, flags=re.IGNORECASE):
+        repaired = re.sub(r"\bin\s+the\s+presence\s+of\b", "when there are", repaired, count=1, flags=re.IGNORECASE)
+
+        # A native draft can retain the content word while dropping the
+        # relationship altogether: “stay focused when there are distractions”
+        # can become “stay focused over long periods, handle distractions”.
+        # Restore only this high-confidence comma-delimited frame; the browser
+        # still performs the final meaning contract before accepting the draft.
+        source_match = re.search(
+            r"\b(when|while|once)\s+there\s+are\s+([^,.;!?]+)",
+            original,
+            flags=re.IGNORECASE,
+        )
+        if source_match and not re.search(
+            r"\b(?:when|while|once|if|unless|because|although|since)\b",
+            repaired,
+            flags=re.IGNORECASE,
+        ):
+            content = source_match.group(2).strip()
+            anchor = content.split()[-1] if content else ""
+            if len(anchor) >= 5:
+                repaired = re.sub(
+                    rf",\s*(?:handle|manage|deal with|work through)\s+[^,.;!?]*\b{re.escape(anchor)}\b\s*(?=,)",
+                    f", especially {source_match.group(1).lower()} there are {content}",
+                    repaired,
+                    count=1,
+                    flags=re.IGNORECASE,
+                )
+
+    return repaired
+
+
+def repair_point_of_view(value: str, request: dict[str, Any]) -> str:
+    """Keep an explicit writer participant in a matching infinitive frame."""
+    original = str(request.get("original_text", ""))
+    repaired = value
+    if re.search(r"\bfor\s+me\s+to\b", original, flags=re.IGNORECASE):
+        repaired = re.sub(
+            r"\bmakes\s+it\s+(difficult|challenging|hard|easy)\s+to\b",
+            r"makes it \1 for me to",
+            repaired,
+            count=1,
+            flags=re.IGNORECASE,
+        )
+    return repaired
+
+
+def generate(request: dict[str, Any]) -> None:
+    from mlx_lm import load
+    from mlx_lm.generate import generate_step
+    from mlx_lm.sample_utils import make_sampler
+    import mlx.core as mx
+
+    model_path = str(request.get("model_path", "")).strip()
+    if not model_path:
+        raise ValueError("The native generator model path was empty.")
+
+    strength = int(request.get("strength", 56))
+    requested_temperature = request.get("temperature")
+    temperature = (
+        max(0.0, min(float(requested_temperature), 1.0))
+        if isinstance(requested_temperature, (int, float))
+        else 0.18 if strength < 42 else 0.24 if strength < 72 else 0.32
+    )
+    top_p = 0.86 if strength < 72 else 0.9
+    max_tokens = max(96, min(int(request.get("max_tokens", 768)), 1536))
+    started = time.perf_counter()
+    model = tokenizer = tokens = sampler = None
+
+    try:
+        model, tokenizer = load(model_path)
+        prompt = render_prompt(tokenizer, build_instruction(request))
+        tokens = mx.array(tokenizer.encode(prompt))
+        sampler = make_sampler(temp=temperature, top_p=top_p)
+        eos_token_id = getattr(tokenizer, "eos_token_id", None)
+        pieces: list[str] = []
+
+        for token_id, _logprobs in generate_step(
+            tokens,
+            model,
+            sampler=sampler,
+            max_tokens=max_tokens,
+        ):
+            if eos_token_id is not None and int(token_id) == eos_token_id:
+                break
+            piece = tokenizer.decode([int(token_id)], skip_special_tokens=True)
+            if piece:
+                pieces.append(piece)
+
+        text = clean_output("".join(pieces))
+        if looks_like_control_echo(text):
+            raise ValueError("The native model returned editing instructions instead of the rewrite; Pari will use its safe local repair.")
+        text = repair_fragmentary_prose(text, request)
+        text = repair_direct_english(text, request)
+        text = repair_english_grammar(text, request)
+        text = repair_safe_lexical_choices(text)
+        text = repair_discourse_relations(text, request)
+        text = repair_point_of_view(text, request)
+        text = restore_missing_modal_markers(text, request)
+        text = warmth_polish(restore_protected_variants(text, request), request)
+        if not text:
+            raise ValueError("The native generator returned an empty paragraph.")
+        emit({
+            "ok": True,
+            "text": text,
+            "duration_ms": round((time.perf_counter() - started) * 1000),
+            "temperature": temperature,
+        })
+    finally:
+        try:
+            if hasattr(mx, "synchronize"):
+                mx.synchronize()
+        finally:
+            model = tokenizer = tokens = sampler = None
+            try:
+                mx.clear_cache()
+            except Exception:
+                pass
+
+
+def main() -> int:
+    try:
+        request = json.load(sys.stdin)
+        generate(request)
+        return 0
+    except Exception as error:  # noqa: BLE001 - native errors are user-facing recovery state
+        emit({"ok": False, "error": str(error)})
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -73,6 +73,7 @@ let cachedInfo: ModelInfo = {
 };
 let cachedInfos = new Map<SemanticModelId, ModelInfo>([[DEFAULT_MODEL_ID, cachedInfo]]);
 let pendingLoads = new Map<SemanticModelId, Promise<{ extractor: FeatureExtractor; info: ModelInfo }>>();
+let localWasmModuleURL: string | null = null;
 
 async function disposeCachedExtractor(modelId?: SemanticModelId): Promise<void> {
   if (modelId) {
@@ -167,8 +168,20 @@ function isSafariBrowser(): boolean {
   );
 }
 
+function isLocalNativeRuntime(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+}
+
 function getBrowserModelRoot(): string {
-  return new URL("./models/", window.location.href).href;
+  const modelRoot = new URL("./models/", window.location.href);
+  return modelRoot.protocol === "app:" ? modelRoot.href : modelRoot.pathname;
+}
+
+function getBrowserModelPath(modelId: SemanticModelId): string {
+  if (typeof window === "undefined") return modelId;
+  const modelPath = new URL(`./models/${modelId}/`, window.location.href);
+  return modelPath.protocol === "app:" ? modelPath.href : modelPath.pathname;
 }
 
 function getBundledModelRoot(modelId: SemanticModelId): URL {
@@ -180,8 +193,8 @@ function getRemoteModelFileURL(modelId: SemanticModelId, filePath: string): stri
   return `https://huggingface.co/${descriptor.repoId}/resolve/main/${encodeModelPath(filePath)}?download=1`;
 }
 
-function getWasmPaths(): { mjs: string; wasm: string } {
-  return isSafariBrowser()
+async function getWasmPaths(): Promise<{ mjs: string; wasm: string }> {
+  const paths = isSafariBrowser() && !isLocalNativeRuntime()
     ? {
         mjs: safariWasmModuleUrl,
         wasm: safariWasmBinaryUrl,
@@ -190,6 +203,24 @@ function getWasmPaths(): { mjs: string; wasm: string } {
         mjs: asyncifyWasmModuleUrl,
         wasm: asyncifyWasmBinaryUrl,
       };
+
+  if (!isLocalNativeRuntime() || localWasmModuleURL) {
+    return { ...paths, ...(localWasmModuleURL ? { mjs: localWasmModuleURL } : {}) };
+  }
+
+  try {
+    const response = await fetch(paths.mjs, { cache: "no-store" });
+    if (response.ok) {
+      localWasmModuleURL = URL.createObjectURL(
+        new Blob([await response.text()], { type: "text/javascript" })
+      );
+      return { ...paths, mjs: localWasmModuleURL };
+    }
+  } catch {
+    // Keep the direct bundle URL so the runtime can report its normal failure.
+  }
+
+  return paths;
 }
 
 function getBootDiagnostics(): BootDiagnostics | undefined {
@@ -220,15 +251,22 @@ async function configureBrowserEnvironment(
   env.logLevel = LogLevel.ERROR;
   env.allowLocalModels = true;
   env.allowRemoteModels = allowRemoteModels;
-  env.useBrowserCache = true;
+  env.useBrowserCache = window.location.hostname !== "127.0.0.1";
   env.localModelPath = getBrowserModelRoot();
+  if (typeof window.fetch === "function") {
+    const nativeFetch = window.fetch.bind(window);
+    env.fetch = (input, init) => nativeFetch(
+      typeof input === "string" ? new URL(input, window.location.href) : input,
+      init
+    );
+  }
   const onnxEnvironment = env.backends.onnx as {
     wasm?: {
       wasmPaths?: { mjs: string; wasm: string };
     };
   };
   onnxEnvironment.wasm ??= {};
-  onnxEnvironment.wasm.wasmPaths = getWasmPaths();
+  onnxEnvironment.wasm.wasmPaths = await getWasmPaths();
 }
 
 async function probeBundledModel(modelId: SemanticModelId): Promise<boolean> {
@@ -351,8 +389,9 @@ async function createFeatureExtractor(
   }
 ): Promise<FeatureExtractor> {
   const descriptor = getModelDescriptor(modelId);
+  const modelPath = source === "bundled" ? getBrowserModelPath(modelId) : modelId;
   const [config, tokenizerArtifacts] = await Promise.all([
-    transformers.AutoConfig.from_pretrained(modelId, options),
+    transformers.AutoConfig.from_pretrained(modelPath, options),
     loadTokenizerArtifacts(modelId, source),
   ]);
 
@@ -362,7 +401,7 @@ async function createFeatureExtractor(
     tokenizerArtifacts.tokenizerConfig
   ) as unknown;
 
-  const model = await transformers.AutoModel.from_pretrained(modelId, {
+  const model = await transformers.AutoModel.from_pretrained(modelPath, {
     ...options,
     config,
     dtype: descriptor.dtype,

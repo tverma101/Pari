@@ -1,12 +1,8 @@
 import type { RewriteMode, StrengthLevel } from "@/lib/types";
 
 export const MODE_OPTIONS: { value: RewriteMode; label: string; hint: string }[] = [
-  { value: "standard", label: "Standard", hint: "Balanced wording" },
-  { value: "fluency", label: "Fluency", hint: "Smooth and natural" },
-  { value: "formal", label: "Formal", hint: "More elevated tone" },
-  { value: "simple", label: "Simple", hint: "Plain and direct" },
-  { value: "creative", label: "Creative", hint: "More expressive" },
-  { value: "shorten", label: "Shorten", hint: "Lean and concise" },
+  { value: "personal", label: "Personal", hint: "Warm, clear, and explanatory" },
+  { value: "warmth", label: "Warmth", hint: "Noticeably more human, kind, and natural" },
 ];
 
 export function clamp(value: number, min: number, max: number): number {
@@ -15,9 +11,9 @@ export function clamp(value: number, min: number, max: number): number {
 
 export function strengthLabel(value: number): string {
   if (value <= 18) return "Light";
-  if (value <= 40) return "Moderate";
+  if (value <= 40) return "Balanced";
   if (value <= 68) return "Strong";
-  return "Aggressive";
+  return "Deep";
 }
 
 export function percentToStrengthLevel(value: number): StrengthLevel {
@@ -32,11 +28,15 @@ export function rewriteChance(mode: RewriteMode, strength: number, word: string)
   const lengthBonus = clamp((word.length - 4) * 0.015, 0, 0.12);
 
   const modeBias: Record<RewriteMode, number> = {
+    personal: 0.04,
+    warmth: 0.12,
     standard: 0.02,
     fluency: 0.06,
+    warm: 0.08,
     formal: 0.08,
     simple: -0.05,
     creative: 0.1,
+    expand: 0.1,
     shorten: 0.06,
   };
 

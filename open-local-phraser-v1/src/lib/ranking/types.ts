@@ -5,6 +5,8 @@ export type CandidateSource =
   | "deep-bank"
   | "phrase-bank"
   | "rule"
+  | "wordnet"
+  | "thesaurus"
   | "contextual-mlm"
   | "generator";
 

@@ -6,6 +6,14 @@ export interface RewriteSettingsInput {
   strength: number;
   freezeWords: string;
   disableAutomaticRewrites?: boolean;
+  /**
+   * Paragraph generation uses a stricter automatic policy than the inline
+   * word picker. Keep this opt-in so the picker can still expose the wider
+   * synonym bank without making the generated draft sound mechanical.
+   */
+  automaticRewriteStrategy?: "default" | "conservative";
+  /** Maximum automatic replacements allowed in one sentence. */
+  automaticRewriteBudget?: number;
 }
 
 export interface RewriteToken {
@@ -21,7 +29,7 @@ export interface RewriteToken {
   start: number;
   end: number;
   partOfSpeech: PartOfSpeech;
-  source: "text" | "static-bank" | "deep-bank" | "phrase-bank" | "rule" | "contextual-mlm" | "generator";
+  source: "text" | "static-bank" | "deep-bank" | "phrase-bank" | "rule" | "wordnet" | "thesaurus" | "contextual-mlm" | "generator";
   label?: string;
   risk: RiskLevel;
   warnings: string[];

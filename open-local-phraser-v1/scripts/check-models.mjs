@@ -1,4 +1,6 @@
 import fs from "fs/promises";
+import { createReadStream } from "fs";
+import crypto from "crypto";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -11,12 +13,35 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 const DEFAULT_DTYPE = "q8";
 const MODEL_ROOT = path.join(ROOT_DIR, "public", "models");
 const MEMORY_CEILING_MB = 6 * 1024;
+const FILES_ONLY = process.argv.includes("--files-only");
+const NATIVE_GENERATIVE_MODEL = {
+  id: "Qwen/Qwen3-4B-MLX-4bit",
+  task: "mlx-generation",
+  storage: "native-models",
+  localPath: "native-models/Qwen/Qwen3-4B-MLX-4bit",
+  role: "paragraph-generation",
+};
 
 function getModelDtype(model) {
+  if (model.storage === "native-models") return "mlx-4bit";
   return model.task === "text2text-generation" ? "fp32" : DEFAULT_DTYPE;
 }
 
 function getRequiredFiles(model) {
+  if (model.storage === "native-models") {
+    return [
+      "LICENSE",
+      "README.md",
+      "config.json",
+      "merges.txt",
+      "model.safetensors",
+      "model.safetensors.index.json",
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "vocab.json",
+    ];
+  }
+
   if (model.task === "text2text-generation") {
     return [
       "config.json",
@@ -87,6 +112,7 @@ const MODELS = [
     task: "fill-mask",
     maskedText: "Writers can <mask> their sentences without changing the meaning.",
   },
+  NATIVE_GENERATIVE_MODEL,
 ];
 
 const TEST_SENTENCES = [
@@ -121,11 +147,21 @@ function rssMb() {
 }
 
 function modelDir(model) {
-  return path.join(MODEL_ROOT, model.id);
+  return model.storage === "native-models"
+    ? path.join(ROOT_DIR, model.localPath)
+    : path.join(MODEL_ROOT, model.id);
 }
 
 function modelManifest(model) {
   return path.join(modelDir(model), "manifest.json");
+}
+
+async function sha256File(absolutePath) {
+  const hash = crypto.createHash("sha256");
+  for await (const chunk of createReadStream(absolutePath)) {
+    hash.update(chunk);
+  }
+  return hash.digest("hex");
 }
 
 function cosineSimilarity(left, right) {
@@ -185,20 +221,32 @@ async function verifyBundledFiles(model) {
   }
 
   const manifestFiles = Array.isArray(manifest.files) ? manifest.files : [];
+  if (!manifest.sha256 || typeof manifest.sha256 !== "object") {
+    throw new Error(`Missing integrity hashes for ${model.id}. Run npm run models:download.`);
+  }
   const required = new Set([...getRequiredFiles(model), ...manifestFiles]);
   const stats = [];
 
   for (const relativePath of required) {
     const absolutePath = path.join(modelDir(model), relativePath);
+    let stat;
     try {
-      const stat = await fs.stat(absolutePath);
-      if (!stat.isFile() || stat.size <= 0) {
-        throw new Error(`${relativePath} is empty or not a file`);
-      }
-      stats.push({ relativePath, size: stat.size });
+      stat = await fs.stat(absolutePath);
     } catch {
       throw new Error(`Missing required bundled file for ${model.id}: ${relativePath}`);
     }
+    if (!stat.isFile() || stat.size <= 0) {
+      throw new Error(`${relativePath} is empty or not a file`);
+    }
+    const expectedHash = manifest.sha256[relativePath];
+    if (typeof expectedHash !== "string") {
+      throw new Error(`${relativePath} has no integrity hash in the manifest`);
+    }
+    const actualHash = await sha256File(absolutePath);
+    if (actualHash !== expectedHash) {
+      throw new Error(`${relativePath} failed SHA-256 verification`);
+    }
+    stats.push({ relativePath, size: stat.size });
   }
 
   log(`${model.id}: manifest verified (${stats.length} files)`);
@@ -373,8 +421,15 @@ async function main() {
     await verifyBundledFiles(model);
   }
 
+  if (FILES_ONLY) {
+    log(`ready: ${MODELS.length} local model bundles passed file verification`);
+    return;
+  }
+
   for (const model of MODELS) {
-    if (model.task === "feature-extraction") {
+    if (model.storage === "native-models") {
+      log(`${model.id}: MLX checkpoint ready for the native paraphrase worker`);
+    } else if (model.task === "feature-extraction") {
       await checkFeatureExtractionModel(model);
     } else if (model.task === "token-classification") {
       await checkTokenClassificationModel(model);

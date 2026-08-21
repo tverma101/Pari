@@ -1,445 +1,653 @@
-import { memo, startTransition, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  type RefObject,
+} from "react";
 import { createPortal } from "react-dom";
 
-import { analyzeGrammar, grammarHealthScore } from "@/lib/nlp/grammar";
-import { getSentenceForRange } from "@/lib/nlp/sentenceSplit";
-import { rankCandidatesByEmbedding, rankCandidatesByEmbeddingEnsemble } from "@/lib/ranking/embeddingRanker";
-import { detectProtectedEntityTerms } from "@/lib/ranking/entityGuard";
-import { getRankingModelEstimatedMemoryMb, getRankingModelIds } from "@/lib/ranking/modelRegistry";
-import { getModelInfoSnapshot, probeModelInfo } from "@/lib/ranking/modelManager";
+import { countSentences, getSentenceForRange, splitSentences } from "@/lib/nlp/sentenceSplit";
+import { countWords, normalizeWord, tokenize } from "@/lib/nlp/tokenizer";
+import { analyzeGrammar, mergeGrammarIssues, type GrammarIssue } from "@/lib/nlp/grammar";
+import { analyzeHarperGrammar } from "@/lib/nlp/harper";
 import { rankCandidatesByRule } from "@/lib/ranking/ruleBasedRanker";
-import type { ModelInfo, RankingResult } from "@/lib/ranking/types";
-import { MODE_OPTIONS, percentToStrengthLevel } from "@/lib/phraseEngine/rules";
-import { countSentences, countWords, parseFreezeEntries, rewriteText } from "@/lib/phraseEngine/rewriteText";
-import type { RewriteToken } from "@/lib/phraseEngine/types";
+import type { CandidateOption, RankingResult } from "@/lib/ranking/types";
+import { rewriteText } from "@/lib/phraseEngine/rewriteText";
+import type { RewriteResult, RewriteToken } from "@/lib/phraseEngine/types";
+import { clamp, MODE_OPTIONS, percentToStrengthLevel, strengthLabel } from "@/lib/phraseEngine/rules";
+import { generateLocalParaphrase } from "@/lib/generation/localParaphrase";
+import { generateAdvancedAlternatives } from "@/lib/rewriteStack/advancedParaphrase";
+import type { LocalModelFailure } from "@/lib/rewriteStack/modelManager";
 import {
-  generateAdvancedAlternatives,
-  selectTokensForEnhancement,
-} from "@/lib/rewriteStack/advancedParaphrase";
+  createEmptyPreferenceMemory,
+  learnFromApproval,
+  rankCandidatesByMemory,
+  type ApprovedExample,
+  type PreferenceMemory,
+} from "@/lib/personalization/approvalMemory";
 import {
-  getRewriteAssistantEstimatedMemoryMb,
-  getRewriteAssistantModelIds,
-} from "@/lib/rewriteStack/modelRegistry";
-import { applyTheme, STRENGTH_STEPS, loadSettings, saveSettings, type AppSettings } from "@/lib/settings/settingsStore";
-import type { RiskLevel } from "@/lib/types";
+  appendGroupedEdit,
+  describeTextEdit,
+  type ParaphraseSession,
+  type TextEditMetadata,
+} from "@/lib/personalization/editHistory";
+import { loadApprovalState, persistApproval, usesNativePersistence } from "@/lib/persistence/approvalStore";
+import { loadCustomStyles } from "@/lib/persistence/styleStore";
+import {
+  hashText,
+  serializeProtectedSpans,
+  validateProtectedContent,
+} from "@/lib/safety/protectedContent";
+import { readClipboardText, writeClipboardText } from "@/lib/platform/nativeClipboard";
+import { applyTheme, loadSettings, saveSettings, type AppSettings } from "@/lib/settings/settingsStore";
+import {
+  customModeForStyle,
+  customStyleIdFromMode,
+  effectiveStyleStrength,
+  engineModeForStyle,
+  type CustomStyle,
+} from "@/lib/styles/customStyles";
+import type { AppMode } from "@/lib/types";
 import { cn } from "@/utils/cn";
 
 const SAMPLE_TEXT =
   "Artificial intelligence is changing the way people work and learn. It can help students improve their writing, find new ideas quickly, and understand difficult topics. Many companies use these powerful tools to make their work more efficient.";
 
-const ADVANCED_ALTERNATIVE_DELAY_MS = 850;
-const ADVANCED_SUGGESTION_MIN_OPTIONS = 40;
-const OPTION_PREVIEW_LIMIT = 40;
-const BACKGROUND_INDEX_DELAY_MS = 90;
-const BACKGROUND_INDEX_TOKEN_LIMIT = 32;
-const SEMANTIC_REFINEMENT_LIMIT = 24;
-const INTERACTIVE_RERANK_DELAY_MS = 260;
-const SEMANTIC_REFINEMENT_DELAY_MS = 1200;
-interface RankingState {
-  tokenId: string;
-  provider: "rule-based" | "embedding";
-  loading: boolean;
-  results: RankingResult[];
-  notice?: string;
-}
+const SYNONYM_LIMIT = 40;
+const REWRITE_AMOUNT_VALUES = [16, 40, 60, 90] as const;
+const INLINE_WORD_TOOL_STOP_WORDS = new Set([
+  "a", "about", "after", "again", "also", "an", "and", "are", "as", "been", "before", "being", "between", "both",
+  "can", "could", "does", "each", "for", "from", "have", "if", "in", "into", "is", "it", "just", "more", "most", "much", "must", "of", "on", "only", "or",
+  "other", "over", "same", "should", "some", "such", "than", "that", "the", "their", "them", "there", "these",
+  "they", "this", "those", "through", "to", "under", "very", "was", "were", "which", "while", "with", "will", "would", "you", "your",
+]);
 
-type AppliedRewriteSettings = Pick<
-  AppSettings,
-  "freezeWords" | "mode" | "rankingProvider" | "semanticModel" | "strength"
->;
-
-function toAppliedRewriteSettings(settings: AppSettings): AppliedRewriteSettings {
-  return {
-    mode: settings.mode,
-    strength: settings.strength,
-    freezeWords: settings.freezeWords,
-    rankingProvider: settings.rankingProvider,
-    semanticModel: settings.semanticModel,
-  };
-}
-
-function loadStartupSettings(): AppSettings {
-  const loaded = loadSettings();
-
-  return {
-    ...loaded,
-    rankingProvider: "rule-based",
-  };
-}
-
-function riskBadgeClass(risk: RiskLevel): string {
-  if (risk === "high") return "badge-risk-high";
-  if (risk === "medium") return "badge-risk-medium";
-  return "badge-risk-low";
-}
-
-function modelStatusBadge(status: ModelInfo["status"]): string {
-  switch (status) {
-    case "downloading": return "badge-info";
-    case "loading": return "badge-info";
-    case "ready": return "badge-status-ready";
-    case "failed": return "badge-risk-high";
-    default: return "badge-muted";
-  }
-}
-
-function modelStatusText(status: ModelInfo["status"]): string {
-  switch (status) {
-    case "downloading": return "Downloading";
-    case "loading": return "Loading";
-    case "ready": return "Ready";
-    case "failed": return "Needs retry";
-    default: return "Idle";
-  }
-}
-
-function candidateSourceLabel(source: RewriteToken["source"] | RankingResult["option"]["source"]): string {
-  switch (source) {
-    case "generator": return "AI";
-    case "contextual-mlm": return "Ctx";
-    case "deep-bank": return "Deep";
-    case "phrase-bank": return "Phrase";
-    case "static-bank": return "Bank";
-    default: return "Rule";
-  }
+function hasInlineWordTool(token: RewriteToken): boolean {
+  const normalized = normalizeWord(token.text);
+  if (!token.isWord || token.frozen || INLINE_WORD_TOOL_STOP_WORDS.has(normalized)) return false;
+  return token.alternatives.length > 0 || normalized.length >= 4;
 }
 
 function popoverStyle(anchorRect: DOMRect | null): CSSProperties {
   if (!anchorRect || typeof window === "undefined") return { opacity: 0 };
 
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
+  const width = Math.min(300, Math.max(260, window.innerWidth - 32));
+  const left = Math.min(
+    window.innerWidth - width - 16,
+    Math.max(16, anchorRect.left + anchorRect.width / 2 - width / 2)
+  );
+  const estimatedHeight = 340;
+  const top =
+    anchorRect.bottom + estimatedHeight + 12 <= window.innerHeight
+      ? anchorRect.bottom + 8
+      : Math.max(12, anchorRect.top - estimatedHeight - 8);
 
-  if (vw < 760) {
-    const mobileWidth = Math.min(286, Math.max(248, vw - 90));
-    const left = Math.min(
-      vw - mobileWidth - 12,
-      Math.max(12, Math.round(anchorRect.left + anchorRect.width / 2 - mobileWidth / 2))
-    );
-
-    return {
-      position: "fixed",
-      left,
-      bottom: 10,
-      width: mobileWidth,
-      maxWidth: "calc(100vw - 48px)",
-      maxHeight: Math.min(310, vh - 24),
-    };
-  }
-
-  const w = Math.min(320, Math.max(286, vw - 40));
-  const estH = 328;
-  const left = Math.min(vw - w - 12, Math.max(12, anchorRect.left + anchorRect.width / 2 - w / 2));
-  const canBelow = anchorRect.bottom + estH + 12 <= vh;
-  const top = canBelow
-    ? Math.min(vh - estH - 12, anchorRect.bottom + 8)
-    : Math.max(12, anchorRect.top - estH - 8);
-
-  return { position: "fixed", top, left, width: w, maxWidth: "calc(100vw - 24px)" };
+  return {
+    position: "fixed",
+    top,
+    left,
+    width,
+    maxHeight: Math.max(250, window.innerHeight - 24),
+  };
 }
 
-const OutputText = memo(function OutputText({
-  tokens,
+function buildChangedTokenIds(originalText: string, currentText: string, result: RewriteResult): Set<string> {
+  const originalWords = tokenize(originalText).filter((token) => token.type === "word");
+  const currentWords = tokenize(currentText).filter((token) => token.type === "word");
+  const matchedCurrentWords = new Set<number>();
+  let originalCursor = 0;
+
+  for (let currentIndex = 0; currentIndex < currentWords.length; currentIndex += 1) {
+    const currentWord = normalizeWord(currentWords[currentIndex].text);
+    const matchIndex = originalWords.findIndex(
+      (word, index) => index >= originalCursor && normalizeWord(word.text) === currentWord
+    );
+    if (matchIndex < 0) continue;
+    matchedCurrentWords.add(currentIndex);
+    originalCursor = matchIndex + 1;
+  }
+
+  const changedIds = new Set<string>();
+  for (const token of result.tokens) {
+    if (!token.isWord || token.frozen) continue;
+    const overlapsChangedWord = currentWords.some((word, index) =>
+      word.start >= token.start && word.end <= token.end && !matchedCurrentWords.has(index)
+    );
+    if (overlapsChangedWord) changedIds.add(token.id);
+  }
+  return changedIds;
+}
+
+function getEditorText(element: HTMLDivElement): string {
+  return (element.innerText || element.textContent || "").replace(/\u00a0/g, " ");
+}
+
+function renderInlineEditorContent(
+  element: HTMLDivElement,
+  result: RewriteResult,
+  changedTokenIds: Set<string>,
+  grammarWarningTokenIds: Set<string>,
+  grammarWarningMessages: Map<string, string>,
+  activeTokenId: string | null
+): void {
+  const fragment = document.createDocumentFragment();
+
+  for (const token of result.tokens) {
+    const clickable = hasInlineWordTool(token);
+    const changed = changedTokenIds.has(token.id);
+    const grammarWarning = grammarWarningTokenIds.has(token.id);
+    if (!clickable && !changed && !grammarWarning) {
+      fragment.appendChild(document.createTextNode(token.text));
+      continue;
+    }
+
+    const span = document.createElement("span");
+    span.textContent = token.text;
+    span.className = cn(
+      "inline-token",
+      clickable && "inline-token-candidate",
+      changed && "inline-token-changed",
+      grammarWarning && "inline-token-warning",
+      activeTokenId === token.id && "inline-token-active"
+    );
+    span.contentEditable = "true";
+    span.dataset.tokenState = grammarWarning ? "warning" : changed ? "changed" : clickable ? "candidate" : "text";
+    if (grammarWarning) {
+      span.dataset.grammarWarningToken = token.id;
+      span.title = grammarWarningMessages.get(token.id) ?? "Review this grammar or flow note.";
+    }
+    if (clickable) {
+      span.dataset.inlineToken = token.id;
+      span.setAttribute("role", "button");
+      span.setAttribute("tabindex", "0");
+      span.setAttribute("aria-haspopup", "dialog");
+      span.setAttribute("aria-expanded", activeTokenId === token.id ? "true" : "false");
+      span.setAttribute("aria-controls", "synonym-popover");
+      span.setAttribute("aria-label", `Choose a synonym for ${token.text}`);
+    }
+    fragment.appendChild(span);
+  }
+
+  element.replaceChildren(fragment);
+}
+
+const InlineRewriteEditor = memo(function InlineRewriteEditor({
+  editorRef,
+  result,
+  text,
+  originalText,
+  grammarIssues,
   activeTokenId,
   onActivate,
+  onAnchorChange,
+  onChange,
+  onPaste,
 }: {
-  tokens: RewriteToken[];
+  editorRef: RefObject<HTMLDivElement | null>;
+  result: RewriteResult;
+  text: string;
+  originalText: string;
+  grammarIssues: GrammarIssue[];
   activeTokenId: string | null;
-  onActivate: (tokenId: string, element: HTMLButtonElement) => void;
+  onActivate: (tokenId: string, element: HTMLElement) => void;
+  onAnchorChange: (element: HTMLElement | null) => void;
+  onChange: (value: string) => void;
+  onPaste: () => void;
 }) {
-  return (
-    <div className="whitespace-pre-wrap break-words text-[15px] leading-7 text-[var(--text)]">
-      {tokens.map((token) => {
-        if (!token.isWord) return <span key={token.id}>{token.text}</span>;
-
-        if (token.frozen || token.alternatives.length === 0) {
-          return (
-            <span
-              key={token.id}
-              className={cn("px-0.5 rounded", token.frozen ? "output-word-btn frozen" : "")}
-            >
-              {token.text}
-            </span>
-          );
+  const changedTokenIds = useMemo(
+    () => buildChangedTokenIds(originalText, text, result),
+    [originalText, result, text]
+  );
+  const grammarWarningTokenIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const issue of grammarIssues) {
+      if (typeof issue.start !== "number" || typeof issue.end !== "number") continue;
+      for (const token of result.tokens) {
+        if (token.end > issue.start && token.start < issue.end) ids.add(token.id);
+      }
+    }
+    return ids;
+  }, [grammarIssues, result.tokens]);
+  const grammarWarningMessages = useMemo(() => {
+    const messages = new Map<string, string>();
+    for (const issue of grammarIssues) {
+      if (typeof issue.start !== "number" || typeof issue.end !== "number") continue;
+      for (const token of result.tokens) {
+        if (token.end > issue.start && token.start < issue.end && !messages.has(token.id)) {
+          messages.set(token.id, `${issue.label}: ${issue.detail}`);
         }
+      }
+    }
+    return messages;
+  }, [grammarIssues, result.tokens]);
 
-        const active = activeTokenId === token.id;
-        return (
-          <button
-            key={token.id}
-            type="button"
-            data-word-token="true"
-            data-token-id={token.id}
-            onFocus={(e) => onActivate(token.id, e.currentTarget)}
-            onClick={(e) => onActivate(token.id, e.currentTarget)}
-            className={cn(
-              "output-word-btn",
-              !token.changed && "candidate",
-              token.changed && "changed",
-              active && "active"
-            )}
-          >
-            {token.text}
-          </button>
-        );
-      })}
-    </div>
+  useEffect(() => {
+    const element = editorRef.current;
+    if (!element) return;
+
+    const renderedWarningIds = new Set(
+      Array.from(element.querySelectorAll<HTMLElement>("[data-grammar-warning-token]"))
+        .map((tokenElement) => tokenElement.dataset.grammarWarningToken)
+        .filter((value): value is string => Boolean(value))
+    );
+    const warningMarkupMatches = renderedWarningIds.size === grammarWarningTokenIds.size &&
+      [...renderedWarningIds].every((tokenId) => grammarWarningTokenIds.has(tokenId));
+    if (getEditorText(element) !== text || !warningMarkupMatches) {
+      renderInlineEditorContent(element, result, changedTokenIds, grammarWarningTokenIds, grammarWarningMessages, activeTokenId);
+      return;
+    }
+
+    element.querySelectorAll<HTMLElement>("[data-inline-token]").forEach((tokenElement) => {
+      const tokenId = tokenElement.dataset.inlineToken;
+      tokenElement.classList.toggle("inline-token-active", tokenId === activeTokenId);
+      tokenElement.classList.toggle("inline-token-changed", tokenId ? changedTokenIds.has(tokenId) : false);
+      tokenElement.classList.toggle("inline-token-warning", tokenId ? grammarWarningTokenIds.has(tokenId) : false);
+      if (tokenId && grammarWarningTokenIds.has(tokenId)) {
+        tokenElement.title = grammarWarningMessages.get(tokenId) ?? "Review this grammar or flow note.";
+      }
+    });
+  }, [activeTokenId, changedTokenIds, editorRef, grammarWarningMessages, grammarWarningTokenIds, result, text]);
+
+  useEffect(() => {
+    const element = editorRef.current;
+    if (!element || !activeTokenId) {
+      onAnchorChange(null);
+      return;
+    }
+
+    const activeElement = Array.from(element.querySelectorAll<HTMLElement>("[data-inline-token]"))
+      .find((tokenElement) => tokenElement.dataset.inlineToken === activeTokenId) ?? null;
+    onAnchorChange(activeElement);
+  }, [activeTokenId, editorRef, onAnchorChange, result, text]);
+
+  const handleInput = () => {
+    const element = editorRef.current;
+    if (element) onChange(getEditorText(element));
+  };
+
+  const activateFromEvent = (event: ReactMouseEvent<HTMLDivElement> | ReactKeyboardEvent<HTMLDivElement>) => {
+    const target = event.target instanceof HTMLElement
+      ? event.target.closest<HTMLElement>("[data-inline-token]")
+      : null;
+    const tokenId = target?.dataset.inlineToken;
+    if (target && tokenId) onActivate(tokenId, target);
+  };
+
+  return (
+    <div
+      ref={editorRef}
+      contentEditable
+      role="textbox"
+      aria-multiline="true"
+      aria-label="Editable paraphrased text with inline word tools"
+      className="inline-editor"
+      onInput={handleInput}
+      onPaste={onPaste}
+      onClick={activateFromEvent}
+      onKeyDown={(event) => {
+        const target = event.target instanceof HTMLElement
+          ? event.target.closest<HTMLElement>("[data-inline-token]")
+          : null;
+        if (target && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          activateFromEvent(event);
+        }
+      }}
+      spellCheck
+      suppressContentEditableWarning
+    />
   );
 });
 
-function AlternativesList({
+function SynonymPopover({
   token,
-  rankingState,
-  onPick,
-  compact = false,
+  results,
+  style,
+  onSelect,
+  onRevertWord,
+  onRevertSentence,
+  onCopySentence,
+  canRevertSentence,
+  loadingAlternatives,
+  onClose,
 }: {
   token: RewriteToken;
-  rankingState: RankingState | null;
-  onPick: (tokenId: string, alternativeId: string | null) => void;
-  compact?: boolean;
+  results: RankingResult[];
+  style: CSSProperties;
+  onSelect: (replacement: string | null) => void;
+  onRevertWord: () => void;
+  onRevertSentence: () => void;
+  onCopySentence: () => void;
+  canRevertSentence: boolean;
+  loadingAlternatives: boolean;
+  onClose: () => void;
 }) {
-  const results = rankingState?.tokenId === token.id ? rankingState.results : [];
-  const visibleResults = results.slice(0, OPTION_PREVIEW_LIMIT);
-  const hiddenCount = Math.max(0, results.length - visibleResults.length);
-
   return (
-    <div className={cn("space-y-1", compact && "space-y-0.5")}>
-      <button
-        type="button"
-        onClick={() => onPick(token.id, null)}
-        className={cn(
-          "flex w-full items-center justify-between rounded-[8px] border text-left transition",
-          compact ? "px-2 py-1.5 text-[11px]" : "px-3 py-2 text-sm",
-          token.selectedAlternativeId === null
-            ? "border-[#a7d5b5] bg-[#e9f5ec] text-[#24342c]"
-            : "border-[#d7e2da] bg-white text-[#24342c] hover:bg-[#f3f8f5]"
-        )}
-      >
-        <span className="min-w-0 truncate">
-          <span className="font-medium">{token.originalText}</span>
-          <span className="ml-1.5 text-[9px] uppercase tracking-[0.12em] text-[#8b9a90]">Original</span>
-        </span>
-        {token.selectedAlternativeId === null && (
-          <svg className="h-3.5 w-3.5 shrink-0 text-[#499557]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        )}
-      </button>
+    <div
+      data-popover="true"
+      data-testid="synonym-popover"
+      id="synonym-popover"
+      role="dialog"
+      aria-modal="false"
+      aria-label={`Local word choices for ${token.text}`}
+      style={style}
+      className="synonym-popover z-50 max-h-[360px] overflow-hidden rounded-[14px] shadow-xl animate-fade-in"
+      onMouseDown={(event) => event.stopPropagation()}
+    >
+      <div className="synonym-header flex items-start justify-between gap-3 px-3 py-3">
+        <div>
+          <div className="synonym-eyebrow text-[9px] font-semibold uppercase tracking-[0.18em]">Personal suggestions</div>
+          <div className="synonym-title mt-1 text-[14px] font-semibold">{token.text}</div>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="ghost-button rounded-md px-2 py-1 text-[10px]"
+        >
+          Close
+        </button>
+      </div>
 
-      {visibleResults.map((result) => {
-        const selected = token.selectedAlternativeId === result.option.id;
-        return (
+      <div className="synonym-list max-h-[250px] overflow-auto px-2 py-2">
+        <button
+          type="button"
+          onClick={() => onSelect(null)}
+          className="synonym-original mb-1.5 flex w-full items-center justify-between rounded-[9px] px-3 py-2 text-left text-[12px] font-medium"
+        >
+          <span>{token.originalText}</span>
+          <span className="synonym-label text-[10px]">Original</span>
+        </button>
+
+        {results.map((result) => (
+          <button
+            key={result.option.id}
+            type="button"
+            onClick={() => onSelect(result.option.replacement)}
+            className="synonym-option flex w-full items-center justify-between rounded-[9px] px-3 py-2 text-left text-[12px]"
+          >
+            <span className="font-semibold">{result.option.replacement}</span>
+            {result.option.label && <span className="synonym-label text-[10px]">{result.option.label}</span>}
+          </button>
+        ))}
+
+        {loadingAlternatives && (
+          <div className="empty-note rounded-[9px] px-3 py-2 text-[11px]" aria-live="polite">
+            Finding local context-aware alternatives…
+          </div>
+        )}
+        {!loadingAlternatives && results.length === 0 && (
+          <div className="empty-note rounded-[9px] px-3 py-2 text-[11px]">
+            No safe local alternatives for this word.
+          </div>
+        )}
+      </div>
+
+      <div className="synonym-footer flex flex-wrap gap-1.5 px-2 py-2">
+        <button
+          type="button"
+          onClick={onRevertWord}
+          className="synonym-action rounded-full px-2.5 py-1 text-[10px]"
+        >
+          Revert word
+        </button>
+        {canRevertSentence && (
           <button
             type="button"
-            key={result.option.id}
-            onClick={() => onPick(token.id, result.option.id)}
-            className={cn(
-              "flex w-full items-start justify-between gap-2 rounded-[8px] border text-left transition",
-              compact ? "px-2 py-1.5" : "px-3 py-2",
-              selected
-                ? "border-[#a7d5b5] bg-[#e9f5ec] text-[#24342c]"
-                : "border-[#d7e2da] bg-white text-[#24342c] hover:bg-[#f3f8f5]"
-            )}
-            style={compact ? { minHeight: 32 } : undefined}
+            onClick={onRevertSentence}
+            className="synonym-action rounded-full px-2.5 py-1 text-[10px]"
           >
-            <span className="min-w-0">
-              <span className={cn("block truncate font-semibold", compact ? "text-[12px]" : "text-sm")}>
-                {result.option.replacement}
-              </span>
-              <span className="mt-0.5 flex flex-wrap items-center gap-1 text-[9px] text-[#8b9a90]">
-                <span>{candidateSourceLabel(result.option.source)}</span>
-                {result.option.label && <span>{result.option.label}</span>}
-                {result.risk !== "low" && (
-                  <span className={cn("rounded-full border px-1.5 py-0.5", riskBadgeClass(result.risk))}>
-                    {result.risk}
-                  </span>
-                )}
-                {!compact && typeof result.semanticScore === "number" && <span>semantic fit</span>}
-                {!compact && typeof result.grammarScore === "number" && <span>grammar fit</span>}
-              </span>
-              {result.warnings.length > 0 && !compact && (
-                <span className="mt-1 block text-[10px] leading-3 text-[#8b9a90]">
-                  {result.warnings.join(" | ")}
-                </span>
-              )}
-            </span>
-            <span className="shrink-0 text-right">
-              {selected ? (
-                <svg className="h-3.5 w-3.5 shrink-0 text-[#499557]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              ) : null}
-            </span>
+            Revert sentence
           </button>
-        );
-      })}
-
-      {hiddenCount > 0 && (
-        <div className="px-2 py-1 text-[10px] text-[#7a8b82]">
-          +{hiddenCount} more local matches ranked below.
-        </div>
-      )}
-
-      {results.length === 0 && (
-        <div className="rounded-[8px] border border-dashed border-[#d7e2da] px-2 py-2 text-[11px] text-[#7a8b82]">
-          No local alternatives for this word yet.
-        </div>
-      )}
-
-      {rankingState?.tokenId === token.id && rankingState.loading && (
-        <div className="rounded-[8px] border border-dashed border-[#d7e2da] px-2 py-1.5 text-[10px] text-[#7a8b82]">
-          Loading deeper matches.
-        </div>
-      )}
+        )}
+        <button
+          type="button"
+          onClick={onCopySentence}
+          className="synonym-action rounded-full px-2.5 py-1 text-[10px]"
+        >
+          Copy sentence
+        </button>
+      </div>
     </div>
   );
 }
 
-function AlternativesPopover({
-  token,
-  rankingState,
-  modelInfo,
-  style,
-  onPick,
-  onRevertSentence,
-  canRevertSentence,
-  onClose,
-  popoverRef,
-}: {
-  token: RewriteToken;
-  rankingState: RankingState | null;
-  modelInfo: ModelInfo;
-  style: CSSProperties;
-  onPick: (tokenId: string, alternativeId: string | null) => void;
-  onRevertSentence: (tokenId: string) => void;
-  canRevertSentence: boolean;
-  onClose: () => void;
-  popoverRef: RefObject<HTMLDivElement | null>;
-}) {
-  return (
-    <div
-      ref={popoverRef}
-      data-popover="true"
-      data-testid="synonym-popover"
-      style={style}
-      className="z-50 max-h-[340px] overflow-hidden rounded-[10px] border border-[#d7e2da] bg-white shadow-xl animate-fade-in"
-      onMouseDown={(e) => e.stopPropagation()}
-    >
-      <div className="border-b border-[#eef2ef] px-2.5 py-2">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-[8px] font-semibold uppercase tracking-[0.18em] text-[#839089]">
-              Synonyms
-            </div>
-            <div className="truncate text-[13px] font-semibold text-[#24342c]">
-              {token.originalText}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="shrink-0 rounded-md border border-[#d7e2da] bg-white px-2 py-1 text-[10px] text-[#7a8c81] transition hover:bg-[#f3f8f5]"
-          >
-            Close
-          </button>
-        </div>
-        <div className="mt-1.5 flex flex-wrap items-center gap-1 text-[9px]">
-          <span className={cn("rounded-full border px-1.5 py-0.5 font-medium", modelStatusBadge(modelInfo.status))}>
-            {rankingState?.provider === "embedding" ? "Semantic" : "Fast"}
-          </span>
-          <span className="rounded-full border border-[#d7e2da] px-1.5 py-0.5 text-[#7a8c81]">
-            {candidateSourceLabel(token.source)}
-          </span>
-          <span className="rounded-full border border-[#d7e2da] px-1.5 py-0.5 text-[#7a8c81]">
-            {token.alternatives.length} choices
-          </span>
-          {canRevertSentence && (
-            <button
-              type="button"
-              onClick={() => onRevertSentence(token.id)}
-              className="rounded-full border border-[#cddfd3] bg-[#f5faf6] px-2 py-0.5 font-semibold text-[#2f7b4c] transition hover:bg-[#e9f5ec]"
-            >
-              Revert sentence
-            </button>
-          )}
-        </div>
-      </div>
+function replaceRange(text: string, start: number, end: number, replacement: string): string {
+  return `${text.slice(0, start)}${replacement}${text.slice(end)}`;
+}
 
-      <div className="max-h-[254px] overflow-auto px-1.5 py-1.5">
-        <AlternativesList token={token} rankingState={rankingState} onPick={onPick} compact />
+function copyToClipboard(text: string): Promise<void> {
+  if (!text.trim()) return Promise.resolve();
+  return writeClipboardText(text);
+}
+
+function RewriteControls({
+  mode,
+  customStyles,
+  onModeChange,
+  strength,
+  onStrengthChange,
+  disabled,
+}: {
+  mode: AppSettings["mode"];
+  customStyles: CustomStyle[];
+  onModeChange: (mode: AppMode) => void;
+  strength: number;
+  onStrengthChange: (strength: number) => void;
+  disabled: boolean;
+}) {
+  const strengthLevel = percentToStrengthLevel(strength);
+  const options = [
+    ...MODE_OPTIONS,
+    ...customStyles.map((style) => ({
+      value: customModeForStyle(style),
+      label: style.name,
+      hint: style.description || "Agent-created custom mode using Pari's shared engine",
+    })),
+  ];
+
+  return (
+    <div className="rewrite-controls">
+      <div className="rewrite-controls-top">
+        <div>
+          <div className="control-label">Rewrite style</div>
+          <div className="control-hint">Every mode uses Pari’s same engine, learned preferences, and grammar safeguards.</div>
+          <div className="mode-picker mt-2" role="radiogroup" aria-label="Rewrite style">
+            {options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                role="radio"
+                aria-checked={mode === option.value}
+                className={cn("mode-option", mode === option.value && "is-selected")}
+                onClick={() => onModeChange(option.value)}
+                disabled={disabled}
+                title={option.hint}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="strength-control">
+          <div className="strength-heading">
+            <span className="control-label">Rewrite amount</span>
+            <span className="strength-value">{strengthLabel(strength)}</span>
+          </div>
+          <div className="strength-meter" aria-hidden="true">
+            {[1, 2, 3, 4].map((level) => (
+              <span key={level} className={cn("strength-segment", level <= strengthLevel && "is-active")} />
+            ))}
+          </div>
+          <input
+            type="range"
+            min="1"
+            max="4"
+            step="1"
+            value={strengthLevel}
+            disabled={disabled}
+            onChange={(event) => {
+              const level = clamp(Number(event.target.value), 1, 4);
+              onStrengthChange(REWRITE_AMOUNT_VALUES[level - 1]);
+            }}
+            className="strength-range"
+            aria-label="Rewrite amount"
+            aria-valuetext={`${strengthLabel(strength)}, level ${strengthLevel} of 4`}
+          />
+        </div>
       </div>
     </div>
   );
+}
+
+function buildApprovedExample(
+  session: ParaphraseSession,
+  now: string
+): ApprovedExample {
+  const id = `approved-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return {
+    id,
+    createdAt: now,
+    originalText: session.originalText,
+    finalText: session.currentEditedText,
+    originalHash: hashText(session.originalText),
+    finalHash: hashText(session.currentEditedText),
+    protectedSpansSnapshot: session.protectedSpans,
+    groupedEditSummary: session.groupedEditEvents.map((event, index) => ({
+      ...event,
+      id: `${id}-edit-${index + 1}`,
+      approvedExampleId: id,
+      sequence: index + 1,
+    })),
+    appVersion: "0.3.0",
+    schemaVersion: 1,
+  };
+}
+
+function ensureLiveEditEvent(
+  session: ParaphraseSession,
+  liveEditedText: string
+): ParaphraseSession {
+  if (liveEditedText === session.generatedText) return session;
+
+  const generatedToLive = describeTextEdit(
+    session.generatedText,
+    liveEditedText,
+    "typed",
+    {},
+    Date.now() - session.startedAt
+  );
+  const hasMatchingEvent = session.groupedEditEvents.some(
+    (event) =>
+      event.originalFragment === generatedToLive.originalFragment &&
+      event.replacementFragment === generatedToLive.replacementFragment
+  );
+  if (hasMatchingEvent) return session;
+
+  return {
+    ...session,
+    currentEditedText: liveEditedText,
+    groupedEditEvents: appendGroupedEdit(session.groupedEditEvents, generatedToLive),
+  };
 }
 
 export default function App() {
   const [input, setInput] = useState("");
-  const [submittedInput, setSubmittedInput] = useState("");
-  const [settings, setSettings] = useState(() => loadStartupSettings());
-  const [appliedSettings, setAppliedSettings] = useState<AppliedRewriteSettings>(() => toAppliedRewriteSettings(loadStartupSettings()));
-  const [manualChoices, setManualChoices] = useState<Record<string, string | null>>({});
-  const [semanticChoices, setSemanticChoices] = useState<Record<string, string | null>>({});
-  const [modelAlternatives, setModelAlternatives] = useState<Record<string, RankingResult["option"][]>>({});
+  const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
+  const [session, setSession] = useState<ParaphraseSession | null>(null);
+  const [approvedExamples, setApprovedExamples] = useState<ApprovedExample[]>([]);
+  const [preferenceMemory, setPreferenceMemory] = useState<PreferenceMemory>(() => createEmptyPreferenceMemory());
+  const [customStyles, setCustomStyles] = useState<CustomStyle[]>([]);
+  const [customStylesLoaded, setCustomStylesLoaded] = useState(false);
+  const [isLoadingMemory, setIsLoadingMemory] = useState(true);
+  const [isParaphrasing, setIsParaphrasing] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [generationNotice, setGenerationNotice] = useState<string | null>(null);
+  const [approvalMessage, setApprovalMessage] = useState<string | null>(null);
+  const [approvalError, setApprovalError] = useState<string | null>(null);
+  const [persistenceError, setPersistenceError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const [activeTokenId, setActiveTokenId] = useState<string | null>(null);
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [modelInfo, setModelInfo] = useState<ModelInfo>(() => getModelInfoSnapshot());
-  const [entityGuardTerms, setEntityGuardTerms] = useState<string[]>([]);
-  const [entityGuardError, setEntityGuardError] = useState<string | null>(null);
-  const [rankingState, setRankingState] = useState<RankingState | null>(null);
-  const [isParaphrasing, setIsParaphrasing] = useState(false);
-  const [isSemanticRefining, setIsSemanticRefining] = useState(false);
-  const [isAdvancedGenerating, setIsAdvancedGenerating] = useState(false);
-  const [isBackgroundIndexing, setIsBackgroundIndexing] = useState(false);
+  const [contextualAlternatives, setContextualAlternatives] = useState<Record<string, CandidateOption[]>>({});
+  const [contextualLoadingTokenId, setContextualLoadingTokenId] = useState<string | null>(null);
+  const [harperIssues, setHarperIssues] = useState<GrammarIssue[]>([]);
+  const [harperStatus, setHarperStatus] = useState<"idle" | "checking" | "ready" | "unavailable">("idle");
 
-  const popoverRef = useRef<HTMLDivElement>(null);
-  const activeAnchorRef = useRef<HTMLButtonElement | null>(null);
-  const pulseTimerRef = useRef<number | null>(null);
-
-  useEffect(() => { saveSettings(settings); }, [settings]);
+  const activeAnchorRef = useRef<HTMLElement | null>(null);
+  const sessionRef = useRef<ParaphraseSession | null>(null);
+  const requestIdRef = useRef(0);
+  const controllerRef = useRef<AbortController | null>(null);
+  const outputEditSourceRef = useRef<"typed" | "paste">("typed");
+  const outputEditorRef = useRef<HTMLDivElement | null>(null);
+  const contextualRequestRef = useRef(0);
 
   useEffect(() => {
-    const update = () => { applyTheme(settings.theme); };
-    update();
-    if (settings.theme !== "system") return undefined;
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, [settings.theme]);
+    saveSettings(settings);
+    applyTheme(settings.theme);
+  }, [settings]);
 
   useEffect(() => {
-    probeModelInfo(settings.semanticModel).then(setModelInfo).catch(() => undefined);
-  }, [settings.semanticModel]);
+    sessionRef.current = session;
+  }, [session]);
+
+  const refreshCustomStyles = useCallback(async () => {
+    try {
+      setCustomStyles(await loadCustomStyles());
+    } catch (error) {
+      setPersistenceError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setCustomStylesLoaded(true);
+    }
+  }, []);
 
   useEffect(() => {
+    void refreshCustomStyles();
+    window.addEventListener("focus", refreshCustomStyles);
+    return () => window.removeEventListener("focus", refreshCustomStyles);
+  }, [refreshCustomStyles]);
+
+  useEffect(() => {
+    if (!customStylesLoaded || !customStyleIdFromMode(settings.mode)) return;
+    if (!customStyles.some((style) => customModeForStyle(style) === settings.mode)) {
+      setSettings((current) => ({ ...current, mode: "personal" }));
+    }
+  }, [customStyles, customStylesLoaded, settings.mode]);
+
+  useEffect(() => {
+    let mounted = true;
+    void loadApprovalState()
+      .then((state) => {
+        if (!mounted) return;
+        setApprovedExamples(state.examples);
+        setPreferenceMemory(state.memory);
+      })
+      .catch((error) => {
+        if (mounted) setPersistenceError(error instanceof Error ? error.message : String(error));
+      })
+      .finally(() => {
+        if (mounted) setIsLoadingMemory(false);
+      });
     return () => {
-      if (pulseTimerRef.current) window.clearTimeout(pulseTimerRef.current);
+      mounted = false;
     };
   }, []);
 
   useEffect(() => {
-    setActiveTokenId(null);
-    setRankingState(null);
-    activeAnchorRef.current = null;
-    setModelAlternatives({});
-    setIsBackgroundIndexing(false);
-  }, [input]);
-
-  useEffect(() => {
     const onDown = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
-      if (!target) return;
-      if (target.closest("[data-word-token='true']")) return;
-      if (target.closest("[data-popover='true']")) return;
-      if (target.closest("[data-inspector-token='true']")) return;
+      if (target?.closest("[data-inline-token]") || target?.closest("[data-popover='true']")) return;
       setActiveTokenId(null);
-      setRankingState(null);
       activeAnchorRef.current = null;
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setActiveTokenId(null);
-        setRankingState(null);
         activeAnchorRef.current = null;
       }
     };
@@ -454,8 +662,7 @@ export default function App() {
   useEffect(() => {
     if (!activeTokenId) return undefined;
     const refresh = () => {
-      const element = activeAnchorRef.current;
-      if (element) setAnchorRect(element.getBoundingClientRect());
+      if (activeAnchorRef.current) setAnchorRect(activeAnchorRef.current.getBoundingClientRect());
     };
     refresh();
     window.addEventListener("resize", refresh);
@@ -466,754 +673,613 @@ export default function App() {
     };
   }, [activeTokenId]);
 
-  const effectiveFreezeWords = useMemo(
-    () => [appliedSettings.freezeWords, entityGuardTerms.join(", ")]
-      .map((entry) => entry.trim())
-      .filter(Boolean)
-      .join(", "),
-    [appliedSettings.freezeWords, entityGuardTerms]
-  );
-
-  const freezeEntries = useMemo(() => parseFreezeEntries(effectiveFreezeWords), [effectiveFreezeWords]);
-  const resolvedChoices = useMemo(
-    () => ({ ...semanticChoices, ...manualChoices }),
-    [manualChoices, semanticChoices]
-  );
-
-  const rewrite = useMemo(
-    () => rewriteText(submittedInput, {
-      mode: appliedSettings.mode,
-      strength: appliedSettings.strength,
-      freezeWords: effectiveFreezeWords,
-    }, resolvedChoices, modelAlternatives),
-    [appliedSettings.mode, appliedSettings.strength, effectiveFreezeWords, modelAlternatives, resolvedChoices, submittedInput]
-  );
-
-  const activeToken = useMemo(
-    () => rewrite.tokens.find((token) => token.id === activeTokenId) ?? null,
-    [activeTokenId, rewrite.tokens]
-  );
-
-  const hasDraft = input.trim().length > 0;
-  const hasSubmitted = submittedInput.trim().length > 0;
-  const hasOutput = rewrite.outputText.trim().length > 0;
-  const hasPendingRewriteSettings = useMemo(
-    () =>
-      settings.mode !== appliedSettings.mode ||
-      settings.strength !== appliedSettings.strength ||
-      settings.freezeWords !== appliedSettings.freezeWords ||
-      settings.rankingProvider !== appliedSettings.rankingProvider ||
-      settings.semanticModel !== appliedSettings.semanticModel,
-    [appliedSettings, settings]
-  );
-  const draftChanged = hasSubmitted && (input !== submittedInput || hasPendingRewriteSettings);
-  const inputWords = countWords(input);
-  const inputSentences = countSentences(input);
-  const outputWords = countWords(rewrite.outputText);
-  const outputSentences = countSentences(rewrite.outputText);
-  const changedTokens = useMemo(
-    () => rewrite.tokens.filter((token) => token.isWord && token.changed),
-    [rewrite.tokens]
-  );
-  const candidateTokens = useMemo(
-    () => rewrite.tokens.filter((token) => token.isWord && token.alternatives.length > 0),
-    [rewrite.tokens]
-  );
-  const grammarText = hasOutput ? rewrite.outputText : input;
-  const grammarIssues = useMemo(() => analyzeGrammar(grammarText), [grammarText]);
-  const grammarScore = useMemo(() => grammarHealthScore(grammarIssues), [grammarIssues]);
-  const activeMode = MODE_OPTIONS.find((mode) => mode.value === settings.mode) ?? MODE_OPTIONS[0];
-  const activeStrengthIndex = Math.max(0, STRENGTH_STEPS.findIndex((step) => step.value === settings.strength));
-  const ensembleModelIds = useMemo(() => getRankingModelIds(), []);
-  const rewriteAssistantIds = useMemo(() => getRewriteAssistantModelIds(), []);
-  const estimatedModelMemoryMb = useMemo(() => getRankingModelEstimatedMemoryMb(), []);
-  const estimatedRewriteStackMemoryMb = useMemo(() => getRewriteAssistantEstimatedMemoryMb(), []);
-  const estimatedTotalStackMemoryMb = estimatedModelMemoryMb + estimatedRewriteStackMemoryMb;
-  const strengthFill =
-    STRENGTH_STEPS.length > 1
-      ? (activeStrengthIndex / (STRENGTH_STEPS.length - 1)) * 100
-      : 0;
-  const freezeWordChips = useMemo(() => parseFreezeEntries(effectiveFreezeWords), [effectiveFreezeWords]);
-  const sliderLevel = activeStrengthIndex + 1;
-  const charCount = input.length;
-  const showRewriteActivity = isAdvancedGenerating && activeToken !== null;
-
-  const buildTokenRankingContext = useCallback((token: RewriteToken) => {
-    const sentence = getSentenceForRange(rewrite.outputText, token.start, token.end);
-    return {
-      fullText: rewrite.outputText,
-      sentence: sentence.text,
-      selectedText: token.text,
-      mode: appliedSettings.mode,
-      strength: percentToStrengthLevel(appliedSettings.strength),
-      freezeWords: freezeEntries,
-      partOfSpeech: token.partOfSpeech,
-      selectionStart: token.start,
-      selectionEnd: token.end,
-      sentenceStart: sentence.start,
-    } as const;
-  }, [appliedSettings.mode, appliedSettings.strength, freezeEntries, rewrite.outputText]);
-
-  const buildBaseRankingResults = useCallback((token: RewriteToken) => {
-    const context = buildTokenRankingContext(token);
-    return {
-      context,
-      results: rankCandidatesByRule(token.alternatives, context),
-    };
-  }, [buildTokenRankingContext]);
-
-  const getSentenceTokens = useCallback((token: RewriteToken) => {
-    const sentence = getSentenceForRange(rewrite.outputText, token.start, token.end);
-    return rewrite.tokens.filter((entry) => {
-      if (!entry.isWord) return false;
-      return entry.start >= sentence.start && entry.end <= sentence.end;
-    });
-  }, [rewrite.outputText, rewrite.tokens]);
-
-  const activeSentenceCanRevert = useMemo(
-    () => (activeToken ? getSentenceTokens(activeToken).some((token) => token.changed) : false),
-    [activeToken, getSentenceTokens]
-  );
-
   useEffect(() => {
-    if (!activeToken || !hasSubmitted || !activeToken.isWord || activeToken.frozen) {
-      return;
-    }
-    if (activeToken.alternatives.length >= ADVANCED_SUGGESTION_MIN_OPTIONS) {
-      return;
-    }
-    if (Object.prototype.hasOwnProperty.call(modelAlternatives, activeToken.id)) {
-      return;
+    const text = session?.currentEditedText.trim() ?? "";
+    if (!text) {
+      setHarperIssues([]);
+      setHarperStatus("idle");
+      return undefined;
     }
 
-    let cancelled = false;
+    let active = true;
+    setHarperStatus("checking");
     const timer = window.setTimeout(() => {
-      if (cancelled) return;
-      setIsAdvancedGenerating(true);
-
-      generateAdvancedAlternatives(
-        activeToken,
-        submittedInput,
-        appliedSettings.mode,
-        percentToStrengthLevel(appliedSettings.strength)
-      )
-        .then((suggestions) => {
-          if (cancelled || suggestions.length === 0) return;
-          startTransition(() => {
-            setModelAlternatives((current) => ({
-              ...current,
-              [activeToken.id]: suggestions,
-            }));
-          });
-        })
-        .catch((error) => {
-          if (!cancelled) {
-            console.warn("advanced token suggestions failed", error);
-          }
-        })
-        .finally(() => {
-          if (!cancelled) {
-            setIsAdvancedGenerating(false);
-          }
-        });
-    }, ADVANCED_ALTERNATIVE_DELAY_MS);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [
-    activeToken,
-    hasSubmitted,
-    modelAlternatives,
-    appliedSettings.mode,
-    appliedSettings.strength,
-    submittedInput,
-  ]);
-
-  useEffect(() => {
-    if (!hasSubmitted || rewrite.tokens.length === 0) {
-      setIsBackgroundIndexing(false);
-      return;
-    }
-
-    const tokensToIndex = selectTokensForEnhancement(rewrite.tokens, BACKGROUND_INDEX_TOKEN_LIMIT)
-      .filter((token) =>
-        !token.isPhrase &&
-        token.alternatives.length > 0 &&
-        token.alternatives.length < OPTION_PREVIEW_LIMIT &&
-        !Object.prototype.hasOwnProperty.call(modelAlternatives, token.id)
-      );
-
-    if (tokensToIndex.length === 0) {
-      setIsBackgroundIndexing(false);
-      return;
-    }
-
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      void (async () => {
-        if (cancelled) return;
-        setIsBackgroundIndexing(true);
-        const indexed: Record<string, RankingResult["option"][]> = {};
-
-        for (const token of tokensToIndex) {
-          if (cancelled) return;
-          try {
-            indexed[token.id] = await generateAdvancedAlternatives(
-              token,
-              submittedInput,
-              appliedSettings.mode,
-              percentToStrengthLevel(appliedSettings.strength)
-            );
-          } catch {
-            indexed[token.id] = [];
-          }
-        }
-
-        if (cancelled) return;
-        startTransition(() => {
-          setModelAlternatives((current) => ({
-            ...current,
-            ...indexed,
-          }));
-          setIsBackgroundIndexing(false);
-        });
-      })();
-    }, BACKGROUND_INDEX_DELAY_MS);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [
-    appliedSettings.mode,
-    appliedSettings.strength,
-    hasSubmitted,
-    modelAlternatives,
-    rewrite.tokens,
-    submittedInput,
-  ]);
-
-  useEffect(() => {
-    if (!hasSubmitted || appliedSettings.rankingProvider !== "embedding" || activeTokenId !== null) {
-      setSemanticChoices({});
-      setIsSemanticRefining(false);
-      return;
-    }
-
-    const draft = rewriteText(submittedInput, {
-      mode: appliedSettings.mode,
-      strength: appliedSettings.strength,
-      freezeWords: effectiveFreezeWords,
-    }, {}, modelAlternatives);
-    const tokensToRefine = draft.tokens
-      .filter((token) =>
-        token.isWord &&
-        token.alternatives.length > 0 &&
-        (token.changed || (modelAlternatives[token.id]?.length ?? 0) > 0)
-      )
-      .slice(0, SEMANTIC_REFINEMENT_LIMIT);
-
-    if (tokensToRefine.length === 0) {
-      setSemanticChoices({});
-      setIsSemanticRefining(false);
-      return;
-    }
-
-    let cancelled = false;
-
-    const runRefinement = async () => {
-      if (cancelled) return;
-      setIsSemanticRefining(true);
-      const nextChoices: Record<string, string | null> = {};
-
-      for (const token of tokensToRefine) {
-        const sentence = getSentenceForRange(draft.outputText, token.start, token.end);
-        const context = {
-          fullText: draft.outputText,
-          sentence: sentence.text,
-          selectedText: token.text,
-          mode: appliedSettings.mode,
-          strength: percentToStrengthLevel(appliedSettings.strength),
-          freezeWords: freezeEntries,
-          partOfSpeech: token.partOfSpeech,
-          selectionStart: token.start,
-          selectionEnd: token.end,
-          sentenceStart: sentence.start,
-        } as const;
-
-        try {
-          const ranked = await rankCandidatesByEmbeddingEnsemble(token.alternatives, context);
-          const top = ranked[0];
-          if (
-            top &&
-            top.option.id !== token.selectedAlternativeId &&
-            top.risk !== "high" &&
-            (top.semanticScore ?? 0) >= 0.72
-          ) {
-            nextChoices[token.id] = top.option.id;
-          }
-        } catch {
-          if (!cancelled) {
-            setIsSemanticRefining(false);
-          }
-          return;
-        }
-      }
-
-      if (cancelled) return;
-      startTransition(() => {
-        setSemanticChoices(nextChoices);
-        setIsSemanticRefining(false);
-      });
-    };
-
-    const timer = window.setTimeout(() => {
-      void runRefinement();
-    }, SEMANTIC_REFINEMENT_DELAY_MS);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [
-    effectiveFreezeWords,
-    freezeEntries,
-    hasSubmitted,
-    appliedSettings.mode,
-    modelAlternatives,
-    appliedSettings.rankingProvider,
-    appliedSettings.strength,
-    activeTokenId,
-    submittedInput,
-  ]);
-
-  useEffect(() => {
-    if (!activeToken || !activeToken.isWord || activeToken.alternatives.length === 0) {
-      setRankingState(null);
-      return;
-    }
-
-    const { context, results: baseResults } = buildBaseRankingResults(activeToken);
-
-    if (appliedSettings.rankingProvider !== "embedding" || modelInfo.status !== "ready") {
-      setRankingState({ tokenId: activeToken.id, provider: "rule-based", loading: false, results: baseResults });
-      return;
-    }
-
-    let cancelled = false;
-    setRankingState({
-      tokenId: activeToken.id,
-      provider: "embedding",
-      loading: true,
-      results: baseResults,
-      notice: "Re-ranking with the fast local semantic model.",
-    });
-
-    const timer = window.setTimeout(() => {
-      rankCandidatesByEmbedding(activeToken.alternatives, context, appliedSettings.semanticModel)
-        .then((results) => {
-          if (!cancelled) setRankingState({ tokenId: activeToken.id, provider: "embedding", loading: false, results });
+      void analyzeHarperGrammar(text)
+        .then((issues) => {
+          if (!active) return;
+          setHarperIssues(issues);
+          setHarperStatus("ready");
         })
         .catch(() => {
-          if (!cancelled) setRankingState({
-            tokenId: activeToken.id,
-            provider: "rule-based",
-            loading: false,
-            results: baseResults,
-            notice: "Semantic ranking failed. Rule-based ordering is active.",
-          });
+          if (!active) return;
+          setHarperIssues([]);
+          setHarperStatus("unavailable");
         });
-    }, INTERACTIVE_RERANK_DELAY_MS);
+    }, 180);
 
     return () => {
-      cancelled = true;
+      active = false;
       window.clearTimeout(timer);
     };
-  }, [
-    activeToken,
-    appliedSettings.rankingProvider,
-    appliedSettings.semanticModel,
-    buildBaseRankingResults,
-    modelInfo.status,
-  ]);
+  }, [session?.currentEditedText]);
 
-  const closeTokenTools = () => {
+  const activeCustomStyle = useMemo(
+    () => customStyles.find((style) => customModeForStyle(style) === settings.mode) ?? null,
+    [customStyles, settings.mode]
+  );
+  const generationStyle = useMemo(
+    () => activeCustomStyle ? { ...activeCustomStyle, strength: settings.strength } : null,
+    [activeCustomStyle, settings.strength]
+  );
+  const engineMode = activeCustomStyle
+    ? engineModeForStyle(generationStyle)
+    : settings.mode === "warmth" ? "warmth" : "personal";
+  const engineStrength = activeCustomStyle
+    ? effectiveStyleStrength(generationStyle, settings.strength)
+    : settings.strength;
+
+  const preview = useMemo<RewriteResult | null>(() => {
+    if (!session) return null;
+    return rewriteText(
+      session.currentEditedText,
+      {
+        mode: engineMode,
+        strength: engineStrength,
+        freezeWords: serializeProtectedSpans(session.protectedSpans),
+        disableAutomaticRewrites: true,
+      },
+      {},
+      contextualAlternatives
+    );
+  }, [contextualAlternatives, engineMode, engineStrength, session]);
+
+  const grammarIssues = useMemo(
+    () => session
+      ? mergeGrammarIssues(analyzeGrammar(session.currentEditedText), harperIssues)
+      : [],
+    [harperIssues, session?.currentEditedText]
+  );
+  const grammarReviewCount = grammarIssues.filter((issue) => issue.severity !== "low").length;
+
+  const activeToken = useMemo(
+    () => preview?.tokens.find((token) => token.id === activeTokenId) ?? null,
+    [activeTokenId, preview]
+  );
+
+  const activeResults = useMemo(() => {
+    if (!activeToken) return [];
+    const sentence = session
+      ? getSentenceForRange(session.currentEditedText, activeToken.start, activeToken.end)
+      : { text: activeToken.text, start: activeToken.start };
+    const ranked = rankCandidatesByRule(activeToken.alternatives, {
+      fullText: session?.currentEditedText ?? activeToken.text,
+      sentence: sentence.text,
+      selectedText: activeToken.text,
+      mode: engineMode,
+      strength: percentToStrengthLevel(engineStrength),
+      freezeWords: [],
+      partOfSpeech: activeToken.partOfSpeech,
+      selectionStart: activeToken.start,
+      selectionEnd: activeToken.end,
+      sentenceStart: sentence.start,
+    });
+    return rankCandidatesByMemory(ranked, activeToken.originalText, preferenceMemory).slice(0, SYNONYM_LIMIT);
+  }, [activeToken, engineMode, engineStrength, preferenceMemory, session?.currentEditedText]);
+
+  const activeSentenceCanRevert = useMemo(() => {
+    if (!activeToken || !session) return false;
+    const currentSentence = getSentenceForRange(session.currentEditedText, activeToken.start, activeToken.end);
+    const currentSentences = splitSentences(session.currentEditedText);
+    const originalSentences = splitSentences(session.originalText);
+    const sentenceIndex = currentSentences.findIndex(
+      (sentence) => sentence.start === currentSentence.start && sentence.end === currentSentence.end
+    );
+    const originalSentence = sentenceIndex >= 0 ? originalSentences[sentenceIndex] : undefined;
+    return Boolean(originalSentence && currentSentence.text !== originalSentence.text);
+  }, [activeToken, session]);
+  const canRevertParagraph = Boolean(session && session.currentEditedText !== session.generatedText);
+  const hasDraft = input.trim().length > 0;
+  const hasOutput = Boolean(session && preview);
+  const inputWordCount = countWords(input);
+  const inputSentenceCount = countSentences(input);
+  const outputWordCount = session ? countWords(session.currentEditedText) : 0;
+  const outputSentenceCount = session ? countSentences(session.currentEditedText) : 0;
+  const activeMode = activeCustomStyle
+    ? { value: settings.mode, label: activeCustomStyle.name, hint: activeCustomStyle.description || "Agent-created custom mode" }
+    : MODE_OPTIONS.find((option) => option.value === settings.mode) ?? MODE_OPTIONS[0];
+
+  const closeTokenTools = useCallback(() => {
     setActiveTokenId(null);
-    setRankingState(null);
+    setAnchorRect(null);
     activeAnchorRef.current = null;
-  };
+  }, []);
 
-  const setStrengthLevel = (level: number) => {
-    const clamped = Math.max(1, Math.min(STRENGTH_STEPS.length, level));
-    setSettings((current) => ({ ...current, strength: STRENGTH_STEPS[clamped - 1].value }));
-  };
+  const applyEditedText = useCallback(
+    (nextText: string, source: "typed" | "paste" | "synonym" | "revert" | "sentence_rephrase" = "typed", metadata: TextEditMetadata = {}) => {
+      contextualRequestRef.current += 1;
+      setContextualLoadingTokenId(null);
+      setContextualAlternatives({});
+      setSession((current) => {
+        if (!current || current.currentEditedText === nextText) return current;
+        const event = describeTextEdit(
+          current.currentEditedText,
+          nextText,
+          source,
+          metadata,
+          Date.now() - current.startedAt
+        );
+        return {
+          ...current,
+          currentEditedText: nextText,
+          groupedEditEvents: appendGroupedEdit(current.groupedEditEvents, event),
+        };
+      });
+      setApprovalMessage(null);
+      setApprovalError(null);
+      setGenerationNotice(null);
+    },
+    []
+  );
 
-  const setRankingProvider = (provider: AppSettings["rankingProvider"]) => {
-    setSettings((current) => ({ ...current, rankingProvider: provider }));
-    setAppliedSettings((current) => ({ ...current, rankingProvider: provider }));
-    closeTokenTools();
-  };
-
-  const handleOpenToken = (tokenId: string, element: HTMLButtonElement) => {
-    if (activeTokenId === tokenId) {
-      activeAnchorRef.current = element;
-      setAnchorRect(element.getBoundingClientRect());
-      return;
+  const handleInputChange = (value: string) => {
+    contextualRequestRef.current += 1;
+    setContextualLoadingTokenId(null);
+    setContextualAlternatives({});
+    if (session) {
+      controllerRef.current?.abort();
+      requestIdRef.current += 1;
+      setSession(null);
+      closeTokenTools();
     }
-    const token = rewrite.tokens.find((entry) => entry.id === tokenId) ?? null;
+    setInput(value);
+    setApprovalMessage(null);
+    setApprovalError(null);
+    setGenerationNotice(null);
+  };
+
+  const handleOpenToken = (tokenId: string, element: HTMLElement) => {
+    const token = preview?.tokens.find((entry) => entry.id === tokenId);
+    if (!token || !hasInlineWordTool(token) || !session) return;
     activeAnchorRef.current = element;
     setAnchorRect(element.getBoundingClientRect());
-    if (token && token.isWord && token.alternatives.length > 0) {
-      const { results } = buildBaseRankingResults(token);
-      const canSemanticRerank = appliedSettings.rankingProvider === "embedding" && modelInfo.status === "ready";
-      setRankingState({
-        tokenId: token.id,
-        provider: canSemanticRerank ? "embedding" : "rule-based",
-        loading: canSemanticRerank,
-        results,
-        notice: canSemanticRerank
-          ? "Re-ranking with the fast local semantic model."
-          : undefined,
-      });
-    } else {
-      setRankingState(null);
-    }
     setActiveTokenId(tokenId);
-  };
 
-  const handlePickAlternative = (tokenId: string, alternativeId: string | null) => {
-    setManualChoices((current) => ({ ...current, [tokenId]: alternativeId }));
-    closeTokenTools();
+    if (token.alternatives.length >= SYNONYM_LIMIT || contextualAlternatives[tokenId]) return;
+
+    const requestId = contextualRequestRef.current + 1;
+    contextualRequestRef.current = requestId;
+    setContextualLoadingTokenId(tokenId);
+    setGenerationNotice("Finding more local alternatives for this word…");
+    const modelFailures: LocalModelFailure[] = [];
+    void generateAdvancedAlternatives(
+      token,
+      session.currentEditedText,
+      engineMode,
+      percentToStrengthLevel(engineStrength),
+      {
+        onModelFailure: (failure) => {
+          if (!modelFailures.some((entry) => entry.modelId === failure.modelId)) {
+            modelFailures.push(failure);
+          }
+        },
+      }
+    )
+      .then((alternatives) => {
+        if (contextualRequestRef.current !== requestId) return;
+        setContextualAlternatives((current) => ({ ...current, [tokenId]: alternatives }));
+        setContextualLoadingTokenId(null);
+        if (modelFailures.length > 0) {
+          const firstFailure = modelFailures[0];
+          setGenerationNotice(
+            alternatives.length > 0
+              ? `${firstFailure.label} is unavailable. Built-in offline choices are still available. ${firstFailure.message}`
+              : `No additional safe local alternatives were found for this word. ${firstFailure.message}`
+          );
+        } else {
+          setGenerationNotice(alternatives.length > 0 ? "Local contextual alternatives are ready." : "No additional safe local alternatives were found.");
+        }
+      })
+      .catch((error) => {
+        if (contextualRequestRef.current !== requestId) return;
+        setContextualLoadingTokenId(null);
+        setGenerationNotice(error instanceof Error ? error.message : "Contextual alternatives were unavailable.");
+      });
   };
 
   const handleParaphrase = async () => {
     if (!hasDraft) return;
+    controllerRef.current?.abort();
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+    const originalText = input.trim();
+
     setIsParaphrasing(true);
-    setEntityGuardError(null);
-
-    let protectedTerms: string[] = [];
-    if (settings.rankingProvider === "embedding") {
-      try {
-        protectedTerms = await detectProtectedEntityTerms(input);
-      } catch (error) {
-        setEntityGuardError(error instanceof Error ? error.message : String(error));
-      }
-    }
-
-    setEntityGuardTerms(protectedTerms);
-    startTransition(() => {
-      setSubmittedInput(input);
-      setAppliedSettings(toAppliedRewriteSettings(settings));
-      setManualChoices({});
-      setSemanticChoices({});
-      setModelAlternatives({});
-      closeTokenTools();
-    });
-    if (pulseTimerRef.current) window.clearTimeout(pulseTimerRef.current);
-    pulseTimerRef.current = window.setTimeout(() => setIsParaphrasing(false), 260);
-  };
-
-  const handleRevertSentence = (tokenId: string) => {
-    const token = rewrite.tokens.find((entry) => entry.id === tokenId);
-    if (!token) return;
-
-    const sentenceTokens = getSentenceTokens(token);
-    if (sentenceTokens.length === 0) return;
-
-    setManualChoices((current) => {
-      const next = { ...current };
-      sentenceTokens.forEach((entry) => {
-        next[entry.id] = null;
-      });
-      return next;
-    });
-    setSemanticChoices((current) => {
-      const next = { ...current };
-      sentenceTokens.forEach((entry) => {
-        delete next[entry.id];
-      });
-      return next;
-    });
+    contextualRequestRef.current += 1;
+    setContextualLoadingTokenId(null);
+    setContextualAlternatives({});
+    setGenerationNotice("Preparing the private on-device paraphraser…");
+    setApprovalMessage(null);
+    setApprovalError(null);
     closeTokenTools();
+
+    try {
+      const result = await generateLocalParaphrase({
+        originalText,
+        examples: approvedExamples,
+        memory: preferenceMemory,
+        mode: engineMode,
+        strength: engineStrength,
+        style: generationStyle ?? undefined,
+        signal: controller.signal,
+      });
+      if (requestId !== requestIdRef.current || controller.signal.aborted) return;
+      setSession({
+        startedAt: Date.now(),
+        originalText,
+        generatedText: result.text,
+        currentEditedText: result.text,
+        protectedSpans: result.protectedSpans,
+        groupedEditEvents: [],
+        generationMetadata: {
+          source: result.source,
+          durationMs: result.durationMs,
+          retryCount: result.retryCount,
+          retrievedExampleCount: result.retrievedExampleCount,
+          safe: result.safe,
+          notice: result.notice,
+        },
+      });
+      setGenerationNotice(result.notice ?? `Ready in ${result.durationMs} ms. Review the wording, then save it to teach Pari.`);
+    } catch (error) {
+      if (controller.signal.aborted || requestId !== requestIdRef.current) return;
+      setGenerationNotice(error instanceof Error ? error.message : String(error));
+      setSession(null);
+    } finally {
+      if (requestId === requestIdRef.current) setIsParaphrasing(false);
+    }
   };
 
-  const handleCopy = async () => {
-    if (!hasOutput) return;
+  const handleCancel = () => {
+    controllerRef.current?.abort();
+    requestIdRef.current += 1;
+    setIsParaphrasing(false);
+    setGenerationNotice("Paraphrase cancelled. Nothing was saved.");
+  };
+
+  const handleCopy = async (text = session?.currentEditedText ?? "") => {
     try {
-      await navigator.clipboard.writeText(rewrite.outputText);
+      await copyToClipboard(text);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
+      window.setTimeout(() => setCopied(false), 1400);
     } catch {
-      // Clipboard access is best-effort in the desktop shell.
+      setApprovalError("Copy is unavailable in this environment.");
     }
   };
 
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (text) setInput(text);
-    } catch {
-      // Clipboard access is best-effort in the desktop shell.
-    }
-  };
-
-  const handleClear = () => {
-    setInput("");
-    setSubmittedInput("");
-    setManualChoices({});
-    setSemanticChoices({});
-    setEntityGuardTerms([]);
-    setEntityGuardError(null);
-    setIsSemanticRefining(false);
-    setIsAdvancedGenerating(false);
-    setIsBackgroundIndexing(false);
-    setModelAlternatives({});
-    setAppliedSettings(toAppliedRewriteSettings(settings));
+  const handleSelectSynonym = (replacement: string | null) => {
+    if (!activeToken || !session) return;
+    const nextText = replaceRange(
+      session.currentEditedText,
+      activeToken.start,
+      activeToken.end,
+      replacement ?? activeToken.originalText
+    );
+    applyEditedText(nextText, replacement === null ? "revert" : "synonym", {
+      type: replacement === null ? "word-revert" : "synonym-replacement",
+      originalFragment: activeToken.originalText,
+      replacementFragment: replacement ?? activeToken.originalText,
+    });
     closeTokenTools();
+  };
+
+  const handleRevertWord = () => handleSelectSynonym(null);
+
+  const handleRevertSentence = () => {
+    if (!activeToken || !session) return;
+    const currentSentence = getSentenceForRange(session.currentEditedText, activeToken.start, activeToken.end);
+    const currentSentences = splitSentences(session.currentEditedText);
+    const originalSentences = splitSentences(session.originalText);
+    const sentenceIndex = currentSentences.findIndex(
+      (sentence) => sentence.start === currentSentence.start && sentence.end === currentSentence.end
+    );
+    const originalSentence = sentenceIndex >= 0 ? originalSentences[sentenceIndex] : undefined;
+    if (!originalSentence || currentSentence.text === originalSentence.text) return;
+    const nextText = replaceRange(
+      session.currentEditedText,
+      currentSentence.start,
+      currentSentence.end,
+      originalSentence.text
+    );
+    applyEditedText(nextText, "revert", { type: "sentence-revert" });
+    closeTokenTools();
+  };
+
+  const handleRevertParagraph = () => {
+    if (!session) return;
+    applyEditedText(session.generatedText, "revert", {
+      type: "paragraph-revert",
+      originalFragment: session.currentEditedText,
+      replacementFragment: session.generatedText,
+    });
+  };
+
+  const handleCopySentence = () => {
+    if (!activeToken || !session) return;
+    const sentence = getSentenceForRange(session.currentEditedText, activeToken.start, activeToken.end);
+    void handleCopy(sentence.text);
+  };
+
+  const handleApprove = async () => {
+    if (!session || isApproving) return;
+    // Read the live editor once more at the approval boundary. This keeps a
+    // direct contenteditable edit from being lost if a browser/WebView input
+    // event arrives between the last React state update and Save & learn.
+    const liveEditedText = outputEditorRef.current
+      ? getEditorText(outputEditorRef.current)
+      : session.currentEditedText;
+    const approvalSession = liveEditedText === session.currentEditedText
+      ? session
+      : {
+          ...session,
+          currentEditedText: liveEditedText,
+          groupedEditEvents: [
+            ...session.groupedEditEvents,
+            describeTextEdit(
+              session.currentEditedText,
+              liveEditedText,
+              "typed",
+              {},
+              Date.now() - session.startedAt
+            ),
+          ],
+        };
+    const finalApprovalSession = ensureLiveEditEvent(approvalSession, liveEditedText);
+    const validation = validateProtectedContent(finalApprovalSession.originalText, finalApprovalSession.currentEditedText, finalApprovalSession.protectedSpans);
+    if (!validation.safe) {
+      setApprovalError(validation.reason ?? "Links, names, and numbers must remain unchanged before saving.");
+      return;
+    }
+
+    const record = buildApprovedExample(finalApprovalSession, new Date().toISOString());
+    const nextMemory = learnFromApproval(preferenceMemory, record);
+    setPersistenceError(null);
+    setIsApproving(true);
+    try {
+      const nextState = await persistApproval(record, nextMemory);
+      setApprovedExamples(nextState.examples);
+      setPreferenceMemory(nextState.memory);
+      setSession(null);
+      closeTokenTools();
+      setApprovalMessage("Saved locally. Pari will use this preference in future rewrites.");
+      setGenerationNotice(null);
+      setApprovalError(null);
+    } catch (error) {
+      setPersistenceError(error instanceof Error ? error.message : String(error));
+      setApprovalError("Approval was not saved. Your draft is still here; try again.");
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
+  const handleDiscard = () => {
+    controllerRef.current?.abort();
+    requestIdRef.current += 1;
+    setIsParaphrasing(false);
+    setSession(null);
+    contextualRequestRef.current += 1;
+    setContextualLoadingTokenId(null);
+    setContextualAlternatives({});
+    closeTokenTools();
+    setApprovalError(null);
+    setGenerationNotice("Draft discarded. Nothing was saved or learned.");
+    setApprovalMessage(null);
+  };
+
+  const handlePasteOutput = () => {
+    outputEditSourceRef.current = "paste";
+  };
+
+  const storageLabel = usesNativePersistence() ? "Private app storage" : "Private local storage";
+  const isDarkMode = settings.theme === "dark";
+  const toggleTheme = () => {
+    setSettings((current) => ({ ...current, theme: current.theme === "dark" ? "light" : "dark" }));
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f8f6] text-[#1f2522] antialiased" style={{ fontFamily: "'Open Sans', 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif" }}>
-      <header className="sticky top-0 z-40 border-b border-[#e6ebe7] bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1320px] flex-col gap-2 px-4 py-2.5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+    <div className="app-shell min-h-[100dvh] antialiased" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif" }}>
+      <header className="app-header sticky top-0 z-40 backdrop-blur">
+        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <div className="flex h-[32px] w-[32px] items-center justify-center rounded-[8px] bg-[#499557] text-[15px] font-bold text-white">P</div>
+            <div className="brand-mark flex h-[34px] w-[34px] items-center justify-center rounded-[9px] text-[16px] font-bold">P</div>
             <div>
-              <div className="text-[19px] font-[700] tracking-[-0.015em] text-[#1d6b43]">Open Local Phraser V2</div>
-              <div className="text-[11px] text-[#73837b]">Local paraphrasing only. Tap words to swap.</div>
+              <div className="brand-name text-[19px] font-[700] tracking-[-0.015em]">Pari</div>
+              <div className="muted-text text-[12px]">Local paraphrasing tool</div>
             </div>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#5d6f66]">
-            <span className="rounded-full border border-[#d7e2da] bg-[#f5f9f6] px-2.5 py-1">Local only</span>
-            <span className="rounded-full border border-[#d7e2da] bg-[#f5f9f6] px-2.5 py-1">
-              {ensembleModelIds.length + rewriteAssistantIds.length + 1} bundled models
-            </span>
-            <span className="rounded-full border border-[#d7e2da] bg-[#f5f9f6] px-2.5 py-1">
-              {(estimatedTotalStackMemoryMb / 1024).toFixed(1)} GB est.
-            </span>
-            <span className={cn("rounded-full border px-2.5 py-1", modelStatusBadge(modelInfo.status))}>
-              {modelStatusText(modelInfo.status)}
-            </span>
+          <div className="flex items-center gap-2 text-[11px]">
+            <span className="status-badge">Runs locally</span>
+            <span className="status-badge hidden sm:inline-flex">{storageLabel}</span>
+            {isLoadingMemory && <span className="muted-text">Loading preferences…</span>}
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+              title={isDarkMode ? "Light mode" : "Dark mode"}
+            >
+              <span aria-hidden="true">{isDarkMode ? "☀" : "☾"}</span>
+              <span className="hidden sm:inline">{isDarkMode ? "Light" : "Dark"}</span>
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1320px] px-3 py-3 sm:px-5 lg:px-6">
-        <section className="mb-3 rounded-[14px] border border-[#e1e8e3] bg-white px-3 py-2.5 shadow-sm">
-          <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto no-scrollbar">
-              <span className="mr-1 shrink-0 text-[11px] font-[700] uppercase tracking-[0.14em] text-[#74847b]">Mode</span>
-            {MODE_OPTIONS.map((mode) => {
-              const selected = mode.value === settings.mode;
-              return (
-                <button
-                  key={mode.value}
-                  type="button"
-                  onClick={() => setSettings((current) => ({ ...current, mode: mode.value }))}
-                  className={cn(
-                    "whitespace-nowrap rounded-full border px-3 py-1.5 text-[12px] transition",
-                    selected
-                      ? "border-[#a7d5b5] bg-[#e9f5ec] font-[600] text-[#227449]"
-                      : "border-[#dde5e0] bg-white text-[#4b5d55] hover:bg-[#f7faf8]"
-                  )}
-                >
-                  {mode.label}
-                </button>
-              );
-            })}
+      <main className="mx-auto max-w-[1240px] px-3 py-4 sm:px-5 lg:px-8">
+        <section className="intro-card mb-4 rounded-[16px] px-4 py-3 shadow-sm">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="eyebrow text-[12px] font-[700] uppercase tracking-[0.14em]">{activeMode.label}</div>
+              <div className="muted-text mt-1 text-[13px]">{activeMode.hint}. Pari learns from the edits you approve.</div>
             </div>
-
-            <div className="flex flex-col gap-2 lg:flex-row lg:items-center xl:min-w-[560px]">
-              <div className="flex min-w-0 flex-1 items-center gap-2">
-                <span className="shrink-0 text-[12px] font-[700] text-[#44544c]">Synonyms</span>
-                <button type="button" onClick={() => setStrengthLevel(sliderLevel - 1)} className="text-[18px] leading-none text-[#718078] hover:text-[#2a392f]">‹</button>
-                <div className="relative flex-1">
-                  <div className="relative h-[6px] rounded-full bg-[#e4ebe6]">
-                  <div className="absolute left-0 top-0 h-[6px] rounded-full bg-gradient-to-r from-[#71b98b] to-[#e2c14a]" style={{ width: `${strengthFill}%` }} />
-                  {[1, 2, 3, 4, 5].map((level) => (
-                    <button
-                      key={level}
-                      type="button"
-                      onClick={() => setStrengthLevel(level)}
-                      className={cn(
-                        "absolute top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] bg-white transition",
-                        level <= sliderLevel ? "border-[#499557] shadow" : "border-[#cfd8d2]"
-                      )}
-                      style={{ left: `${((level - 1) / 4) * 100}%` }}
-                      aria-label={`Level ${level}`}
-                    />
-                  ))}
-                  </div>
-                </div>
-                <button type="button" onClick={() => setStrengthLevel(sliderLevel + 1)} className="text-[18px] leading-none text-[#718078] hover:text-[#2a392f]">›</button>
-                <span className="w-[58px] shrink-0 rounded-full border border-[#dde5e1] bg-[#f3f7f4] px-2 py-1 text-center text-[10.5px] text-[#66756c]">
-                  L{sliderLevel}
-                </span>
-              </div>
-
-              <div className="flex shrink-0 items-center gap-1 rounded-full border border-[#dce5df] bg-[#f7faf8] p-0.5">
-                {(["rule-based", "embedding"] as const).map((provider) => {
-                  const selected = settings.rankingProvider === provider;
-                  return (
-                    <button
-                      key={provider}
-                      type="button"
-                      onClick={() => setRankingProvider(provider)}
-                      className={cn(
-                        "rounded-full px-2.5 py-1 text-[11px] font-[600] transition",
-                        selected ? "bg-white text-[#227449] shadow-sm" : "text-[#6f8077] hover:text-[#31463a]"
-                      )}
-                    >
-                      {provider === "rule-based" ? "Fast" : "Semantic"}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <div className="muted-text text-[12px]">Private by default · no remote requests</div>
           </div>
+          <RewriteControls
+            mode={settings.mode}
+            customStyles={customStyles}
+            onModeChange={(mode) => {
+              const selectedStyle = customStyles.find((style) => customModeForStyle(style) === mode);
+              setSettings((current) => ({
+                ...current,
+                mode,
+                strength: selectedStyle?.strength ?? current.strength,
+              }));
+              setContextualAlternatives({});
+              setGenerationNotice(null);
+            }}
+            strength={settings.strength}
+            onStrengthChange={(strength) => setSettings((current) => ({ ...current, strength }))}
+            disabled={isParaphrasing}
+          />
         </section>
 
-        <section className="grid gap-3 lg:grid-cols-[minmax(320px,0.86fr)_minmax(460px,1.14fr)]">
-          <div className="flex min-h-[390px] flex-col rounded-[14px] border border-[#e1e8e3] bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-[#eef2ef] px-4 py-3">
+        <section className="grid gap-4 lg:grid-cols-[minmax(320px,0.9fr)_minmax(460px,1.1fr)]">
+          <div className="app-panel flex min-h-[500px] flex-col rounded-[16px] shadow-sm">
+            <div className="panel-header flex items-center justify-between px-4 py-3">
               <div>
-                <div className="text-[13px] font-[600] text-[#32443a]">Input</div>
-                <div className="text-[11px] text-[#86958c]">Paste or type text to paraphrase.</div>
+                <div className="panel-title text-[13px] font-[650]">Original text</div>
+                <div className="muted-text text-[12px]">Paste or type the paragraph you want to reshape.</div>
               </div>
-              <div className="flex items-center gap-3 text-[12.5px] text-[#7a8b82]">
-                <button type="button" onClick={handlePaste} className="hover:text-[#2d4236]">Paste</button>
-                <button
-                  type="button"
-                  onClick={() => (input ? handleClear() : setInput(SAMPLE_TEXT))}
-                  className="underline decoration-dotted underline-offset-2 hover:text-[#2d4236]"
-                >
+              <div className="muted-actions flex items-center gap-3 text-[12px]">
+                <button type="button" onClick={async () => {
+                  try { const text = await readClipboardText(); if (text) handleInputChange(text); }
+                  catch { setApprovalError("Paste is unavailable in this environment."); }
+                }} className="text-action">Paste</button>
+                <button type="button" onClick={() => handleInputChange(input ? "" : SAMPLE_TEXT)} className="text-action underline decoration-dotted underline-offset-2">
                   {input ? "Clear" : "Example"}
                 </button>
               </div>
             </div>
 
-            <div className="relative flex-1">
-              <textarea
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                placeholder="Enter text to paraphrase…"
-                className="h-full min-h-[320px] w-full resize-none bg-transparent px-4 py-4 text-[15px] leading-[1.72] text-[#24342c] outline-none placeholder-[#9aa8a0]"
-                maxLength={10000}
-              />
-              {!input && (
-                <div className="pointer-events-none absolute bottom-5 left-4 right-4 text-[12px] text-[#8e9f96]">
-                  The output keeps real replacements clickable so you can tap and swap words after paraphrasing.
-                </div>
-              )}
-            </div>
+            <textarea
+              value={input}
+              onChange={(event) => handleInputChange(event.target.value)}
+              placeholder="Paste text to paraphrase…"
+              maxLength={10000}
+              className="input-editor min-h-[390px] flex-1 resize-none px-4 py-4 text-[15px] leading-[1.72] outline-none"
+              aria-label="Original text"
+            />
 
-            <div className="flex items-center justify-between border-t border-[#eef2ef] px-4 py-3">
-              <div className="text-[12px] text-[#798982]">
-                {inputWords} words · {inputSentences} sentences · {charCount}/10,000 chars
-              </div>
+            <div className="panel-footer flex items-center justify-between px-4 py-3">
+              <div className="muted-text text-[12px]">{inputWordCount} words · {inputSentenceCount} sentences · {input.length}/10,000</div>
               <button
                 type="button"
-                onClick={handleParaphrase}
-                disabled={!input.trim() || isParaphrasing}
-                className="rounded-full bg-[#499557] px-5 py-[9px] text-[13px] font-[600] text-white shadow-sm transition hover:bg-[#3d8450] disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={isParaphrasing ? handleCancel : handleParaphrase}
+                disabled={!hasDraft && !isParaphrasing}
+                className="primary-button rounded-full px-5 py-[9px] text-[13px] font-[650] shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isParaphrasing ? "Paraphrasing…" : draftChanged ? "Update draft" : "Paraphrase"}
+                {isParaphrasing ? "Cancel" : "Paraphrase"}
               </button>
             </div>
           </div>
 
-          <div className="flex min-h-[390px] flex-col rounded-[14px] border border-[#e1e8e3] bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-[#eef2ef] px-4 py-3">
+          <div
+            className="app-panel flex min-h-[500px] flex-col rounded-[16px] shadow-sm"
+            data-generation-source={session?.generationMetadata.source ?? ""}
+          >
+            <div className="panel-header flex items-center justify-between px-4 py-3">
               <div>
-                <div className="text-[13px] font-[600] text-[#2b7b4f]">Paraphrased</div>
-                <div className="text-[11px] text-[#86958c]">
-                  {hasPendingRewriteSettings && hasSubmitted
-                    ? "Mode or strength changed. Press Paraphrase to apply it to this sentence."
-                    : "Tap highlighted words to open compact synonym choices."}
+                <div className="panel-title accent-text text-[13px] font-[650]">Your {activeMode.label} rewrite</div>
+                <div className="muted-text text-[12px]">Edit directly, or select a highlighted word for local choices.</div>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5" aria-live="polite">
+                  <span className={cn("quality-chip", grammarReviewCount > 0 && "quality-chip-warning")}>
+                    {harperStatus === "checking"
+                      ? "Checking grammar locally…"
+                      : grammarReviewCount > 0
+                      ? `${grammarReviewCount} grammar or flow note${grammarReviewCount === 1 ? "" : "s"}`
+                      : harperStatus === "unavailable" ? "Built-in grammar rules" : "Grammar checked"}
+                  </span>
+                  {grammarIssues.some((issue) => typeof issue.start === "number") && (
+                    <span className="muted-text text-[10px]">Underlined text has a review note.</span>
+                  )}
                 </div>
+                {hasOutput && (
+                  <div className="quality-legend mt-2" data-testid="quality-legend" aria-label="Rewrite highlighting key">
+                    <span className="legend-item"><span className="legend-swatch legend-swatch-changed" aria-hidden="true" /> Changed wording</span>
+                    <span className="legend-item"><span className="legend-swatch legend-swatch-choice" aria-hidden="true" /> Local word choices</span>
+                    <span className="legend-item"><span className="legend-swatch legend-swatch-warning" aria-hidden="true" /> Grammar or flow note</span>
+                  </div>
+                )}
               </div>
-              <div className="flex flex-wrap items-center justify-end gap-1.5 text-[12px] text-[#6f8077]">
-                <button type="button" onClick={handleCopy} className="rounded-full border border-transparent px-2 py-1 hover:border-[#d7e2da] hover:text-[#2f4337]">
-                  {copied ? "Copied" : "Copy"}
-                </button>
-                <button type="button" onClick={handleParaphrase} className="rounded-full border border-transparent px-2 py-1 hover:border-[#d7e2da] hover:text-[#2f4337]">Rephrase</button>
-              </div>
+              <button type="button" onClick={() => void handleCopy()} disabled={!hasOutput} className="text-action rounded-full px-2.5 py-1 text-[12px] disabled:opacity-40">
+                {copied ? "Copied" : "Copy"}
+              </button>
             </div>
 
-            <div className="relative flex-1 overflow-auto px-4 py-4 text-[15px] leading-[1.74] text-[#24342c]">
+            <div className="flex-1 overflow-auto px-4 py-4">
               {!hasOutput && !isParaphrasing && (
-                <div className="text-[#9aa9a0]">
-                  Your paraphrased text will appear here after you press Paraphrase.
+                <div className="empty-editor rounded-[12px] px-4 py-5 text-[13px] leading-6">
+                  Your {activeMode.label} rewrite will appear here after you paraphrase.
                 </div>
               )}
               {isParaphrasing && (
-                <div className="space-y-3 pr-6">
-                  {[...Array(5)].map((_, index) => (
-                    <div
-                      key={index}
-                      className="h-[14px] animate-pulse rounded-full bg-gradient-to-r from-[#eef5f0] via-[#dff0e4] to-[#eef5f0]"
-                      style={{ width: `${92 - index * 10}%` }}
-                    />
+                <div className="space-y-3 pr-6" aria-live="polite">
+                  {[...Array(6)].map((_, index) => (
+                    <div key={index} className="skeleton-line h-[14px] animate-pulse rounded-full" style={{ width: `${94 - index * 9}%` }} />
                   ))}
-                  <div className="pt-2 text-[12.5px] text-[#73947f]">Rewriting with {activeMode.label} mode…</div>
+                  <div className="muted-text pt-2 text-[12px]">Keeping the editor responsive while the local draft is prepared…</div>
                 </div>
               )}
-              {!isParaphrasing && hasOutput && (
-                <OutputText
-                  tokens={rewrite.tokens}
+              {!isParaphrasing && session && preview && (
+                <InlineRewriteEditor
+                  editorRef={outputEditorRef}
+                  result={preview}
+                  text={session.currentEditedText}
+                  originalText={session.originalText}
+                  grammarIssues={grammarIssues}
                   activeTokenId={activeTokenId}
                   onActivate={handleOpenToken}
+                  onAnchorChange={(element) => {
+                    if (activeAnchorRef.current === element) return;
+                    activeAnchorRef.current = element;
+                    setAnchorRect(element?.getBoundingClientRect() ?? null);
+                  }}
+                  onChange={(value) => {
+                    const source = outputEditSourceRef.current;
+                    outputEditSourceRef.current = "typed";
+                    applyEditedText(value, source);
+                  }}
+                  onPaste={handlePasteOutput}
                 />
               )}
             </div>
 
-            <div className="flex items-center justify-between border-t border-[#eef2ef] px-4 py-3 text-[12px] text-[#7d8d83]">
-              <span>{hasOutput ? `${outputWords} words · ${outputSentences} sentences` : "0 words"}</span>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="rounded-full border border-[#d7e2da] px-3 py-[6px] text-[#476157] hover:bg-[#f5f9f6]"
-              >
-                {copied ? "Copied" : "Copy all"}
-              </button>
+            <div className="panel-footer flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+              <div className="muted-text text-[12px]">{hasOutput ? `${outputWordCount} words · ${outputSentenceCount} sentences` : "No draft yet"}</div>
+              <div className="flex items-center gap-2">
+                {session && <button type="button" onClick={handleRevertParagraph} disabled={!canRevertParagraph} className="secondary-button rounded-full px-3 py-[6px] text-[11px] disabled:cursor-not-allowed disabled:opacity-45">Revert edits</button>}
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="mt-3 rounded-[14px] border border-[#e1e8e3] bg-white px-4 py-2.5 shadow-sm">
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#687970]">
-            <span className="rounded-full border border-[#d7e2da] bg-[#f5f9f6] px-2.5 py-1">
-              {changedTokens.length} changed
-            </span>
-            <span className="rounded-full border border-[#d7e2da] bg-[#f5f9f6] px-2.5 py-1">
-              {candidateTokens.length} swappable
-            </span>
-            <span className="rounded-full border border-[#d7e2da] bg-[#f5f9f6] px-2.5 py-1">
-              Grammar {grammarScore}/100
-            </span>
-            <span className="rounded-full border border-[#d7e2da] bg-[#f5f9f6] px-2.5 py-1">
-              {rewriteAssistantIds.length}-model rewrite stack
-            </span>
-            {freezeWordChips.length > 0 && (
-              <span className="rounded-full border border-[#d7e2da] bg-[#f5f9f6] px-2.5 py-1">
-                Protected: {freezeWordChips.slice(0, 4).join(", ")}
-              </span>
+        <section className="app-panel mt-4 rounded-[16px] px-4 py-3 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2 text-[11px]">
+              <span className="status-badge">Learns from approved edits</span>
+              {session && <span className="status-badge">Links, names, and numbers stay protected</span>}
+            </div>
+            {session && (
+              <div className="flex items-center gap-2">
+                <button type="button" onClick={handleDiscard} className="secondary-button rounded-full px-3 py-[7px] text-[12px]">Discard</button>
+                <button type="button" onClick={() => void handleApprove()} disabled={isApproving} className="approve-button rounded-full px-4 py-[7px] text-[12px] font-[650] disabled:cursor-wait disabled:opacity-60">{isApproving ? "Saving & learning…" : "Save & learn"}</button>
+              </div>
             )}
           </div>
-          {(showRewriteActivity || isBackgroundIndexing || isSemanticRefining || entityGuardError) && (
-            <div className={cn("mt-2 text-[12px]", entityGuardError ? "inline-error rounded-md border px-2 py-1" : "text-[#6a8f77]")}>
-              {entityGuardError
-                ? entityGuardError
-                : showRewriteActivity
-                ? "Expanding contextual replacements with the fast local context model…"
-                : isBackgroundIndexing
-                ? "Indexing deeper local synonym matches toward 40 choices…"
-                : isSemanticRefining
-                ? "Refining word choices in the background…"
-                : null}
+          {(generationNotice || approvalMessage || approvalError || persistenceError) && (
+            <div className={cn("notice mt-2 rounded-[9px] border px-3 py-2 text-[12px]", approvalError || persistenceError ? "notice-error" : "notice-success")} aria-live="polite">
+              {approvalError ?? persistenceError ?? approvalMessage ?? generationNotice}
             </div>
           )}
         </section>
@@ -1221,16 +1287,17 @@ export default function App() {
 
       {activeToken && anchorRect && typeof document !== "undefined"
         ? createPortal(
-            <AlternativesPopover
+            <SynonymPopover
               token={activeToken}
-              rankingState={rankingState}
-              modelInfo={modelInfo}
+              results={activeResults}
               style={popoverStyle(anchorRect)}
-              onPick={handlePickAlternative}
+              onSelect={handleSelectSynonym}
+              onRevertWord={handleRevertWord}
               onRevertSentence={handleRevertSentence}
+              onCopySentence={handleCopySentence}
               canRevertSentence={activeSentenceCanRevert}
+              loadingAlternatives={contextualLoadingTokenId === activeTokenId}
               onClose={closeTokenTools}
-              popoverRef={popoverRef}
             />,
             document.body
           )

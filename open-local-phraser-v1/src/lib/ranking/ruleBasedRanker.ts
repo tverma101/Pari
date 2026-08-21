@@ -1,5 +1,5 @@
 import { grammarCompatibility } from "@/lib/nlp/posTagger";
-import type { RewriteMode, RiskLevel } from "@/lib/types";
+import { isWarmthMode, type RewriteMode, type RiskLevel } from "@/lib/types";
 
 import type { CandidateOption, RankingContext, RankingResult } from "./types";
 
@@ -23,13 +23,20 @@ function modeFitBonus(mode: RewriteMode, option: CandidateOption): number {
   const replacementLength = option.replacement.length;
   const originalLength = option.original.length;
 
-  if (option.modePreference?.includes(mode)) return 0.16;
+  if (option.modePreference?.includes(mode) || (isWarmthMode(mode) && option.modePreference?.includes("warm"))) return 0.16;
 
   switch (mode) {
+    case "personal":
+      return Math.abs(replacementLength - originalLength) <= 6 ? 0.09 : 0.05;
     case "simple":
       return replacementLength < originalLength ? 0.12 : -0.02;
     case "shorten":
       return replacementLength <= originalLength ? 0.14 : -0.04;
+    case "expand":
+      return replacementLength >= originalLength + 4 ? 0.18 : replacementLength > originalLength ? 0.08 : -0.04;
+    case "warm":
+    case "warmth":
+      return 0.04;
     case "formal":
       return replacementLength >= originalLength ? 0.12 : 0;
     case "fluency":
@@ -46,14 +53,21 @@ function labelBonus(mode: RewriteMode, label?: string): number {
   if (!label) return 0;
 
   const normalized = label.toLowerCase();
+  if (isWarmthMode(mode) && (normalized.includes("warm") || normalized.includes("friendly") || normalized.includes("casual") || normalized.includes("natural") || normalized.includes("soft"))) {
+    return 0.16;
+  }
   if (normalized.includes("natural")) return mode === "fluency" ? 0.14 : 0.1;
   if (normalized.includes("clear") || normalized.includes("balanced")) return 0.08;
+  if (normalized === "context") return 0.06;
+  if (normalized === "thesaurus") return 0.015;
+  if (normalized === "related") return -0.04;
   if (normalized.includes("precise")) return 0.06;
   if ((mode === "simple" || mode === "shorten") && normalized.includes("simple")) return 0.1;
   if (mode === "formal" && normalized.includes("formal")) return 0.1;
   if (mode === "fluency" && (normalized.includes("natural") || normalized.includes("soft"))) {
     return 0.08;
   }
+  if (mode === "expand" && (normalized.includes("expanded") || normalized.includes("detail") || normalized.includes("phrase"))) return 0.14;
   if (normalized.includes("expanded")) return -0.02;
   return 0;
 }
@@ -66,6 +80,10 @@ function sourceFitBonus(mode: RewriteMode, option: CandidateOption): number {
       return 0.04;
     case "contextual-mlm":
       return mode === "creative" ? 0.03 : 0;
+    case "wordnet":
+      return mode === "personal" || isWarmthMode(mode) ? 0.1 : 0.03;
+    case "thesaurus":
+      return mode === "personal" ? 0.015 : 0;
     case "deep-bank":
       return mode === "creative" ? 0.01 : -0.06;
     case "generator":
@@ -73,6 +91,87 @@ function sourceFitBonus(mode: RewriteMode, option: CandidateOption): number {
     default:
       return 0;
   }
+}
+
+const CONSERVATIVE_LABELS = new Set([
+  "balanced",
+  "clear",
+  "compact",
+  "concise",
+  "context",
+  "direct",
+  "friendly",
+  "natural",
+  "plain",
+  "quality",
+  "simple",
+  "shorter",
+  "soft",
+  "warm",
+]);
+
+// These are legitimate dictionary relationships in some contexts, but they
+// are too ambiguous for an automatic word-by-word paragraph pass. They stay
+// available in the inline chooser where the writer can inspect the sentence.
+const CONSERVATIVE_AMBIGUOUS_REPLACEMENTS = new Set([
+  "although",
+  "as",
+  "bonds",
+  "during",
+  "folks",
+  "follow",
+  "if",
+  "humans",
+  "invited",
+  "persons",
+  "questioned",
+  "sluggish",
+  "some",
+  "optimal",
+  "unlike",
+  "whereas",
+  "while",
+]);
+
+function normalizedLabel(option: CandidateOption): string {
+  return option.label?.trim().toLowerCase() ?? "";
+}
+
+/**
+ * Automatic paragraph output needs a smaller, safer candidate set than the
+ * inline chooser. Deep clusters are useful for discovery but are not
+ * reliable enough to combine word-by-word without a language model.
+ */
+export function isConservativeAutomaticCandidate(
+  option: CandidateOption,
+  mode: RewriteMode
+): boolean {
+  if ((option.risk ?? "low") !== "low") return false;
+  if (CONSERVATIVE_AMBIGUOUS_REPLACEMENTS.has(option.replacement.trim().toLowerCase())) return false;
+  if (option.source === "deep-bank" || option.source === "wordnet" || option.source === "thesaurus" || option.source === "generator" || option.source === "contextual-mlm") {
+    return false;
+  }
+
+  const label = normalizedLabel(option);
+  if (mode === "personal" || mode === "standard" || mode === "fluency") {
+    return CONSERVATIVE_LABELS.has(label) || option.source === "phrase-bank";
+  }
+  if (isWarmthMode(mode)) {
+    return /^(?:warm|natural|soft|friendly|clear|balanced|plain)$/.test(label) || option.source === "phrase-bank";
+  }
+  if (mode === "formal") {
+    return /^(?:formal|precise|clear|balanced|natural|concise)$/.test(label) || option.source === "phrase-bank";
+  }
+  if (mode === "simple") {
+    return /^(?:simple|plain|clear|shorter|compact|concise|natural)$/.test(label) || option.source === "phrase-bank";
+  }
+  if (mode === "shorten") {
+    return /^(?:shorter|compact|simple|plain|clear|concise)$/.test(label) || option.source === "phrase-bank";
+  }
+  if (mode === "expand") {
+    return /^(?:expanded|detail|more detail|phrase|natural|clear|balanced)$/.test(label) || option.source === "phrase-bank";
+  }
+  return /^(?:natural|warm|soft|clear|balanced|quality|concise|simple)$/.test(label) || option.source === "phrase-bank";
 }
 
 function articleBeforeSelection(context: RankingContext): "a" | "an" | "the" | null {
@@ -132,6 +231,12 @@ function specificityPenalty(option: CandidateOption, context: RankingContext): n
         replacement
       )
     ) {
+      return 0.18;
+    }
+  }
+
+  if (original === "user" || original === "users") {
+    if (/\b(writer|writers|learner|learners|operator|operators|reader|readers)\b/.test(replacement)) {
       return 0.18;
     }
   }
