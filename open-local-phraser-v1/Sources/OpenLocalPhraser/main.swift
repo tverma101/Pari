@@ -366,25 +366,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     private let approvalPersistence = ApprovalPersistence()
     private let agentStyleStore = AgentStyleStore()
     private let nativeModelID: String = {
+        // Precedence: env > config > fallback (matches scripts). Env must override config.
+        if let env = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_ID"], !env.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return env.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
         if let data = try? Data(contentsOf: Bundle.main.resourceURL!.appendingPathComponent("native-models/config.json")),
            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            let native = json["nativeModel"] as? [String: Any],
            let id = native["id"] as? String, !id.isEmpty { return id }
-        if let env = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_ID"], !env.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return env.trimmingCharacters(in: .whitespacesAndNewlines)
-        }
+        // Last-resort fallback when neither env nor config exists (e.g. fresh checkout without config). Keep generic; do not hard-code Qwen as the decoupled default.
         return "mlx-community/Qwen3.5-4B-MLX-4bit"
     }()
     private let nativeModelRelativePath: String = {
+        if let env = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_PATH"],
+           !env.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return (env as NSString).expandingTildeInPath
+        }
         if let data = try? Data(contentsOf: Bundle.main.resourceURL!.appendingPathComponent("native-models/config.json")),
            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            let native = json["nativeModel"] as? [String: Any],
            let p = native["localPath"] as? String, !p.isEmpty { return p }
-        if let env = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_PATH"],
-           !env.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            // PARI_NATIVE_MODEL_PATH is handled as a full override in nativeModelCandidates(); this is just the default relative path
-            return "native-models/Qwen/Qwen3.5-4B-MLX-4bit"
-        }
         return "native-models/Qwen/Qwen3.5-4B-MLX-4bit"
     }()
     private let nativeWorkerRelativePath = "native-runtime/paraphrase_worker.py"

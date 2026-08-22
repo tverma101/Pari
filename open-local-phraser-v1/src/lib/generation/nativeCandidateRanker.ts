@@ -14,6 +14,7 @@ import {
   type ProtectedSpan,
 } from "@/lib/safety/protectedContent";
 import { validateRewriteQuality } from "@/lib/generation/rewriteQuality";
+import { assessEnglishQuality } from "@/lib/scoring/englishQuality";
 import type { RewriteMode } from "@/lib/types";
 
 export interface RankedNativeCandidate {
@@ -21,6 +22,7 @@ export interface RankedNativeCandidate {
   temperature?: number;
   semanticScore: number;
   grammarGain: number;
+  englishQualityScore: number;
   safe: boolean;
 }
 
@@ -67,13 +69,18 @@ export async function rankNativeCandidates(
     cosine = cosineSimilarity;
   } catch {
     vectors = [];
-    cosine = () => 0.5; // neutral semantic score; ordering falls to grammar gain
+    cosine = () => 0.5; // neutral semantic score; semantic floor is WAIVED when embeddings unavailable
   }
   const originalVector = vectors[0] ?? [];
 
   const inputIssues = await highSeverityIssueCount(options.originalText);
   const inputRate = inputIssues / tokensOf(options.originalText);
 
+  // Embedding failure must NOT make every candidate unsafe — otherwise an
+  // unavailable model bricks the product. The 0.55 floor is hard only when
+  // embeddings actually loaded; when they didn't, grammarGain + clause + NLI
+  // still gate safety and ordering falls to English quality.
+  const hasEmbeddings = vectors.length > 0 && originalVector.length > 0;
   const ranked = await Promise.all(
     candidates.map(async (candidate, index) => {
       const repairedText = options.finalizeDraft(
@@ -90,25 +97,30 @@ export async function rankNativeCandidates(
 
       const outIssues = quality.safe ? await highSeverityIssueCount(repairedText) : Number.POSITIVE_INFINITY;
       const outRate = outIssues / tokensOf(repairedText);
+      const semanticScore = cosine(originalVector, vectors[index + 1] ?? []);
+      const semanticFloorOk = !hasEmbeddings || semanticScore >= 0.55;
+      const englishQuality = await assessEnglishQuality(options.originalText, repairedText);
+      // Learned judge can veto: contradict => not safe, even if Harper is clean.
+      const nliOk = englishQuality.entailment !== "contradict";
 
       return {
         text: repairedText,
         temperature: candidate.temperature,
-        semanticScore: cosine(originalVector, vectors[index + 1] ?? []),
+        semanticScore,
         grammarGain: (inputRate - outRate) * 100,
-        safe: validation.safe && quality.safe && repairedText !== options.originalText && outRate <= inputRate + 0.005,
+        englishQualityScore: englishQuality.englishQualityScore,
+        safe: validation.safe && quality.safe && semanticFloorOk && nliOk && repairedText !== options.originalText && outRate <= inputRate + 0.005,
       };
     })
   );
 
   return ranked.sort((left, right) => {
     if (left.safe !== right.safe) return left.safe ? -1 : 1;
-    // Issue #7: English quality is primary; similarity is a floor/tie-break.
-    // Hard floor: candidates with very low similarity should sink even if
-    // grammar looks clean (meaning floor lives in metrics.mjs as well).
-    const leftLowSim = left.semanticScore < 0.55;
-    const rightLowSim = right.semanticScore < 0.55;
-    if (leftLowSim !== rightLowSim) return leftLowSim ? 1 : -1;
+    // Issue #7: English quality is primary; similarity is a hard floor (see above).
+    // Among safe candidates, prefer higher learned English quality, then grammarGain, then similarity.
+    if (Math.abs(right.englishQualityScore - left.englishQualityScore) > 0.01) {
+      return right.englishQualityScore - left.englishQualityScore;
+    }
     if (Math.abs(right.grammarGain - left.grammarGain) > 0.01) {
       return right.grammarGain - left.grammarGain;
     }

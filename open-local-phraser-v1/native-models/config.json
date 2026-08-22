@@ -1,0 +1,17 @@
+{
+  "nativeModel": {
+    "id": "mlx-community/Qwen3.5-4B-MLX-4bit",
+    "localPath": "native-models/Qwen/Qwen3.5-4B-MLX-4bit",
+    "incumbentUntilReplaced": true,
+    "comment": "Issue #6: Qwen3.5-4B is incumbent/control only. Ling-3.0-tiny (~4.2GB rapid-mlx, 7.9B/1.3B active, ~86-90 tok/s M4 Pro) is the first challenger. Override via PARI_NATIVE_MODEL_PATH or nativeModel.localPath. Promotion requires beating Qwen on the hardened English-quality benchmark (#7/#8)."
+  },
+  "challengers": [
+    {
+      "id": "rapid-mlx/Ling-3.0-tiny-MLX-4bit",
+      "source": "https://huggingface.co/rapid-mlx/Ling-3.0-tiny-MLX-4bit",
+      "upstream": "https://huggingface.co/inclusionAI/Ling-3.0-tiny",
+      "runtime": "rapid-mlx",
+      "note": "bailing_hybrid requires rapid-mlx until mlx-lm upstream lands"
+    }
+  ]
+}

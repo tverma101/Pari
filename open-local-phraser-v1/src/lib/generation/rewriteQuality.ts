@@ -3,6 +3,7 @@ import { analyzeSentenceFlow } from "@/lib/generation/sentenceFlow";
 import { grammarSafetyIssues } from "@/lib/nlp/grammar";
 import { countWords, normalizeWord, tokenize } from "@/lib/nlp/tokenizer";
 import { looksLikeUnrepairedFragmentaryProse } from "@/lib/generation/brokenProseRepair";
+import { clauseAttachmentIssues } from "@/lib/nlp/clauseAttachment";
 import { meaningContractIssues } from "@/lib/generation/meaningContract";
 import {
   extractProtectedSpans,
@@ -614,6 +615,7 @@ export function analyzeRewriteQuality(
 ): RewriteQualityIssue[] {
   return [
     ...grammarSafetyIssues(candidate).map(({ id, detail }) => ({ id, detail })),
+    ...clauseAttachmentIssues(original, candidate).map(({ id, detail }) => ({ id, detail })),
     ...lexicalIssues(candidate, protectedSpans),
     ...analyzeSentenceFlow(original, candidate),
     ...semanticShiftIssues(original, candidate),

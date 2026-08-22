@@ -1,4 +1,4 @@
-# QuillBot-killer benchmark (Issue #8) — frozen 320
+# QuillBot-killer benchmark (Issue #8) — seed/frozen split
 
 ## Goal
 
@@ -8,8 +8,10 @@ Prove Pari beats QuillBot on the product task:
 
 ## Corpus
 
-- `corpus.seed.json` / `corpus.frozen.json` — **320 cases** (frozen, version 2) across: broken_grammar 105, vague 52, run_on 51, ambiguity_invention_trap 40, canary 38, word_salad 34. All inputs ≤600 chars so the QuillBot free-tier (~600 chars / ~125 words) chunker is a convenience, not a requirement per case.
-- Seed history: 100 seed → +106 expansion (206) → +114 expansion (320). Corpus is now at the 300+ frozen threshold required before any "beats QuillBot" claim; further expansion still toward 500+ is welcome but not blocking.
+- `corpus.seed.json` — **100 cases**, tunable. Use for prompt/model iteration only.
+- `corpus.frozen.json` — **300 cases**, FROZEN HELD-OUT, **disjoint** from seed (0 shared IDs, `qb-hold-***` are brand-new never-committed inputs). Do not tune on this file. This is the final untouched holdout; claims require a win on frozen.
+- Previous versions shipped identical 320-case files (same SHA); that is now fixed — seed 100 vs frozen 300 are disjoint.
+- All inputs ≤600 chars so the QuillBot free-tier (~600 chars / ~125 words) chunker is a convenience, not a requirement per case.
 - Keep the existing 64-case `benchmarks/eval/corpus.json` as the **fast smoke/regression** suite (now hardened per #7 — `ro-04` no longer passes and the old 61/64 must not be called "95% human quality").
 
 ## Scoring

@@ -82,8 +82,10 @@ async function scoreEngine(engine) {
 function fmtPct(n,d){ return `${((n/d)*100).toFixed(1)}%`; }
 
 function pairwiseTable(engines, scored) {
-  // Pairwise win/tie/loss on `passed` only. With a learned pairwise judge this
-  // would be blind preference; the automatic gate is a conservative proxy.
+  // Pairwise on automatic PASS gate — NOT blind human preference. Binary PASS
+  // is a conservative proxy; blind preference (which output is better English?)
+  // is the real product metric (see src/lib/scoring/englishQuality.ts). This
+  // table will show PASS-based wins; prefer human/blind-judge preference when available.
   const names = scored.map(s=>s.engine);
   const passById = new Map(scored.map(s=>[s.engine, new Map(s.results.map(r=>[r.id, r.passed]))]));
   const rows = [];
@@ -95,7 +97,25 @@ function pairwiseTable(engines, scored) {
       const pa = ma.get(cas.id) ?? false, pb = mb.get(cas.id) ?? false;
       if (pa && !pb) aWin++; else if (!pa && pb) bWin++; else tie++;
     }
-    rows.push({ pair: `${a} vs ${b}`, aWin, bWin, tie });
+    rows.push({ pair: `${a} vs ${b}`, aWin, bWin, tie, note: "PASS-gate proxy, not blind English preference" });
+  }
+  return rows;
+}
+
+function pairwisePreferenceTable(engines, scored, preferenceMap) {
+  // If a blind pairwise judge (human or learned englishQuality) is available,
+  // preferenceMap: Map<id, preferredEngineName> drives this. Otherwise returns [].
+  if (!preferenceMap || preferenceMap.size === 0) return [];
+  const names = scored.map(s=>s.engine);
+  const rows = [];
+  for (let i=0;i<names.length;i++) for(let j=i+1;j<names.length;j++) {
+    const a = names[i], b = names[j];
+    let aWin=0,bWin=0,tie=0;
+    for (const cas of corpus) {
+      const pref = preferenceMap.get(cas.id);
+      if (pref === a) aWin++; else if (pref === b) bWin++; else tie++;
+    }
+    rows.push({ pair: `${a} vs ${b}`, aWin, bWin, tie, note: "blind preference (human/learned judge)" });
   }
   return rows;
 }
@@ -131,10 +151,11 @@ async function main(){
   }
 
   if (scored.length >= 2) {
-    console.log(`\n--- Pairwise PASS win/tie/loss (automatic gate proxy; blind human preference is the product metric) ---`);
+    console.log(`\n--- Pairwise PASS win/tie/loss — AUTOMATIC GATE PROXY (not blind English preference) ---`);
+    console.log(`(blind preference — "which output is better English?" — is the product metric; this counts binary PASS only)`);
     for (const r of pairwiseTable(engines, scored)) {
       const [a,b] = r.pair.split(" vs ");
-      console.log(`${r.pair.padEnd(44)} ${a} win ${String(r.aWin).padStart(3)}  tie ${String(r.tie).padStart(3)}  ${b} win ${String(r.bWin).padStart(3)}`);
+      console.log(`${r.pair.padEnd(44)} ${a} win ${String(r.aWin).padStart(3)}  tie ${String(r.tie).padStart(3)}  ${b} win ${String(r.bWin).padStart(3)}  [${r.note}]`);
     }
   }
 

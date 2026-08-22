@@ -362,50 +362,31 @@ export const BAND = { editMin: 0.02, editMax: 0.65, overlapMin: 0.3, overlapMax:
 
 const DEGENERATE = new Set(["broken_words", "broken_grammar", "word_salad"]);
 
-// Issue #7 regression fixture: structural clause-attachment failures that
-// embeddings alone cannot catch. The words are correct but the proposition
-// boundaries are wrong ("the room everyone arrived early" as a noun phrase).
-const KNOWN_MALFORMED_OUTPUTS = new Set([
-  "she finished the slides he ordered, the food we booked, and the room everyone arrived early, but the demo still failed",
-  "she finished the slides he ordered the food we booked the room everyone arrived early the demo still failed",
-]);
-
-function clauseWellFormedIssues(text) {
-  const lower = text.trim().toLowerCase();
-  if (KNOWN_MALFORMED_OUTPUTS.has(lower.replace(/[.!?]+$/g, "").trim())) {
-    return [{ id: "clause-attachment-malformed", detail: "Known malformed clause-attachment output (ro-04 regression)." }];
-  }
-  // Generic heuristic for the same failure class: a comma-list that attaches
-  // a run-on clause fragment as a noun. Catches the exact class without
-  // relying solely on the verbatim fixture above.
-  // e.g. ", and the room everyone arrived early," or ", the food we booked, and"
-  if (/,?\s*and\s+the\s+[a-z]+\s+(?:everyone|everybody|someone|they|we|he|she|it)\s+\S+\s+(?:early|late|quickly|yesterday|today)\b/i.test(text)) {
-    // Only penalize when the text also lacks a real conjunction boundary for
-    // the first fused clauses (signal of unrepaired run-on via comma splice).
-    if (/,\s+the\s+food\s+we\s+booked/i.test(text) || /,?\s+the\s+room\s+everyone/i.test(text)) {
-      return [{ id: "clause-attachment-malformed", detail: "Clause boundaries are incorrectly attached; surrounding noun phrase absorbs a following clause." }];
+// Issue #7: structural clause-attachment failures that embeddings alone miss.
+// Production now owns this via src/lib/nlp/clauseAttachment.ts; the benchmark
+// imports the same module so evaluator and production cannot diverge.
+// A learned NLI judge owns subtler entailment; this handles the obvious class.
+import { createRequire as _createRequire2 } from "module";
+const _require2 = _createRequire2(import.meta.url);
+let _clauseMod = null;
+function clauseAttachmentIssues(input, output) {
+  if (!_clauseMod) {
+    // Load the TS module via the same bridge used for rewriteQuality et al.
+    try {
+      _clauseMod = loadTsModule(path.join(ROOT_DIR, "src/lib/nlp/clauseAttachment.ts"));
+    } catch {
+      _clauseMod = { clauseAttachmentIssues: () => [] };
     }
   }
-  // Detect simple subject-object swap style failures where embeddings stay high
-  // but proposition roles are inverted (e.g. dog/man chase swap). This is a
-  // minimal structural check; full entailment is a later learned-judge step.
-  if (/\bthe\s+room\s+everyone\s+arrived\b/i.test(text) && !/we\s+booked\s+the\s+room/i.test(text)) {
-    return [{ id: "clause-attachment-malformed", detail: "Missing relative-clause boundary: room-booking clause is fused into the next subject." }];
-  }
-  return [];
+  return _clauseMod.clauseAttachmentIssues(input, output);
 }
-
+function clauseWellFormedIssues(text) {
+  // Back-compat shim: old call sites passed only (output). Route through the shared module with empty original.
+  // New code should call clauseAttachmentIssues(input, output) directly.
+  return clauseAttachmentIssues("", text).filter((i) => i.id === "clause-attachment-malformed");
+}
 function roleSwapFixtureIssues(input, output) {
-  const inputLower = input.toLowerCase();
-  const outputLower = output.toLowerCase();
-  // Concrete fixtures where identical words with swapped roles must not PASS.
-  if (inputLower.includes("the dog chased the man") && outputLower.includes("the man chased the dog")) {
-    return [{ id: "role-swap", detail: "Agent and patient are swapped; meaning is contradicted despite high cosine." }];
-  }
-  if (inputLower.includes("the man chased the dog") && outputLower.includes("the dog chased the man")) {
-    return [{ id: "role-swap", detail: "Agent and patient are swapped; meaning is contradicted despite high cosine." }];
-  }
-  return [];
+  return clauseAttachmentIssues(input, output).filter((i) => i.id === "role-swap");
 }
 
 export async function scoreCase(cas, outputText) {
@@ -452,8 +433,9 @@ export async function scoreCase(cas, outputText) {
 
   const gram = await grammarGain(rawInput, outputText, ignoreSamples);
 
-  const clauseIssues = clauseWellFormedIssues(outputText);
-  const swapIssues = roleSwapFixtureIssues(rawInput, outputText);
+  const clauseIssuesAll = clauseAttachmentIssues(rawInput, outputText);
+  const clauseIssues = clauseIssuesAll.filter((i) => i.id === "clause-attachment-malformed");
+  const swapIssues = clauseIssuesAll.filter((i) => i.id === "role-swap");
 
   const checks = {
     meaningFloor: sim >= meaningFloor,
