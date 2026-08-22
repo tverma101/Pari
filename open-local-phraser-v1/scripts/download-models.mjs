@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { createReadStream } from "fs";
+import { createReadStream, readFileSync, existsSync } from "fs";
 import crypto from "crypto";
 import os from "os";
 import path from "path";
@@ -14,12 +14,38 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 const DEFAULT_DTYPE = "q8";
 const NATIVE_ONLY = process.argv.includes("--native-only");
 const INSTALL_NATIVE = process.argv.includes("--install-native");
-const NATIVE_GENERATIVE_MODEL = {
-  id: "mlx-community/Qwen3.5-4B-MLX-4bit",
-  task: "mlx-generation",
-  role: "paragraph-generation",
-  storage: "native-models",
-  localPath: "native-models/Qwen/Qwen3.5-4B-MLX-4bit",
+function resolveNativeGenerativeModel() {
+  // Config drives the default; env overrides it. This retires Qwen as a baked-in default.
+  let cfg = null;
+  try {
+    cfg = JSON.parse(readFileSync(path.join(ROOT_DIR, "native-models/config.json"), "utf8"));
+  } catch {}
+  const envId = process.env.PARI_NATIVE_MODEL_ID?.trim();
+  const envPath = process.env.PARI_NATIVE_MODEL_PATH?.trim();
+  const id = envId || cfg?.nativeModel?.id || "mlx-community/Qwen3.5-4B-MLX-4bit";
+  const localPath = envPath
+    ? (envPath.startsWith("~/") ? path.join(os.homedir(), envPath.slice(2)) : envPath)
+    : (cfg?.nativeModel?.localPath || "native-models/Qwen/Qwen3.5-4B-MLX-4bit");
+  const requiredFiles = cfg?.nativeModel?.requiredFiles || [
+    "README.md",
+    "chat_template.jinja",
+    "config.json",
+    "model.safetensors",
+    "model.safetensors.index.json",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "vocab.json",
+  ];
+  return {
+    id,
+    task: "mlx-generation",
+    role: "paragraph-generation",
+    storage: "native-models",
+    localPath,
+    requiredFiles,
+  };
+}
+const NATIVE_GENERATIVE_MODEL = resolveNativeGenerativeModel();
   requiredFiles: [
     "README.md",
     "chat_template.jinja",

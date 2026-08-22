@@ -365,8 +365,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     private let scheme = "app"
     private let approvalPersistence = ApprovalPersistence()
     private let agentStyleStore = AgentStyleStore()
-    private let nativeModelID = "mlx-community/Qwen3.5-4B-MLX-4bit"
-    private let nativeModelRelativePath = "native-models/Qwen/Qwen3.5-4B-MLX-4bit"
+    private let nativeModelID: String = {
+        if let data = try? Data(contentsOf: Bundle.main.resourceURL!.appendingPathComponent("native-models/config.json")),
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let native = json["nativeModel"] as? [String: Any],
+           let id = native["id"] as? String, !id.isEmpty { return id }
+        if let env = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_ID"], !env.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return env.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return "mlx-community/Qwen3.5-4B-MLX-4bit"
+    }()
+    private let nativeModelRelativePath: String = {
+        if let data = try? Data(contentsOf: Bundle.main.resourceURL!.appendingPathComponent("native-models/config.json")),
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let native = json["nativeModel"] as? [String: Any],
+           let p = native["localPath"] as? String, !p.isEmpty { return p }
+        if let env = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_PATH"],
+           !env.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            // PARI_NATIVE_MODEL_PATH is handled as a full override in nativeModelCandidates(); this is just the default relative path
+            return "native-models/Qwen/Qwen3.5-4B-MLX-4bit"
+        }
+        return "native-models/Qwen/Qwen3.5-4B-MLX-4bit"
+    }()
     private let nativeWorkerRelativePath = "native-runtime/paraphrase_worker.py"
     private let nativeModelRequiredFiles = [
         "manifest.json",

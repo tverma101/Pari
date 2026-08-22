@@ -3,7 +3,19 @@ import path from "path";
 import { spawn } from "child_process";
 
 const ROOT_DIR = path.resolve(new URL("..", import.meta.url).pathname);
-const MODEL_DIR = path.join(ROOT_DIR, "native-models", "Qwen", "Qwen3.5-4B-MLX-4bit");
+function resolveModelDir() {
+  const env = process.env.PARI_NATIVE_MODEL_PATH?.trim();
+  if (env) {
+    const p = env.startsWith("~/") ? path.join(process.env.HOME || "", env.slice(2)) : env;
+    return path.resolve(p);
+  }
+  try {
+    const cfg = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, "native-models/config.json"), "utf8"));
+    if (cfg?.nativeModel?.localPath) return path.join(ROOT_DIR, cfg.nativeModel.localPath);
+  } catch {}
+  return path.join(ROOT_DIR, "native-models", "Qwen", "Qwen3.5-4B-MLX-4bit");
+}
+const MODEL_DIR = resolveModelDir();
 const WORKER = path.join(ROOT_DIR, "native-runtime", "paraphrase_worker.py");
 const PYTHON = [
   "/opt/homebrew/bin/python3",

@@ -1,0 +1,515 @@
+{
+  "version": 1,
+  "description": "QuillBot-killer seed corpus (Issue #8). 120 broken/vague/awkward cases. Expand to 300-500 held-out before claiming 'beats QuillBot'. Scoring uses benchmarks/eval/metrics.mjs (grammar + meaning + clause). Competitor captures (QuillBot Fluency/Standard) are manual/exports — do not automate in violation of ToS.",
+  "source": "Derived from adversarial eval + hard-tail categories in #8: broken grammar, fragments, run-ons, vagueness, word salad, tense, register, ambiguity where invention must be penalized.",
+  "categories": {
+    "broken_grammar": "typos, agreement, fragments that must become complete",
+    "vague": "vague referents / hedged mush",
+    "run_on": "fused clauses requiring restructuring",
+    "word_salad": "incoherent proposition to reconstitute",
+    "ambiguity_invention_trap": "ambiguous inputs where inventing specifics must FAIL",
+    "canary": "anchors/negation/quantity that must survive exactly"
+  },
+  "cases": [
+    {
+      "id": "qb-bw-01",
+      "category": "broken_grammar",
+      "input": "i dont knwo waht happned but it lookd liek the meetign went badlly"
+    },
+    {
+      "id": "qb-bw-02",
+      "category": "broken_grammar",
+      "input": "the package arived yesturday but it was dammaged so i called costumer service"
+    },
+    {
+      "id": "qb-bw-03",
+      "category": "broken_grammar",
+      "input": "we shoudl of left eariler becuase the trafic was teribble"
+    },
+    {
+      "id": "qb-bw-04",
+      "category": "broken_grammar",
+      "input": "hes been workin on teh report all nite, its almost done"
+    },
+    {
+      "id": "qb-bw-05",
+      "category": "broken_grammar",
+      "input": "thye didnt tell me nothin about the schdule chnage"
+    },
+    {
+      "id": "qb-bw-06",
+      "category": "broken_grammar",
+      "input": "Last week she says she will calls me back but never does."
+    },
+    {
+      "id": "qb-bw-07",
+      "category": "broken_grammar",
+      "input": "The results wasn't good and nobody was happy about it."
+    },
+    {
+      "id": "qb-bw-08",
+      "category": "broken_grammar",
+      "input": "We was planning to ship on time, but the bug keep delaying us."
+    },
+    {
+      "id": "qb-bw-09",
+      "category": "broken_grammar",
+      "input": "He don't think the numbers is right, but she believe they are."
+    },
+    {
+      "id": "qb-bw-10",
+      "category": "broken_grammar",
+      "input": "Next month we launches the feature we been working on since January."
+    },
+    {
+      "id": "qb-fr-01",
+      "category": "broken_grammar",
+      "input": "Not sure. Maybe Friday. If that works. Otherwise next week sometime."
+    },
+    {
+      "id": "qb-fr-02",
+      "category": "broken_grammar",
+      "input": "Because of the deadline situation."
+    },
+    {
+      "id": "qb-fr-03",
+      "category": "broken_grammar",
+      "input": "A difficult conversation. That nobody wanted to have. Especially on Monday."
+    },
+    {
+      "id": "qb-fr-04",
+      "category": "broken_grammar",
+      "input": "Still waiting on the numbers. From finance. Again."
+    },
+    {
+      "id": "qb-fr-05",
+      "category": "broken_grammar",
+      "input": "No idea where the file went. Probably the shared drive. Maybe."
+    },
+    {
+      "id": "qb-vg-01",
+      "category": "vague",
+      "input": "the thing with the guy from before didnt really go how i wanted it to go honestly"
+    },
+    {
+      "id": "qb-vg-02",
+      "category": "vague",
+      "input": "we should do something about the stuff soon before it becomes a bigger problem"
+    },
+    {
+      "id": "qb-vg-03",
+      "category": "vague",
+      "input": "so basically the whole thing fell apart because reasons"
+    },
+    {
+      "id": "qb-vg-04",
+      "category": "vague",
+      "input": "that situation last week was not great and we need to handle it somehow"
+    },
+    {
+      "id": "qb-vg-05",
+      "category": "vague",
+      "input": "there are concerns about how things are being handled lately and people are saying things"
+    },
+    {
+      "id": "qb-vg-06",
+      "category": "vague",
+      "input": "u were right about the thing with the guy"
+    },
+    {
+      "id": "qb-vg-07",
+      "category": "vague",
+      "input": "the meeting was fine i guess, some stuff came up, we'll see what happens"
+    },
+    {
+      "id": "qb-vg-08",
+      "category": "vague",
+      "input": "it kinda worked out but not really, depends how you look at it"
+    },
+    {
+      "id": "qb-ro-01",
+      "category": "run_on",
+      "input": "The client called this morning he was upset about the delay we need to send an update before the end of the day."
+    },
+    {
+      "id": "qb-ro-02",
+      "category": "run_on",
+      "input": "I finished the report she sent the slides we reviewed the deck together it took three hours."
+    },
+    {
+      "id": "qb-ro-03",
+      "category": "run_on",
+      "input": "We shipped the feature customers complained the docs were unclear support tickets spiked overnight."
+    },
+    {
+      "id": "qb-ro-04",
+      "category": "run_on",
+      "input": "She finished the slides he ordered the food we booked the room everyone arrived early the demo still failed."
+    },
+    {
+      "id": "qb-ro-05",
+      "category": "run_on",
+      "input": "The deadline missed the client waiting for the proposal we need to explain the delay without making excuses."
+    },
+    {
+      "id": "qb-ro-06",
+      "category": "run_on",
+      "input": "Meeting today with the client who is upset about the delay need to explain clearly and keep the relationship positive."
+    },
+    {
+      "id": "qb-ro-07",
+      "category": "run_on",
+      "input": "Results were mixed feedback was harsh morale dipped leadership wants a plan by Friday."
+    },
+    {
+      "id": "qb-ro-08",
+      "category": "run_on",
+      "input": "The proposal looks good the budget is shaky we should double check the numbers before approval."
+    },
+    {
+      "id": "qb-ws-01",
+      "category": "word_salad",
+      "input": "Budget planning quarter initial forecast revision stakeholder alignment pending final approval process."
+    },
+    {
+      "id": "qb-ws-02",
+      "category": "word_salad",
+      "input": "Marketing campaign analysis funnel impact attribution model comparison exclusive large interest credit."
+    },
+    {
+      "id": "qb-ws-03",
+      "category": "word_salad",
+      "input": "Client presentation feedback negative received version second revision requested scope change implication."
+    },
+    {
+      "id": "qb-ws-04",
+      "category": "word_salad",
+      "input": "Training session attendance low participation improvement plan creation responsibility assignment completed."
+    },
+    {
+      "id": "qb-ws-05",
+      "category": "word_salad",
+      "input": "System migration downtime window weekend notification user communication preparation checklist finalization ongoing."
+    },
+    {
+      "id": "qb-ws-06",
+      "category": "word_salad",
+      "input": "Ideas missing, grammar off, no clear point, needs rewrite but keep the complaint."
+    },
+    {
+      "id": "qb-ws-07",
+      "category": "word_salad",
+      "input": "Deadline missed client upset need action explain delay relationship important."
+    },
+    {
+      "id": "qb-ws-08",
+      "category": "word_salad",
+      "input": "Analysis results interpretation confusion team discussion clarification requirement identified."
+    },
+    {
+      "id": "qb-rg-01",
+      "category": "broken_grammar",
+      "input": "hey so basically the results came back and they were kinda mixed but mostly fine i think"
+    },
+    {
+      "id": "qb-rg-02",
+      "category": "broken_grammar",
+      "input": "ngl the onboarding was confusing af, took me like 3 hours to figure out the basics"
+    },
+    {
+      "id": "qb-rg-03",
+      "category": "broken_grammar",
+      "input": "lol the demo crashed again, classic, anyway im sure well fix it eventually"
+    },
+    {
+      "id": "qb-rg-04",
+      "category": "broken_grammar",
+      "input": "kinda over it tbh, like why bother anymore"
+    },
+    {
+      "id": "qb-rg-05",
+      "category": "broken_grammar",
+      "input": "ok so the thing is we cant really afford the upgrade rn, maybe next quarter idk"
+    },
+    {
+      "id": "qb-rg-06",
+      "category": "broken_grammar",
+      "input": "yeah the update bricked my laptop lol, spent all night fixing it, super fun times"
+    },
+    {
+      "id": "qb-amb-01",
+      "category": "ambiguity_invention_trap",
+      "input": "He said he would meet us there after the event."
+    },
+    {
+      "id": "qb-amb-02",
+      "category": "ambiguity_invention_trap",
+      "input": "The update will be available soon."
+    },
+    {
+      "id": "qb-amb-03",
+      "category": "ambiguity_invention_trap",
+      "input": "We should handle the situation with the client soon."
+    },
+    {
+      "id": "qb-amb-04",
+      "category": "ambiguity_invention_trap",
+      "input": "The team needs to address the issues from last week."
+    },
+    {
+      "id": "qb-amb-05",
+      "category": "ambiguity_invention_trap",
+      "input": "She mentioned the deadline might move."
+    },
+    {
+      "id": "qb-amb-06",
+      "category": "ambiguity_invention_trap",
+      "input": "The report needs some work before it's ready."
+    },
+    {
+      "id": "qb-amb-07",
+      "category": "ambiguity_invention_trap",
+      "input": "We had some concerns about the proposal."
+    },
+    {
+      "id": "qb-amb-08",
+      "category": "ambiguity_invention_trap",
+      "input": "The manager will review the situation and decide."
+    },
+    {
+      "id": "qb-attach-01",
+      "category": "run_on",
+      "input": "She finished the slides, we booked the room, everyone arrived early the demo failed because the projector broke."
+    },
+    {
+      "id": "qb-attach-02",
+      "category": "run_on",
+      "input": "He ordered the food we ate the dessert they left the restaurant we missed the train."
+    },
+    {
+      "id": "qb-attach-03",
+      "category": "run_on",
+      "input": "The engineer fixed the bug the manager approved the deploy the client signed the contract we shipped on Friday."
+    },
+    {
+      "id": "qb-cn-01",
+      "category": "canary",
+      "input": "I never said the report was wrong, I said the numbers were not final."
+    },
+    {
+      "id": "qb-cn-02",
+      "category": "canary",
+      "input": "Send the 42.5% summary to Maya Chen by 2026-08-25 or call +1-555-0142."
+    },
+    {
+      "id": "qb-cn-03",
+      "category": "canary",
+      "input": "The doctor prescribed 50mg twice daily after meals."
+    },
+    {
+      "id": "qb-cn-04",
+      "category": "canary",
+      "input": "Payment due within 30 days of invoice receipt or service suspended."
+    },
+    {
+      "id": "qb-cn-05",
+      "category": "canary",
+      "input": "Neither the manager nor the team lead approved the refund of $1,240.50."
+    },
+    {
+      "id": "qb-cn-06",
+      "category": "canary",
+      "input": "Do not share the draft outside the company until legal signs off on 12 August."
+    },
+    {
+      "id": "qb-cn-07",
+      "category": "canary",
+      "input": "Without the permit, construction cannot legally begin before March 2027."
+    },
+    {
+      "id": "qb-cn-08",
+      "category": "canary",
+      "input": "The meeting is on 2026-09-01 at 2pm and the budget is $12,000."
+    },
+    {
+      "id": "qb-role-01",
+      "category": "canary",
+      "input": "The dog chased the man down the street."
+    },
+    {
+      "id": "qb-role-02",
+      "category": "canary",
+      "input": "The committee approved the proposal after review."
+    },
+    {
+      "id": "qb-hedge-01",
+      "category": "vague",
+      "input": "I think maybe we could possibly consider looking into it when we have time."
+    },
+    {
+      "id": "qb-hedge-02",
+      "category": "vague",
+      "input": "It might be worth maybe discussing this at some point if people are available."
+    },
+    {
+      "id": "qb-tense-01",
+      "category": "broken_grammar",
+      "input": "Yesterday they announce the new policy and everyone has complained immediately."
+    },
+    {
+      "id": "qb-tense-02",
+      "category": "broken_grammar",
+      "input": "When I arrived, she already leaves without saying goodbye."
+    },
+    {
+      "id": "qb-tense-03",
+      "category": "broken_grammar",
+      "input": "The team have finished their part, but the vendor hasn't delivered theirs yet."
+    },
+    {
+      "id": "qb-colloc-01",
+      "category": "broken_grammar",
+      "input": "We need to make a decision about the proposal and take responsibility for the outcome."
+    },
+    {
+      "id": "qb-colloc-02",
+      "category": "broken_grammar",
+      "input": "The teacher gave us clear responsibilities and we need to make the work clear."
+    },
+    {
+      "id": "qb-flow-01",
+      "category": "run_on",
+      "input": "Results look solid but the sample is small we need more data before we celebrate."
+    },
+    {
+      "id": "qb-flow-02",
+      "category": "run_on",
+      "input": "Onboarding was confusing we spent hours on setup the docs assume prior knowledge."
+    },
+    {
+      "id": "qb-pron-01",
+      "category": "vague",
+      "input": "He told him that he was responsible for the delay."
+    },
+    {
+      "id": "qb-pron-02",
+      "category": "vague",
+      "input": "The manager gave the report to the client and he was not happy."
+    },
+    {
+      "id": "qb-neg-01",
+      "category": "canary",
+      "input": "I don't think we should ignore this feedback, even if it's hard to hear."
+    },
+    {
+      "id": "qb-neg-02",
+      "category": "canary",
+      "input": "We cannot ship until QA signs off and the client approves the scope change."
+    },
+    {
+      "id": "qb-wordy-01",
+      "category": "broken_grammar",
+      "input": "Due to the fact that the server was down, we were not able to deploy on time."
+    },
+    {
+      "id": "qb-wordy-02",
+      "category": "broken_grammar",
+      "input": "At this point in time, we are in the process of reviewing the proposal."
+    },
+    {
+      "id": "qb-mixed-01",
+      "category": "run_on",
+      "input": "The client is waiting for an update the team is still debugging the payment flow we promised a fix by tomorrow."
+    },
+    {
+      "id": "qb-mixed-02",
+      "category": "run_on",
+      "input": "Feedback was positive overall one reviewer flagged the methods section we should revise it tonight."
+    },
+    {
+      "id": "qb-mixed-03",
+      "category": "run_on",
+      "input": "Budget cuts hit last quarter hiring froze morale dipped we need a realistic plan."
+    },
+    {
+      "id": "qb-mixed-04",
+      "category": "word_salad",
+      "input": "Proposal review meeting notes action items ownership assignment deadline follow-up coordination pending."
+    },
+    {
+      "id": "qb-mixed-05",
+      "category": "word_salad",
+      "input": "Customer feedback analysis sentiment mixed feature request frequency priority ranking required."
+    },
+    {
+      "id": "qb-mixed-06",
+      "category": "vague",
+      "input": "We need to figure out the next steps and make sure everyone is aligned."
+    },
+    {
+      "id": "qb-mixed-07",
+      "category": "vague",
+      "input": "There were a few issues with the launch that we should probably talk about."
+    },
+    {
+      "id": "qb-mixed-08",
+      "category": "broken_grammar",
+      "input": "Its been a long week and everyones tired but we still need to finish the report."
+    },
+    {
+      "id": "qb-mixed-09",
+      "category": "broken_grammar",
+      "input": "Their going to review the draft tomorrow and give us there feedback."
+    },
+    {
+      "id": "qb-mixed-10",
+      "category": "broken_grammar",
+      "input": "The data shows a increase in errors and we need an solution quickly."
+    },
+    {
+      "id": "qb-good-01",
+      "category": "canary",
+      "input": "The study examined 42 participants and found a modest improvement in recall."
+    },
+    {
+      "id": "qb-good-02",
+      "category": "canary",
+      "input": "Please send the invoice for $2,300 by Friday."
+    },
+    {
+      "id": "qb-good-03",
+      "category": "canary",
+      "input": "We will meet at 3pm in Room 204 to review the proposal."
+    },
+    {
+      "id": "qb-good-04",
+      "category": "vague",
+      "input": "The plan is to launch the feature next month if testing goes well."
+    },
+    {
+      "id": "qb-good-05",
+      "category": "broken_grammar",
+      "input": "The team completed the sprint, but the release was delayed due to a bug."
+    },
+    {
+      "id": "qb-good-06",
+      "category": "run_on",
+      "input": "We finished the draft, shared it with legal, and are waiting for approval."
+    },
+    {
+      "id": "qb-tone-01",
+      "category": "vague",
+      "input": "We need to be more careful about how we communicate the changes."
+    },
+    {
+      "id": "qb-tone-02",
+      "category": "vague",
+      "input": "The situation could have been handled better and we should learn from it."
+    },
+    {
+      "id": "qb-ref-01",
+      "category": "vague",
+      "input": "This is important and that was not handled well, so we need to fix it."
+    }
+  ]
+}

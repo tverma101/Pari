@@ -1,6 +1,7 @@
 import fs from "fs/promises";
-import { createReadStream } from "fs";
+import { createReadStream, readFileSync } from "fs";
 import crypto from "crypto";
+import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -14,13 +15,18 @@ const DEFAULT_DTYPE = "q8";
 const MODEL_ROOT = path.join(ROOT_DIR, "public", "models");
 const MEMORY_CEILING_MB = 6 * 1024;
 const FILES_ONLY = process.argv.includes("--files-only");
-const NATIVE_GENERATIVE_MODEL = {
-  id: "mlx-community/Qwen3.5-4B-MLX-4bit",
-  task: "mlx-generation",
-  storage: "native-models",
-  localPath: "native-models/Qwen/Qwen3.5-4B-MLX-4bit",
-  role: "paragraph-generation",
-};
+function resolveNativeGenerativeModel() {
+  let cfg = null;
+  try { cfg = JSON.parse(readFileSync(path.join(ROOT_DIR, "native-models/config.json"), "utf8")); } catch {}
+  const envId = process.env.PARI_NATIVE_MODEL_ID?.trim();
+  const envPath = process.env.PARI_NATIVE_MODEL_PATH?.trim();
+  const id = envId || cfg?.nativeModel?.id || "mlx-community/Qwen3.5-4B-MLX-4bit";
+  const localPath = envPath
+    ? (envPath.startsWith("~/") ? path.join(os.homedir(), envPath.slice(2)) : envPath)
+    : (cfg?.nativeModel?.localPath || "native-models/Qwen/Qwen3.5-4B-MLX-4bit");
+  return { id, task: "mlx-generation", storage: "native-models", localPath, role: "paragraph-generation" };
+}
+const NATIVE_GENERATIVE_MODEL = resolveNativeGenerativeModel();
 
 function getModelDtype(model) {
   if (model.storage === "native-models") return "mlx-4bit";

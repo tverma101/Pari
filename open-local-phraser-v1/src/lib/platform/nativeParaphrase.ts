@@ -184,7 +184,7 @@ export async function generateNativeParaphrase(
   return {
     text: result.text.trim(),
     durationMs: typeof result.durationMs === "number" ? result.durationMs : 0,
-    modelId: typeof result.modelId === "string" ? result.modelId : "mlx-community/Qwen3.5-4B-MLX-4bit",
+    modelId: typeof result.modelId === "string" ? result.modelId : (typeof result.text === "string" ? "local-model" : "local-model"),
     ...(candidates && candidates.length > 1 ? { candidates } : {}),
   };
 }

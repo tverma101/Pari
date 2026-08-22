@@ -3,9 +3,10 @@
  *
  * Every candidate must pass the same hard gates as a single draft
  * (protected content, rewrite quality, no new high-severity grammar issues).
- * Passing candidates are ranked by MiniLM similarity to the original plus a
- * small grammar-gain bonus; ties prefer the lower temperature. When nothing
- * passes, the caller falls back to its existing single-draft behavior.
+ * Among survivors, survivors are ranked primarily by English quality
+ * (grammarGain) with semantic similarity as a floor/tie-break — per Issue #7
+ * the previous MiniLM-first sort could certify malformed English like ro-04.
+ * When nothing passes, the caller falls back to single-draft behavior.
  */
 import { analyzeHarperGrammar } from "@/lib/nlp/harper";
 import {
@@ -102,11 +103,17 @@ export async function rankNativeCandidates(
 
   return ranked.sort((left, right) => {
     if (left.safe !== right.safe) return left.safe ? -1 : 1;
-    if (Math.abs(right.semanticScore - left.semanticScore) > 0.001) {
-      return right.semanticScore - left.semanticScore;
-    }
+    // Issue #7: English quality is primary; similarity is a floor/tie-break.
+    // Hard floor: candidates with very low similarity should sink even if
+    // grammar looks clean (meaning floor lives in metrics.mjs as well).
+    const leftLowSim = left.semanticScore < 0.55;
+    const rightLowSim = right.semanticScore < 0.55;
+    if (leftLowSim !== rightLowSim) return leftLowSim ? 1 : -1;
     if (Math.abs(right.grammarGain - left.grammarGain) > 0.01) {
       return right.grammarGain - left.grammarGain;
+    }
+    if (Math.abs(right.semanticScore - left.semanticScore) > 0.01) {
+      return right.semanticScore - left.semanticScore;
     }
     return (left.temperature ?? 0) - (right.temperature ?? 0);
   });
