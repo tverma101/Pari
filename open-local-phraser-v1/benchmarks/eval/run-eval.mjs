@@ -2,8 +2,9 @@
  * Pari adversarial eval runner.
  *
  * Usage:
- *   node benchmarks/eval/run-eval.mjs                       # engine = built-in generateLocalParaphrase
- *   node benchmarks/eval/run-eval.mjs --outputs out.jsonl   # score external outputs ({id, output} lines)
+ *   node benchmarks/eval/run-eval.mjs                                          # engine = built-in generateLocalParaphrase
+ *   node benchmarks/eval/run-eval.mjs --outputs out.jsonl                      # score external outputs ({id, output} lines)
+ *   node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.seed.json --outputs out.jsonl
  *
  * Exit code 1 if hard gates fail (meaning floor, anchors, negation, new grammar errors).
  */
@@ -59,7 +60,8 @@ function argValue(flag) {
   return i >= 0 ? args[i + 1] : undefined;
 }
 
-const corpus = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, "benchmarks/eval/corpus.json"), "utf8")).cases;
+const corpusPath = path.resolve(ROOT_DIR, argValue("--corpus") ?? "benchmarks/eval/corpus.json");
+const corpus = JSON.parse(fs.readFileSync(corpusPath, "utf8")).cases;
 
 async function main() {
   let outputs; // Map<id, string>

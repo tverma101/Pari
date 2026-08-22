@@ -360,7 +360,7 @@ export async function correctTypos(text) {
 
 export const BAND = { editMin: 0.02, editMax: 0.65, overlapMin: 0.3, overlapMax: 0.85 };
 
-const DEGENERATE = new Set(["broken_words", "word_salad"]);
+const DEGENERATE = new Set(["broken_words", "broken_grammar", "word_salad"]);
 
 // Issue #7 regression fixture: structural clause-attachment failures that
 // embeddings alone cannot catch. The words are correct but the proposition

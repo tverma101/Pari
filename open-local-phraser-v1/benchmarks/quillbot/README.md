@@ -1,4 +1,4 @@
-# QuillBot-killer benchmark (Issue #8)
+# QuillBot-killer benchmark (Issue #8) — frozen 320
 
 ## Goal
 
@@ -8,8 +8,8 @@ Prove Pari beats QuillBot on the product task:
 
 ## Corpus
 
-- `corpus.seed.json` — 120 seed cases across: broken grammar, vagueness, run-ons/clause-attachment, word salad, ambiguity traps (no invention), canaries/negation, register.
-- This is a **seed**. Before any "beats QuillBot" claim, expand to a **frozen held-out set of 300–500+ cases** emphasizing the hard tail (typos/shorthand, fragments, run-ons, vague recoverable prose, clause attachment, modality/negation/quantity, sentences that should split/join, pronoun ambiguity, hedges).
+- `corpus.seed.json` / `corpus.frozen.json` — **320 cases** (frozen, version 2) across: broken_grammar 105, vague 52, run_on 51, ambiguity_invention_trap 40, canary 38, word_salad 34. All inputs ≤600 chars so the QuillBot free-tier (~600 chars / ~125 words) chunker is a convenience, not a requirement per case.
+- Seed history: 100 seed → +106 expansion (206) → +114 expansion (320). Corpus is now at the 300+ frozen threshold required before any "beats QuillBot" claim; further expansion still toward 500+ is welcome but not blocking.
 - Keep the existing 64-case `benchmarks/eval/corpus.json` as the **fast smoke/regression** suite (now hardened per #7 — `ro-04` no longer passes and the old 61/64 must not be called "95% human quality").
 
 ## Scoring
@@ -43,13 +43,27 @@ Capture outputs for each case from:
 5. leading replacement (Ling-3.0-tiny via `benchmarks/llm-shootout/run_openai_compatible.py`)
 6. optional frontier editor (quality ceiling)
 
-**Do not automate access to any service in violation of its ToS.** Manual/exports are acceptable for the frozen benchmark — store as `benchmarks/quillbot/captures/<engine>.jsonl` with `{id, output}` lines.
+Manual/exports are acceptable for the frozen benchmark — store as `benchmarks/quillbot/captures/<engine>.jsonl` with `{id, output}` lines.
+
+## QuillBot free-tier chunking
+
+QuillBot free tier caps at ~600 chars / ~125 words. All 320 frozen inputs fit per-case, but if you paste longer drafts use:
+
+```bash
+node scripts/quillbot-chunker.mjs --corpus benchmarks/quillbot/corpus.frozen.json --out /tmp/quillbot-chunks.jsonl
+# paste each chunk into QuillBot Fluency/Standard, collect {id, chunkIndex, output} as JSONL, then:
+node scripts/quillbot-chunker.mjs --assemble /tmp/quillbot-chunks.jsonl --responses /tmp/my-pastes.jsonl --out benchmarks/quillbot/captures/quillbot-fluency.jsonl
+```
+
+manual paste + stitch is the supported path.
 
 ## Running the comparison
 
 ```bash
-# 1. Collect Pari outputs for the QuillBot corpus (reuse shootout runner or eval directly)
-node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.seed.json --outputs benchmarks/quillbot/captures/pari.jsonl
+# 1. Collect outputs for the frozen corpus (Pari local-safe-engine runs without --outputs; shootout runners take --corpus)
+node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.frozen.json
+# or score existing captures:
+node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.frozen.json --outputs benchmarks/quillbot/captures/pari.jsonl
 node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.seed.json --outputs benchmarks/quillbot/captures/quillbot-fluency.jsonl
 node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.seed.json --outputs benchmarks/quillbot/captures/quillbot-standard.jsonl
 
@@ -57,7 +71,7 @@ node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.seed.json 
 node benchmarks/quillbot/report.mjs
 ```
 
-`--corpus` flag is not yet wired in `run-eval.mjs` — temporary workaround: copy `corpus.seed.json` over `benchmarks/eval/corpus.json` in a temp checkout, or adapt `run-eval.mjs` to accept `--corpus`. The canonical comparison will be scripted in `report.mjs`.
+`--corpus` is wired in `benchmarks/eval/run-eval.mjs` and both shootout runners (`run_model.py`, `run_openai_compatible.py`); use `benchmarks/quillbot/corpus.frozen.json` directly. Report is `benchmarks/quillbot/report.mjs`.
 
 ## Acceptance (from #8)
 

@@ -12,7 +12,18 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-CORPUS = json.loads((ROOT / "benchmarks/eval/corpus.json").read_text())["cases"]
+DEFAULT_CORPUS = ROOT / "benchmarks/eval/corpus.json"
+
+
+def load_corpus(corpus_arg: str | None) -> list[dict]:
+    p = Path(corpus_arg) if corpus_arg else DEFAULT_CORPUS
+    if not p.is_absolute():
+        cand = Path.cwd() / p
+        p = cand if cand.exists() else (ROOT / p).resolve() if not p.exists() else p.resolve()
+        if not p.exists() and corpus_arg:
+            p = (ROOT / corpus_arg).resolve()
+    data = json.loads(p.read_text())
+    return data["cases"] if isinstance(data, dict) and "cases" in data else data
 
 PROMPT = """Rewrite the text below so it is clear, coherent, and grammatically correct English.
 Rules:
@@ -39,8 +50,11 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("model_dir")
     ap.add_argument("out_file")
+    ap.add_argument("--corpus", default=None, help="Corpus JSON path (default: benchmarks/eval/corpus.json). For QuillBot frozen use benchmarks/quillbot/corpus.frozen.json")
     ap.add_argument("--max-tokens", type=int, default=220)
     args = ap.parse_args()
+    corpus = load_corpus(args.corpus)
+    print(f"corpus: {args.corpus or str(DEFAULT_CORPUS)} cases={len(corpus)}", flush=True)
 
     from mlx_lm import load
     from mlx_lm.generate import generate
@@ -60,7 +74,7 @@ def main() -> None:
                 done_ids.add(json.loads(line)["id"])
 
     with out_path.open("a") as fh:
-        for case in CORPUS:
+        for case in corpus:
             if case["id"] in done_ids:
                 continue
             messages = [{"role": "user", "content": PROMPT.format(text=case["input"])}]

@@ -28,7 +28,19 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-CORPUS = json.loads((ROOT / "benchmarks/eval/corpus.json").read_text())["cases"]
+DEFAULT_CORPUS = ROOT / "benchmarks/eval/corpus.json"
+
+
+def load_corpus(corpus_arg: str | None) -> list[dict[str, Any]]:
+    p = Path(corpus_arg) if corpus_arg else DEFAULT_CORPUS
+    if not p.is_absolute():
+        p = (Path.cwd() / p).resolve() if p.exists() else (ROOT / p).resolve()
+        # fallback: try relative to ROOT
+        if not p.exists():
+            p = (ROOT / corpus_arg).resolve() if corpus_arg else DEFAULT_CORPUS
+    data = json.loads(p.read_text())
+    cases = data["cases"] if isinstance(data, dict) and "cases" in data else data
+    return cases
 
 PROMPT = """Rewrite the text below so it is clear, coherent, and grammatically correct English.
 Rules:
@@ -129,6 +141,7 @@ def main() -> None:
     parser.add_argument("--base-url", default="http://127.0.0.1:8000/v1")
     parser.add_argument("--model", required=True)
     parser.add_argument("--out", required=True)
+    parser.add_argument("--corpus", default=None, help="Path to corpus JSON (default: benchmarks/eval/corpus.json). For QuillBot held-out use benchmarks/quillbot/corpus.frozen.json")
     parser.add_argument("--max-tokens", type=int, default=220)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--timeout", type=float, default=120.0)
@@ -145,6 +158,8 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    corpus = load_corpus(args.corpus)
+    print(f"corpus: {args.corpus or str(DEFAULT_CORPUS)} cases={len(corpus)}", flush=True)
     extra_body = parse_json_object(args.extra_body, "--extra-body")
     chat_template_kwargs = parse_json_object(args.chat_template_kwargs, "--chat-template-kwargs")
 
@@ -158,7 +173,7 @@ def main() -> None:
 
     print(f"server={endpoint(args.base_url)} model={args.model}", flush=True)
     with out_path.open("a") as fh:
-        for case in CORPUS:
+        for case in corpus:
             if case["id"] in done_ids:
                 continue
 
