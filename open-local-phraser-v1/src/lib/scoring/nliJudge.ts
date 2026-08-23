@@ -2,9 +2,10 @@
  * Lightweight production NLI / role-preservation judge (Issue #7).
  *
  * The "learned judge" requirement cannot be satisfied by fixtures/regexes alone.
- * Full DeBERTa-v3 MNLI ONNX is the target, but we can ship an immediate
- * improvement that is (a) general across verbs/roles and (b) catches the class
- * of failures where cosine stays high but the proposition is wrong.
+ * Full DeBERTa-v3 MNLI ONNX is now bundled through onnxNli.ts. This module is
+ * the deterministic safety rail that remains useful when the learned asset is
+ * unavailable and catches the class of failures where cosine stays high but
+ * the proposition is wrong.
  *
  * Approach (no new weights, no network):
  *  - Negation / quantity / named-entity checks (already in metrics.mjs guards).
@@ -15,9 +16,8 @@
  *  - Clause-attachment is handled by clauseAttachment.ts; this module handles
  *    NLI-style contradiction vs entailment.
  *
- * When a real ONNX NLI pipeline is available, `createNliJudge({ pipeline })`
- * wraps it; otherwise `createRuleNliJudge()` is the learned-free but general
- * fallback that still passes unseen role/clause tests (no fixtures).
+ * `createPipelineNliJudge({ pipeline })` remains available for adapters, while
+ * production uses the bundled learned judge plus `createRuleNliJudge()`.
  */
 
 import type { EntailmentLabel } from "./englishQuality";
@@ -36,12 +36,46 @@ function wordSet(text: string): Set<string> {
 
 // Very small general NLI: contradiction signals that survive cosine.
 // These are not fixtures — they fire on any verb with the same pattern.
-const NEGATION_WORDS = new Set(["not", "no", "never", "without", "neither", "nor", "cannot", "n't"]);
+const NEGATION_WORDS = new Set([
+  "not", "no", "never", "without", "neither", "nor", "cannot",
+  "can't", "cant", "couldn't", "couldnt", "didn't", "didnt",
+  "doesn't", "doesnt", "don't", "dont", "hadn't", "hadnt",
+  "hasn't", "hasnt", "haven't", "havent", "isn't", "isnt",
+  "mustn't", "mustnt", "needn't", "neednt", "shouldn't", "shouldnt",
+  "wasn't", "wasnt", "weren't", "werent", "won't", "wont",
+  "wouldn't", "wouldnt", "n't",
+]);
+
+function isNegationToken(token: string): boolean {
+  const normalized = token.replace(/’/g, "'");
+  return NEGATION_WORDS.has(normalized) || normalized.endsWith("n't");
+}
 const QUANT_WORDS = new Set(["all", "every", "each", "none", "only", "always", "never"]);
 
 function negationCount(text: string): number {
   const toks = normalize(text).match(/[a-z']+/g) ?? [];
-  return toks.filter((t) => NEGATION_WORDS.has(t) || t.endsWith("n't")).length;
+  return toks.filter(isNegationToken).length;
+}
+
+function negationSignature(text: string): string {
+  const tokens = normalize(text).match(/[a-z']+/g) ?? [];
+  const kept: string[] = [];
+  for (const token of tokens) {
+    if (isNegationToken(token)) {
+      const previous = kept[kept.length - 1];
+      if (previous && ["do", "does", "did", "can", "could", "should", "will", "would", "must", "need"].includes(previous)) {
+        kept.pop();
+      }
+      continue;
+    }
+    kept.push(token);
+  }
+  return kept.join(" ");
+}
+
+function directNegationFlip(premise: string, hypothesis: string): boolean {
+  if (negationCount(premise) === negationCount(hypothesis)) return false;
+  return negationSignature(premise) === negationSignature(hypothesis);
 }
 
 function hasQuantityMismatch(premise: string, hypothesis: string): boolean {
@@ -86,8 +120,11 @@ export function createRuleNliJudge(): NliJudge {
         return { label: "neutral", score: 0.5, reason: "empty input" };
       }
       const negP = negationCount(premise), negH = negationCount(hypothesis);
-      if (negP !== negH && Math.abs(negP - negH) >= 1) {
-        // Flipped negation is strong contradiction — cosine often stays >0.85.
+      if (negP !== negH && directNegationFlip(premise, hypothesis)) {
+        // A direct lexical negation flip is a strong contradiction — cosine
+        // often stays >0.85. Do not veto merely because a malformed source
+        // spells "dont" and the repair spells "don't"; learned NLI handles
+        // those non-identical sentence shapes.
         return { label: "contradict", score: 0.9, reason: `negation count ${negP}→${negH}` };
       }
       if (hasQuantityMismatch(premise, hypothesis)) {

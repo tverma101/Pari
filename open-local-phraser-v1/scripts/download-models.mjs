@@ -14,6 +14,8 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 const DEFAULT_DTYPE = "q8";
 const NATIVE_ONLY = process.argv.includes("--native-only");
 const INSTALL_NATIVE = process.argv.includes("--install-native");
+const UNCONFIGURED_NATIVE_MODEL_ID = "unconfigured-native-model";
+const UNCONFIGURED_NATIVE_MODEL_PATH = "native-models/unconfigured";
 function resolveNativeGenerativeModel() {
   // Config drives the default; env overrides it. This retires Qwen as a baked-in default.
   let cfg = null;
@@ -22,10 +24,10 @@ function resolveNativeGenerativeModel() {
   } catch {}
   const envId = process.env.PARI_NATIVE_MODEL_ID?.trim();
   const envPath = process.env.PARI_NATIVE_MODEL_PATH?.trim();
-  const id = envId || cfg?.nativeModel?.id || "mlx-community/Qwen3.5-4B-MLX-4bit";
+  const id = envId || cfg?.nativeModel?.id || UNCONFIGURED_NATIVE_MODEL_ID;
   const localPath = envPath
     ? (envPath.startsWith("~/") ? path.join(os.homedir(), envPath.slice(2)) : envPath)
-    : (cfg?.nativeModel?.localPath || "native-models/Qwen/Qwen3.5-4B-MLX-4bit");
+    : (cfg?.nativeModel?.localPath || UNCONFIGURED_NATIVE_MODEL_PATH);
   const requiredFiles = cfg?.nativeModel?.requiredFiles || [
     "README.md",
     "chat_template.jinja",
@@ -46,17 +48,6 @@ function resolveNativeGenerativeModel() {
   };
 }
 const NATIVE_GENERATIVE_MODEL = resolveNativeGenerativeModel();
-  requiredFiles: [
-    "README.md",
-    "chat_template.jinja",
-    "config.json",
-    "model.safetensors",
-    "model.safetensors.index.json",
-    "tokenizer.json",
-    "tokenizer_config.json",
-    "vocab.json",
-  ],
-};
 
 function getModelDtype(model) {
   if (model.storage === "native-models") return "mlx-4bit";
@@ -164,6 +155,11 @@ const MODELS = [
     id: "Xenova/distilroberta-base",
     task: "fill-mask",
     role: "mask-suggestions",
+  },
+  {
+    id: "Xenova/nli-deberta-v3-xsmall",
+    task: "text-classification",
+    role: "nli-judge",
   },
   NATIVE_GENERATIVE_MODEL,
 ];

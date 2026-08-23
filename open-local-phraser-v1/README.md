@@ -37,6 +37,7 @@ npm run models:install                 # optional: connect Qwen outside Pari.app
 npm run models:check
 npm run build
 npm run qa:approval
+npm run qa:learned:judge
 npm run qa:native:model
 npm run qa:native:prompt
 npm run benchmark:quality
@@ -45,20 +46,23 @@ npm run research:grammar:check
 npm run build:desktop
 ```
 
-The model downloader restores the eleven pinned local bundles in the
-development checkout: ten ONNX models used for semantic checks, entity
-protection, and contextual word suggestions, plus the Apache-2.0 Qwen3 4B MLX
-4-bit paragraph generator. `npm run models:download` transfers the bundles in
+The model downloader restores the twelve pinned local bundles in the
+development checkout: eleven ONNX models used for semantic checks, entity
+protection, contextual word suggestions, learned NLI, and learned fluency,
+plus the configured Apache-2.0 native paragraph generator. Qwen3.5-4B remains
+the current incumbent/control from `native-models/config.json`; it is not a
+promotion decision. `npm run models:download` transfers the bundles in
 parallel, writes manifests with SHA-256 hashes, and repairs incomplete or
 corrupt files. `npm run models:download:native` is the explicit opt-in command
-that downloads only Qwen into
+that downloads only the configured native generator into
 `~/Library/Application Support/Open Local Phraser/Models/`, outside the app.
 `npm run models:install` copies a previously verified checkout model to that
 same external location without downloading it again.
 
 `npm run build` verifies the checkout models before copying the browser models
-into the web bundle. `build:desktop` deliberately does not copy the Qwen
-checkpoint into `Pari.app` or the DMG; it ships only the one-shot native worker.
+into the web bundle. `build:desktop` deliberately does not copy the native
+generator checkpoint into `Pari.app` or the DMG; it ships only the one-shot
+native worker.
 At runtime Pari discovers a complete external model through
 `PARI_NATIVE_MODEL_PATH` or the Application Support location above. If it is
 missing, incomplete, unreadable, or the Python/MLX runtime is absent, Pari keeps
@@ -82,7 +86,7 @@ closed to those built-in checks if its optional runtime cannot initialize.
 sentences from the pinned UD English EWT test split and enforces bounded
 high/medium-severity rates so new rules do not over-warn clean natural English.
 
-`build:desktop` builds the Vite bundle, compiles the Swift/WKWebView wrapper, creates an ad-hoc signed `.app`, and creates a DMG without embedding Qwen, downloading a model, or contacting a remote model service.
+`build:desktop` builds the Vite bundle, compiles the Swift/WKWebView wrapper, creates an ad-hoc signed `.app`, and creates a DMG without embedding the native generator, downloading a model, or contacting a remote model service.
 
 `npm run qa:installed` runs the fresh lean packaged app with a hidden,
 accessory-only window. It exercises the real installed UI, the screenshot-style
@@ -109,14 +113,23 @@ The output editor also runs a local grammar/flow diagnostic after generation and
 
 ## Current backend boundary
 
-The primary desktop path is an optional external Qwen/Qwen3-4B-MLX-4bit
-checkpoint launched through the one-shot local MLX worker. The worker is
+The primary desktop path is an optional external native generator selected by
+`native-models/config.json` and launched through the one-shot local MLX worker.
+Qwen/Qwen3.5-4B-MLX-4bit is the current incumbent/control; Ling remains a
+challenger and is not promoted by this path. The worker is
 isolated from WebKit, receives the selected style, repairs malformed prose, and
 never receives remote requests. The packaged app contains no Qwen weights. It
-looks first at `PARI_NATIVE_MODEL_PATH`, then at
-`~/Library/Application Support/Open Local Phraser/Models/native-models/Qwen/Qwen3-4B-MLX-4bit`,
+looks first at the absolute `PARI_NATIVE_MODEL_PATH`, then at the configured
+`nativeModel.localPath` under
+`~/Library/Application Support/Open Local Phraser/Models/`,
 and retains compatibility with older development bundles. If the model is not
 connected, Python/MLX is absent, generation times out, or a draft fails
 protected-content/grammar/flow gates, Pari explains the failure and uses the
 bounded `local-safe-engine` fallback. The fallback remains intentionally
 conservative and cannot match the native model on open-ended structural repair.
+
+The production quality judge is also local-only: bundled DeBERTa-v3-xsmall
+provides bidirectional NLI and bundled DistilBERT masked-LM scoring provides a
+separate fluency signal. `npm run qa:learned:judge` must prove both assets ran;
+if either asset is unavailable, the evaluator reports the explicit fallback
+state instead of presenting a heuristic score as learned quality.

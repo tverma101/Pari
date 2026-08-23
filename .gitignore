@@ -20,9 +20,9 @@ open-local-phraser-v1/native-models/**/*.safetensors
 open-local-phraser-v1/native-models/**/*.bin
 open-local-phraser-v1/research/grammar-sources/
 open-local-phraser-v1/public/models/**/onnx/
+!open-local-phraser-v1/public/models/Xenova/nli-deberta-v3-xsmall/**
 open-local-phraser-v1/scripts/__pycache__/
 open-local-phraser-v1/native-runtime/__pycache__/
-*.onnx
 paraphraser-inspect/
 .freebuff/
 .agents/

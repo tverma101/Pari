@@ -2,7 +2,8 @@
  * Reference-free eval metrics for Pari paraphrase quality.
  * All local, zero new dependencies:
  *  - grammaticality: harper.js + clause-structure heuristics
- *  - meaning preservation: MiniLM embeddings (floor only) + clause-attachment checks
+ *  - meaning preservation: local MiniLM embeddings (floor only) + clause checks + DeBERTa NLI
+ *  - English quality: Harper/clause gates + DistilBERT masked-LM fluency
  *  - paraphrase band: char edit distance + content-word overlap + distinct-n
  *  - guards: anchors, negation cues, clause-well-formedness
  *
@@ -138,7 +139,7 @@ export async function grammarGain(input, output, ignoreSamples) {
 }
 
 // ---------------------------------------------------------------------------
-// Meaning preservation (MiniLM cosine)
+// Meaning preservation (MiniLM cosine floor; learned NLI is applied below)
 // ---------------------------------------------------------------------------
 
 let embedder = null;
@@ -436,16 +437,38 @@ export async function scoreCase(cas, outputText) {
   const clauseIssuesAll = clauseAttachmentIssues(rawInput, outputText);
   const clauseIssues = clauseIssuesAll.filter((i) => i.id === "clause-attachment-malformed");
   const swapIssues = clauseIssuesAll.filter((i) => i.id === "role-swap");
+  // The evaluator uses the same learned judge entry point as production:
+  // DeBERTa bidirectional NLI plus the bundled masked-LM fluency signal.
+  // Missing learned assets remain a visible fallback state in the result;
+  // local-only means no network fallback is permitted.
+  let qualityJudge = null;
+  try {
+    const { assessEnglishQuality } = loadTsModule(path.join(ROOT_DIR, "src/lib/scoring/englishQuality.ts"));
+    qualityJudge = await assessEnglishQuality(rawInput, outputText);
+  } catch (error) {
+    qualityJudge = {
+      englishQualityScore: 0.5,
+      fluencyScore: 0.5,
+      entailment: "neutral",
+      learned: false,
+      learnedNli: false,
+      learnedFluency: false,
+      reason: `judge bridge unavailable: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
+  const nliFail = qualityJudge.entailment === "contradict";
+  const nliReason = qualityJudge.reason;
 
   const checks = {
     meaningFloor: sim >= meaningFloor,
     noNewErrors: gram.gain >= -0.5, // small tolerance for harper noise
     anchorSafe: missing.length === 0,
-    negationSafe: !(negOut < negIn),
+    negationSafe: !(negOut < negIn) && !nliFail,
     // Issue #7: clause/syntax well-formedness is a hard gate, not a soft hint.
     // Embeddings can score high while clause boundaries are fused.
     clauseWellFormed: clauseIssues.length === 0,
     rolePreserved: swapIssues.length === 0,
+    nliContradictionFree: !nliFail,
     // No overlap ceiling: merging fragments or de-duplicating salad keeps
     // every content word by definition.
     // Edit-distance floor is waived when the rewrite strictly IMPROVED grammar:
@@ -471,11 +494,19 @@ export async function scoreCase(cas, outputText) {
     id: cas.id,
     category: cas.category,
     passed,
-    meaningSafe,
+    meaningSafe: meaningSafe && !nliFail,
     englishQuality,
+    nliReason,
+    learnedJudge: {
+      learned: qualityJudge.learned,
+      nli: qualityJudge.learnedNli,
+      fluency: qualityJudge.learnedFluency,
+    },
     metrics: {
       cosineSim: Number(sim.toFixed(3)),
       grammarGain: Number(gram.gain.toFixed(2)),
+      englishQualityScore: Number(qualityJudge.englishQualityScore.toFixed(3)),
+      fluencyScore: Number(qualityJudge.fluencyScore.toFixed(3)),
       errorsInPer100: Number(gram.inRate.toFixed(2)),
       errorsOutPer100: Number(gram.outRate.toFixed(2)),
       editDistanceRatio: Number(editRatio.toFixed(3)),

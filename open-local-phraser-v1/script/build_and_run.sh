@@ -24,7 +24,8 @@ case "$MODE" in
     # Installed connected-path probe: keep the checkpoint outside the app
     # bundle and point this one hidden request at the separately installed
     # development model directory.
-    env PARI_NATIVE_MODEL_PATH="$ROOT_DIR/native-models/Qwen/Qwen3.5-4B-MLX-4bit" \
+    NATIVE_MODEL_PATH="${PARI_NATIVE_MODEL_PATH:-$(cd "$ROOT_DIR" && node --input-type=module -e 'import fs from "node:fs"; const cfg=JSON.parse(fs.readFileSync("native-models/config.json", "utf8")); process.stdout.write(cfg.nativeModel.localPath);')}"
+    env PARI_NATIVE_MODEL_PATH="$NATIVE_MODEL_PATH" \
       "$APP_BINARY" --headless --headless-require-native
     ;;
   headless-custom|--headless-custom)

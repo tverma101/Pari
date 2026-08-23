@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "description": "QuillBot-killer tunable SEED corpus (Issue #8). 100 cases — use for development/tuning. Frozen held-out is corpus.frozen.json (300+ cases, disjoint). Do not claim beating QuillBot until frozen passes.",
+  "description": "QuillBot-killer tunable DEVELOPMENT corpus (Issue #8). 100 cases — use for development/tuning. corpus.frozen.json is a disjoint interim validation set; a fresh 300+ corpus.final.json must be created after #7 is frozen before any product claim.",
   "source": "Derived from adversarial eval + hard-tail categories in #8: broken grammar, fragments, run-ons, vagueness, word salad, tense, register, ambiguity where invention must be penalized.",
   "categories": {
     "broken_grammar": "typos, agreement, fragments that must become complete",

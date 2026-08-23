@@ -21,6 +21,7 @@
     "research:grammar:download": "node scripts/download-grammar-resources.mjs",
     "research:grammar:check": "node scripts/check-grammar-resources.mjs",
     "qa:grammar:ewt": "node scripts/qa-ewt-grammar.mjs",
+    "qa:learned:judge": "node scripts/qa-learned-judge.mjs",
     "build:lexicon": "node scripts/build-lexicon.mjs",
     "build": "npm run build:lexicon && npm run models:check:files && tsc -p tsconfig.json && vite build",
     "build:desktop": "bash build_dmg.sh",

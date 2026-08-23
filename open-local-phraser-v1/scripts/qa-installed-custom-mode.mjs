@@ -2,10 +2,19 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import fs from "node:fs";
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const APP_BINARY = path.join(ROOT_DIR, "release", "Pari.app", "Contents", "MacOS", "OpenLocalPhraserV2");
-const NATIVE_MODEL_DIR = path.join(ROOT_DIR, "native-models", "Qwen", "Qwen3.5-4B-MLX-4bit");
+function resolveNativeModelDir() {
+  const configured = process.env.PARI_NATIVE_MODEL_PATH?.trim();
+  if (configured) return path.resolve(configured.startsWith("~/") ? path.join(process.env.HOME ?? "", configured.slice(2)) : configured);
+  const config = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, "native-models/config.json"), "utf8"));
+  const localPath = config?.nativeModel?.localPath;
+  if (typeof localPath !== "string" || !localPath.trim()) throw new Error("native-models/config.json has no nativeModel.localPath");
+  return path.resolve(ROOT_DIR, localPath);
+}
+const NATIVE_MODEL_DIR = resolveNativeModelDir();
 const BACKEND_TIMEOUT_MS = 30_000;
 const HEADLESS_TIMEOUT_MS = 180_000;
 
@@ -111,7 +120,7 @@ async function main() {
       env: {
         ...process.env,
         PARI_HEADLESS_CUSTOM_STYLE_NAME: styleName,
-        // The packaged app intentionally contains no Qwen checkpoint. This
+        // The packaged app intentionally contains no generator checkpoint. This
         // proves the same installed app can connect to a separately installed
         // model without changing the package contents.
         PARI_NATIVE_MODEL_PATH: NATIVE_MODEL_DIR,

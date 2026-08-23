@@ -122,8 +122,10 @@ function pairwisePreferenceTable(engines, scored, preferenceMap) {
 
 async function main(){
   const engines = loadCaptures();
-  console.log(`\n=== QuillBot held-out report ===`);
-  console.log(`corpus: ${path.relative(ROOT, corpusPath)} cases=${corpus.length}`);
+const isFinalHoldout = path.basename(corpusPath) === "corpus.final.json";
+console.log(`\n=== QuillBot ${isFinalHoldout ? "final holdout" : "validation"} report ===`);
+console.log(`corpus: ${path.relative(ROOT, corpusPath)} cases=${corpus.length}`);
+if (!isFinalHoldout) console.log("NOTICE: this corpus is validation/comparability data, not the untouched final claim set.");
   console.log(`captures: ${path.relative(ROOT, capturesDir)} engines=${engines.map(e=>e.name).join(", ") || "(none — see README / quillbot-chunker.mjs)"}`);
 
   if (engines.length===0) {

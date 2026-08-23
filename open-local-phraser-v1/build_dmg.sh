@@ -51,6 +51,10 @@ echo "==> Copying native paraphrase worker (model connects after install)"
 mkdir -p "$RESOURCES_DIR/native-runtime"
 cp "$NATIVE_RUNTIME_DIR/paraphrase_worker.py" "$RESOURCES_DIR/native-runtime/"
 
+echo "==> Copying native model configuration (no checkpoint weights)"
+mkdir -p "$RESOURCES_DIR/native-models"
+cp "$ROOT_DIR/native-models/config.json" "$RESOURCES_DIR/native-models/config.json"
+
 echo "==> Generating Pari app icon"
 ICONSET_DIR="$BUILD_DIR/Pari.iconset"
 /usr/bin/swift "$ROOT_DIR/scripts/generate-app-icon.swift" "$ICONSET_DIR"

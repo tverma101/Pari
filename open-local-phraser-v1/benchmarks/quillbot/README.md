@@ -1,4 +1,4 @@
-# QuillBot-killer benchmark (Issue #8) — seed/frozen split
+# QuillBot-killer benchmark (Issue #8) — development/validation/final-holdout protocol
 
 ## Goal
 
@@ -8,9 +8,10 @@ Prove Pari beats QuillBot on the product task:
 
 ## Corpus
 
-- `corpus.seed.json` — **100 cases**, tunable. Use for prompt/model iteration only.
-- `corpus.frozen.json` — **300 cases**, FROZEN HELD-OUT, **disjoint** from seed (0 shared IDs, `qb-hold-***` are brand-new never-committed inputs). Do not tune on this file. This is the final untouched holdout; claims require a win on frozen.
-- Previous versions shipped identical 320-case files (same SHA); that is now fixed — seed 100 vs frozen 300 are disjoint.
+- `corpus.seed.json` — **100 development cases**, visible and tunable. Use for prompt/model/ranker iteration only.
+- `corpus.frozen.json` — **300 validation cases**, disjoint from seed (0 shared IDs). It preserves 220 heritage cases from the earlier public corpus plus 80 newer `qb-hold-*` cases, so it is useful for longitudinal validation but is **not** the final untouched claim set.
+- `corpus.final.json` — **not checked in yet by design**. Create a fresh, untouched 300+ case holdout only after #7's judge thresholds and the generation/ranking configuration are frozen. Never use it to write prompts, regexes, thresholds, or weights.
+- Previous versions shipped identical 320-case files (same SHA); the development/validation split fixes that leakage without pretending the exposed validation cases are pristine.
 - All inputs ≤600 chars so the QuillBot free-tier (~600 chars / ~125 words) chunker is a convenience, not a requirement per case.
 - Keep the existing 64-case `benchmarks/eval/corpus.json` as the **fast smoke/regression** suite (now hardened per #7 — `ro-04` no longer passes and the old 61/64 must not be called "95% human quality").
 
@@ -18,9 +19,10 @@ Prove Pari beats QuillBot on the product task:
 
 Run every case through `benchmarks/eval/metrics.mjs:scoreCase` — it now returns separate dimensions:
 
-- `meaningSafe` — `meaningFloor && anchorSafe && negationSafe && rolePreserved`
+- `meaningSafe` — `meaningFloor && anchorSafe && negationSafe && rolePreserved && nliContradictionFree`
 - `englishQuality` — `noNewErrors && clauseWellFormed && bandFit`
-- `failedChecks` — `meaningFloor | anchorSafe | negationSafe | clauseWellFormed | rolePreserved | noNewErrors | bandFit`
+- `learnedJudge` — whether bundled DeBERTa NLI and masked-LM fluency actually ran for the case
+- `failedChecks` — `meaningFloor | anchorSafe | negationSafe | nliContradictionFree | clauseWellFormed | rolePreserved | noNewErrors | bandFit`
 - `missingAnchors`, `clauseWellFormedIssues`
 
 Report by category and overall:
@@ -62,7 +64,7 @@ manual paste + stitch is the supported path.
 ## Running the comparison
 
 ```bash
-# 1. Collect outputs for the frozen corpus (Pari local-safe-engine runs without --outputs; shootout runners take --corpus)
+# 1. Collect outputs for the current validation corpus (Pari local-safe-engine runs without --outputs; shootout runners take --corpus)
 node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.frozen.json
 # or score existing captures:
 node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.frozen.json --outputs benchmarks/quillbot/captures/pari.jsonl
@@ -73,7 +75,7 @@ node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.seed.json 
 node benchmarks/quillbot/report.mjs
 ```
 
-`--corpus` is wired in `benchmarks/eval/run-eval.mjs` and both shootout runners (`run_model.py`, `run_openai_compatible.py`); use `benchmarks/quillbot/corpus.frozen.json` directly. Report is `benchmarks/quillbot/report.mjs`.
+`--corpus` is wired in `benchmarks/eval/run-eval.mjs` and both shootout runners (`run_model.py`, `run_openai_compatible.py`). Use `corpus.frozen.json` for interim validation only. The eventual product claim must use the separately created `corpus.final.json`; `report.mjs` labels automatic PASS comparisons as a gate proxy, not blind preference.
 
 ## Acceptance (from #8)
 

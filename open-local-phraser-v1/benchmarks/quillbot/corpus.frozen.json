@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "description": "QuillBot-killer FROZEN HELD-OUT benchmark (Issue #8). 300 cases, DISJOINT from corpus.seed.json (0 shared IDs). This file has NEVER been used to tune the evaluator or prompts — it is the final untouched holdout. Do not tune on this file. Scoring via benchmarks/eval/metrics.mjs (meaningSafe vs englishQuality + clause).",
+  "description": "QuillBot-killer validation benchmark (Issue #8). 300 cases, DISJOINT from corpus.seed.json (0 shared IDs). This file is an interim validation/comparability set: 220 heritage cases were already exposed during evaluator development and 80 qb-hold cases are newer. Create a separate fresh 300+ corpus.final.json after the learned judge and ranking configuration are frozen. Scoring via benchmarks/eval/metrics.mjs (meaningSafe vs englishQuality + learned judge).",
   "source": "Derived from adversarial eval + hard-tail categories in #8: broken grammar, fragments, run-ons, vagueness, word salad, tense, register, ambiguity where invention must be penalized.",
   "categories": {
     "broken_grammar": "typos, agreement, fragments that must become complete",

@@ -871,7 +871,7 @@ def restore_missing_modal_markers(value: str, request: dict[str, Any]) -> str:
         if modal not in protected:
             continue
         expected = sum(1 for span in protected if span.lower() == modal.lower())
-        actual = len(re.findall(rf"\b{re.escape(modal)}\b", repaired, flags=re.IGNORECASE))
+        actual = len(re.findall(rf"\b{re.escape(modal)}(?!['’])\b", repaired, flags=re.IGNORECASE))
         missing = expected - actual
         if missing <= 0:
             continue
@@ -898,6 +898,36 @@ def restore_missing_modal_markers(value: str, request: dict[str, Any]) -> str:
                         break
                     repaired, replacements = re.subn(pattern, rf"\1 {modal.lower()} \2", repaired, count=missing, flags=re.IGNORECASE)
                     missing -= replacements
+
+                if missing > 0:
+                    # Qwen may replace “I can ...” with “I ...” or
+                    # “These symptoms can ...” with “These symptoms ...”.
+                    # Recover the source subject from each protected modal
+                    # clause and restore the exact marker without replacing
+                    # the model's otherwise useful wording.
+                    subject_pattern = re.compile(
+                        r"\b((?:I|we|you|they|he|she|it|this|that|these|those)(?:\s+[A-Za-z]+){0,3}|(?:the|a|an)\s+[A-Za-z]+(?:\s+[A-Za-z]+){0,2})\s+can\b",
+                        flags=re.IGNORECASE,
+                    )
+                    source_subjects = []
+                    for sentence in re.split(r"(?<=[.!?])\s+", original):
+                        for subject_match in subject_pattern.finditer(sentence):
+                            subject = re.sub(r"\s+", " ", subject_match.group(1)).strip()
+                            if subject.lower() not in {item.lower() for item in source_subjects}:
+                                source_subjects.append(subject)
+                    for subject in source_subjects:
+                        if missing <= 0:
+                            break
+                        if re.search(rf"\b{re.escape(subject)}\s+can(?!['’])\b", repaired, flags=re.IGNORECASE):
+                            continue
+                        repaired, replacements = re.subn(
+                            rf"\b({re.escape(subject)})\s+(?!can(?!['’])\b)",
+                            rf"\1 {modal.lower()} ",
+                            repaired,
+                            count=1,
+                            flags=re.IGNORECASE,
+                        )
+                        missing -= replacements
 
     return repaired
 

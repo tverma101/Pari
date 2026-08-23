@@ -53,7 +53,7 @@ export async function rankCandidatesByEmbedding(
   if (options.length === 0) return [];
 
   const baseRanked = rankCandidatesByRule(options, context);
-  const extractor = await getEmbeddingExtractor(modelId, { allowRemoteFallback: true });
+  const extractor = await getEmbeddingExtractor(modelId, { allowRemoteFallback: false });
   const candidateSentences = baseRanked.map((result) => replaceSelection(context, result.option.replacement));
   const embeddings = await extractor([context.sentence, ...candidateSentences], {
     pooling: "mean",

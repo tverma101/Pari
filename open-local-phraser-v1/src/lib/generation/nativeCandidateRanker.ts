@@ -3,8 +3,9 @@
  *
  * Every candidate must pass the same hard gates as a single draft
  * (protected content, rewrite quality, no new high-severity grammar issues).
- * Among survivors, survivors are ranked primarily by English quality
- * (grammarGain) with semantic similarity as a floor/tie-break — per Issue #7
+ * Among survivors, candidates are ranked primarily by the learned English
+ * quality score (masked-LM fluency + NLI) with semantic similarity as a
+ * floor/tie-break — per Issue #7
  * the previous MiniLM-first sort could certify malformed English like ro-04.
  * When nothing passes, the caller falls back to single-draft behavior.
  */
@@ -23,7 +24,31 @@ export interface RankedNativeCandidate {
   semanticScore: number;
   grammarGain: number;
   englishQualityScore: number;
+  learnedNli: boolean;
+  learnedFluency: boolean;
+  englishQualityReason: string;
   safe: boolean;
+}
+
+function compareRankedCandidates(left: RankedNativeCandidate, right: RankedNativeCandidate): number {
+  if (left.safe !== right.safe) return left.safe ? -1 : 1;
+  // Issue #7: English quality is primary; similarity is a hard floor (see above).
+  // Among safe candidates, prefer higher learned English quality, then grammarGain, then similarity.
+  if (Math.abs(right.englishQualityScore - left.englishQualityScore) > 0.01) {
+    return right.englishQualityScore - left.englishQualityScore;
+  }
+  if (Math.abs(right.grammarGain - left.grammarGain) > 0.01) {
+    return right.grammarGain - left.grammarGain;
+  }
+  if (Math.abs(right.semanticScore - left.semanticScore) > 0.01) {
+    return right.semanticScore - left.semanticScore;
+  }
+  return (left.temperature ?? 0) - (right.temperature ?? 0);
+}
+
+/** Pure ordering boundary used by production and the ranker regression QA. */
+export function sortRankedNativeCandidates(candidates: RankedNativeCandidate[]): RankedNativeCandidate[] {
+  return [...candidates].sort(compareRankedCandidates);
 }
 
 function tokensOf(text: string): number {
@@ -56,7 +81,7 @@ export async function rankNativeCandidates(
       import("@/lib/ranking/similarity"),
     ]);
     const extractor = await getEmbeddingExtractor("Xenova/all-MiniLM-L6-v2", {
-      allowRemoteFallback: true,
+      allowRemoteFallback: false,
     });
     const texts = [options.originalText, ...candidates.map((candidate) => candidate.text)];
     const embeddings = await extractor(texts, { pooling: "mean", normalize: true });
@@ -109,24 +134,13 @@ export async function rankNativeCandidates(
         semanticScore,
         grammarGain: (inputRate - outRate) * 100,
         englishQualityScore: englishQuality.englishQualityScore,
+        learnedNli: englishQuality.learnedNli,
+        learnedFluency: englishQuality.learnedFluency,
+        englishQualityReason: englishQuality.reason,
         safe: validation.safe && quality.safe && semanticFloorOk && nliOk && repairedText !== options.originalText && outRate <= inputRate + 0.005,
       };
     })
   );
 
-  return ranked.sort((left, right) => {
-    if (left.safe !== right.safe) return left.safe ? -1 : 1;
-    // Issue #7: English quality is primary; similarity is a hard floor (see above).
-    // Among safe candidates, prefer higher learned English quality, then grammarGain, then similarity.
-    if (Math.abs(right.englishQualityScore - left.englishQualityScore) > 0.01) {
-      return right.englishQualityScore - left.englishQualityScore;
-    }
-    if (Math.abs(right.grammarGain - left.grammarGain) > 0.01) {
-      return right.grammarGain - left.grammarGain;
-    }
-    if (Math.abs(right.semanticScore - left.semanticScore) > 0.01) {
-      return right.semanticScore - left.semanticScore;
-    }
-    return (left.temperature ?? 0) - (right.temperature ?? 0);
-  });
+  return sortRankedNativeCandidates(ranked);
 }

@@ -4,6 +4,9 @@ import Foundation
 import Network
 import WebKit
 
+private let unconfiguredNativeModelID = "unconfigured-native-model"
+private let unconfiguredNativeModelPath = "native-models/unconfigured"
+
 final class LocalWebServer {
     private let rootDirectory: URL
     private let queue = DispatchQueue(label: "com.tejas.pari.local-web-server")
@@ -365,28 +368,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     private let scheme = "app"
     private let approvalPersistence = ApprovalPersistence()
     private let agentStyleStore = AgentStyleStore()
+    private let nativeModelPathOverride: URL? = {
+        guard let value = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_PATH"],
+              !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else { return nil }
+        return URL(fileURLWithPath: (value as NSString).expandingTildeInPath).standardizedFileURL
+    }()
     private let nativeModelID: String = {
         // Precedence: env > config > fallback (matches scripts). Env must override config.
         if let env = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_ID"], !env.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return env.trimmingCharacters(in: .whitespacesAndNewlines)
         }
-        if let data = try? Data(contentsOf: Bundle.main.resourceURL!.appendingPathComponent("native-models/config.json")),
+        if let resourceURL = Bundle.main.resourceURL,
+           let data = try? Data(contentsOf: resourceURL.appendingPathComponent("native-models/config.json")),
            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            let native = json["nativeModel"] as? [String: Any],
            let id = native["id"] as? String, !id.isEmpty { return id }
-        // Last-resort fallback when neither env nor config exists (e.g. fresh checkout without config). Keep generic; do not hard-code Qwen as the decoupled default.
-        return "mlx-community/Qwen3.5-4B-MLX-4bit"
+        return unconfiguredNativeModelID
     }()
     private let nativeModelRelativePath: String = {
-        if let env = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_PATH"],
-           !env.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return (env as NSString).expandingTildeInPath
-        }
-        if let data = try? Data(contentsOf: Bundle.main.resourceURL!.appendingPathComponent("native-models/config.json")),
+        if let resourceURL = Bundle.main.resourceURL,
+           let data = try? Data(contentsOf: resourceURL.appendingPathComponent("native-models/config.json")),
            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            let native = json["nativeModel"] as? [String: Any],
            let p = native["localPath"] as? String, !p.isEmpty { return p }
-        return "native-models/Qwen/Qwen3.5-4B-MLX-4bit"
+        return unconfiguredNativeModelPath
     }()
     private let nativeWorkerRelativePath = "native-runtime/paraphrase_worker.py"
     private let nativeModelRequiredFiles = [
@@ -420,6 +426,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     }()
 
     private lazy var nativeModelInstallDirectory: URL = {
+        if let nativeModelPathOverride {
+            return nativeModelPathOverride
+        }
         let applicationSupport = FileManager.default.urls(
             for: .applicationSupportDirectory,
             in: .userDomainMask
@@ -1423,29 +1432,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     private func nativeModelCandidates() -> [URL] {
         var candidates = [URL]()
 
-        if let configuredPath = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_PATH"],
-           !configuredPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            let expandedPath = (configuredPath as NSString).expandingTildeInPath
-            candidates.append(URL(fileURLWithPath: expandedPath).standardizedFileURL)
-        }
+        if let nativeModelPathOverride {
+            // An absolute override is a complete candidate, never a component
+            // appended to Application Support or the app bundle.
+            candidates.append(nativeModelPathOverride)
+        } else {
+            candidates.append(nativeModelInstallDirectory)
 
-        candidates.append(nativeModelInstallDirectory)
+            let applicationSupport = FileManager.default.urls(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask
+            ).first ?? FileManager.default.temporaryDirectory
+            candidates.append(
+                applicationSupport
+                    .appendingPathComponent("Open Local Phraser", isDirectory: true)
+                    .appendingPathComponent("Models", isDirectory: true)
+                    .appendingPathComponent(nativeModelRelativePath, isDirectory: true)
+            )
 
-        let applicationSupport = FileManager.default.urls(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask
-        ).first ?? FileManager.default.temporaryDirectory
-        candidates.append(
-            applicationSupport
-                .appendingPathComponent("Open Local Phraser", isDirectory: true)
-                .appendingPathComponent("Models", isDirectory: true)
-                .appendingPathComponent(nativeModelRelativePath, isDirectory: true)
-        )
-
-        if let resourceRoot = Bundle.main.resourceURL {
-            // Retain compatibility with development bundles built before the
-            // checkpoint was moved out of Pari.app. New packages never copy it.
-            candidates.append(resourceRoot.appendingPathComponent(nativeModelRelativePath, isDirectory: true))
+            if let resourceRoot = Bundle.main.resourceURL {
+                // Retain compatibility with development bundles built before
+                // the checkpoint was moved out of Pari.app. New packages never copy it.
+                candidates.append(resourceRoot.appendingPathComponent(nativeModelRelativePath, isDirectory: true))
+            }
         }
 
         var seen = Set<String>()

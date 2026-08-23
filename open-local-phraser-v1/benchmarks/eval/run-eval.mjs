@@ -126,6 +126,15 @@ async function main() {
   }
   console.log(`OVERALL          ${totalPassed}/${results.length}  (${((totalPassed / results.length) * 100).toFixed(0)}%)\n`);
 
+  const learnedJudgeRows = results.filter((row) => !row.empty && row.learnedJudge);
+  const learnedNliCount = learnedJudgeRows.filter((row) => row.learnedJudge.nli).length;
+  const learnedFluencyCount = learnedJudgeRows.filter((row) => row.learnedJudge.fluency).length;
+  console.log(
+    `LEARNED JUDGE    NLI ${learnedNliCount}/${learnedJudgeRows.length}  ` +
+    `fluency ${learnedFluencyCount}/${learnedJudgeRows.length}  ` +
+    `(fallback rows are reported, not silently treated as learned quality)\n`
+  );
+
   for (const r of results.filter((r) => !r.passed)) {
     const m = r.metrics ?? {};
     console.log(

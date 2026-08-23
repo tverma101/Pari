@@ -193,7 +193,7 @@ function getRemoteModelFileURL(modelId: SemanticModelId, filePath: string): stri
   return `https://huggingface.co/${descriptor.repoId}/resolve/main/${encodeModelPath(filePath)}?download=1`;
 }
 
-async function getWasmPaths(): Promise<{ mjs: string; wasm: string }> {
+export async function getWasmPaths(): Promise<{ mjs: string; wasm: string }> {
   const paths = isSafariBrowser() && !isLocalNativeRuntime()
     ? {
         mjs: safariWasmModuleUrl,
@@ -525,7 +525,7 @@ export async function ensureModelReady(
   modelId: SemanticModelId = DEFAULT_MODEL_ID,
   options: EnsureModelOptions = {}
 ): Promise<{ extractor: FeatureExtractor; info: ModelInfo }> {
-  const { allowRemoteFallback = true, forceReload = false, onUpdate } = options;
+  const { allowRemoteFallback = false, forceReload = false, onUpdate } = options;
 
   if (
     !forceReload &&
@@ -662,7 +662,7 @@ export async function runSemanticSelfTest(
 ): Promise<SemanticSelfTestResult> {
   try {
     const { extractor, info } = await ensureModelReady(modelId, {
-      allowRemoteFallback: options.allowRemoteFallback ?? true,
+      allowRemoteFallback: options.allowRemoteFallback ?? false,
       onUpdate: options.onUpdate,
       forceReload: options.forceReload,
     });

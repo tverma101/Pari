@@ -5,7 +5,12 @@ import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import { env, pipeline } from "@huggingface/transformers";
+import {
+  AutoModelForSequenceClassification,
+  AutoTokenizer,
+  env,
+  pipeline,
+} from "@huggingface/transformers";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,15 +20,17 @@ const DEFAULT_DTYPE = "q8";
 const MODEL_ROOT = path.join(ROOT_DIR, "public", "models");
 const MEMORY_CEILING_MB = 6 * 1024;
 const FILES_ONLY = process.argv.includes("--files-only");
+const UNCONFIGURED_NATIVE_MODEL_ID = "unconfigured-native-model";
+const UNCONFIGURED_NATIVE_MODEL_PATH = "native-models/unconfigured";
 function resolveNativeGenerativeModel() {
   let cfg = null;
   try { cfg = JSON.parse(readFileSync(path.join(ROOT_DIR, "native-models/config.json"), "utf8")); } catch {}
   const envId = process.env.PARI_NATIVE_MODEL_ID?.trim();
   const envPath = process.env.PARI_NATIVE_MODEL_PATH?.trim();
-  const id = envId || cfg?.nativeModel?.id || "mlx-community/Qwen3.5-4B-MLX-4bit";
+  const id = envId || cfg?.nativeModel?.id || UNCONFIGURED_NATIVE_MODEL_ID;
   const localPath = envPath
     ? (envPath.startsWith("~/") ? path.join(os.homedir(), envPath.slice(2)) : envPath)
-    : (cfg?.nativeModel?.localPath || "native-models/Qwen/Qwen3.5-4B-MLX-4bit");
+    : (cfg?.nativeModel?.localPath || UNCONFIGURED_NATIVE_MODEL_PATH);
   return { id, task: "mlx-generation", storage: "native-models", localPath, role: "paragraph-generation" };
 }
 const NATIVE_GENERATIVE_MODEL = resolveNativeGenerativeModel();
@@ -116,6 +123,11 @@ const MODELS = [
     id: "Xenova/distilroberta-base",
     task: "fill-mask",
     maskedText: "Writers can <mask> their sentences without changing the meaning.",
+  },
+  {
+    id: "Xenova/nli-deberta-v3-xsmall",
+    task: "text-classification",
+    role: "nli-judge",
   },
   NATIVE_GENERATIVE_MODEL,
 ];
@@ -415,6 +427,37 @@ async function checkFillMaskModel(model) {
   }
 }
 
+async function checkNliModel(model) {
+  const startedAt = performance.now();
+  const tokenizer = await AutoTokenizer.from_pretrained(model.id, { local_files_only: true });
+  const classifier = await AutoModelForSequenceClassification.from_pretrained(model.id, {
+    dtype: getModelDtype(model),
+    local_files_only: true,
+  });
+  const pairs = [
+    ["The dog chased the man.", "The man chased the dog."],
+    ["The dog chased the man.", "The dog pursued the man."],
+  ];
+  const labels = [];
+  for (const [premise, hypothesis] of pairs) {
+    const inputs = tokenizer(premise, { text_pair: hypothesis, padding: true, truncation: true });
+    const output = await classifier(inputs);
+    const logits = Array.from(output.logits.data);
+    let best = 0;
+    for (let index = 1; index < logits.length; index += 1) {
+      if (logits[index] > logits[best]) best = index;
+    }
+    labels.push(String(classifier.config.id2label?.[String(best)] ?? best).toLowerCase());
+  }
+  const loadTimeMs = Math.round(performance.now() - startedAt);
+  log(`${model.id}: ready`);
+  log(`${model.id}: load time ${loadTimeMs} ms`);
+  log(`${model.id}: contradiction=${labels[0]} entailment=${labels[1]}`);
+  if (!labels[0].includes("contradict") || !labels[1].includes("entail")) {
+    throw new Error(`${model.id} label sanity check failed: ${labels.join(", ")}`);
+  }
+}
+
 async function main() {
   env.allowLocalModels = true;
   env.allowRemoteModels = false;
@@ -442,6 +485,8 @@ async function main() {
       await checkText2TextModel(model);
     } else if (model.task === "fill-mask") {
       await checkFillMaskModel(model);
+    } else if (model.task === "text-classification") {
+      await checkNliModel(model);
     }
 
     const currentRss = rssMb();

@@ -6,18 +6,20 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const UNCONFIGURED_NATIVE_MODEL_ID = "unconfigured-native-model";
+const UNCONFIGURED_NATIVE_MODEL_PATH = "native-models/unconfigured";
 function resolveNativeModelConfig() {
   let cfg = null;
   try { cfg = JSON.parse(readFileSync(path.join(ROOT_DIR, "native-models/config.json"), "utf8")); } catch {}
   const envId = process.env.PARI_NATIVE_MODEL_ID?.trim();
   const envPath = process.env.PARI_NATIVE_MODEL_PATH?.trim();
-  const id = envId || cfg?.nativeModel?.id || "mlx-community/Qwen3.5-4B-MLX-4bit";
+  const id = envId || cfg?.nativeModel?.id || UNCONFIGURED_NATIVE_MODEL_ID;
   const localPath = envPath
     ? (envPath.startsWith("~/") ? path.join(os.homedir(), envPath.slice(2)) : envPath)
-    : (cfg?.nativeModel?.localPath || "native-models/Qwen/Qwen3.5-4B-MLX-4bit");
+    : (cfg?.nativeModel?.localPath || UNCONFIGURED_NATIVE_MODEL_PATH);
   // install script targets the installed location (Library/.../Models/<localPath>)
   // but source is always checkout native-models/<model folder>
-  const sourcePath = cfg?.nativeModel?.localPath || "native-models/Qwen/Qwen3.5-4B-MLX-4bit";
+  const sourcePath = cfg?.nativeModel?.localPath || UNCONFIGURED_NATIVE_MODEL_PATH;
   return { id, localPath, sourcePath };
 }
 const _nativeCfg = resolveNativeModelConfig();

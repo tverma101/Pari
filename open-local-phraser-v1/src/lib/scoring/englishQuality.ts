@@ -1,146 +1,281 @@
 /**
- * Learned English-quality / NLI judge interface (Issue #7).
+ * Local English-quality and meaning judge (Issue #7).
  *
- * Production currently scores "English quality" as Harper high-severity
- * lint delta (grammarGain). That is necessary but not sufficient: two
- * candidates can both have zero Harper errors while one is stilted or
- * clause-fused. The design doc (pari-quality-system.md §1) calls for:
- *   - a small NLI model (DeBERTa-v3-xsmall MNLI / ONNX) for entailment:
- *     output must be entailed-by input, never contradicted.
- *   - a tiny LM perplexity ratio for fluency: PPL(out) <= 1.5*PPL(in).
+ * The production score is deliberately split into independent signals:
+ * - DeBERTa-v3-xsmall NLI provides a learned meaning/contradiction signal.
+ * - DistilBERT masked-LM pseudo-perplexity provides a learned fluency signal.
+ * - deterministic NLI/clause/protection rails remain hard safety checks.
  *
- * Running those models requires ONNX/MLX binaries that are not yet
- * bundled. This module provides the stable interface now so the
- * production ranker and metrics.mjs can call it; implementations
- * start as bounded fallbacks (Pari-Q + clause check) and are upgraded
- * to ONNX without changing call sites.
- *
- * Contract (mirrors scoreCase's englishQuality split):
- *   - englishQualityScore ∈ [0,1] higher is better
- *   - meaningEntailment: entail | neutral | contradict
- *   - an explanation for why the score was given
+ * If a learned asset is unavailable, the result says so through
+ * `learnedNli`/`learnedFluency` and falls back to bounded rails. It never
+ * labels a fallback score as learned confidence.
  */
 
 export type EntailmentLabel = "entail" | "neutral" | "contradict";
 
 export interface EnglishQualityAssessment {
-  /** 0..1 — 1 is fully fluent. 0.5 is neutral fallback when no model loaded. */
+  /** 0..1 — higher is better for candidate ranking. */
   englishQualityScore: number;
-  /** Bounded 0..1 fluency component (tiny-LM PPL ratio when available). */
+  /** 0..1 learned masked-LM fluency when available. */
   fluencyScore: number;
-  /** NLI-style entailment judgment when available; neutral is the safe fallback. */
+  /** Hard contradiction means the candidate must not pass. */
   entailment: EntailmentLabel;
-  /** Whether a learned model actually ran (vs heuristic fallback). */
+  /** True when either learned signal actually ran. */
   learned: boolean;
-  /** Short human-readable reason (for logs / report.mjs). */
+  /** Explicit availability states for evaluator/runtime diagnostics. */
+  learnedNli: boolean;
+  learnedFluency: boolean;
+  /** Short reason suitable for benchmark reports and logs. */
   reason: string;
 }
 
 export interface EnglishQualityOptions {
-  /** Optional pre-loaded NLI pipeline; if absent, uses neutral fallback. */
+  /** Test/adapter injection for a local NLI implementation. */
   nli?: {
-    score: (premise: string, hypothesis: string) => Promise<{ label: EntailmentLabel; score: number }>;
+    score: (premise: string, hypothesis: string) => Promise<{
+      label: EntailmentLabel;
+      score: number;
+      reason?: string;
+      hardContradiction?: boolean;
+    }>;
   } | null;
-  /** Optional PPL scorer; if absent, uses Pari-Q structural proxy. */
+  /** Legacy test/adapter injection for a perplexity implementation. */
   fluency?: {
     perplexity: (text: string) => Promise<number>;
   } | null;
 }
 
+function clamp(value: number, min = 0, max = 1): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function structuralFluency(input: string, output: string): { score: number; reason: string } {
+  const inputWords = input.split(/\s+/).filter(Boolean).length;
+  const outputWords = output.split(/\s+/).filter(Boolean).length;
+  const lengthRatio = outputWords / Math.max(1, inputWords);
+  let lengthScore = 1;
+  if (lengthRatio < 0.6 || lengthRatio > 1.6) lengthScore = 0.6;
+  else if (lengthRatio < 0.8 || lengthRatio > 1.35) lengthScore = 0.85;
+
+  const tokens = output.toLowerCase().match(/[a-z]+/g) ?? [];
+  const bigrams = new Set<string>();
+  for (let index = 0; index < tokens.length - 1; index += 1) {
+    bigrams.add(`${tokens[index]} ${tokens[index + 1]}`);
+  }
+  const distinctBigrams = tokens.length > 1 ? bigrams.size / (tokens.length - 1) : 1;
+  const diversityScore = distinctBigrams < 0.5 ? 0.5 : distinctBigrams < 0.7 ? 0.75 : 1;
+  return {
+    score: 0.6 * lengthScore + 0.4 * diversityScore,
+    reason: `structural length=${lengthRatio.toFixed(2)} distinct2=${distinctBigrams.toFixed(2)}`,
+  };
+}
+
+function canonicalFormatting(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[’]/g, "'")
+    .replace(/\s+/g, " ")
+    .replace(/(\d)\s+(?=[a-z])/g, "$1")
+    .replace(/([a-z])\s+(?=\d)/g, "$1")
+    .replace(/\s+([.,;:!?])/g, "$1")
+    .trim();
+}
+
+function entailmentScore(label: EntailmentLabel, confidence: number): number {
+  if (label === "contradict") return 0;
+  if (label === "entail") return clamp(0.65 + 0.35 * confidence);
+  return 0.72;
+}
+
+function assessment(
+  entailment: EntailmentLabel,
+  nliConfidence: number,
+  fluencyScore: number,
+  learnedNli: boolean,
+  learnedFluency: boolean,
+  reason: string
+): EnglishQualityAssessment {
+  const hardContradiction = entailment === "contradict";
+  const englishQualityScore = hardContradiction
+    ? 0
+    : 0.4 * entailmentScore(entailment, nliConfidence) + 0.6 * clamp(fluencyScore);
+  return {
+    englishQualityScore,
+    fluencyScore: clamp(fluencyScore),
+    entailment,
+    learned: learnedNli || learnedFluency,
+    learnedNli,
+    learnedFluency,
+    reason,
+  };
+}
+
 /**
- * Score English quality for a (input, output) pair.
- * Safe to call in production — never throws, falls back deterministically.
+ * Run the bundled DeBERTa + masked-LM path. The optional NLI function keeps
+ * this boundary easy to exercise with a deterministic test double.
+ */
+export async function assessEnglishQualityWithOnnx(
+  input: string,
+  output: string,
+  scoreNliBi?: (premise: string, hypothesis: string) => Promise<{
+    label: EntailmentLabel;
+    score: number;
+    reason: string;
+    hardContradiction?: boolean;
+  }>
+): Promise<EnglishQualityAssessment> {
+  const trimmed = output.trim();
+  if (!trimmed) {
+    return assessment("contradict", 1, 0, false, false, "empty output");
+  }
+
+  let nliLabel: EntailmentLabel = "neutral";
+  let nliConfidence = 0.5;
+  let learnedNli = false;
+  let hardContradiction = false;
+  let nliReason = "nli unavailable";
+
+  try {
+    const scorer = scoreNliBi ?? (await import("./onnxNli")).scoreNliBidirectional;
+    const result = await scorer(input, trimmed);
+    nliLabel = result.label;
+    nliConfidence = result.score;
+    hardContradiction = result.hardContradiction ?? (result.label === "contradict" && result.score >= 0.6);
+    learnedNli = true;
+    nliReason = result.reason;
+  } catch (error) {
+    nliReason = `nli unavailable: ${error instanceof Error ? error.message : String(error)}`;
+  }
+
+  // Rails are still authoritative when the learned model is confident in the
+  // wrong direction or when the learned asset cannot be loaded.
+  try {
+    const rail = await (await import("./nliJudge")).createRuleNliJudge().judge(input, trimmed);
+    if (rail.label === "contradict") {
+      hardContradiction = true;
+      nliLabel = "contradict";
+      nliConfidence = Math.max(nliConfidence, rail.score);
+      nliReason = `${rail.reason}; ${nliReason}`;
+    }
+  } catch (error) {
+    nliReason += `; rails unavailable: ${error instanceof Error ? error.message : String(error)}`;
+  }
+
+  const structural = structuralFluency(input, trimmed);
+  let fluencyScore = structural.score;
+  let fluencyReason = structural.reason;
+  let learnedFluency = false;
+  try {
+    const result = await (await import("./fluencyMlm")).scoreMaskedLmFluency(trimmed);
+    fluencyScore = result.score;
+    fluencyReason = result.reason;
+    learnedFluency = result.tokenCount > 0;
+  } catch (error) {
+    fluencyReason += `; masked LM unavailable: ${error instanceof Error ? error.message : String(error)}`;
+  }
+
+  // A below-threshold learned contradiction is not a hard veto. Keep the
+  // result visible in the reason but score it as neutral so only the agreed
+  // threshold controls rejection.
+  const formattingOnly = canonicalFormatting(input) === canonicalFormatting(trimmed);
+  if (formattingOnly && hardContradiction) {
+    // DeBERTa can overreact to a tokenization-only edit such as `50mg` ->
+    // `50 mg`. Preserve the learned run and its diagnostics, but do not let a
+    // formatting-equivalent candidate fail the meaning gate.
+    hardContradiction = false;
+    nliLabel = "entail";
+    nliReason = `format-equivalent override; ${nliReason}`;
+  }
+  const effectiveLabel = hardContradiction
+    ? "contradict"
+    : nliLabel === "contradict" ? "neutral" : nliLabel;
+  return assessment(
+    effectiveLabel,
+    nliConfidence,
+    fluencyScore,
+    learnedNli,
+    learnedFluency,
+    `nli=${nliReason}; fluency=${fluencyReason}`
+  );
+}
+
+/**
+ * Stable public score entry point. Explicit adapters remain supported for
+ * tests and future local models; the default is always the bundled path.
  */
 export async function assessEnglishQuality(
   input: string,
   output: string,
   opts: EnglishQualityOptions = {}
 ): Promise<EnglishQualityAssessment> {
+  if (!opts.nli && !opts.fluency) {
+    return assessEnglishQualityWithOnnx(input, output);
+  }
+
   const trimmed = output.trim();
-  if (!trimmed) {
-    return { englishQualityScore: 0, fluencyScore: 0, entailment: "contradict", learned: false, reason: "empty output" };
-  }
+  if (!trimmed) return assessment("contradict", 1, 0, false, false, "empty output");
 
-  // Lazy rule-NLI fallback so production has a real (general) judge even before ONNX is bundled.
-  // This is not a neutral 0.5 — it detects negation flips, quantity mismatches, invented numbers,
-  // and generic SVO role swaps for unseen verbs. See nliJudge.ts.
-  // Avoid top-level import to prevent circular init with nliJudge.
-  async function ruleNliJudge(
-    premise: string,
-    hypothesis: string
-  ): Promise<{ label: EntailmentLabel; score: number; reason: string }> {
-    const mod = await import("@/lib/scoring/nliJudge");
-    return mod.createRuleNliJudge().judge(premise, hypothesis);
-  }
-
-  // 1) NLI judgment: prefer wired pipeline, else rule-based general NLI.
   let entailment: EntailmentLabel = "neutral";
-  let nliConfidence = 0.55;
+  let nliConfidence = 0.5;
   let learnedNli = false;
   let nliReason = "rule-nli";
   if (opts.nli) {
     try {
-      const r = await opts.nli.score(input, output);
-      entailment = r.label;
-      nliConfidence = r.score;
+      const result = await opts.nli.score(input, trimmed);
+      entailment = result.label;
+      nliConfidence = result.score;
       learnedNli = true;
-      nliReason = "onnx-nli";
+      nliReason = result.reason ?? "injected-nli";
     } catch {
-      // fall through to rule NLI
-    }
-  }
-  if (!learnedNli) {
-    try {
-      const r = await ruleNliJudge(input, output);
-      entailment = r.label;
-      nliConfidence = r.score;
-      nliReason = r.reason;
-    } catch {
-      // stay neutral
+      // The deterministic rail below remains the source of truth.
     }
   }
 
-  // 2) Fluency: prefer tiny-LM PPL, else structural proxy from Harper + sentence shape.
-  // The structural proxy is not "learned" but it distinguishes 0-harper clean vs stilted.
-  let fluencyScore = 0.5;
-  let learnedFlu = false;
-  let fluReason = "structural-proxy";
+  try {
+    const rail = await (await import("./nliJudge")).createRuleNliJudge().judge(input, trimmed);
+    if (rail.label === "contradict") {
+      entailment = "contradict";
+      nliConfidence = Math.max(nliConfidence, rail.score);
+      nliReason = `${rail.reason}; ${nliReason}`;
+    } else if (!learnedNli) {
+      entailment = rail.label;
+      nliConfidence = rail.score;
+      nliReason = rail.reason;
+    }
+  } catch {
+    // Keep neutral if even the rail cannot initialize.
+  }
+
+  const structural = structuralFluency(input, trimmed);
+  let fluencyScore = structural.score;
+  let fluencyReason = structural.reason;
+  let learnedFluency = false;
   if (opts.fluency) {
     try {
-      const [pIn, pOut] = await Promise.all([opts.fluency.perplexity(input), opts.fluency.perplexity(output)]);
-      const ratio = pOut / Math.max(1, pIn);
-      fluencyScore = ratio <= 1.0 ? 1 : ratio <= 1.5 ? 1 - (ratio - 1) : Math.max(0, 1 - ratio);
-      learnedFlu = true;
-      fluReason = "tiny-lm-ppl";
+      const [inputPerplexity, outputPerplexity] = await Promise.all([
+        opts.fluency.perplexity(input),
+        opts.fluency.perplexity(trimmed),
+      ]);
+      const ratio = outputPerplexity / Math.max(1, inputPerplexity);
+      fluencyScore = ratio <= 1 ? 1 : ratio <= 1.5 ? 1 - (ratio - 1) : Math.max(0, 1 - ratio);
+      learnedFluency = true;
+      fluencyReason = `injected-ppl ratio=${ratio.toFixed(2)}`;
     } catch {
-      // fall through
+      // Keep the structural fallback.
     }
   }
-  if (!learnedFlu) {
-    // Cheap structural fluency: penalize very long/short rewrites and repeated n-grams.
-    // This is heuristic, not learned, but prevents "0 harper errors but unreadable" from scoring 0.5.
-    const wordsIn = input.split(/\s+/).filter(Boolean).length;
-    const wordsOut = output.split(/\s+/).filter(Boolean).length;
-    const lenRatio = wordsOut / Math.max(1, wordsIn);
-    let lenScore = 1;
-    if (lenRatio < 0.6 || lenRatio > 1.6) lenScore = 0.6;
-    else if (lenRatio < 0.8 || lenRatio > 1.35) lenScore = 0.85;
-    // distinct-bigram proxy via simple token set
-    const toks = output.toLowerCase().match(/[a-z]+/g) ?? [];
-    const bigrams = new Set<string>();
-    for (let i = 0; i < toks.length - 1; i++) bigrams.add(`${toks[i]} ${toks[i + 1]}`);
-    const distinct2 = toks.length > 1 ? bigrams.size / (toks.length - 1) : 1;
-    const diversityScore = distinct2 < 0.5 ? 0.5 : distinct2 < 0.7 ? 0.75 : 1;
-    fluencyScore = 0.6 * lenScore + 0.4 * diversityScore;
+
+  if (canonicalFormatting(input) === canonicalFormatting(trimmed) && entailment === "contradict") {
+    entailment = "entail";
+    nliReason = `format-equivalent override; ${nliReason}`;
   }
 
-  const learned = learnedNli || learnedFlu;
-  const entailScore = entailment === "entail" ? 1 : entailment === "neutral" ? 0.75 : 0;
-  const englishQualityScore = entailment === "contradict" ? 0 : 0.5 * entailScore + 0.5 * fluencyScore;
-  const reason =
-    entailment === "contradict"
-      ? `contradiction: ${nliReason} (${nliConfidence.toFixed(2)})`
-      : `${nliReason} entail=${entailment}(${nliConfidence.toFixed(2)}) fluency=${fluencyScore.toFixed(2)}[${fluReason}]${learned ? " learned" : " rule"}`;
-
-  return { englishQualityScore, fluencyScore, entailment, learned, reason };
+  return assessment(
+    entailment,
+    nliConfidence,
+    fluencyScore,
+    learnedNli,
+    learnedFluency,
+    `nli=${nliReason}; fluency=${fluencyReason}`
+  );
 }
