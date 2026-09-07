@@ -113,3 +113,28 @@
 - `rollout_refs`: prior Pari learned-judge and holdout work is recorded in the
   Codex memory rollout archive; current raw outputs are retained only under
   the temporary path above.
+
+## 2026-09-07 — Bounded live QuillBot browser comparison
+
+- `scope`: QuillBot's live in-app browser page and the installed Pari native
+  worker, using the same synthetic corpus sample.
+- `method`: QuillBot `https://quillbot.com/paraphrasing-tool` in Standard mode,
+  guest session, with no sign-in or quota workaround. Pari used the installed
+  Qwen3-4B MLX worker with its normal post-processing.
+- `case`: `bw-02`, input `cant make it tmrw, smth came up sry`.
+- `observed_outputs`: QuillBot visibly produced `Sorry, something came up and
+  I can't make it tomorrow.` and a repeated request produced the variant `I
+  apologize, but I can't make it tomorrow.` Pari produced `I can't make it
+  tomorrow, something came up. I'm sorry.`
+- `assessment`: both systems produced grammatical text. Pari preserved the
+  source's reason in both the input and its output; one observed QuillBot
+  variant omitted that reason while sounding more polished. This is one live
+  example, not a general superiority claim.
+- `limitation`: a further guest request opened QuillBot's `Continue for free`
+  sign-up limit. The comparison stopped there; no account login, duplicate
+  session, or quota bypass was attempted. A blind multi-case comparison is
+  still outstanding.
+- `evidence_state`: live QuillBot one-case sample=yes; installed Pari output
+  yes; blind pairwise human comparison=no; user visual confirmation=no.
+- `cleanup`: the QuillBot tab was reloaded to its blank initial state; no
+  external account or repository state was changed.
