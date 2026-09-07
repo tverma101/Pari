@@ -48,6 +48,7 @@ export async function rankNativeCandidates(
   // only) and must not break plain-Node callers, which get grammar-only ranking.
   let cosine: (a: number[], b: number[]) => number;
   let vectors: number[][];
+  let semanticAvailable = false;
   try {
     const [{ getEmbeddingExtractor }, { cosineSimilarity }] = await Promise.all([
       import("@/lib/ranking/modelManager"),
@@ -65,11 +66,16 @@ export async function rankNativeCandidates(
       values.slice(index * width, (index + 1) * width)
     );
     cosine = cosineSimilarity;
+    semanticAvailable = vectors.length === texts.length && vectors.every((vector) => vector.length > 0);
   } catch {
     vectors = [];
     cosine = () => 0.5; // neutral semantic score; ordering falls to grammar gain
   }
   const originalVector = vectors[0] ?? [];
+  // Match the frozen evaluation policy: ordinary paraphrases need a strong
+  // semantic match, while genuinely broken/fragmentary prose gets a looser
+  // floor because reconstruction can move embeddings substantially.
+  const semanticFloor = options.structuralRepair ? 0.55 : 0.72;
 
   const inputIssues = await highSeverityIssueCount(options.originalText);
   const inputRate = inputIssues / tokensOf(options.originalText);
@@ -90,29 +96,35 @@ export async function rankNativeCandidates(
 
       const outIssues = quality.safe ? await highSeverityIssueCount(repairedText) : Number.POSITIVE_INFINITY;
       const outRate = outIssues / tokensOf(repairedText);
+      const semanticScore = cosine(originalVector, vectors[index + 1] ?? []);
+      const semanticSafe = !semanticAvailable || semanticScore >= semanticFloor;
 
       return {
         text: repairedText,
         temperature: candidate.temperature,
-        semanticScore: cosine(originalVector, vectors[index + 1] ?? []),
+        semanticScore,
         grammarGain: (inputRate - outRate) * 100,
-        safe: validation.safe && quality.safe && repairedText !== options.originalText && outRate <= inputRate + 0.005,
+        safe:
+          validation.safe &&
+          quality.safe &&
+          semanticSafe &&
+          repairedText !== options.originalText &&
+          outRate <= inputRate + 0.005,
       };
     })
   );
 
   return ranked.sort((left, right) => {
     if (left.safe !== right.safe) return left.safe ? -1 : 1;
-    // Issue #7: English quality is primary; similarity is a floor/tie-break.
-    // Hard floor: candidates with very low similarity should sink even if
-    // grammar looks clean (meaning floor lives in metrics.mjs as well).
-    const leftLowSim = left.semanticScore < 0.55;
-    const rightLowSim = right.semanticScore < 0.55;
+    // English quality is primary after the hard semantic floor. When semantic
+    // embeddings are unavailable, grammar-only ordering remains the fallback.
+    const leftLowSim = semanticAvailable && left.semanticScore < semanticFloor;
+    const rightLowSim = semanticAvailable && right.semanticScore < semanticFloor;
     if (leftLowSim !== rightLowSim) return leftLowSim ? 1 : -1;
     if (Math.abs(right.grammarGain - left.grammarGain) > 0.01) {
       return right.grammarGain - left.grammarGain;
     }
-    if (Math.abs(right.semanticScore - left.semanticScore) > 0.01) {
+    if (semanticAvailable && Math.abs(right.semanticScore - left.semanticScore) > 0.01) {
       return right.semanticScore - left.semanticScore;
     }
     return (left.temperature ?? 0) - (right.temperature ?? 0);
