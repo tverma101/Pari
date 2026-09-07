@@ -9,8 +9,9 @@
 - `goal`: Test usable FreeLLMAPI models against Pari's frozen English-repair
   corpus, select the safest quota-compatible candidate, and add an explicit
   packaged route without weakening the local fallback.
-- `status`: implemented and verified locally; publication is limited to the
-  isolated feature branch.
+- `status`: implemented, tested, packaged, and published to the isolated
+  feature branch in commit `a5580c1` (`feat: add quota-safe FreeLLM inference
+  route`).
 - `changed_files`: `native-runtime/freellm_worker.py`, Swift route selection in
   `Sources/OpenLocalPhraser/main.swift`, native bridge/backend metadata,
   `script/build_and_run.sh`, `package.json`, `build_dmg.sh`, model catalog and
@@ -37,15 +38,21 @@
   run qa:installed:connected`; `npm run qa:installed:custom`; `npm run
   qa:installed:missing-model`; and `npm run qa:installed:freellm` all passed.
   The packaged remote smoke reported `generator=freellm-api`, contextual
-  choices, and grammar highlighting.
+  choices, and grammar highlighting. The final rebuilt app has no model
+  weights or Python bytecode cache in the bundle, and
+  `codesign --verify --deep --strict` passes after the installed local smoke.
 - `evidence_state`: source implemented=yes; tests passed=yes; packaged and
   installed=yes; live FreeLLMAPI route reached=yes; user visual confirmation=no.
 - `blocker`: none for the local implementation. FreeLLMAPI provider
   availability, routing, and quotas are live service state and can change;
-  the app remains local by default and fails closed to its offline engine.
-- `next_action`: audit/stage only the intended source and documentation files,
-  commit, push `feat/quality-judge-holdout`, and report the commit/ref. Do not
-  inspect or run GitHub Actions without a separate request.
+  the app remains local by default and fails closed to its offline engine. The
+  final native UI quota refresh was not captured because the Mac locked; no
+  current quota number is inferred from that missing read.
+- `cleanup`: the transient API key was cleared from the clipboard, no task
+  processes remain, and the generated invalidating bundle cache was moved
+  recoverably to `/tmp/pari-bundle-pycache-2026-09-07` before the final rebuild.
+- `next_action`: none required for this turn. Do not inspect or run GitHub
+  Actions without a separate request.
 - `rollout_refs`: prior Pari learned-judge and holdout work is recorded in the
   Codex memory rollout archive; this turn's external benchmark JSONL remains
   under the task workbench and is not bundled into the app.
