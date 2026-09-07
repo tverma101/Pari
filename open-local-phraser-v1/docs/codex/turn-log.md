@@ -178,3 +178,22 @@
   mutation was performed.
 - `next_action`: continue with P0.1/P0.2/P0.4 human holdout and contextual
   synonym review before any model promotion or readiness claim.
+
+## 2026-09-07 — Test and documentation publication audit
+
+- `scope`: canonical Pari checkout, QA scripts/fixtures, benchmark guidance,
+  and project documentation on `feat/quality-judge-holdout`.
+- `goal`: Publish all pending canonical test and documentation work to GitHub.
+- `result`: no uncommitted or unpushed canonical test/documentation files were
+  present before this audit. The QA and documentation changes from the prior
+  improvement are already included in commit `31d7bcb`, and local `HEAD`
+  matches `origin/feat/quality-judge-holdout`.
+- `evidence_state`: canonical source/test/docs tracked=yes; remote branch
+  synchronized=yes; ignored `paraphraser-inspect/` workbench not published;
+  user-confirmed remote review=no.
+- `validation`: `git status --porcelain=v1 --untracked-files=all` was clean;
+  tracked QA/documentation paths were enumerated with `git ls-files`; remote
+  identity and branch tracking matched `git@github.com:tverma101/Pari.git`.
+- `blocker`: none for canonical test/documentation publication. The ignored
+  workbench is outside the verified Pari source boundary and was not staged.
+- `next_action`: none; continue from the synchronized topic branch.
