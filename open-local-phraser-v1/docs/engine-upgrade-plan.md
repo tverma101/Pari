@@ -1,59 +1,39 @@
-# Pari Engine Upgrade Plan — v3 "SOTA push"
+# Pari Engine Upgrade Plan — historical note
 
-Synthesis of: adversarial baseline measurement (13%), LLM landscape research
-(Aug 2026), architecture brainstorm, and quality-systems design. Sources:
-- `benchmarks/eval/` — 64-case corpus + reference-free metrics
-- `~/.hermes/research/small-llm-paraphrasing-aug2026.md` — model shootout receipts
-- subagent design docs (quality systems: ~/pari-quality-system.md)
+> **Superseded for execution tracking.** The canonical current plan is [`docs/remaining-work.md`](remaining-work.md).
 
-## Where we are
+This file records the August 2026 "SOTA push" that moved Pari away from treating the deterministic safe engine as a sufficient paraphraser. Its architectural conclusions remain useful, but its model-selection step is no longer current.
 
-| engine | overall | broken | frag | vague | run-on | salad | tense | register | canary |
-|---|---|---|---|---|---|---|---|---|---|
-| local-safe-engine (baseline) | 13% | 0% | 13% | 0% | 0% | 0% | 0% | 0% | 88% |
+## What remains valid
 
-The safe engine is an excellent *guardrail* and a poor *paraphraser*: it
-changes ~5% of words and leaves degenerate input untouched. The native MLX
-path (Qwen3-4B) fixes mechanics but keeps vagueness, fragments, and informal
-register (see benchmarks/llm-shootout/qwen3-4b-probe-results.json).
+- The deterministic `local-safe-engine` is a guardrail/fallback, not the quality ceiling.
+- Generate -> verify -> repair remains the correct high-level shape.
+- Protected spans, sentence relationships, negation/modality/quantity, grammar and semantic preservation remain hard constraints.
+- Best-of-N candidate generation and replayable ranking are preferable to trusting one stochastic draft.
+- Broken-input normalization/category-aware prompting are reasonable only when they improve the frozen Pari corpus.
+- "Changed more" is not a quality metric.
+- Fine-tuning should wait until enough clean, explicitly approved examples exist.
 
-## Decisions (evidence-backed)
+## Model-selection correction
 
-1. **Model**: upgrade bundled generator Qwen3-4B → **Qwen3.5-4B MLX 4bit**
-   (same ~2GB footprint; IFEval 89.8 vs 83.4; Apache-2.0; thinking off by
-   default). Runner-up Gemma 4 E2B-it stays on the bench for prose-style A/B.
-   Receipts in the research report above.
-2. **Pipeline shape**: keep generate→verify→repair, but add a **pre-repair
-   stage** (degenerate-input normalization feeding the LLM a cleaner prompt)
-   and **N+1 candidate generation** (two sampled candidates + one greedy,
-   ranked by existing semantic ranker + harper error count).
-3. **Meaning gate**: add NLI entailment check (DeBERTA-v3-xsmall ONNX,
-   ~90MB q8) as a second gate beside MiniLM cosine floor. Kills negation
-   flips that cosine cannot see.
-4. **Prompting**: task-specific prompt tracks per detected input category
-   (broken words / vague / fragment / run-on / register), chosen by cheap
-   heuristics — the probe showed generic prompts under-fix vagueness.
-5. **Style tuning (later)**: few-shot exemplar bank from approval memory
-   (already partially built via buildNativeStyleContext); LoRA only after
-   bank >200 approvals.
+The old plan treated **Qwen3.5-4B** as the next production upgrade. That decision is now intentionally reopened:
 
-## Execution order (each its own PR, each must move the eval number)
+- **Qwen3-4B MLX 4-bit** remains the current production local backend.
+- **Qwen3.5-4B** is the current general-model benchmark control.
+- **MiniCPM5-2B** is a new must-test challenger because of its small footprint and strong September 2026 independent small-model results.
+- MiniCPM testing is tracked in [issue #10](https://github.com/tverma101/Pari/issues/10).
 
-- PR#2 llm-shootout: score Qwen3.5-4B vs Qwen3-4B vs safe-engine on the
-  identical corpus; wire winner as default native model. Gate: overall ≥ 60%
-  with zero guard violations.
-- PR#3 pre-repair stage: deterministic normalization (spacing, apostrophes,
-  common typo map via existing lexicon) before the LLM sees text. Gate:
-  broken_words ≥ 75%.
-- PR#4 category-aware prompts + N-candidate ranking. Gate: vague ≥ 50%,
-  register_shift ≥ 50%, no canary regressions.
-- PR#5 NLI entailment gate in app pipeline (not just eval). Gate: canary 100%,
-  zero negation flips across corpus.
-- PR#6 CI wiring: run-eval.mjs --outputs as GitHub Action on every PR to
-  main, failing below committed floors.
+No model should be promoted from generic benchmark scores alone. The winner must beat the controls on Pari's own coherence, grammar, reconstruction, meaning-preservation, safety, latency and target-Mac memory tests.
 
-## Non-negotiables (from AGENTS.md + roadmap)
+## Historical execution ideas still worth evaluating
 
-- local-safe fallback stays bounded and deterministic; never remote.
-- Protected spans, sentence-count stability, anchor preservation remain hard gates.
-- "Changed more" is not a quality metric; the eval composite is.
+These remain candidates, but their order is governed by `docs/remaining-work.md`:
+
+1. pre-repair / deterministic normalization for malformed input;
+2. category-aware prompts and multi-candidate ranking;
+3. compact NLI/entailment veto for contradiction/negation failures that cosine can miss;
+4. grammar-specialist + general-rewriter cascades;
+5. CI quality floors;
+6. approval-derived style tuning only after a sufficiently large clean approval bank.
+
+For research rationale see [`research/quality-roadmap.md`](../research/quality-roadmap.md). For the current model harness and promotion rules see [`benchmarks/llm-shootout/README.md`](../benchmarks/llm-shootout/README.md).
