@@ -22,10 +22,16 @@ export interface ClauseIssue {
   detail: string;
 }
 
-const ROOM_ARRIVED_PATTERN = /\bthe\s+room\s+everyone\s+arrived\b/i;
+const ROOM_ARRIVED_PATTERN =
+  /\bthe\s+room\s+everyone\s+arrived\b(?!\s+(?:at|in|on|from|to|for|with|by)\b)/i;
 
-const GENERIC_FUSED_CLAUSE =
-  /,?\s*and\s+the\s+[a-z]+\s+(?:everyone|everybody|someone|they|we|he|she|it)\s+\S+\s+(?:early|late|quickly|yesterday|today)\b/i;
+// A noun followed directly by an independent subject + an intransitive verb
+// + an adverb is not a valid relative clause without a boundary marker. Keep
+// the verb/adverb vocabulary deliberately small: this is a hard gate and must
+// catch the unseen ro-04-shaped class without rejecting ordinary relative
+// clauses such as "the report she sent yesterday".
+const FUSED_RELATIVE_CLAUSE =
+  /\b(?:the|a|an|this|that|these|those|my|your|his|her|our|their|some)\s+[a-z][a-z'-]*\s+(?:everyone|everybody|someone|somebody|they|we|he|she|it)\s+(?:arrived|departed|returned|fell|waited)\s+(?:early|late|quickly|yesterday|today|there|overnight)\b/i;
 
 const ROLE_SWAP_PAIRS: Array<[RegExp, RegExp]> = [
   [/\bthe dog chased the man\b/i, /\bthe man chased the dog\b/i],
@@ -43,14 +49,11 @@ export function clauseAttachmentIssues(
   // 1) Generic fused-clause detector: a comma-list that absorbs a clause
   // fragment as a noun modifier. This is the ro-04 class, but expressed
   // generically so new malformed outputs with different nouns still fail.
-  if (GENERIC_FUSED_CLAUSE.test(candidate)) {
-    if (/,\s+the\s+food\s+we\s+booked/i.test(candidate) || /,?\s+the\s+room\s+everyone/i.test(candidate)) {
-      issues.push({
-        id: "clause-attachment-malformed",
-        detail: "Clause boundaries are incorrectly attached; surrounding noun phrase absorbs a following clause.",
-      });
-      // Don't double-report the room check below if this already fired.
-    }
+  if (FUSED_RELATIVE_CLAUSE.test(candidate)) {
+    issues.push({
+      id: "clause-attachment-malformed",
+      detail: "Clause boundaries are incorrectly attached; surrounding noun phrase absorbs a following clause.",
+    });
   }
 
   // 2) Missing relative-clause boundary for room-booking type fusion.

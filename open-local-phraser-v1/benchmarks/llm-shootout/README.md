@@ -31,6 +31,28 @@ Use `run_openai_compatible.py` for local runtimes that expose `/v1/chat/completi
 
 This keeps the benchmark model-agnostic and lets new Apple-Silicon runtimes compete without first wiring them into production.
 
+The same adapter can probe FreeLLMAPI without storing its key:
+
+```bash
+FREELLM_KEY="$(pbpaste | tr -d '\r\n')"
+python benchmarks/llm-shootout/run_openai_compatible.py \
+  --base-url http://127.0.0.1:31415/v1 \
+  --model gemma-4-31b \
+  --api-key "$FREELLM_KEY" \
+  --out /tmp/pari-gemma431.jsonl \
+  --max-tokens 220
+
+node benchmarks/eval/run-eval.mjs --outputs /tmp/pari-gemma431.jsonl
+```
+
+Use `--offset` and `--limit` for bounded availability probes and preserve the
+raw JSONL before scoring. On 2026-09-07 the full 64-case FreeLLMAPI comparison
+selected `gemma-4-31b` over `llama-3.3-70b-fp8-fast`: Gemma scored 57/64 with
+two hard-gate failures and a 0.51-second median; Llama scored 59/64 with three
+hard-gate failures and a 0.62-second median. These automatic scores are
+selection evidence only; the production app still applies its own gates and
+falls back closed.
+
 ## MiniCPM5-2B candidate
 
 Tracking issue: [#10](https://github.com/tverma101/Pari/issues/10)

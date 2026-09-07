@@ -8,28 +8,38 @@ import { fileURLToPath } from "url";
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const UNCONFIGURED_NATIVE_MODEL_ID = "unconfigured-native-model";
 const UNCONFIGURED_NATIVE_MODEL_PATH = "native-models/unconfigured";
+
+function expandConfiguredPath(value) {
+  if (!value) return value;
+  return value.startsWith("~/") ? path.join(os.homedir(), value.slice(2)) : value;
+}
+
 function resolveNativeModelConfig() {
   let cfg = null;
   try { cfg = JSON.parse(readFileSync(path.join(ROOT_DIR, "native-models/config.json"), "utf8")); } catch {}
   const envId = process.env.PARI_NATIVE_MODEL_ID?.trim();
   const envPath = process.env.PARI_NATIVE_MODEL_PATH?.trim();
   const id = envId || cfg?.nativeModel?.id || UNCONFIGURED_NATIVE_MODEL_ID;
-  const localPath = envPath
-    ? (envPath.startsWith("~/") ? path.join(os.homedir(), envPath.slice(2)) : envPath)
-    : (cfg?.nativeModel?.localPath || UNCONFIGURED_NATIVE_MODEL_PATH);
+  const catalog = [
+    cfg?.nativeModel,
+    ...(Array.isArray(cfg?.benchmarkControls) ? cfg.benchmarkControls : []),
+    ...(Array.isArray(cfg?.challengers) ? cfg.challengers : []),
+  ].filter(Boolean);
+  const selected = catalog.find((entry) => entry.id === id) ?? cfg?.nativeModel ?? {};
+  const localPath = expandConfiguredPath(envPath || selected.localPath || UNCONFIGURED_NATIVE_MODEL_PATH);
   // install script targets the installed location (Library/.../Models/<localPath>)
   // but source is always checkout native-models/<model folder>
-  const sourcePath = cfg?.nativeModel?.localPath || UNCONFIGURED_NATIVE_MODEL_PATH;
+  const sourcePath = selected.localPath || UNCONFIGURED_NATIVE_MODEL_PATH;
   return { id, localPath, sourcePath };
 }
 const _nativeCfg = resolveNativeModelConfig();
 const MODEL_ID = _nativeCfg.id;
 const MODEL_RELATIVE_PATH = _nativeCfg.sourcePath;
-const SOURCE_DIR = path.join(ROOT_DIR, MODEL_RELATIVE_PATH);
+const SOURCE_DIR = path.resolve(ROOT_DIR, MODEL_RELATIVE_PATH);
 const configuredTarget = process.env.PARI_NATIVE_MODEL_PATH?.trim();
 const TARGET_DIR = configuredTarget
-  ? path.resolve(configuredTarget.startsWith("~") ? path.join(os.homedir(), configuredTarget.slice(2)) : configuredTarget)
-  : path.join(os.homedir(), "Library", "Application Support", "Open Local Phraser", "Models", MODEL_RELATIVE_PATH);
+  ? path.resolve(expandConfiguredPath(configuredTarget))
+  : path.resolve(os.homedir(), "Library", "Application Support", "Open Local Phraser", "Models", MODEL_RELATIVE_PATH);
 
 function log(message) {
   console.log(`[models:install] ${message}`);

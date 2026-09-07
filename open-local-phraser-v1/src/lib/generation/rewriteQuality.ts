@@ -839,6 +839,11 @@ export function validateRewriteQuality(
   const newIssues = candidateIssues.filter((issue) => {
     const used = candidateIssueUsage.get(issue.id) ?? 0;
     candidateIssueUsage.set(issue.id, used + 1);
+    // Clause attachment and role swaps are hard meaning/syntax failures. A
+    // malformed source is allowed to reach the deterministic fallback, but a
+    // generated candidate may never preserve one merely because the source
+    // already had the same issue.
+    if (issue.id === "clause-attachment-malformed" || issue.id === "role-swap") return true;
     if (used < (originalIssueCounts.get(issue.id) ?? 0)) return false;
     if (options.allowStructuralRepair && issue.id === "sentence-shape-drift") return false;
     if (options.allowStructuralRepair && issue.id === "point-of-view-drift" && hasImpliedFirstPersonFragment(original)) return false;

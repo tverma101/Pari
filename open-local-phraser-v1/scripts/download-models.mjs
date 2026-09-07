@@ -16,6 +16,12 @@ const NATIVE_ONLY = process.argv.includes("--native-only");
 const INSTALL_NATIVE = process.argv.includes("--install-native");
 const UNCONFIGURED_NATIVE_MODEL_ID = "unconfigured-native-model";
 const UNCONFIGURED_NATIVE_MODEL_PATH = "native-models/unconfigured";
+
+function expandConfiguredPath(value) {
+  if (!value) return value;
+  return value.startsWith("~/") ? path.join(os.homedir(), value.slice(2)) : value;
+}
+
 function resolveNativeGenerativeModel() {
   // Config drives the default; env overrides it. This retires Qwen as a baked-in default.
   let cfg = null;
@@ -25,26 +31,29 @@ function resolveNativeGenerativeModel() {
   const envId = process.env.PARI_NATIVE_MODEL_ID?.trim();
   const envPath = process.env.PARI_NATIVE_MODEL_PATH?.trim();
   const id = envId || cfg?.nativeModel?.id || UNCONFIGURED_NATIVE_MODEL_ID;
-  const localPath = envPath
-    ? (envPath.startsWith("~/") ? path.join(os.homedir(), envPath.slice(2)) : envPath)
-    : (cfg?.nativeModel?.localPath || UNCONFIGURED_NATIVE_MODEL_PATH);
-  const requiredFiles = cfg?.nativeModel?.requiredFiles || [
-    "README.md",
-    "chat_template.jinja",
+  const catalog = [
+    cfg?.nativeModel,
+    ...(Array.isArray(cfg?.benchmarkControls) ? cfg.benchmarkControls : []),
+    ...(Array.isArray(cfg?.challengers) ? cfg.challengers : []),
+  ].filter(Boolean);
+  const selected = catalog.find((entry) => entry.id === id) ?? cfg?.nativeModel ?? {};
+  const localPath = expandConfiguredPath(envPath || selected.localPath || UNCONFIGURED_NATIVE_MODEL_PATH);
+  const requiredFiles = selected.requiredFiles || [
     "config.json",
     "model.safetensors",
     "model.safetensors.index.json",
     "tokenizer.json",
     "tokenizer_config.json",
-    "vocab.json",
   ];
   return {
     id,
     task: "mlx-generation",
-    role: "paragraph-generation",
+    role: selected.role || "paragraph-generation",
     storage: "native-models",
     localPath,
     requiredFiles,
+    runtime: selected.runtime || "unconfigured",
+    license: selected.license,
   };
 }
 const NATIVE_GENERATIVE_MODEL = resolveNativeGenerativeModel();
@@ -185,8 +194,8 @@ function modelRoot(model) {
   if (model.storage === "native-models") {
     if (INSTALL_NATIVE) {
       const configuredPath = process.env.PARI_NATIVE_MODEL_PATH?.trim();
-      if (configuredPath) return path.resolve((configuredPath.startsWith("~") ? path.join(os.homedir(), configuredPath.slice(2)) : configuredPath));
-      return path.join(
+      if (configuredPath) return path.resolve(expandConfiguredPath(configuredPath));
+      return path.resolve(
         os.homedir(),
         "Library",
         "Application Support",
@@ -195,9 +204,9 @@ function modelRoot(model) {
         model.localPath,
       );
     }
-    return path.join(ROOT_DIR, model.localPath);
+    return path.resolve(ROOT_DIR, model.localPath);
   }
-  return path.join(ROOT_DIR, "public", "models", model.id);
+  return path.resolve(ROOT_DIR, "public", "models", model.id);
 }
 
 function manifestPath(model) {
@@ -433,6 +442,8 @@ async function writeManifest(model, files, downloadedAt = new Date().toISOString
     task: model.task,
     role: model.role,
     ...(model.storage ? { storage: model.storage, localPath: model.localPath } : {}),
+    ...(model.runtime ? { runtime: model.runtime } : {}),
+    ...(model.license ? { license: model.license } : {}),
     dtype: getModelDtype(model),
     downloadedAt,
     files,

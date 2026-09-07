@@ -45,10 +45,23 @@ function loadTsModule(filePath) {
   const module = { exports: {} };
   moduleCache.set(absolutePath, module);
   const localRequire = (specifier) => {
-    if (absolutePath.endsWith("/rewriteStack/advancedParaphrase.ts") && specifier === "./modelManager") {
+    if (
+      absolutePath.endsWith("/rewriteStack/advancedParaphrase.ts") &&
+      specifier === "./modelManager"
+    ) {
       return {
         generateMaskSuggestions: async () => [],
         warmRewriteAssistantModels: async () => {},
+      };
+    }
+    if (
+      absolutePath.endsWith("/ranking/embeddingRanker.ts") &&
+      specifier === "./modelManager"
+    ) {
+      return {
+        getEmbeddingExtractor: async () => {
+          throw new Error("embedding models are intentionally stubbed by qa:approval");
+        },
       };
     }
     const resolved = resolveModule(specifier, absolutePath);

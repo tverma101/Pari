@@ -359,9 +359,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     private let headlessCustomStyle = CommandLine.arguments.contains("--headless-custom-style")
     private let headlessMissingModel = CommandLine.arguments.contains("--headless-missing-model")
     private let headlessRequireNative = CommandLine.arguments.contains("--headless-require-native")
+    private let headlessFreeLLM = CommandLine.arguments.contains("--headless-freellm")
     private let headlessCustomStyleName = ProcessInfo.processInfo.environment["PARI_HEADLESS_CUSTOM_STYLE_NAME"] ?? "QA Warm Direct"
     private let agentStyleBackendRequested = CommandLine.arguments.contains("--agent-style-backend")
-    private let headlessInput = "My ADHD makes it difficult for me to sustain attention for long periods, stay focused when there are distractions, organize tasks and assignments, and remember information or instructions. I can also have difficulty listening continuously during lectures and completing work that requires sustained mental effort. These symptoms can affect my test performance, note-taking, time management, and ability to keep up with longer assignments."
+    private let headlessInput: String = {
+        let environment = ProcessInfo.processInfo.environment
+        let remoteRequested = CommandLine.arguments.contains("--headless-freellm")
+            || environment["PARI_GENERATION_BACKEND"]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "freellm"
+            || environment["PARI_FREELLM_ENABLED"] == "1"
+        if remoteRequested {
+            // Keep the installed remote-path smoke deterministic and focused
+            // on proving the route, while the full adversarial shootout covers
+            // long ADHD-style paragraphs and hard safety cases separately.
+            return "The package arrived yesterday but it was damaged."
+        }
+        return "My ADHD makes it difficult for me to sustain attention for long periods, stay focused when there are distractions, organize tasks and assignments, and remember information or instructions. I can also have difficulty listening continuously during lectures and completing work that requires sustained mental effort. These symptoms can affect my test performance, note-taking, time management, and ability to keep up with longer assignments."
+    }()
     private let consoleHandlerName = "openLocalPhraserConsole"
     private let nativeHandlerName = "openLocalPhraserNative"
     private let clipboardHandlerName = "openLocalPhraserClipboard"
@@ -372,7 +385,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         guard let value = ProcessInfo.processInfo.environment["PARI_NATIVE_MODEL_PATH"],
               !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         else { return nil }
-        return URL(fileURLWithPath: (value as NSString).expandingTildeInPath).standardizedFileURL
+        let expanded = (value as NSString).expandingTildeInPath
+        if expanded.hasPrefix("/") {
+            return URL(fileURLWithPath: expanded).standardizedFileURL
+        }
+        return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            .appendingPathComponent(expanded)
+            .standardizedFileURL
     }()
     private let nativeModelID: String = {
         // Precedence: env > config > fallback (matches scripts). Env must override config.
@@ -395,6 +414,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         return unconfiguredNativeModelPath
     }()
     private let nativeWorkerRelativePath = "native-runtime/paraphrase_worker.py"
+    private let freeLLMWorkerRelativePath = "native-runtime/freellm_worker.py"
     private let nativeModelRequiredFiles = [
         "manifest.json",
         "config.json",
@@ -402,7 +422,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         "model.safetensors.index.json",
         "tokenizer.json",
         "tokenizer_config.json",
-        "vocab.json",
     ]
     private let nativeGenerationQueue = DispatchQueue(
         label: "com.tejas.pari.native-generation",
@@ -448,7 +467,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     private var nativeProcesses: [Int: Process] = [:]
     private var agentStyleBackend: AgentStyleBackend?
 
+    private var freellmRequested: Bool {
+        if headlessFreeLLM { return true }
+        let environment = ProcessInfo.processInfo.environment
+        return environment["PARI_GENERATION_BACKEND"]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "freellm"
+            || environment["PARI_FREELLM_ENABLED"] == "1"
+    }
+
     private var headlessExpectedGenerationSource: String {
+        if freellmRequested { return "freellm-api" }
         if headlessRequireNative { return "native-mlx" }
         return nativeModelURL() == nil ? "local-safe-engine" : "native-mlx"
     }
@@ -1267,6 +1294,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     }
 
     private func runNativeParaphrase(requestID: Int, payload: [String: Any]) {
+        if freellmRequested {
+            runFreeLLMParaphrase(requestID: requestID, payload: payload)
+            return
+        }
+
         let startedAt = Date()
         let resourceRoot = Bundle.main.resourceURL ?? URL(fileURLWithPath: "/")
         let workerURL = resourceRoot.appendingPathComponent(nativeWorkerRelativePath)
@@ -1351,6 +1383,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         process.standardInput = inputPipe
         process.standardOutput = outputPipe
         process.standardError = errorPipe
+        var processEnvironment = ProcessInfo.processInfo.environment
+        processEnvironment["PYTHONDONTWRITEBYTECODE"] = "1"
+        process.environment = processEnvironment
 
         nativeProcesses[requestID] = process
         defer {
@@ -1397,6 +1432,136 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
             replyToGeneration(requestID: requestID, result: [
                 "ok": false,
                 "error": "The local \(nativeModelID) generator could not start: \(error.localizedDescription)",
+            ])
+        }
+    }
+
+    private func runFreeLLMParaphrase(requestID: Int, payload: [String: Any]) {
+        let startedAt = Date()
+        let environment = ProcessInfo.processInfo.environment
+        guard let apiKey = environment["PARI_FREELLM_API_KEY"], !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            replyToGeneration(requestID: requestID, result: [
+                "ok": false,
+                "error": "FreeLLMAPI routing is enabled, but PARI_FREELLM_API_KEY is not set. Pari stayed on its safe offline fallback.",
+            ])
+            return
+        }
+
+        let resourceRoot = Bundle.main.resourceURL ?? URL(fileURLWithPath: "/")
+        let workerURL = resourceRoot.appendingPathComponent(freeLLMWorkerRelativePath)
+        guard fileExists(workerURL) else {
+            replyToGeneration(requestID: requestID, result: [
+                "ok": false,
+                "error": "The FreeLLMAPI worker is missing from this Pari installation. Rebuild or reinstall Pari to restore the optional API route.",
+            ])
+            return
+        }
+
+        guard let pythonURL = nativePythonURL() else {
+            replyToGeneration(requestID: requestID, result: [
+                "ok": false,
+                "error": "The FreeLLMAPI route needs the selected Python 3 runtime. Install Python 3 and relaunch Pari.",
+            ])
+            return
+        }
+
+        guard let originalText = payload["originalText"] as? String, !originalText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            replyToGeneration(requestID: requestID, result: [
+                "ok": false,
+                "error": "The FreeLLMAPI paraphrase request contained no text.",
+            ])
+            return
+        }
+
+        let protectedSpans = payload["protectedSpans"] as? [String] ?? []
+        let mode = payload["mode"] as? String ?? "personal"
+        let strength = (payload["strength"] as? NSNumber)?.intValue ?? 56
+        let maxTokens = (payload["maxTokens"] as? NSNumber)?.intValue ?? 768
+        let repairPass = payload["repairPass"] as? Bool ?? false
+        let styleInstructions = payload["styleInstructions"] as? String
+        let styleTweaks = payload["styleTweaks"] as? [String: Any]
+        let styleContext = payload["styleContext"] as? [String: Any]
+        var request: [String: Any] = [
+            "original_text": originalText,
+            "protected_spans": protectedSpans,
+            "mode": mode,
+            "strength": strength,
+            "max_tokens": maxTokens,
+        ]
+        if repairPass { request["repair_pass"] = true }
+        if let styleInstructions, !styleInstructions.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            request["custom_instructions"] = styleInstructions
+        }
+        if let styleTweaks { request["style_tweaks"] = styleTweaks }
+        if let styleContext { request["style_context"] = styleContext }
+
+        guard let requestData = try? JSONSerialization.data(withJSONObject: request) else {
+            replyToGeneration(requestID: requestID, result: [
+                "ok": false,
+                "error": "The FreeLLMAPI paraphrase request could not be serialized.",
+            ])
+            return
+        }
+
+        let process = Process()
+        let inputPipe = Pipe()
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        process.executableURL = pythonURL
+        process.arguments = [workerURL.path]
+        process.standardInput = inputPipe
+        process.standardOutput = outputPipe
+        process.standardError = errorPipe
+        var processEnvironment = ProcessInfo.processInfo.environment
+        processEnvironment["PYTHONDONTWRITEBYTECODE"] = "1"
+        process.environment = processEnvironment
+
+        nativeProcesses[requestID] = process
+        defer {
+            nativeProcesses.removeValue(forKey: requestID)
+        }
+
+        do {
+            try process.run()
+            inputPipe.fileHandleForWriting.write(requestData)
+            inputPipe.fileHandleForWriting.closeFile()
+            let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+            process.waitUntilExit()
+
+            let response = parseNativeWorkerResponse(outputData)
+            let elapsedMs = Int(Date().timeIntervalSince(startedAt) * 1000)
+            if process.terminationStatus == 0,
+               let response,
+               response["ok"] as? Bool == true,
+               let text = response["text"] as? String,
+               !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                let configuredModel = environment["PARI_FREELLM_MODEL"]?.trimmingCharacters(in: .whitespacesAndNewlines)
+                var reply: [String: Any] = [
+                    "ok": true,
+                    "text": text,
+                    "durationMs": elapsedMs,
+                    "modelId": response["model_id"] as? String ?? "freellm:\(configuredModel?.isEmpty == false ? configuredModel! : "gemma-4-31b")",
+                    "backend": "freellm-api",
+                ]
+                if let servedModel = response["served_model"] as? String {
+                    reply["servedModel"] = servedModel
+                }
+                replyToGeneration(requestID: requestID, result: reply)
+                return
+            }
+
+            let workerError = response?["error"] as? String
+            let stderr = String(data: errorData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let detail = workerError ?? (stderr?.isEmpty == false ? stderr! : "FreeLLMAPI returned no usable paragraph.")
+            replyToGeneration(requestID: requestID, result: [
+                "ok": false,
+                "error": "The FreeLLMAPI generator could not produce a safe draft: \(detail)",
+            ])
+        } catch {
+            replyToGeneration(requestID: requestID, result: [
+                "ok": false,
+                "error": "The FreeLLMAPI generator could not start: \(error.localizedDescription)",
             ])
         }
     }
@@ -1465,7 +1630,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
 
     private func nativeModelIsComplete(at url: URL) -> Bool {
         guard directoryExists(url) else { return false }
-        return nativeModelRequiredFiles.allSatisfy { fileExists(url.appendingPathComponent($0)) }
+        guard let data = try? Data(contentsOf: url.appendingPathComponent("manifest.json")),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let manifestModelID = json["modelId"] as? String,
+              manifestModelID == nativeModelID,
+              let manifestFiles = json["files"] as? [String],
+              !manifestFiles.isEmpty
+        else { return false }
+
+        let requiredFiles = Set(nativeModelRequiredFiles + manifestFiles)
+        return requiredFiles.allSatisfy { fileExists(url.appendingPathComponent($0)) }
     }
 
     private func nativeModelUnavailableMessage() -> String {

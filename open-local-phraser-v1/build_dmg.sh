@@ -50,6 +50,7 @@ cp -R "$FRONTEND_DIST/." "$WEB_DIR/"
 echo "==> Copying native paraphrase worker (model connects after install)"
 mkdir -p "$RESOURCES_DIR/native-runtime"
 cp "$NATIVE_RUNTIME_DIR/paraphrase_worker.py" "$RESOURCES_DIR/native-runtime/"
+cp "$NATIVE_RUNTIME_DIR/freellm_worker.py" "$RESOURCES_DIR/native-runtime/"
 
 echo "==> Copying native model configuration (no checkpoint weights)"
 mkdir -p "$RESOURCES_DIR/native-models"

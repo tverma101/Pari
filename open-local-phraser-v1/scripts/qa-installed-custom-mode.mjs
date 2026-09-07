@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs";
@@ -8,11 +9,15 @@ const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const APP_BINARY = path.join(ROOT_DIR, "release", "Pari.app", "Contents", "MacOS", "OpenLocalPhraserV2");
 function resolveNativeModelDir() {
   const configured = process.env.PARI_NATIVE_MODEL_PATH?.trim();
-  if (configured) return path.resolve(configured.startsWith("~/") ? path.join(process.env.HOME ?? "", configured.slice(2)) : configured);
+  if (configured) return path.resolve(configured.startsWith("~/") ? path.join(os.homedir(), configured.slice(2)) : configured);
   const config = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, "native-models/config.json"), "utf8"));
   const localPath = config?.nativeModel?.localPath;
   if (typeof localPath !== "string" || !localPath.trim()) throw new Error("native-models/config.json has no nativeModel.localPath");
-  return path.resolve(ROOT_DIR, localPath);
+  const candidates = [
+    path.resolve(ROOT_DIR, localPath),
+    path.resolve(os.homedir(), "Library", "Application Support", "Open Local Phraser", "Models", localPath),
+  ];
+  return candidates.find((candidate) => fs.existsSync(path.join(candidate, "manifest.json"))) ?? candidates[0];
 }
 const NATIVE_MODEL_DIR = resolveNativeModelDir();
 const BACKEND_TIMEOUT_MS = 30_000;

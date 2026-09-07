@@ -56,6 +56,12 @@ async function main() {
   const { sortRankedNativeCandidates } = loadTsModule(
     path.join(ROOT_DIR, "src/lib/generation/nativeCandidateRanker.ts")
   );
+  const { clauseAttachmentIssues } = loadTsModule(
+    path.join(ROOT_DIR, "src/lib/nlp/clauseAttachment.ts")
+  );
+  const { validateRewriteQuality } = loadTsModule(
+    path.join(ROOT_DIR, "src/lib/generation/rewriteQuality.ts")
+  );
 
   const source = "The curator mailed the rare manuscript to the archive.";
   const roleSwap = "The archive mailed the rare manuscript to the curator.";
@@ -83,6 +89,33 @@ async function main() {
 
   const roleQuality = await assessEnglishQuality(source, roleSwap);
   assert.equal(roleQuality.entailment, "contradict", "unseen subject/object reversal must be rejected");
+
+  const unseenRoleSource = "The pilot guided the student through the museum.";
+  const unseenRoleSwap = "The student guided the pilot through the museum.";
+  const unseenRoleQuality = await assessEnglishQuality(unseenRoleSource, unseenRoleSwap);
+  assert.equal(unseenRoleQuality.entailment, "contradict", "fresh role-swap vocabulary must be rejected");
+
+  const unseenFusedSource = "The team visited the venue.";
+  const unseenFusedCandidate = "The team visited the venue everyone arrived early.";
+  const attachmentIssues = clauseAttachmentIssues(unseenFusedSource, unseenFusedCandidate);
+  assert.ok(
+    attachmentIssues.some((issue) => issue.id === "clause-attachment-malformed"),
+    "fresh noun + subject + intransitive-clause fusion must be detected"
+  );
+  const malformedValidation = validateRewriteQuality(
+    unseenFusedSource,
+    unseenFusedCandidate,
+    [],
+    { allowStructuralRepair: true }
+  );
+  assert.equal(malformedValidation.safe, false, "production validation must hard-reject fused clauses");
+  const repairedValidation = validateRewriteQuality(
+    unseenFusedSource,
+    "The team visited the venue. Everyone arrived early.",
+    [],
+    { allowStructuralRepair: true }
+  );
+  assert.equal(repairedValidation.safe, true, "a bounded clause repair should remain acceptable");
 
   const repairedContraction = await assessEnglishQuality(
     "i dont know what happened, but it looked like the meeting went badly",

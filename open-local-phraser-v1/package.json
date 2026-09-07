@@ -27,6 +27,7 @@
     "build:desktop": "bash build_dmg.sh",
     "qa:installed": "./script/build_and_run.sh --headless",
     "qa:installed:connected": "./script/build_and_run.sh --headless-connected",
+    "qa:installed:freellm": "./script/build_and_run.sh --headless-freellm",
     "qa:installed:custom": "node scripts/qa-installed-custom-mode.mjs",
     "qa:installed:missing-model": "./script/build_and_run.sh --headless-missing-model",
     "backend:styles": "./script/build_and_run.sh --agent-style-backend",

@@ -24,9 +24,15 @@ case "$MODE" in
     # Installed connected-path probe: keep the checkpoint outside the app
     # bundle and point this one hidden request at the separately installed
     # development model directory.
-    NATIVE_MODEL_PATH="${PARI_NATIVE_MODEL_PATH:-$(cd "$ROOT_DIR" && node --input-type=module -e 'import fs from "node:fs"; const cfg=JSON.parse(fs.readFileSync("native-models/config.json", "utf8")); process.stdout.write(cfg.nativeModel.localPath);')}"
+    NATIVE_MODEL_PATH="${PARI_NATIVE_MODEL_PATH:-$(cd "$ROOT_DIR" && node --input-type=module -e 'import fs from "node:fs"; import os from "node:os"; import path from "node:path"; const cfg=JSON.parse(fs.readFileSync("native-models/config.json", "utf8")); process.stdout.write(path.resolve(os.homedir(), "Library", "Application Support", "Open Local Phraser", "Models", cfg.nativeModel.localPath));')}"
     env PARI_NATIVE_MODEL_PATH="$NATIVE_MODEL_PATH" \
       "$APP_BINARY" --headless --headless-require-native
+    ;;
+  headless-freellm|--headless-freellm)
+    # Explicit remote-path probe. The API key is inherited from the caller;
+    # this script never stores or prints it.
+    env PARI_GENERATION_BACKEND=freellm \
+      "$APP_BINARY" --headless --headless-freellm
     ;;
   headless-custom|--headless-custom)
     # Installed integration probe for an agent-created saved mode.
@@ -56,7 +62,7 @@ case "$MODE" in
     lldb -- "$APP_BINARY"
     ;;
   *)
-    echo "usage: $0 [run|headless|headless-connected|headless-custom|headless-missing-model|verify|agent-style-backend|logs|telemetry|debug]" >&2
+    echo "usage: $0 [run|headless|headless-connected|headless-freellm|headless-custom|headless-missing-model|verify|agent-style-backend|logs|telemetry|debug]" >&2
     exit 2
     ;;
 esac

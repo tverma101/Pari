@@ -1,4 +1,5 @@
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { spawn } from "child_process";
 
@@ -7,12 +8,18 @@ const UNCONFIGURED_NATIVE_MODEL_PATH = "native-models/unconfigured";
 function resolveModelDir() {
   const env = process.env.PARI_NATIVE_MODEL_PATH?.trim();
   if (env) {
-    const p = env.startsWith("~/") ? path.join(process.env.HOME || "", env.slice(2)) : env;
+    const p = env.startsWith("~/") ? path.join(os.homedir(), env.slice(2)) : env;
     return path.resolve(p);
   }
   try {
     const cfg = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, "native-models/config.json"), "utf8"));
-    if (cfg?.nativeModel?.localPath) return path.join(ROOT_DIR, cfg.nativeModel.localPath);
+    if (cfg?.nativeModel?.localPath) {
+      const candidates = [
+        path.resolve(ROOT_DIR, cfg.nativeModel.localPath),
+        path.resolve(os.homedir(), "Library", "Application Support", "Open Local Phraser", "Models", cfg.nativeModel.localPath),
+      ];
+      return candidates.find((candidate) => fs.existsSync(path.join(candidate, "manifest.json"))) ?? candidates[0];
+    }
   } catch {}
   return path.join(ROOT_DIR, UNCONFIGURED_NATIVE_MODEL_PATH);
 }

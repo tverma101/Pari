@@ -46,9 +46,8 @@ PROMPT = """Rewrite the text below so it is clear, coherent, and grammatically c
 Rules:
 - Keep the original meaning exactly. Do not add facts. Do not drop negations.
 - Keep every name, date, number, percentage, phone number, and link exactly as written.
-- Fix typos, broken grammar, fragments, and run-ons. Repair vague wording only as far as the source supports; never invent missing specifics.
-- Combine fragments into complete sentences where natural; split run-ons when that improves clarity.
-- Prefer ordinary, natural English over thesaurus-like substitutions.
+- Fix typos, broken grammar, fragments, and run-ons. Turn vague wording into clear, concrete statements.
+- Combine fragments into complete sentences where natural; split run-ons.
 - Output ONLY the rewritten text, nothing else.
 
 Text: {text}
@@ -94,7 +93,7 @@ def request_completion(
     api_key: str | None,
     extra_body: dict[str, Any],
     chat_template_kwargs: dict[str, Any],
-) -> str:
+) -> tuple[str, dict[str, Any], dict[str, Any]]:
     body: dict[str, Any] = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
@@ -133,7 +132,13 @@ def request_completion(
     content = message.get("content") if isinstance(message, dict) else None
     if not isinstance(content, str):
         raise RuntimeError(f"Response did not contain text content: {json.dumps(payload)[:800]}")
-    return strip_control_text(content)
+    usage = payload.get("usage") if isinstance(payload.get("usage"), dict) else {}
+    metadata = {
+        key: payload[key]
+        for key in ("id", "model", "system_fingerprint")
+        if isinstance(payload.get(key), (str, int, float))
+    }
+    return strip_control_text(content), usage, metadata
 
 
 def main() -> None:
@@ -146,6 +151,8 @@ def main() -> None:
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--timeout", type=float, default=120.0)
     parser.add_argument("--api-key", default=None)
+    parser.add_argument("--offset", type=int, default=0)
+    parser.add_argument("--limit", type=int, default=None)
     parser.add_argument(
         "--extra-body",
         default=None,
@@ -159,7 +166,16 @@ def main() -> None:
     args = parser.parse_args()
 
     corpus = load_corpus(args.corpus)
-    print(f"corpus: {args.corpus or str(DEFAULT_CORPUS)} cases={len(corpus)}", flush=True)
+    if args.offset < 0:
+        raise SystemExit("--offset must be non-negative")
+    if args.limit is not None and args.limit < 1:
+        raise SystemExit("--limit must be positive when provided")
+    corpus = corpus[args.offset : args.offset + args.limit if args.limit is not None else None]
+    print(
+        f"corpus: {args.corpus or str(DEFAULT_CORPUS)} cases={len(corpus)} "
+        f"offset={args.offset} limit={args.limit if args.limit is not None else 'all'}",
+        flush=True,
+    )
     extra_body = parse_json_object(args.extra_body, "--extra-body")
     chat_template_kwargs = parse_json_object(args.chat_template_kwargs, "--chat-template-kwargs")
 
@@ -178,7 +194,7 @@ def main() -> None:
                 continue
 
             started = time.perf_counter()
-            text = request_completion(
+            text, usage, metadata = request_completion(
                 base_url=args.base_url,
                 model=args.model,
                 prompt=PROMPT.format(text=case["input"]),
@@ -191,18 +207,21 @@ def main() -> None:
             )
             elapsed = time.perf_counter() - started
 
-            fh.write(
-                json.dumps(
-                    {
-                        "id": case["id"],
-                        "output": text,
-                        "seconds": round(elapsed, 2),
-                        "model": args.model,
-                    },
-                    ensure_ascii=False,
-                )
-                + "\n"
-            )
+            row = {
+                "id": case["id"],
+                "output": text,
+                "seconds": round(elapsed, 2),
+                "model": args.model,
+            }
+            if isinstance(metadata.get("model"), str):
+                row["served_model"] = metadata["model"]
+            for field, usage_key in (("prompt_tokens", "prompt_tokens"), ("output_tokens", "completion_tokens")):
+                value = usage.get(usage_key)
+                if isinstance(value, (int, float)):
+                    row[field] = value
+            if isinstance(row.get("output_tokens"), (int, float)):
+                row["tokens_per_second"] = round(row["output_tokens"] / max(elapsed, 0.001), 2)
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
             fh.flush()
             print(f"{case['id']:8s} {elapsed:5.1f}s  {text[:90]}", flush=True)
 

@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { createReadStream, readFileSync } from "fs";
+import { createReadStream, existsSync, readFileSync } from "fs";
 import crypto from "crypto";
 import os from "os";
 import path from "path";
@@ -22,16 +22,35 @@ const MEMORY_CEILING_MB = 6 * 1024;
 const FILES_ONLY = process.argv.includes("--files-only");
 const UNCONFIGURED_NATIVE_MODEL_ID = "unconfigured-native-model";
 const UNCONFIGURED_NATIVE_MODEL_PATH = "native-models/unconfigured";
+
+function expandConfiguredPath(value) {
+  if (!value) return value;
+  return value.startsWith("~/") ? path.join(os.homedir(), value.slice(2)) : value;
+}
+
 function resolveNativeGenerativeModel() {
   let cfg = null;
   try { cfg = JSON.parse(readFileSync(path.join(ROOT_DIR, "native-models/config.json"), "utf8")); } catch {}
   const envId = process.env.PARI_NATIVE_MODEL_ID?.trim();
   const envPath = process.env.PARI_NATIVE_MODEL_PATH?.trim();
   const id = envId || cfg?.nativeModel?.id || UNCONFIGURED_NATIVE_MODEL_ID;
-  const localPath = envPath
-    ? (envPath.startsWith("~/") ? path.join(os.homedir(), envPath.slice(2)) : envPath)
-    : (cfg?.nativeModel?.localPath || UNCONFIGURED_NATIVE_MODEL_PATH);
-  return { id, task: "mlx-generation", storage: "native-models", localPath, role: "paragraph-generation" };
+  const catalog = [
+    cfg?.nativeModel,
+    ...(Array.isArray(cfg?.benchmarkControls) ? cfg.benchmarkControls : []),
+    ...(Array.isArray(cfg?.challengers) ? cfg.challengers : []),
+  ].filter(Boolean);
+  const selected = catalog.find((entry) => entry.id === id) ?? cfg?.nativeModel ?? {};
+  const localPath = expandConfiguredPath(envPath || selected.localPath || UNCONFIGURED_NATIVE_MODEL_PATH);
+  return {
+    id,
+    task: "mlx-generation",
+    storage: "native-models",
+    localPath,
+    role: selected.role || "paragraph-generation",
+    requiredFiles: selected.requiredFiles,
+    runtime: selected.runtime,
+    license: selected.license,
+  };
 }
 const NATIVE_GENERATIVE_MODEL = resolveNativeGenerativeModel();
 
@@ -42,15 +61,12 @@ function getModelDtype(model) {
 
 function getRequiredFiles(model) {
   if (model.storage === "native-models") {
-    return [
-      "README.md",
-      "chat_template.jinja",
+    return model.requiredFiles || [
       "config.json",
       "model.safetensors",
       "model.safetensors.index.json",
       "tokenizer.json",
       "tokenizer_config.json",
-      "vocab.json",
     ];
   }
 
@@ -164,9 +180,15 @@ function rssMb() {
 }
 
 function modelDir(model) {
-  return model.storage === "native-models"
-    ? path.join(ROOT_DIR, model.localPath)
-    : path.join(MODEL_ROOT, model.id);
+  if (model.storage !== "native-models") return path.resolve(MODEL_ROOT, model.id);
+
+  const configuredPath = process.env.PARI_NATIVE_MODEL_PATH?.trim();
+  const candidates = [
+    configuredPath ? path.resolve(expandConfiguredPath(configuredPath)) : null,
+    path.resolve(ROOT_DIR, model.localPath),
+    path.resolve(os.homedir(), "Library", "Application Support", "Open Local Phraser", "Models", model.localPath),
+  ].filter(Boolean);
+  return [...new Set(candidates)].find((candidate) => existsSync(path.join(candidate, "manifest.json"))) ?? candidates[0];
 }
 
 function modelManifest(model) {

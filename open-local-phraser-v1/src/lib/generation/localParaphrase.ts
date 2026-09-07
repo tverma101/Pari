@@ -53,7 +53,7 @@ export interface LocalParaphraseRequest {
 export interface LocalParaphraseResult {
   text: string;
   protectedSpans: ProtectedSpan[];
-  source: "native-mlx" | "local-safe-engine";
+  source: "native-mlx" | "freellm-api" | "local-safe-engine";
   durationMs: number;
   retryCount: number;
   retrievedExampleCount: number;
@@ -503,6 +503,8 @@ export async function generateLocalParaphrase(
         ...(nativeStyleContext ? { styleContext: nativeStyleContext } : {}),
       }, request.signal);
       throwIfAborted(request.signal);
+      const nativeSource = native.backend === "freellm-api" ? "freellm-api" : "native-mlx";
+      const nativeRouteLabel = native.backend === "freellm-api" ? "through FreeLLMAPI" : "locally";
 
       // Best-of-N: rank every candidate with the same gates a single draft
       // must pass. If the ranker itself fails, fall back to inspecting every
@@ -523,12 +525,12 @@ export async function generateLocalParaphrase(
           return {
             text: winner.text,
             protectedSpans,
-            source: "native-mlx",
+            source: nativeSource,
             durationMs: Math.round(performance.now() - startedAt),
             retryCount: 0,
             retrievedExampleCount: retrievedExamples.length,
             safe: true,
-            notice: `Generated locally with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
+            notice: `Generated ${nativeRouteLabel} with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
           };
         }
         inspection = { text: ranked[0]?.text ?? native.text, safe: false, reason: `No candidate passed Pari's meaning and grammar checks (ranked=${ranked.length}, requested=${candidateList.length}).` };
@@ -551,12 +553,12 @@ export async function generateLocalParaphrase(
             return {
               text: single.text,
               protectedSpans,
-              source: "native-mlx",
+              source: nativeSource,
               durationMs: Math.round(performance.now() - startedAt),
               retryCount: 0,
               retrievedExampleCount: retrievedExamples.length,
               safe: true,
-              notice: `Generated locally with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
+              notice: `Generated ${nativeRouteLabel} with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
             };
           }
           inspection = { ...inspection, reason: single.reason ?? inspection.reason };
@@ -566,12 +568,12 @@ export async function generateLocalParaphrase(
         return {
           text: inspection.text,
           protectedSpans,
-          source: "native-mlx",
+          source: nativeSource,
           durationMs: Math.round(performance.now() - startedAt),
           retryCount: 0,
           retrievedExampleCount: retrievedExamples.length,
           safe: true,
-          notice: `Generated locally with ${native.modelId}. Review the wording, then save it to teach Pari.`,
+          notice: `Generated ${nativeRouteLabel} with ${native.modelId}. Review the wording, then save it to teach Pari.`,
         };
       }
 
@@ -605,15 +607,17 @@ export async function generateLocalParaphrase(
           warmthPolish,
         );
         if (retryInspection.safe) {
+          const repairedSource = repairedNative.backend === "freellm-api" ? "freellm-api" : "native-mlx";
+          const repairedRouteLabel = repairedNative.backend === "freellm-api" ? "through FreeLLMAPI" : "locally";
           return {
             text: retryInspection.text,
             protectedSpans,
-            source: "native-mlx",
+            source: repairedSource,
             durationMs: Math.round(performance.now() - startedAt),
             retryCount: 1,
             retrievedExampleCount: retrievedExamples.length,
             safe: true,
-            notice: `Generated locally with ${repairedNative.modelId} after a quality repair pass. Review the wording, then save it to teach Pari.`,
+            notice: `Generated ${repairedRouteLabel} with ${repairedNative.modelId} after a quality repair pass. Review the wording, then save it to teach Pari.`,
           };
         }
         nativeFailureNotice = `${nativeFailureNotice} The native repair pass also failed: ${retryInspection.reason ?? "its draft was unsafe."}`;

@@ -42,6 +42,8 @@ export interface NativeCandidate {
   temperature?: number;
 }
 
+export type NativeGenerationBackend = "native-mlx" | "freellm-api";
+
 interface NativeBridge {
   postMessage(message: {
     id: number;
@@ -56,6 +58,8 @@ interface NativeParaphraseResponse {
   text?: unknown;
   durationMs?: unknown;
   modelId?: unknown;
+  backend?: unknown;
+  servedModel?: unknown;
   candidates?: unknown;
 }
 
@@ -165,7 +169,14 @@ export function nativeParaphraseAvailable(): boolean {
 export async function generateNativeParaphrase(
   request: NativeParaphraseRequest,
   signal?: AbortSignal
-): Promise<{ text: string; durationMs: number; modelId: string; candidates?: NativeCandidate[] }> {
+): Promise<{
+  text: string;
+  durationMs: number;
+  modelId: string;
+  backend: NativeGenerationBackend;
+  servedModel?: string;
+  candidates?: NativeCandidate[];
+}> {
   const result = await requestNative(request, signal);
   if (result.ok === false) {
     throw new Error(typeof result.error === "string" ? result.error : "The local generative model failed to load.");
@@ -185,6 +196,10 @@ export async function generateNativeParaphrase(
     text: result.text.trim(),
     durationMs: typeof result.durationMs === "number" ? result.durationMs : 0,
     modelId: typeof result.modelId === "string" ? result.modelId : (typeof result.text === "string" ? "local-model" : "local-model"),
+    backend: result.backend === "freellm-api" ? "freellm-api" : "native-mlx",
+    ...(typeof result.servedModel === "string" && result.servedModel.trim()
+      ? { servedModel: result.servedModel.trim() }
+      : {}),
     ...(candidates && candidates.length > 1 ? { candidates } : {}),
   };
 }

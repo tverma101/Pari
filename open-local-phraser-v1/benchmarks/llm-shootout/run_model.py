@@ -46,6 +46,16 @@ def strip_think(text: str) -> str:
     return text.strip()
 
 
+def token_count(tokenizer, text: str) -> int | None:
+    try:
+        try:
+            return len(tokenizer.encode(text, add_special_tokens=False))
+        except TypeError:
+            return len(tokenizer.encode(text))
+    except Exception:
+        return None
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("model_dir")
@@ -88,7 +98,16 @@ def main() -> None:
             # The model must never echo meta instructions back.
             if "Text:" in text or "Rewritten" in text.split("\n")[0]:
                 text = ""
-            fh.write(json.dumps({"id": case["id"], "output": text, "seconds": round(dt, 2)}) + "\n")
+            output_tokens = token_count(tokenizer, text)
+            row = {"id": case["id"], "output": text, "seconds": round(dt, 2)}
+            if output_tokens is not None:
+                row["output_tokens"] = output_tokens
+                row["tokens_per_second"] = round(output_tokens / max(dt, 0.001), 2)
+            try:
+                row["prompt_tokens"] = len(prompt_ids)
+            except TypeError:
+                pass
+            fh.write(json.dumps(row) + "\n")
             fh.flush()
             print(f"{case['id']:8s} {dt:5.1f}s  {text[:90]}", flush=True)
 
