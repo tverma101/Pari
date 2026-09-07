@@ -297,3 +297,55 @@
 - `next_action`: commit and push the audited topic-branch changes; if a higher
   confidence claim is needed afterward, add a larger untouched corpus and the
   blind human/QuillBot comparison rather than tuning against this frozen set.
+
+## 2026-09-07 — Restored and bounded the FreeLLM route
+
+- `scope`: FreeLLMAPI runtime, Pari's optional remote generation path, packaged
+  desktop app, and installed smoke validation on `feat/quality-judge-holdout`.
+- `goal`: restart the local FreeLLM service after its timeout and make the
+  paste-and-paraphrase route responsive enough for practical use.
+- `changed_files`: `src/lib/generation/localParaphrase.ts` and this log.
+- `implementation`: restarted the pre-existing `/Applications/FreeLLMAPI.app`
+  instance after verifying its existing unified-key screen; the service
+  returned to `127.0.0.1:31415` and accepted the existing key without
+  regenerating or recording it. FreeLLM's single network candidate now uses
+  Pari's bounded single-draft inspection instead of loading the local
+  MiniLM/NLI/fluency ranking stack. The optional Harper grammar check is capped
+  at 1.5 seconds; protected-content and deterministic rewrite-quality gates
+  remain authoritative. Local Qwen3 multi-candidate ranking is unchanged.
+- `model_selection`: the fresh 64-case FreeLLM comparison completed 64/64
+  requests for `gemma-4-31b` and `gpt-oss-120b`. Gemma scored 59/64 raw and
+  after Pari finalization; gpt-oss scored 50/64 in both views and produced
+  control-echo/empty-style outputs. Neither replaces the incumbent Qwen3
+  product boundary, whose frozen effective replay remains 64/64.
+- `validation`: `npm run qa:approval`; `npm run build`; `npm run build:desktop`;
+  `codesign --verify --deep --strict --verbose=2 release/Pari.app`; `hdiutil
+  verify release/Pari.dmg`; `npm run qa:installed`; `npm run
+  qa:installed:connected`; `npm run qa:installed:freellm` with the existing
+  local key; `npm run qa:installed:custom`; `npm run qa:grammar:harper`; and
+  `npm run qa:learned:judge` all passed. The rebuilt FreeLLM smoke completed in
+  about four seconds with `generator=freellm-api`, after the previous roughly
+  90-second headless timeout. The direct native FreeLLM worker also completed
+  successfully in about one second.
+- `evidence_state`: source implemented=yes; automated regression passed=yes;
+  packaged, signed, and DMG checksum-verified=yes; FreeLLM service live=yes;
+  installed FreeLLM route live-and-smoke-tested=yes; general model quality
+  superiority over QuillBot=no; blind human holdout=no; user visual
+  confirmation=no.
+- `blocker`: no current local implementation blocker. FreeLLM remains an
+  optional remote dependency with provider quota and network variability; the
+  current evidence supports Gemma as the best tested FreeLLM candidate, not as
+  a replacement for local Qwen3. The existing packaging audit warning remains
+  18 npm vulnerabilities and was not changed in this scoped pass.
+- `cleanup`: the copied key was cleared from the clipboard after each smoke;
+  no key was written to the repository or logs. No model weights or Python
+  bytecode entered the app bundle; no GitHub Actions, PR, merge,
+  default-branch mutation, or force-push was performed.
+- `learning_checkpoint`: promoted the remote fast-path boundary and Harper
+  timeout because they are backed by a reproduced timeout, a direct worker
+  isolation check, and a passing installed smoke. Quarantined promotion of
+  FreeLLM models because Gemma remained below the incumbent effective score
+  and gpt-oss emitted unsafe control echoes. Skipped another model download.
+- `next_action`: commit and push the audited topic-branch change; retain the
+  optional FreeLLM route for users who prefer remote variety, with local Qwen3
+  as the default quality baseline.

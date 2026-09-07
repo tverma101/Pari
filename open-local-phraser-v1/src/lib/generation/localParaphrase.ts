@@ -346,23 +346,36 @@ function automaticRewriteBudget(strength: number): number {
 }
 
 async function hasNewHighGrammarIssue(originalText: string, candidateText: string): Promise<string | null> {
+  // Harper is an optional browser-side validator. A cold WASM startup must
+  // not hold the user-facing generation promise indefinitely, especially on
+  // the optional FreeLLM route where the model response has already arrived.
+  const timeoutMs = 1500;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
   try {
-    const [originalIssues, candidateIssues] = await Promise.all([
+    const grammarCheck = Promise.all([
       analyzeHarperGrammar(originalText),
       analyzeHarperGrammar(candidateText),
-    ]);
-    const originalHighLabels = new Set(
-      originalIssues.filter((issue) => issue.severity === "high").map((issue) => issue.label)
-    );
-    const newIssue = candidateIssues.find(
-      (issue) => issue.severity === "high" && !originalHighLabels.has(issue.label)
-    );
-    return newIssue?.detail ?? null;
+    ]).then(([originalIssues, candidateIssues]) => {
+      const originalHighLabels = new Set(
+        originalIssues.filter((issue) => issue.severity === "high").map((issue) => issue.label)
+      );
+      const newIssue = candidateIssues.find(
+        (issue) => issue.severity === "high" && !originalHighLabels.has(issue.label)
+      );
+      return newIssue?.detail ?? null;
+    }).catch(() => null);
+
+    const boundedCheck = new Promise<string | null>((resolve) => {
+      timeout = setTimeout(() => resolve(null), timeoutMs);
+    });
+    return await Promise.race([grammarCheck, boundedCheck]);
   } catch {
     // Harper is an additional local validator. The synchronous hard rules and
     // protected-content gate remain the required fallback if its WASM runtime
     // cannot initialize in a particular browser.
     return null;
+  } finally {
+    if (timeout !== undefined) clearTimeout(timeout);
   }
 }
 
@@ -507,51 +520,36 @@ export async function generateLocalParaphrase(
       const nativeRouteLabel = native.backend === "freellm-api" ? "through FreeLLMAPI" : "locally";
 
       // Best-of-N: rank every candidate with the same gates a single draft
-      // must pass. If the ranker itself fails, fall back to inspecting every
-      // candidate individually so generation never degrades to one draft.
+      // must pass. FreeLLM deliberately returns one network candidate, so use
+      // the bounded single-draft inspector on that route: local learned model
+      // assets are reserved for local multi-candidate ranking and cannot delay
+      // an already-completed remote response. Protected-content, deterministic
+      // quality, and the bounded Harper grammar gate still apply.
       let inspection: { text: string; safe: boolean; reason?: string };
       const candidateList = native.candidates ?? [{ text: native.text }];
-      try {
-        const ranked = await rankNativeCandidates(candidateList, {
+      if (native.backend === "freellm-api" && candidateList.length === 1) {
+        inspection = await inspectNativeDraft(
+          candidateList[0]?.text ?? native.text,
           originalText,
           protectedSpans,
           mode,
           structuralRepair,
-          finalizeDraft,
           warmthPolish,
-        });
-        const winner = ranked.find((candidate) => candidate.safe);
-        if (winner) {
-          return {
-            text: winner.text,
-            protectedSpans,
-            source: nativeSource,
-            durationMs: Math.round(performance.now() - startedAt),
-            retryCount: 0,
-            retrievedExampleCount: retrievedExamples.length,
-            safe: true,
-            notice: `Generated ${nativeRouteLabel} with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
-          };
-        }
-        inspection = { text: ranked[0]?.text ?? native.text, safe: false, reason: `No candidate passed Pari's meaning and grammar checks (ranked=${ranked.length}, requested=${candidateList.length}).` };
-      } catch (rankError) {
-        if (rankError instanceof DOMException && rankError.name === "AbortError") throw rankError;
-        // Ranker unavailable: still use best-of-N via the single-draft inspector.
-        inspection = { text: native.text, safe: false, reason: `Candidate ranking was unavailable (${candidateList.length} candidates): ${rankError instanceof Error ? rankError.message : String(rankError)}` };
-        for (const candidate of candidateList) {
-          if (!candidate.text.trim()) continue;
-          throwIfAborted(request.signal);
-          const single = await inspectNativeDraft(
-            candidate.text,
+        );
+      } else {
+        try {
+          const ranked = await rankNativeCandidates(candidateList, {
             originalText,
             protectedSpans,
             mode,
             structuralRepair,
+            finalizeDraft,
             warmthPolish,
-          );
-          if (single.safe) {
+          });
+          const winner = ranked.find((candidate) => candidate.safe);
+          if (winner) {
             return {
-              text: single.text,
+              text: winner.text,
               protectedSpans,
               source: nativeSource,
               durationMs: Math.round(performance.now() - startedAt),
@@ -561,7 +559,36 @@ export async function generateLocalParaphrase(
               notice: `Generated ${nativeRouteLabel} with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
             };
           }
-          inspection = { ...inspection, reason: single.reason ?? inspection.reason };
+          inspection = { text: ranked[0]?.text ?? native.text, safe: false, reason: `No candidate passed Pari's meaning and grammar checks (ranked=${ranked.length}, requested=${candidateList.length}).` };
+        } catch (rankError) {
+          if (rankError instanceof DOMException && rankError.name === "AbortError") throw rankError;
+          // Ranker unavailable: still use best-of-N via the single-draft inspector.
+          inspection = { text: native.text, safe: false, reason: `Candidate ranking was unavailable (${candidateList.length} candidates): ${rankError instanceof Error ? rankError.message : String(rankError)}` };
+          for (const candidate of candidateList) {
+            if (!candidate.text.trim()) continue;
+            throwIfAborted(request.signal);
+            const single = await inspectNativeDraft(
+              candidate.text,
+              originalText,
+              protectedSpans,
+              mode,
+              structuralRepair,
+              warmthPolish,
+            );
+            if (single.safe) {
+              return {
+                text: single.text,
+                protectedSpans,
+                source: nativeSource,
+                durationMs: Math.round(performance.now() - startedAt),
+                retryCount: 0,
+                retrievedExampleCount: retrievedExamples.length,
+                safe: true,
+                notice: `Generated ${nativeRouteLabel} with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
+              };
+            }
+            inspection = { ...inspection, reason: single.reason ?? inspection.reason };
+          }
         }
       }
       if (inspection.safe) {
