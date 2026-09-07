@@ -100,7 +100,10 @@ const {
   looksLikeUnrepairedFragmentaryProse,
   repairBrokenProse,
 } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/brokenProseRepair.ts"));
-const { generateAdvancedAlternatives } = loadTsModule(path.join(ROOT_DIR, "src/lib/rewriteStack/advancedParaphrase.ts"));
+const {
+  generateAdvancedAlternatives,
+  MAX_VISIBLE_SYNONYMS,
+} = loadTsModule(path.join(ROOT_DIR, "src/lib/rewriteStack/advancedParaphrase.ts"));
 const { validateRewriteQuality } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/rewriteQuality.ts"));
 const { analyzeGrammar, grammarSafetyIssues } = loadTsModule(path.join(ROOT_DIR, "src/lib/nlp/grammar.ts"));
 const { analyzeSentenceFlow, repairSentenceFlow } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/sentenceFlow.ts"));
@@ -349,6 +352,8 @@ const worldAlternatives = await generateAdvancedAlternatives(
   "balanced"
 );
 assert(worldAlternatives.some((option) => option.replacement.toLowerCase() === "cosmos"), "World suggestions lost a precise WordNet synonym");
+assert(MAX_VISIBLE_SYNONYMS === 64, `Manual synonym palette cap regressed to ${MAX_VISIBLE_SYNONYMS}`);
+assert(worldAlternatives.length > 40, `Advanced local suggestions exposed only ${worldAlternatives.length} options for world`);
 
 const usedOptions = buildCandidateOptions("used", getSynonymEntry("used"));
 assert(usedOptions.length >= 10, `used exposes only ${usedOptions.length} contextual choices`);

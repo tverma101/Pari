@@ -197,3 +197,43 @@
 - `blocker`: none for canonical test/documentation publication. The ignored
   workbench is outside the verified Pari source boundary and was not staged.
 - `next_action`: none; continue from the synchronized topic branch.
+
+## 2026-09-07 — Broadened the manual synonym palette
+
+- `scope`: canonical Pari source, contextual/dictionary synonym generation,
+  synonym QA, packaged desktop app, and installed smoke paths on
+  `feat/quality-judge-holdout`.
+- `goal`: optimize the practical paste-a-paragraph workflow for manual editing
+  by making more of the existing safe local synonym pool reachable without
+  widening automatic paragraph generation.
+- `changed_files`: `src/App.tsx`,
+  `src/lib/rewriteStack/advancedParaphrase.ts`,
+  `scripts/qa-paraphrase.mjs`, `README.md`, `docs/remaining-work.md`, and this
+  log.
+- `implementation`: raised the shared visible synonym cap from 40 to 64 and
+  made the UI use that exported boundary. Existing ranked contextual,
+  dictionary, WordNet, thesaurus, and mask-model candidates remain ordered by
+  the current semantic safeguards; the automatic paragraph path is unchanged.
+  Initial base tokens now request contextual expansion when the broader
+  palette is opened.
+- `validation`: `npm run qa:approval`; `npm run benchmark:quality`;
+  `npm run qa:native:prompt`; `npm run build`; `npm run build:desktop`;
+  `codesign --verify --deep --strict --verbose=2 release/Pari.app`;
+  packaged-bundle hygiene check; `npm run qa:installed`; `npm run
+  qa:installed:connected`; `npm run qa:installed:missing-model`; and `npm run
+  qa:installed:custom` all passed. The regression suite confirms the 64-option
+  boundary and more than 40 generated local choices for `world`.
+- `evidence_state`: source implemented=yes; automated tests passed=yes;
+  packaged and signed=yes; installed local, connected-native, recovery, and
+  custom-mode paths passed=yes; live FreeLLMAPI not re-smoked in this UI-only
+  pass; blind human QuillBot comparison=no; user visual confirmation=no.
+- `blocker`: no local implementation blocker. The broader list is a manual
+  candidate palette, not a promise that all 64 entries are equally good; the
+  top 6–10 remain the intended spot-check surface. No QuillBot-superiority
+  claim is made.
+- `cleanup`: no model weights or Python bytecode entered the app bundle; no
+  GitHub Actions, PR, merge, default-branch mutation, or external account
+  action was performed.
+- `next_action`: use the installed app on a real paragraph and manually review
+  the first 6–10 choices for the words that matter, then reassess any ranking
+  changes from actual use.

@@ -35,6 +35,9 @@ export interface AdvancedAlternativeOptions {
 
 const CONTENT_POS = new Set<PartOfSpeech>(["adjective", "adverb", "noun", "verb", "phrase"]);
 const MASK_SUGGESTION_TOP_K = 40;
+// Keep the manual palette broader than the automatic paragraph path while
+// bounding the popover and the amount of ranked data a user must scan.
+export const MAX_VISIBLE_SYNONYMS = 64;
 const CONTEXTUAL_RANK_MODEL = "Xenova/paraphrase-MiniLM-L6-v2" as const;
 const CONTEXTUAL_PRIORITY_COUNT = 12;
 const SEMANTIC_DRIFT_MARGIN = 0.08;

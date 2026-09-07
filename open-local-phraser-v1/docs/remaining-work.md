@@ -112,7 +112,7 @@ For each clicked target verify:
 - wrong POS/inflection, antonyms, garbage subwords and meaning-changing choices are demoted or absent;
 - manual replacement, sentence revert and undo still behave correctly.
 
-**Done when:** a human spot-check shows the top few choices are routinely usable and installed-app QA has no interaction regressions.
+**Done when:** a human spot-check shows the top 6–10 choices are routinely usable within the broader manual palette, and installed-app QA has no interaction regressions.
 
 ## P0.3 — rerun the complete safety/quality regression after the new semantic floor
 

@@ -22,7 +22,10 @@ import { rewriteText } from "@/lib/phraseEngine/rewriteText";
 import type { RewriteResult, RewriteToken } from "@/lib/phraseEngine/types";
 import { clamp, MODE_OPTIONS, percentToStrengthLevel, strengthLabel } from "@/lib/phraseEngine/rules";
 import { generateLocalParaphrase } from "@/lib/generation/localParaphrase";
-import { generateAdvancedAlternatives } from "@/lib/rewriteStack/advancedParaphrase";
+import {
+  generateAdvancedAlternatives,
+  MAX_VISIBLE_SYNONYMS,
+} from "@/lib/rewriteStack/advancedParaphrase";
 import type { LocalModelFailure } from "@/lib/rewriteStack/modelManager";
 import {
   createEmptyPreferenceMemory,
@@ -59,7 +62,7 @@ import { cn } from "@/utils/cn";
 const SAMPLE_TEXT =
   "Artificial intelligence is changing the way people work and learn. It can help students improve their writing, find new ideas quickly, and understand difficult topics. Many companies use these powerful tools to make their work more efficient.";
 
-const SYNONYM_LIMIT = 40;
+const SYNONYM_LIMIT = MAX_VISIBLE_SYNONYMS;
 const REWRITE_AMOUNT_VALUES = [16, 40, 60, 90] as const;
 const INLINE_WORD_TOOL_STOP_WORDS = new Set([
   "a", "about", "after", "again", "also", "an", "and", "are", "as", "been", "before", "being", "between", "both",

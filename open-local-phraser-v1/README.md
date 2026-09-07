@@ -6,7 +6,8 @@ Pari is a local-first paraphrasing tool with shared Personal and Warmth styles. 
 
 - One `Paraphrase` action produces one stable draft.
 - The draft is directly editable and can be pasted over.
-- Highlighted words expose up to ten local contextual alternatives.
+- Highlighted words expose a scrollable local palette of up to 64 ranked
+  contextual/dictionary alternatives when enough safe choices exist.
 - `Save & learn` validates protected content, stores the original/final pair, and updates preference memory.
 - `Discard`, copy, abandoned drafts, and failed approvals save and learn nothing.
 - Generation requests can be cancelled, and stale requests cannot replace newer output.
