@@ -237,3 +237,63 @@
 - `next_action`: use the installed app on a real paragraph and manually review
   the first 6–10 choices for the words that matter, then reassess any ranking
   changes from actual use.
+
+## 2026-09-07 — Hardened the automatic paraphrase boundary
+
+- `scope`: production finalization, native Qwen3 worker normalization, protected
+  content validation, automatic evaluation replay, packaged app, and installed
+  runtime smoke paths on `feat/quality-judge-holdout`.
+- `goal`: continue improving Pari until the current automatic evaluation
+  boundary is saturated while preserving meaning, uncertainty, and protected
+  facts.
+- `changed_files`: `src/lib/generation/brokenProseRepair.ts`,
+  `src/lib/generation/sentenceFlow.ts`, `src/lib/generation/meaningContract.ts`,
+  `src/lib/safety/protectedContent.ts`, `native-runtime/paraphrase_worker.py`,
+  `benchmarks/eval/run-eval.mjs`, `benchmarks/llm-shootout/README.md`,
+  `scripts/qa-paraphrase.mjs`, `scripts/qa-native-model.mjs`, and this log.
+- `implementation`: added narrow source-gated repairs for standalone
+  evaluative and location fragments, mirrored the repairs in the native worker,
+  registered “for unspecified reasons” as a cause relation, and allowed only
+  case-only normalization of protected negation spans. The evaluator now has an
+  explicit `--production-postprocess` mode that scores retained external model
+  outputs after Pari's real `finalizeDraft` boundary while keeping raw-generator
+  scoring separate.
+- `validation`: `npm run qa:approval`; `npm run qa:native:model`; `npm run
+  qa:native:prompt`; `npm run qa:learned:judge`; `npm run qa:grammar:harper`;
+  `npm run qa:grammar:ewt`; `npm run benchmark:quality`; `npm run build`;
+  `npm run build:desktop`; `codesign --verify --deep --strict release/Pari.app`;
+  `hdiutil verify release/Pari.dmg`; `npm run qa:installed`; `npm run
+  qa:installed:connected`; `npm run qa:installed:missing-model`; and `npm run
+  qa:installed:custom` all passed. The raw retained Qwen3-4B 64-case replay
+  remains 61/64; the same outputs after Pari finalization score 64/64 (8/8 in
+  every category) with learned NLI and fluency active. The explicit FreeLLM
+  installed probe timed out waiting for a changed rewrite and fell back to the
+  unchanged paragraph, so it is not live-provider evidence. A no-provider
+  local-safe-only adversarial replay scored 39/64 and failed two hard gates;
+  that fallback intentionally leaves most input unchanged and is not the
+  model-backed production boundary.
+- `evidence_state`: source implemented=yes; automated regression and
+  model-backed fixtures passed=yes; raw generator benchmark=61/64; Pari
+  postprocessed product-boundary replay=64/64; packaged and signed=yes; local,
+  connected-native, missing-model fallback, and custom installed paths
+  passed=yes; FreeLLM live route=not proven; blind human QuillBot comparison=no;
+  user confirmation=no.
+- `blocker`: no local implementation blocker. The 64/64 result is a frozen
+  automatic corpus replay and does not establish general quality or superiority
+  to QuillBot. The source-gated fragment rules are intentionally narrow, the raw
+  generator still has three band-fit misses, the local-safe recovery path is not
+  intended to be a full paraphraser, and the larger human holdout remains
+  outstanding.
+- `cleanup`: the rebuilt app contains no model weights or Python bytecode; no
+  GitHub Actions, PR, merge, default-branch mutation, or external account
+  action was performed. The existing packaging audit warning remains 18 npm
+  vulnerabilities and was not changed in this scoped quality pass.
+- `learning_checkpoint`: promoted the source-gated fragment repair and the
+  explicit raw-versus-production evaluation split because both are backed by
+  current executable tests. Quarantined broad model-promotion and QuillBot
+  superiority conclusions. Skipped new model downloads because the incumbent
+  Qwen3 path plus production finalization already saturates the current frozen
+  automatic corpus.
+- `next_action`: commit and push the audited topic-branch changes; if a higher
+  confidence claim is needed afterward, add a larger untouched corpus and the
+  blind human/QuillBot comparison rather than tuning against this frozen set.

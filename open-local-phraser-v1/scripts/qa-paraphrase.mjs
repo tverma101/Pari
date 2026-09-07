@@ -93,7 +93,7 @@ const {
   appendGroupedEdit,
   describeTextEdit,
 } = loadTsModule(path.join(ROOT_DIR, "src/lib/personalization/editHistory.ts"));
-const { buildNativeStyleContext, generateLocalParaphrase } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/localParaphrase.ts"));
+const { buildNativeStyleContext, finalizeDraft, generateLocalParaphrase } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/localParaphrase.ts"));
 const {
   hasStandaloneNoteFragment,
   looksLikeModelControlEcho,
@@ -251,6 +251,25 @@ const waitingFragmentProbe = repairBrokenProse(
   extractProtectedSpans("Still waiting on the client."),
 );
 assert(/^I am still waiting on the client\.$/i.test(waitingFragmentProbe), `Standalone waiting fragment was not completed safely: ${waitingFragmentProbe}`);
+const honestFragmentProbe = repairBrokenProse(
+  "Honestly? Best pizza in town. No contest.",
+  "Honestly? Best pizza in town. No contest.",
+  extractProtectedSpans("Honestly? Best pizza in town. No contest."),
+);
+assert(
+  /Honestly, this is the best pizza in town, and there is no contest\./i.test(honestFragmentProbe) ||
+    /Honestly, this is the best pizza in town\. (?:There is )?No contest\./i.test(honestFragmentProbe),
+  `Standalone evaluative fragments were not completed safely: ${honestFragmentProbe}`,
+);
+const missingFileProbe = repairBrokenProse(
+  "No idea where the file went. Probably the shared drive. Maybe.",
+  "No idea where the file went. Probably the shared drive. Maybe.",
+  extractProtectedSpans("No idea where the file went. Probably the shared drive. Maybe."),
+);
+assert(
+  /I have no idea where the file went; it probably went to the shared drive, maybe\./i.test(missingFileProbe),
+  `Missing-file fragments were not completed safely: ${missingFileProbe}`,
+);
 const pendingStatusProbe = repairBrokenProse(
   "The quarterly implementation review is pending completion status.",
   "The quarterly implementation review is pending completion status.",
@@ -272,6 +291,13 @@ const directEnglishProbe = repairDirectEnglish(
 assert(!/\bit is important to note\b|\bthere are a number of\b|\bdue to the fact that\b/i.test(directEnglishProbe), `Direct-English filler repair was incomplete: ${directEnglishProbe}`);
 const vagueReasonProbe = repairDirectEnglish("The whole thing fell apart because of reasons.");
 assert(/fell apart for unspecified reasons\./i.test(vagueReasonProbe), `Vague reason repair was incomplete: ${vagueReasonProbe}`);
+const vagueReasonSentenceProbe = finalizeDraft(
+  "So basically, the whole thing fell apart because of reasons.",
+  "so basically the whole thing fell apart because reasons",
+  extractProtectedSpans("so basically the whole thing fell apart because reasons"),
+  "personal",
+);
+assert(/whole thing fell apart for unspecified reasons/i.test(vagueReasonSentenceProbe), `Vague reason finalization dropped the main clause: ${vagueReasonSentenceProbe}`);
 const gerundInfinitiveProbe = repairDirectEnglish("The team met for the purpose of making and reviewing the plan.");
 assert(/to make and reviewing the plan\./i.test(gerundInfinitiveProbe), `Gerund-to-infinitive repair produced a broken verb: ${gerundInfinitiveProbe}`);
 assert(!/\bto\s+mak\b/i.test(gerundInfinitiveProbe), `Gerund-to-infinitive repair left a truncated verb: ${gerundInfinitiveProbe}`);
@@ -520,6 +546,16 @@ assert(
 );
 assert(!validateProtectedContent(protectedOriginal, protectedOriginal.replace("42.5%", "43.5%"), protectedSpans).safe, "Changed percentage was accepted");
 assert(validateProtectedContent(protectedOriginal, protectedOriginal.replace("device", "machine"), protectedSpans).safe, "Safe wording edit was rejected");
+const negationCaseOriginal = "No idea where the file went.";
+const negationCaseSpans = extractProtectedSpans(negationCaseOriginal);
+assert(
+  validateProtectedContent(negationCaseOriginal, "I have no idea where the file went.", negationCaseSpans).safe,
+  "Case-only normalization of a protected negation was rejected",
+);
+assert(
+  !validateProtectedContent(negationCaseOriginal, "I have some idea where the file went.", negationCaseSpans).safe,
+  "Protected negation removal was accepted",
+);
 
 const baseMemory = createEmptyPreferenceMemory();
 const learnedExample = {

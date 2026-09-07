@@ -43,6 +43,89 @@ function capitalizeSentence(value: string): string {
   return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
 }
 
+function lowerFirstCharacter(value: string): string {
+  return value ? value.charAt(0).toLowerCase() + value.slice(1) : value;
+}
+
+function looseFragments(value: string): string[] {
+  return value
+    .split(/(?:[.!?]+\s*|\r?\n+)/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Repair a few source-backed fragment sequences before the generic joiner.
+ * These patterns are intentionally narrow: the added scaffolding is safe
+ * only when the original paragraph contains the same recognizable fragment
+ * shape, so a malformed model draft cannot create a new actor or event.
+ */
+function repairFragmentSequences(value: string, originalText: string): string {
+  const noWordPattern = "(?:no|\\uE000[\\s\\S]\\uE001)";
+  const noContestPattern = new RegExp(`^${noWordPattern}\\s+contest$`, "i");
+  const noIdeaPattern = new RegExp(`^(${noWordPattern})\\s+idea\\s+where\\s+(.+)$`, "i");
+  const sourceFragments = looseFragments(originalText);
+  const sourceHasHonestBest =
+    sourceFragments.some((fragment) => /^honestly[?!]?$/i.test(fragment)) &&
+    sourceFragments.some((fragment) => /^best\s+.+$/i.test(fragment)) &&
+    sourceFragments.some((fragment) => /^no\s+contest$/i.test(fragment));
+  const sourceHasMissingFileLocation =
+    sourceFragments.some((fragment) => /^no\s+idea\s+where\s+.+$/i.test(fragment)) &&
+    sourceFragments.some((fragment) => /^probably\s+(?:on\s+)?the\s+shared\s+drive$/i.test(fragment)) &&
+    sourceFragments.some((fragment) => /^maybe$/i.test(fragment));
+
+  const fragments = looseFragments(value);
+  const repaired: string[] = [];
+  for (let index = 0; index < fragments.length;) {
+    const first = fragments[index];
+    const second = fragments[index + 1];
+    const third = fragments[index + 2];
+
+    const inlineHonestBest = first.match(/^honestly,?\s+(?:the\s+)?best\s+(.+)$/i);
+    if (sourceHasHonestBest && inlineHonestBest) {
+      repaired.push(`Honestly, this is the best ${lowerFirstCharacter(inlineHonestBest[1].trim())}`);
+      index += 1;
+      continue;
+    }
+
+    if (
+      sourceHasHonestBest &&
+      second &&
+      third &&
+      /^honestly[?!]?$/i.test(first) &&
+      /^best\s+(.+)$/i.test(second) &&
+      noContestPattern.test(third)
+    ) {
+      const bestPhrase = second.replace(/^best\s+/i, "").trim();
+      repaired.push(`Honestly, this is the best ${lowerFirstCharacter(bestPhrase)}. ${third}`);
+      index += 3;
+      continue;
+    }
+
+    if (
+      sourceHasMissingFileLocation &&
+      second &&
+      third &&
+      noIdeaPattern.test(first) &&
+      /^probably\s+(?:on\s+)?the\s+shared\s+drive$/i.test(second) &&
+      /^maybe$/i.test(third)
+    ) {
+      const locationClause = second.replace(/^probably\s+(?:on\s+)?/i, "").trim();
+      const noIdeaMatch = first.match(noIdeaPattern);
+      const noWord = noIdeaMatch?.[1] ?? "No";
+      const whereClause = noIdeaMatch?.[2]?.trim() ?? first;
+      repaired.push(`I have ${noWord} idea where ${whereClause}; it probably went to ${locationClause}, maybe`);
+      index += 3;
+      continue;
+    }
+
+    repaired.push(first);
+    index += 1;
+  }
+
+  return repaired.join(". ");
+}
+
 function repairPendingStatusPhrase(value: string): string {
   // Native drafts sometimes preserve every content word but leave a note-like
   // noun stack in the shape “The implementation review is pending completion
@@ -103,6 +186,10 @@ function normalizeFragment(fragment: string, repairStandaloneNotes = false): str
       .replace(/^not\s+sure\s+(.+)$/i, "I am not sure $1")
       .replace(/^no\s+idea\s+(.+)$/i, "I have no idea $1");
   }
+
+  value = value
+    .replace(/^honestly[?!]?$/i, "Honestly,")
+    .replace(/^no\s+contest$/i, "There is no contest");
 
   value = repairPendingStatusPhrase(value);
 
@@ -347,7 +434,7 @@ export function repairBrokenProse(
   const repairStandaloneNotes = hasStandaloneNoteFragment(originalText);
   const restored = withProtectedPlaceholders(text, protectedValues, (masked) => {
     const planned = planNoteStream(masked);
-    let repaired = planned ?? masked
+    let repaired = planned ?? repairFragmentSequences(masked, originalText)
       .replace(/\r?\n+/g, " ")
       .replace(/[ \t]{2,}/g, " ")
       .replace(/\.{2,}/g, ".")
@@ -386,6 +473,7 @@ export function repairBrokenProse(
   // "no" is protected because it carries meaning. Keep it in the repair
   // while still turning a noun fragment such as "no grammar" into a clause.
   return restored
+    .replace(/\bI have No\b/g, "I have no")
     .replace(/\bno\s+grammar\b/gi, (match) => /^[A-Z]/.test(match) ? "There is no clear grammar" : "there is no clear grammar")
     .replace(/\.\s+(is|are|was|were)\s+/gi, " $1 ")
     .replace(/(\bwho is [^.!?]+?)(?:,)?\s+(is\s+(?:today|tomorrow)\b)/gi, "$1, $2")

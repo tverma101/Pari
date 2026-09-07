@@ -172,6 +172,12 @@ function countExact(text: string, fragment: string): number {
   return count;
 }
 
+function countCaseInsensitive(text: string, fragment: string): number {
+  if (!fragment) return 0;
+  const pattern = new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+  return [...text.matchAll(pattern)].length;
+}
+
 function uniqueTexts(spans: ProtectedSpan[]): string[] {
   return [...new Set(spans.map((span) => span.text))];
 }
@@ -195,9 +201,12 @@ export function validateProtectedContent(
   protectedSpans: ProtectedSpan[] = extractProtectedSpans(originalText)
 ): ProtectionValidation {
   for (const text of uniqueTexts(protectedSpans)) {
-    const expected = protectedSpans.filter((span) => span.text === text).length;
+    const matchingSpans = protectedSpans.filter((span) => span.text === text);
+    const expected = matchingSpans.length;
     const actual = countExact(candidateText, text);
-    if (actual < expected) {
+    const caseNormalizedNegation = matchingSpans.every((span) => span.kind === "negation") &&
+      countCaseInsensitive(candidateText, text) >= expected;
+    if (actual < expected && !caseNormalizedNegation) {
       const missing = protectedSpans.find((span) => span.text === text);
       return {
         safe: false,

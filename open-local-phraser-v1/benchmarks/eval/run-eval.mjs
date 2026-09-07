@@ -4,6 +4,8 @@
  * Usage:
  *   node benchmarks/eval/run-eval.mjs                                          # engine = built-in generateLocalParaphrase
  *   node benchmarks/eval/run-eval.mjs --outputs out.jsonl                      # score external outputs ({id, output} lines)
+ *   node benchmarks/eval/run-eval.mjs --outputs out.jsonl --production-postprocess
+ *                                                                                # score external outputs after Pari's finalization boundary
  *   node benchmarks/eval/run-eval.mjs --corpus benchmarks/quillbot/corpus.seed.json --outputs out.jsonl
  *
  * Exit code 1 if hard gates fail (meaning floor, anchors, negation, new grammar errors).
@@ -68,14 +70,30 @@ async function main() {
   let engineName;
 
   const outputsPath = argValue("--outputs");
+  const productionPostprocess = args.includes("--production-postprocess");
   if (outputsPath) {
-    engineName = path.basename(outputsPath);
+    engineName = `${path.basename(outputsPath)}${productionPostprocess ? "+pari-postprocess" : ""}`;
     outputs = new Map();
     for (const line of fs.readFileSync(outputsPath, "utf8").split("\n").filter(Boolean)) {
       const row = JSON.parse(line);
       outputs.set(row.id, row.output);
     }
+    if (productionPostprocess) {
+      const { finalizeDraft } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/localParaphrase.ts"));
+      const { extractProtectedSpans } = loadTsModule(path.join(ROOT_DIR, "src/lib/safety/protectedContent.ts"));
+      for (const cas of corpus) {
+        const rawOutput = outputs.get(cas.id) ?? "";
+        outputs.set(
+          cas.id,
+          finalizeDraft(rawOutput, cas.input, extractProtectedSpans(cas.input), "personal", false).trim(),
+        );
+      }
+      console.log("POSTPROCESS       Pari finalizeDraft applied before scoring external outputs");
+    }
   } else {
+    if (productionPostprocess) {
+      throw new Error("--production-postprocess requires --outputs so the raw external output remains inspectable.");
+    }
     const { generateLocalParaphrase } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/localParaphrase.ts"));
     const { createEmptyPreferenceMemory } = loadTsModule(path.join(ROOT_DIR, "src/lib/personalization/approvalMemory.ts"));
     engineName = "local-safe-engine";
@@ -151,7 +169,7 @@ async function main() {
     (r) => r.failedChecks?.some((c) => ["anchorSafe", "negationSafe", "noNewErrors", "meaningFloor"].includes(c))
   );
   const outPath = argValue("--out") ?? path.join(ROOT_DIR, `benchmarks/eval/results-${engineName.replace(/[^\w.-]/g, "_")}.json`);
-  fs.writeFileSync(outPath, JSON.stringify({ engine: engineName, generatedAt: new Date().toISOString(), byCategory, overall: { passed: totalPassed, total: results.length }, results }, null, 2));
+  fs.writeFileSync(outPath, JSON.stringify({ engine: engineName, generatedAt: new Date().toISOString(), postprocessedByPari: productionPostprocess, byCategory, overall: { passed: totalPassed, total: results.length }, results }, null, 2));
   console.log(`saved -> ${outPath}`);
 
   if (guardFailures.length > 0) {

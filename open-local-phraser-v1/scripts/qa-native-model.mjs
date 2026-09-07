@@ -135,6 +135,20 @@ const fixtures = [
     sameSentenceCount: true,
   },
   {
+    name: "standalone-evaluative-fragments",
+    mode: "personal",
+    text: "Honestly? Best pizza in town. No contest.",
+    protectedSpans: [],
+    sameSentenceCount: false,
+  },
+  {
+    name: "standalone-location-fragments",
+    mode: "personal",
+    text: "No idea where the file went. Probably the shared drive. Maybe.",
+    protectedSpans: [],
+    sameSentenceCount: false,
+  },
+  {
     name: "grammar-cascade",
     mode: "personal",
     text: "they is ready. the editor can explains the change. She wrote an useful summary. Between you and I, need help. send update. They could of written a lot more better.",
@@ -252,6 +266,14 @@ for (const fixture of fixtures) {
   if (fixture.name === "standalone-causal-fragment") {
     assert(!/^(?:because\s+of|due\s+to)\b/i.test(output), `${fixture.name}: subjectless causal fragment remained: ${output}`);
     assert(/\b(?:cause|reason|deadline\s+situation)\b/i.test(output), `${fixture.name}: the stated cause was lost: ${output}`);
+  }
+  if (fixture.name === "standalone-evaluative-fragments") {
+    assert(/\bHonestly,\s+(?:this\s+is\s+)?the\s+best\s+pizza\s+in\s+town\b/i.test(output), `${fixture.name}: evaluative fragment was not completed: ${output}`);
+    assert(/\b(?:no|there's\s+no)\s+contest\b/i.test(output), `${fixture.name}: the stated comparison was lost: ${output}`);
+  }
+  if (fixture.name === "standalone-location-fragments") {
+    assert(/\bI\s+have\s+no\s+idea\s+where\s+the\s+file\s+(?:went|disappeared)\b/i.test(output), `${fixture.name}: missing-file fragment was not completed: ${output}`);
+    assert(/\b(?:probably|may|might)\b[^.!?]{0,40}\bshared\s+drive\b/i.test(output), `${fixture.name}: the uncertain location was lost: ${output}`);
   }
   if (fixture.name === "word-salad-pending-status") {
     assert(!/\bis\s+pending\s+(?:its\s+)?(?:the\s+)?\w+(?:\s+\w+){0,3}\s+status\b/i.test(output), `${fixture.name}: dense pending-status wording remained: ${output}`);

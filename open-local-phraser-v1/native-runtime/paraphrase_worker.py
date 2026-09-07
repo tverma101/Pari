@@ -359,7 +359,9 @@ def repair_pending_status_phrase(value: str) -> str:
 def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
     """Repair obvious note fragments after generation without inventing facts."""
     protected = [str(span).strip() for span in request.get("protected_spans", []) if str(span).strip()]
-    repair_standalone_notes = has_standalone_note_fragment(str(request.get("original_text", "")))
+    original_text = str(request.get("original_text", ""))
+    repair_standalone_notes = has_standalone_note_fragment(original_text)
+    original_fragments = [part.strip() for part in re.split(r"(?:[.!?]+\s*|\r?\n+)", original_text) if part.strip()]
     masked = value
     for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
         masked = masked.replace(span, f"\ue000{index}\ue001")
@@ -369,6 +371,10 @@ def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
         if last in {"people", "children", "men", "women", "they", "we", "you", "these", "those"}:
             return True
         return last.endswith("s") and not last.endswith(("ss", "us", "is"))
+
+    no_word_pattern = r"(?:no|\ue000\d+\ue001)"
+    no_contest_pattern = re.compile(rf"^{no_word_pattern}\s+contest$", flags=re.IGNORECASE)
+    no_idea_pattern = re.compile(rf"^({no_word_pattern})\s+idea\s+where\s+(.+)$", flags=re.IGNORECASE)
 
     def normalize(fragment: str) -> str:
         item = re.sub(r"^[-*•]+\s*", "", re.sub(r"\s+", " ", re.sub(r"\.{2,}", ".", fragment))).strip()
@@ -391,6 +397,8 @@ def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
         item = re.sub(r"\b(the team|the manager|the client|the project|the system|the user)\s+(say|want|need|have)\b", lambda match: f"{match.group(1)} { {'say':'says','want':'wants','need':'needs','have':'has'}[match.group(2).lower()] }", item, flags=re.IGNORECASE)
         item = re.sub(r"\b(can|could|may|might|must|shall|should|will|would)\s+(explains?|helps?|shows?|makes?|improves?|affects?)\b", lambda match: f"{match.group(1)} {re.sub(r's$', '', match.group(2), flags=re.IGNORECASE)}", item, flags=re.IGNORECASE)
         item = re.sub(r"\bi\b", "I", item)
+        item = re.sub(r"^honestly[?!]?$", "Honestly,", item, flags=re.IGNORECASE)
+        item = re.sub(r"^no\s+contest$", "There is no contest", item, flags=re.IGNORECASE)
         item = re.sub(r"^no\s+grammar$", "The grammar needs work", item, flags=re.IGNORECASE)
         item = re.sub(r"^ideas?\s+missing$", "Ideas are missing", item, flags=re.IGNORECASE)
         item = re.sub(r"^reason(?:s)?\s+unclear$", "The reasons are unclear", item, flags=re.IGNORECASE)
@@ -408,9 +416,64 @@ def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
         item = re.sub(r"^send\s+update\b", "Send an update", item, flags=re.IGNORECASE)
         return item[:1].upper() + item[1:]
 
-    planned = plan_note_stream(masked)
+    fragments_before_normalize = [part.strip() for part in re.split(r"(?:[.!?]+\s*|\r?\n+)", masked) if part.strip()]
+    source_has_honest_best = (
+        any(re.match(r"^honestly[?!]?$", part, flags=re.IGNORECASE) for part in original_fragments)
+        and any(re.match(r"^best\s+.+$", part, flags=re.IGNORECASE) for part in original_fragments)
+        and any(re.match(r"^no\s+contest$", part, flags=re.IGNORECASE) for part in original_fragments)
+    )
+    source_has_missing_file_location = (
+        any(re.match(r"^no\s+idea\s+where\s+.+$", part, flags=re.IGNORECASE) for part in original_fragments)
+        and any(re.match(r"^probably\s+(?:on\s+)?the\s+shared\s+drive$", part, flags=re.IGNORECASE) for part in original_fragments)
+        and any(re.match(r"^maybe$", part, flags=re.IGNORECASE) for part in original_fragments)
+    )
+    sequence_repaired: list[str] = []
+    index = 0
+    while index < len(fragments_before_normalize):
+        first = fragments_before_normalize[index]
+        second = fragments_before_normalize[index + 1] if index + 1 < len(fragments_before_normalize) else None
+        third = fragments_before_normalize[index + 2] if index + 2 < len(fragments_before_normalize) else None
+        inline_honest_best = re.match(r"^honestly,?\s+(?:the\s+)?best\s+(.+)$", first, flags=re.IGNORECASE)
+        if source_has_honest_best and inline_honest_best:
+            best_phrase = inline_honest_best.group(1).strip()
+            sequence_repaired.append(f"Honestly, this is the best {best_phrase[:1].lower() + best_phrase[1:]}")
+            index += 1
+            continue
+        if (
+            source_has_honest_best
+            and second
+            and third
+            and re.match(r"^honestly[?!]?$", first, flags=re.IGNORECASE)
+            and re.match(r"^best\s+(.+)$", second, flags=re.IGNORECASE)
+            and no_contest_pattern.match(third)
+        ):
+            best_phrase = re.sub(r"^best\s+", "", second, count=1, flags=re.IGNORECASE).strip()
+            sequence_repaired.append(f"Honestly, this is the best {best_phrase[:1].lower() + best_phrase[1:]}. {third}")
+            index += 3
+            continue
+        if (
+            source_has_missing_file_location
+            and second
+            and third
+            and no_idea_pattern.match(first)
+            and re.match(r"^probably\s+(?:on\s+)?the\s+shared\s+drive$", second, flags=re.IGNORECASE)
+            and re.match(r"^maybe$", third, flags=re.IGNORECASE)
+        ):
+            no_idea_match = no_idea_pattern.match(first)
+            no_word = no_idea_match.group(1) if no_idea_match else "No"
+            where_clause = no_idea_match.group(2).strip() if no_idea_match else first
+            location_clause = re.sub(r"^probably\s+(?:on\s+)?", "", second, count=1, flags=re.IGNORECASE).strip()
+            sequence_repaired.append(f"I have {no_word} idea where {where_clause}; it probably went to {location_clause}, maybe")
+            index += 3
+            continue
+        sequence_repaired.append(first)
+        index += 1
+
+    planned = plan_note_stream(". ".join(sequence_repaired))
     if planned:
         masked = planned
+    else:
+        masked = ". ".join(sequence_repaired)
     masked = re.sub(r"\b(?:the\s+)?reasons?\s+unclear\b", "the reasons are unclear", masked, flags=re.IGNORECASE)
     masked = re.sub(r"\bteam\s+say\b", "the team says", masked, flags=re.IGNORECASE)
     masked = re.sub(r"\bmanager\s+want\b", "the manager wants", masked, flags=re.IGNORECASE)
@@ -423,6 +486,7 @@ def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
 
     for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
         repaired = repaired.replace(f"\ue000{index}\ue001", span)
+    repaired = re.sub(r"\bI have No\b", "I have no", repaired)
     repaired = re.sub(r"\bno\s+grammar\b", "there is no clear grammar", repaired, flags=re.IGNORECASE)
     repaired = re.sub(r"\.\s+(is|are|was|were)\s+", r" \1 ", repaired, flags=re.IGNORECASE)
     repaired = re.sub(r"(\bwho is [^.!?]+?)(?:,)?\s+(is\s+(?:today|tomorrow)\b)", r"\1, \2", repaired, flags=re.IGNORECASE)

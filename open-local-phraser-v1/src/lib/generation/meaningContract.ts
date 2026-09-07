@@ -17,7 +17,7 @@ const MODALITY_RE = /\b(?:may|might|could|can|must|should|will|would|shall)\b/gi
 // “More” and “less” are excluded because they are frequently ordinary
 // comparatives (for example, “read more smoothly”), not quantity claims.
 const QUANTITY_RE = /\b(?:a\s+number\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|any|enough)\b/gi;
-const RELATION_RE = /\b(?:due\s+to\s+the\s+fact\s+that|notwithstanding\s+the\s+fact\s+that|in\s+the\s+event\s+that|because|since|although|though|even\s+though|if|unless|when|while|therefore|thus|so|however|but|yet|as\s+a\s+result)\b/gi;
+const RELATION_RE = /\b(?:due\s+to\s+the\s+fact\s+that|notwithstanding\s+the\s+fact\s+that|in\s+the\s+event\s+that|for\s+unspecified\s+reasons|because|since|although|though|even\s+though|if|unless|when|while|therefore|thus|so|however|but|yet|as\s+a\s+result)\b/gi;
 // Expletive “it” is not a writer perspective marker. Keeping it out avoids
 // rejecting a direct repair such as “It is important to note that …” -> “Several …”.
 const PERSON_RE = /\b(?:I|we|you|he|she|they|me|us|them|him|her|my|our|your|his|their)\b/gi;
@@ -55,7 +55,7 @@ function quantityClass(value: string): string {
 }
 
 function relationClass(value: string): string {
-  if (/^(?:due to the fact that|because|since|therefore|thus|so|as a result)$/.test(value)) return "cause-result";
+  if (/^(?:due to the fact that|for unspecified reasons|because|since|therefore|thus|so|as a result)$/.test(value)) return "cause-result";
   if (/^(?:notwithstanding the fact that|although|though|even though|however|but|yet)$/.test(value)) return "contrast";
   if (/^(?:in the event that|if|unless)$/.test(value)) return "condition";
   if (/^(?:when|while)$/.test(value)) return "time";

@@ -29,6 +29,7 @@ const LEADING_TRANSITIONS: Array<{ phrase: string; family: TransitionFamily }> =
   { phrase: "even though", family: "contrast" },
   { phrase: "even if", family: "contrast" },
   { phrase: "given that", family: "cause" },
+  { phrase: "for unspecified reasons", family: "cause" },
   { phrase: "moreover", family: "addition" },
   { phrase: "furthermore", family: "addition" },
   { phrase: "therefore", family: "result" },

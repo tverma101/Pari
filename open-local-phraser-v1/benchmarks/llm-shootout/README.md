@@ -25,6 +25,22 @@ node benchmarks/eval/run-eval.mjs \
   --outputs benchmarks/llm-shootout/model-output.jsonl
 ```
 
+That command scores the raw generator, which is useful for model selection.
+To measure the output a user would receive after Pari's shared finalization
+boundary, add `--production-postprocess`; it applies the same local fragment,
+direct-English, collocation, flow, and grammar repairs used by the app before
+running the evaluator:
+
+```bash
+node benchmarks/eval/run-eval.mjs \
+  --outputs benchmarks/llm-shootout/model-output.jsonl \
+  --production-postprocess
+```
+
+Keep both numbers: a postprocessed score measures the product boundary, while
+the raw score remains the fair comparison of generator quality. Neither score
+is a substitute for a held-out human comparison.
+
 ## OpenAI-compatible local runner
 
 Use `run_openai_compatible.py` for local runtimes that expose `/v1/chat/completions` but are not yet supported by Pari's direct `mlx-lm` path.
