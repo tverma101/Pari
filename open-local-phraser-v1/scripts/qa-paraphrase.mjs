@@ -248,6 +248,15 @@ const waitingFragmentProbe = repairBrokenProse(
   extractProtectedSpans("Still waiting on the client."),
 );
 assert(/^I am still waiting on the client\.$/i.test(waitingFragmentProbe), `Standalone waiting fragment was not completed safely: ${waitingFragmentProbe}`);
+const pendingStatusProbe = repairBrokenProse(
+  "The quarterly implementation review is pending completion status.",
+  "The quarterly implementation review is pending completion status.",
+  extractProtectedSpans("The quarterly implementation review is pending completion status."),
+);
+assert(
+  /^The completion status of the quarterly implementation review is pending\.$/i.test(pendingStatusProbe),
+  `Dense pending-status wording was not normalized safely: ${pendingStatusProbe}`,
+);
 assert(looksLikeUnrepairedFragmentaryProse("Because of the deadline situation."), "Unrepaired causal fragment was not detected");
 assert(
   looksLikeModelControlEcho("The text needs to be corrected. The rewritten paragraph should preserve every fact."),

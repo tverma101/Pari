@@ -138,3 +138,43 @@
   yes; blind pairwise human comparison=no; user visual confirmation=no.
 - `cleanup`: the QuillBot tab was reloaded to its blank initial state; no
   external account or repository state was changed.
+
+## 2026-09-07 — Bounded pending-status word-salad repair
+
+- `scope`: Pari's native Qwen3 worker, local finalization, MLX/OpenAI-compatible
+  shootout prompts, regression fixtures, packaged app, and installed smoke
+  paths.
+- `goal`: Continue improving the user-facing paraphrase boundary after the
+  native probe exposed a dense operational-note noun stack.
+- `changed_files`: `src/lib/generation/brokenProseRepair.ts`,
+  `native-runtime/paraphrase_worker.py`, both shootout prompt adapters,
+  `scripts/qa-paraphrase.mjs`, `scripts/qa-native-model.mjs`,
+  `docs/remaining-work.md`, and this log.
+- `implementation`: added a bounded, source-neutral repair for sentences of
+  the form “The ... is pending ... status,” moving the stated status into a
+  grammatical “The ... status of ... is pending” frame. The rule requires a
+  recognizable multiword subject and short status phrase, preserves the
+  subject/status terms, and does not invent a cause, actor, or outcome. The
+  native prompt and standalone shootout prompts now describe the same repair.
+- `validation`: `npm run qa:paraphrase`; `npm run qa:native:prompt`;
+  `npm run qa:learned:judge`; `npm run qa:grammar:harper`; `npm run
+  qa:grammar:ewt`; `npm run qa:native:model`; `npm run benchmark:quality`;
+  `npm run build`; `npm run build:desktop`; `codesign --verify --deep
+  --strict --verbose=2 release/Pari.app`; `npm run qa:installed`; `npm run
+  qa:installed:connected`; `npm run qa:installed:missing-model`; and `npm run
+  qa:installed:custom` all passed. The native fixture passed through Qwen3
+  candidate fan-out, and the packaged worker contains the repair.
+- `evidence_state`: source implemented=yes; automated tests passed=yes;
+  model-backed native fixture passed=yes; packaged=yes; installed local,
+  connected-native, missing-model fallback, and custom-mode paths passed=yes;
+  current live FreeLLMAPI route not re-smoked because its credential is not
+  present; blind human QuillBot comparison=no; user visual confirmation=no.
+- `blocker`: no local implementation blocker. Pari is still not ready for a
+  broad QuillBot-class or superiority claim; the larger held-out and blind
+  human comparison remain the required evidence.
+- `cleanup`: generated Python cache was moved recoverably to
+  `/tmp/pari-pycache-word-salad-2026-09-07`; the app bundle contains no model
+  weights or Python bytecode; no GitHub Actions, PR, merge, or default-branch
+  mutation was performed.
+- `next_action`: continue with P0.1/P0.2/P0.4 human holdout and contextual
+  synonym review before any model promotion or readiness claim.

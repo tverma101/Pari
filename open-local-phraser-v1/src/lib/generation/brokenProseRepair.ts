@@ -43,6 +43,39 @@ function capitalizeSentence(value: string): string {
   return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
 }
 
+function repairPendingStatusPhrase(value: string): string {
+  // Native drafts sometimes preserve every content word but leave a note-like
+  // noun stack in the shape “The implementation review is pending completion
+  // status.” Reorder only this high-confidence frame; do not invent a cause,
+  // actor, or outcome, and keep the stated subject and status terms intact.
+  const match = value.match(
+    /^The\s+(.+?)\s+is\s+pending\s+((?:(?:its|the|a|an)\s+)?[^.!?,;:]+?)\s+status([.!?])?$/i,
+  );
+  if (!match) return value;
+
+  const subject = match[1].replace(/\s+/g, " ").trim();
+  const status = match[2]
+    .replace(/^(?:its|the|a|an)\s+/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const subjectWordCount = countWords(subject);
+  const statusWordCount = countWords(status);
+  if (
+    subjectWordCount < 3 ||
+    subjectWordCount > 12 ||
+    statusWordCount < 1 ||
+    statusWordCount > 4 ||
+    /\b(?:is|are|was|were|has|have)\b/i.test(status)
+  ) {
+    return value;
+  }
+
+  const subjectWithArticle = /^(?:the|a|an|my|your|our|their|his|her|its)\b/i.test(subject)
+    ? subject
+    : `the ${subject}`;
+  return `The ${status} status of ${subjectWithArticle} is pending${match[3] ?? ""}`;
+}
+
 function lowerSentenceStart(value: string): string {
   if (!value) return value;
   if (/^I(?:\b|')/.test(value)) return value;
@@ -70,6 +103,8 @@ function normalizeFragment(fragment: string, repairStandaloneNotes = false): str
       .replace(/^not\s+sure\s+(.+)$/i, "I am not sure $1")
       .replace(/^no\s+idea\s+(.+)$/i, "I have no idea $1");
   }
+
+  value = repairPendingStatusPhrase(value);
 
   value = value
     .replace(/\bthey\s+is\b/gi, "they are")

@@ -31,6 +31,7 @@ Rules:
 - Keep every name, date, number, percentage, phone number, and link exactly as written.
 - Fix typos, broken grammar, fragments, and run-ons. Make vague wording clearer only with facts already present; never invent a person, cause, amount, event, or outcome.
 - Complete standalone “Because of …”, “Due to …”, or “Waiting …” fragments without inventing who acted or what happened.
+- When a dense noun stack ends with “is pending … status,” make it grammatical by putting the stated status first; preserve every stated noun and do not add a cause or outcome.
 - Combine fragments into complete sentences where natural; split run-ons.
 - Output ONLY the rewritten text, nothing else.
 

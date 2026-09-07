@@ -139,6 +139,7 @@ Rules:
 - If the source is terse or fragmentary, connect the ideas into a readable paragraph instead of preserving choppy three-word fragments.
 - Make vague wording clearer only with facts already present; never invent a person, cause, amount, event, or outcome.
 - A standalone fragment beginning with “Because of …” or “Due to …” must become a complete sentence that names only that stated cause (for example, “The cause was …”); a standalone “Waiting …” fragment must keep its original object without inventing who is waiting.
+- When a dense noun stack ends with “is pending … status,” make it grammatical by putting the stated status first (for example, “The completion status of the implementation review is pending”); preserve every stated noun and do not add a cause or outcome.
 - {repair_block}
 - {variation}
 - {custom_block}
@@ -323,6 +324,38 @@ def has_standalone_note_fragment(value: str) -> bool:
     )
 
 
+def repair_pending_status_phrase(value: str) -> str:
+    """Reorder one recognizable note-style status frame without adding facts."""
+    match = re.match(
+        r"^The\s+(.+?)\s+is\s+pending\s+((?:(?:its|the|a|an)\s+)?[^.!?,;:]+?)\s+status([.!?])?$",
+        value,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return value
+
+    subject = re.sub(r"\s+", " ", match.group(1)).strip()
+    status = re.sub(r"^(?:its|the|a|an)\s+", "", match.group(2), flags=re.IGNORECASE)
+    status = re.sub(r"\s+", " ", status).strip()
+    subject_word_count = len(re.findall(r"[A-Za-z]+(?:[-'][A-Za-z]+)*", subject))
+    status_word_count = len(re.findall(r"[A-Za-z]+(?:[-'][A-Za-z]+)*", status))
+    if (
+        subject_word_count < 3
+        or subject_word_count > 12
+        or status_word_count < 1
+        or status_word_count > 4
+        or re.search(r"\b(?:is|are|was|were|has|have)\b", status, flags=re.IGNORECASE)
+    ):
+        return value
+
+    subject_with_article = (
+        subject
+        if re.match(r"^(?:the|a|an|my|your|our|their|his|her|its)\b", subject, flags=re.IGNORECASE)
+        else f"the {subject}"
+    )
+    return f"The {status} status of {subject_with_article} is pending{match.group(3) or ''}"
+
+
 def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
     """Repair obvious note fragments after generation without inventing facts."""
     protected = [str(span).strip() for span in request.get("protected_spans", []) if str(span).strip()]
@@ -341,6 +374,7 @@ def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
         item = re.sub(r"^[-*•]+\s*", "", re.sub(r"\s+", " ", re.sub(r"\.{2,}", ".", fragment))).strip()
         if not item:
             return item
+        item = repair_pending_status_phrase(item)
         # Add grammatical scaffolding only when the source had the same
         # subjectless note shape. This never supplies an invented actor or
         # outcome to a fragment created by the model.

@@ -121,6 +121,13 @@ const fixtures = [
     sameSentenceCount: false,
   },
   {
+    name: "word-salad-pending-status",
+    mode: "personal",
+    text: "The quarterly implementation review is pending completion status.",
+    protectedSpans: [],
+    sameSentenceCount: true,
+  },
+  {
     name: "standalone-causal-fragment",
     mode: "personal",
     text: "Because of the deadline situation.",
@@ -245,6 +252,10 @@ for (const fixture of fixtures) {
   if (fixture.name === "standalone-causal-fragment") {
     assert(!/^(?:because\s+of|due\s+to)\b/i.test(output), `${fixture.name}: subjectless causal fragment remained: ${output}`);
     assert(/\b(?:cause|reason|deadline\s+situation)\b/i.test(output), `${fixture.name}: the stated cause was lost: ${output}`);
+  }
+  if (fixture.name === "word-salad-pending-status") {
+    assert(!/\bis\s+pending\s+(?:its\s+)?(?:the\s+)?\w+(?:\s+\w+){0,3}\s+status\b/i.test(output), `${fixture.name}: dense pending-status wording remained: ${output}`);
+    assert(/\bcompletion\s+status\b/i.test(output) && /\bis\s+pending\b/i.test(output), `${fixture.name}: the stated status relationship was lost: ${output}`);
   }
   if (fixture.name === "grammar-cascade") {
     assert(!/\bthey\s+is\b|\bcan\s+explains\b|\ban\s+useful\b|\bbetween\s+you\s+and\s+I\b|\bsend\s+update\b|\bcould\s+of\b|\balot\b|\bmore\s+better\b/i.test(output), `${fixture.name}: a grammar cascade remained: ${output}`);
