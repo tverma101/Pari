@@ -113,16 +113,16 @@ The output editor also runs a local grammar/flow diagnostic after generation and
 
 ## Current backend boundary
 
-The primary desktop path is an optional external native generator selected by
-`native-models/config.json` and launched through the one-shot local MLX worker.
-Qwen/Qwen3.5-4B-MLX-4bit is the current incumbent/control; Ling remains a
-challenger and is not promoted by this path. The worker is
-isolated from WebKit, receives the selected style, repairs malformed prose, and
-never receives remote requests. The packaged app contains no Qwen weights. It
+The production desktop path currently uses an optional external Qwen/Qwen3-4B-MLX-4bit checkpoint launched through the one-shot local MLX worker. Qwen3.5-4B is currently the **general-model benchmark control** in `benchmarks/llm-shootout`; that does not mean it has already replaced the shipped Qwen3 backend. Keeping benchmark control and production backend separate lets new models and grammar-specialist cascades compete without silently changing the app.
+
+The tracked `native-models/config.json` is the source of truth for the model
+ID, local path, required files, and runtime. `PARI_NATIVE_MODEL_ID` and
+`PARI_NATIVE_MODEL_PATH` are explicit overrides. The worker is isolated from
+WebKit, receives the selected style, repairs malformed prose, and never
+receives remote requests. The packaged app contains no native weights. It
 looks first at the absolute `PARI_NATIVE_MODEL_PATH`, then at the configured
-`nativeModel.localPath` under
-`~/Library/Application Support/Open Local Phraser/Models/`,
-and retains compatibility with older development bundles. If the model is not
+model under `~/Library/Application Support/Open Local Phraser/Models/`, and
+retains compatibility with older development bundles. If the model is not
 connected, Python/MLX is absent, generation times out, or a draft fails
 protected-content/grammar/flow gates, Pari explains the failure and uses the
 bounded `local-safe-engine` fallback. The fallback remains intentionally

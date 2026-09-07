@@ -1,12 +1,16 @@
 # Pari local-model shootout
 
-This directory is for **generator research**, not production model promotion.
+This directory is for **generator and editing-model research**, not production model promotion.
 
 The product target is narrow:
 
 > Repair broken, vague, awkward English into clear, natural, maximally grammatical English while preserving every recoverable fact and inventing nothing.
 
-A model does not become Pari's default because it wins a generic reasoning benchmark. It must beat the current incumbent on Pari's frozen English-repair benchmark and survive the production safety gates.
+A model does not become Pari's default because it wins a generic reasoning benchmark. It must beat the current controls on Pari's frozen English-repair benchmark and survive the production safety gates.
+
+Pari should not assume that one general LLM must do every editing task. The shootout includes both general rewrite models and compact grammatical-error-correction specialists. The useful question is whether a specialist + general rewrite cascade beats either model alone on quality, safety, memory, and latency.
+
+Current execution priority is tracked in [`docs/remaining-work.md`](../../docs/remaining-work.md).
 
 ## Existing direct MLX runner
 
@@ -26,6 +30,54 @@ node benchmarks/eval/run-eval.mjs \
 Use `run_openai_compatible.py` for local runtimes that expose `/v1/chat/completions` but are not yet supported by Pari's direct `mlx-lm` path.
 
 This keeps the benchmark model-agnostic and lets new Apple-Silicon runtimes compete without first wiring them into production.
+
+## MiniCPM5-2B candidate
+
+Tracking issue: [#10](https://github.com/tverma101/Pari/issues/10)
+
+Primary model card:
+
+- https://huggingface.co/openbmb/MiniCPM5-2B
+
+Why it is a high-priority test:
+
+- ~2.6B dense parameters;
+- Apache-2.0;
+- 131k advertised context;
+- intended for on-device / edge use;
+- Artificial Analysis Intelligence Index v4.2 score of 15, versus an estimated 14 for Qwen3.5-4B Reasoning in the same comparison;
+- substantially smaller weight footprint than the 4B benchmark control.
+
+Those generic results do **not** establish that MiniCPM is the better Pari paraphraser. The exact test is MiniCPM5-2B vs Qwen3.5-4B vs the production Qwen3-4B backend on the frozen Pari corpus, with reasoning/thinking disabled for the normal rewrite path unless separately justified.
+
+Save raw outputs/candidates before changing the production backend. Promotion requires zero new hard safety regressions, comparable-or-better coherence/meaning preservation, and either a product-quality win or a meaningful memory/latency win at comparable quality.
+
+## Grammar-specialist candidates
+
+Initial research targets:
+
+| Candidate | Approx. size | Primary use |
+| --- | ---: | --- |
+| GECToR | ~355M | high-precision minimal grammar edits |
+| DeCoGLM | ~335M | detect suspicious spans, then locally correct |
+| BART-family GEC | ~400M | compact seq2seq grammatical correction |
+| CoEdIT-large | ~770M | grammar, coherence, paraphrase, formality |
+
+These are research targets, not pinned production dependencies. Verify checkpoint license, runtime support, and actual Pari benchmark quality before downloading or bundling anything. In particular, released CoEdIT checkpoints should be treated as research/non-commercial references unless a distributable alternative is selected.
+
+The preferred experiment is not only `specialist vs Qwen`. Also test the cascade:
+
+```text
+input
+  -> grammar specialist candidate
+  -> conservative general rewrite candidate
+  -> stronger general rewrite candidate
+  -> original/deterministic fallback
+  -> Pari safety + grammar + semantic scorer
+  -> winner
+```
+
+A specialist should be rewarded for **precision**, not edit count. Unnecessary corrections and meaning drift are failures.
 
 ## Ling-3.0-tiny candidate
 
@@ -71,16 +123,17 @@ If the runtime exposes a different model ID, pass that exact ID to `--model`; th
 
 ## Promotion rules
 
-Do not replace the incumbent based only on the current 64-case automatic score. See #7 and #8.
+Do not replace the production backend or add a second model based only on the current automatic score.
 
-A candidate must eventually be judged on:
+A candidate or cascade must eventually be judged on:
 
 1. grammatical correctness and syntactic well-formedness;
 2. natural English / collocations;
 3. clarity and reconstruction of broken prose;
 4. meaning preservation and unsupported-invention rate;
 5. protected-span / negation / modality / quantity safety;
-6. latency and peak memory on the target Mac;
-7. installed-app/native-runtime reliability.
+6. unnecessary-edit / overcorrection rate;
+7. latency and peak memory on the target Mac;
+8. installed-app/native-runtime reliability.
 
-Qwen3.5-4B remains the **control** until another model passes those gates. It is not the assumed long-term architecture.
+Qwen3.5-4B remains the **general-model benchmark control pending issue #10**. The shipped backend may differ; benchmark control and production backend are deliberately separate concepts.

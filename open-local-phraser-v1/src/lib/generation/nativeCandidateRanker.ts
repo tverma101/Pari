@@ -75,6 +75,7 @@ export async function rankNativeCandidates(
   // only) and must not break plain-Node callers, which get grammar-only ranking.
   let cosine: (a: number[], b: number[]) => number;
   let vectors: number[][];
+  let semanticAvailable = false;
   try {
     const [{ getEmbeddingExtractor }, { cosineSimilarity }] = await Promise.all([
       import("@/lib/ranking/modelManager"),
@@ -92,20 +93,20 @@ export async function rankNativeCandidates(
       values.slice(index * width, (index + 1) * width)
     );
     cosine = cosineSimilarity;
+    semanticAvailable = vectors.length === texts.length && vectors.every((vector) => vector.length > 0);
   } catch {
     vectors = [];
     cosine = () => 0.5; // neutral semantic score; semantic floor is WAIVED when embeddings unavailable
   }
   const originalVector = vectors[0] ?? [];
+  // Match the frozen evaluation policy: ordinary paraphrases need a strong
+  // semantic match, while genuinely broken/fragmentary prose gets a looser
+  // floor because reconstruction can move embeddings substantially.
+  const semanticFloor = options.structuralRepair ? 0.55 : 0.72;
 
   const inputIssues = await highSeverityIssueCount(options.originalText);
   const inputRate = inputIssues / tokensOf(options.originalText);
 
-  // Embedding failure must NOT make every candidate unsafe — otherwise an
-  // unavailable model bricks the product. The 0.55 floor is hard only when
-  // embeddings actually loaded; when they didn't, grammarGain + clause + NLI
-  // still gate safety and ordering falls to English quality.
-  const hasEmbeddings = vectors.length > 0 && originalVector.length > 0;
   const ranked = await Promise.all(
     candidates.map(async (candidate, index) => {
       const repairedText = options.finalizeDraft(
@@ -123,7 +124,7 @@ export async function rankNativeCandidates(
       const outIssues = quality.safe ? await highSeverityIssueCount(repairedText) : Number.POSITIVE_INFINITY;
       const outRate = outIssues / tokensOf(repairedText);
       const semanticScore = cosine(originalVector, vectors[index + 1] ?? []);
-      const semanticFloorOk = !hasEmbeddings || semanticScore >= 0.55;
+      const semanticSafe = !semanticAvailable || semanticScore >= semanticFloor;
       const englishQuality = await assessEnglishQuality(options.originalText, repairedText);
       // Learned judge can veto: contradict => not safe, even if Harper is clean.
       const nliOk = englishQuality.entailment !== "contradict";
@@ -137,7 +138,13 @@ export async function rankNativeCandidates(
         learnedNli: englishQuality.learnedNli,
         learnedFluency: englishQuality.learnedFluency,
         englishQualityReason: englishQuality.reason,
-        safe: validation.safe && quality.safe && semanticFloorOk && nliOk && repairedText !== options.originalText && outRate <= inputRate + 0.005,
+        safe:
+          validation.safe &&
+          quality.safe &&
+          semanticSafe &&
+          nliOk &&
+          repairedText !== options.originalText &&
+          outRate <= inputRate + 0.005,
       };
     })
   );
