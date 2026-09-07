@@ -6,7 +6,8 @@ import {
   inflectFallbackReplacement,
 } from "@/lib/phraseEngine/synonymBank";
 import type { RewriteToken } from "@/lib/phraseEngine/types";
-import type { CandidateOption } from "@/lib/ranking/types";
+import { rankCandidatesByEmbedding } from "@/lib/ranking/embeddingRanker";
+import type { CandidateOption, RankingContext } from "@/lib/ranking/types";
 import type { PartOfSpeech, RewriteMode, StrengthLevel } from "@/lib/types";
 
 import {
@@ -34,6 +35,9 @@ export interface AdvancedAlternativeOptions {
 
 const CONTENT_POS = new Set<PartOfSpeech>(["adjective", "adverb", "noun", "verb", "phrase"]);
 const MASK_SUGGESTION_TOP_K = 40;
+const CONTEXTUAL_RANK_MODEL = "Xenova/paraphrase-MiniLM-L6-v2" as const;
+const CONTEXTUAL_PRIORITY_COUNT = 12;
+const SEMANTIC_DRIFT_MARGIN = 0.08;
 
 type WordNetPartOfSpeech = "noun" | "verb" | "adjective" | "adverb";
 type WordNetEntry = Partial<Record<WordNetPartOfSpeech, string[]>> & {
@@ -189,6 +193,76 @@ function maskSentence(context: EnhancementContext, maskToken: string): string {
   return context.sentence.slice(0, localStart) + maskToken + context.sentence.slice(localEnd);
 }
 
+/**
+ * ConCat-style lexical substitution input: retain the untouched sentence as a
+ * meaning anchor, then ask the masked LM to fill the target in a second copy.
+ * This is intentionally local and keeps exactly one mask token in the input.
+ */
+function contextualMaskInput(
+  context: EnhancementContext,
+  modelId: string,
+  maskToken: string
+): string {
+  const masked = maskSentence(context, maskToken);
+  const separator = modelId.includes("roberta") ? "</s></s>" : "[SEP]";
+  return `${context.sentence} ${separator} ${masked}`;
+}
+
+function rankingContext(context: EnhancementContext): RankingContext {
+  return {
+    fullText: context.sentence,
+    sentence: context.sentence,
+    selectedText: context.token.originalText,
+    mode: context.mode,
+    strength: context.strength,
+    freezeWords: [],
+    partOfSpeech: context.token.partOfSpeech,
+    selectionStart: context.token.originalStart,
+    selectionEnd: context.token.originalEnd,
+    sentenceStart: context.sentenceStart,
+  };
+}
+
+async function semanticallyPrioritizeCandidates(
+  candidates: CandidateOption[],
+  context: EnhancementContext
+): Promise<CandidateOption[]> {
+  if (candidates.length === 0) return [];
+
+  try {
+    const ranked = await rankCandidatesByEmbedding(
+      candidates,
+      rankingContext(context),
+      CONTEXTUAL_RANK_MODEL
+    );
+    const bestSemanticScore = ranked.reduce(
+      (best, result) => Math.max(best, result.semanticScore ?? 0),
+      0
+    );
+
+    return ranked.map((result, index) => {
+      const semanticScore = result.semanticScore ?? bestSemanticScore;
+      const semanticDrift = bestSemanticScore > 0 && bestSemanticScore - semanticScore > SEMANTIC_DRIFT_MARGIN;
+      const shouldPromoteContextual =
+        result.option.source === "contextual-mlm" &&
+        index < CONTEXTUAL_PRIORITY_COUNT &&
+        !semanticDrift;
+
+      return {
+        ...result.option,
+        label: shouldPromoteContextual ? "natural context" : result.option.label,
+        risk: semanticDrift && (result.option.risk ?? "low") === "low"
+          ? "medium"
+          : result.option.risk,
+      };
+    });
+  } catch {
+    // Contextual suggestions are an editing convenience, so semantic ranking is
+    // deliberately fail-open to the existing deterministic/rule-ranked list.
+    return candidates;
+  }
+}
+
 export async function warmAdvancedParaphraseStack(): Promise<void> {
   await warmRewriteAssistantModels(getRewriteMaskModelIds());
 }
@@ -238,8 +312,12 @@ async function collectMaskSuggestions(
   for (const modelId of getRewriteMaskModelIds()) {
     const descriptor = getRewriteAssistantDescriptor(modelId);
     try {
-      const masked = maskSentence(context, descriptor.maskToken ?? "[MASK]");
-      const suggestions = await generateMaskSuggestions(modelId, masked, MASK_SUGGESTION_TOP_K);
+      const maskedInput = contextualMaskInput(
+        context,
+        modelId,
+        descriptor.maskToken ?? "[MASK]"
+      );
+      const suggestions = await generateMaskSuggestions(modelId, maskedInput, MASK_SUGGESTION_TOP_K);
 
       suggestions.forEach((suggestion) => {
         const replacement = normalizeCandidateText(context.token, cleanGeneratedPiece(suggestion.token));
@@ -385,10 +463,12 @@ export async function generateAdvancedAlternatives(
     Promise.resolve(collectThesaurusSuggestions(context)),
     collectMaskSuggestions(context, options),
   ]);
-  return dedupeCandidates([
+  const candidates = dedupeCandidates([
     ...lexicalSuggestions,
     ...wordNetSuggestions,
     ...thesaurusSuggestions,
     ...maskSuggestions,
   ]);
+
+  return semanticallyPrioritizeCandidates(candidates, context);
 }
