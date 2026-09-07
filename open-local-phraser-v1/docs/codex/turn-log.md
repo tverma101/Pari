@@ -56,3 +56,60 @@
 - `rollout_refs`: prior Pari learned-judge and holdout work is recorded in the
   Codex memory rollout archive; this turn's external benchmark JSONL remains
   under the task workbench and is not bundled into the app.
+
+## 2026-09-07 — Paraphraser readiness checkpoint and fragment repair
+
+- `scope`: Pari production checkout, native Qwen3 generation pipeline, frozen
+  64-case evaluation, packaged macOS app, and installed recovery paths.
+- `project`: `tverma101/Pari`, branch `feat/quality-judge-holdout`; canonical
+  checkout is this directory.
+- `goal`: Decide whether Pari is ready to present as a reliable paraphraser;
+  where it was not, repair the highest-confidence quality gap and revalidate
+  the shipped path.
+- `assessment`: not ready to claim a broadly reliable or QuillBot-superior
+  paraphraser. It is ready as a safety-first local rewrite prototype with a
+  packaged native path. The remaining readiness proof is human and
+  product-specific, not another generic model score.
+- `changed_files`: `src/lib/generation/brokenProseRepair.ts`,
+  `src/lib/generation/rewriteQuality.ts`,
+  `src/lib/generation/directEnglishRepair.ts`,
+  `native-runtime/paraphrase_worker.py`, both MLX/OpenAI-compatible shootout
+  prompts, `scripts/qa-paraphrase.mjs`, `scripts/qa-native-model.mjs`,
+  `scripts/qa-native-prompt.py`, `docs/remaining-work.md`, and this log.
+- `implementation`: recognized only source-backed standalone causal, waiting,
+  and note fragments; completed those conservatively without adding an actor,
+  event, or outcome; normalized high-confidence “because of reasons” wording;
+  tightened model prompts against invented facts; and added unit, prompt, and
+  native-model regression fixtures.
+- `benchmark`: the same raw Qwen3-4B MLX run remained 61/64 (95%) with all
+  broken-word, vague, run-on, word-salad, tense/agreement, register, and canary
+  cases passing. The remaining automatic misses were `fr-02`, `fr-03`, and
+  `fr-08` fragment band-fit cases. This score is a judge signal, not a human
+  paraphrase-quality claim. Raw output and scores were moved to
+  `/tmp/pari-benchmark-2026-09-07/` and are not repository artifacts.
+- `validation`: `npm run qa:paraphrase`; `npm run qa:native:prompt`; `npm run
+  qa:learned:judge`; `npm run qa:grammar:harper`; `npm run qa:grammar:ewt`;
+  `npm run qa:native:model`; `npm run benchmark:quality`; `npm run build`;
+  `npm run build:desktop`; `codesign --verify --deep --strict --verbose=2
+  release/Pari.app`; `npm run qa:installed`; `npm run
+  qa:installed:missing-model`; `npm run qa:installed:custom`; and `npm run
+  qa:installed:connected` all passed. The final bundle contains no model
+  weights or `__pycache__` directories.
+- `evidence_state`: source implemented=yes; automated tests passed=yes;
+  model-backed native fixture passed=yes; packaged=yes; installed native,
+  disconnected, and recovery paths passed=yes; FreeLLM route remains covered
+  by the previous live smoke; blind human QuillBot comparison=no; user visual
+  confirmation=no.
+- `blocker`: no local implementation blocker. Readiness is blocked by the
+  remaining P0 human evidence: a larger held-out real-paragraph comparison
+  against the same default/conservative QuillBot inputs and a contextual
+  synonym spot-check. Do not promote Qwen3.5, MiniCPM, Ling, or FreeLLMAPI on
+  the automatic score alone.
+- `cleanup`: task-generated benchmark files were moved recoverably outside the
+  repository; no model weights were added to the app bundle; no GitHub Actions,
+  PR, merge, or default-branch mutation was performed.
+- `next_action`: run the P0.1/P0.2/P0.4 human spot-check and larger holdout,
+  then reassess readiness before making any model-promotion or PR decision.
+- `rollout_refs`: prior Pari learned-judge and holdout work is recorded in the
+  Codex memory rollout archive; current raw outputs are retained only under
+  the temporary path above.

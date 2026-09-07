@@ -2,7 +2,10 @@ import { countSentences, splitSentences } from "@/lib/nlp/sentenceSplit";
 import { analyzeSentenceFlow } from "@/lib/generation/sentenceFlow";
 import { grammarSafetyIssues } from "@/lib/nlp/grammar";
 import { countWords, normalizeWord, tokenize } from "@/lib/nlp/tokenizer";
-import { looksLikeUnrepairedFragmentaryProse } from "@/lib/generation/brokenProseRepair";
+import {
+  hasStandaloneNoteFragment,
+  looksLikeUnrepairedFragmentaryProse,
+} from "@/lib/generation/brokenProseRepair";
 import { clauseAttachmentIssues } from "@/lib/nlp/clauseAttachment";
 import { meaningContractIssues } from "@/lib/generation/meaningContract";
 import {
@@ -39,6 +42,7 @@ export function needsStructuralRepair(text: string): boolean {
 
   return grammarSafetyIssues(trimmed).some((issue) => issue.severity !== "low") ||
     shortFragments >= 2 ||
+    hasStandaloneNoteFragment(trimmed) ||
     hasBrokenBoundary ||
     hasLowercaseSentenceStart ||
     hasRepeatedWord ||

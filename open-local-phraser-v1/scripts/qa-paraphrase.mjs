@@ -94,7 +94,12 @@ const {
   describeTextEdit,
 } = loadTsModule(path.join(ROOT_DIR, "src/lib/personalization/editHistory.ts"));
 const { buildNativeStyleContext, generateLocalParaphrase } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/localParaphrase.ts"));
-const { looksLikeModelControlEcho, repairBrokenProse } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/brokenProseRepair.ts"));
+const {
+  hasStandaloneNoteFragment,
+  looksLikeModelControlEcho,
+  looksLikeUnrepairedFragmentaryProse,
+  repairBrokenProse,
+} = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/brokenProseRepair.ts"));
 const { generateAdvancedAlternatives } = loadTsModule(path.join(ROOT_DIR, "src/lib/rewriteStack/advancedParaphrase.ts"));
 const { validateRewriteQuality } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/rewriteQuality.ts"));
 const { analyzeGrammar, grammarSafetyIssues } = loadTsModule(path.join(ROOT_DIR, "src/lib/nlp/grammar.ts"));
@@ -229,6 +234,21 @@ assert(migratedSettings.mode === "personal", "Stored mode did not migrate to Per
 assert(migratedSettings.strength === 82, "Stored Rewrite amount was not preserved during mode migration");
 
 assert(needsStructuralRepair("they is ready. writing hard. need help"), "Broken prose was not recognized as structural repair input");
+assert(hasStandaloneNoteFragment("Because of the deadline situation."), "Standalone causal fragment was not recognized");
+assert(needsStructuralRepair("Because of the deadline situation."), "Standalone causal fragment was not marked for structural repair");
+const causalFragmentProbe = repairBrokenProse(
+  "Because of the deadline situation.",
+  "Because of the deadline situation.",
+  extractProtectedSpans("Because of the deadline situation."),
+);
+assert(/^The cause was the deadline situation\.$/i.test(causalFragmentProbe), `Standalone causal fragment was not completed safely: ${causalFragmentProbe}`);
+const waitingFragmentProbe = repairBrokenProse(
+  "Still waiting on the client.",
+  "Still waiting on the client.",
+  extractProtectedSpans("Still waiting on the client."),
+);
+assert(/^I am still waiting on the client\.$/i.test(waitingFragmentProbe), `Standalone waiting fragment was not completed safely: ${waitingFragmentProbe}`);
+assert(looksLikeUnrepairedFragmentaryProse("Because of the deadline situation."), "Unrepaired causal fragment was not detected");
 assert(
   looksLikeModelControlEcho("The text needs to be corrected. The rewritten paragraph should preserve every fact."),
   "Native control-text echo was not recognized"
@@ -238,6 +258,8 @@ const directEnglishProbe = repairDirectEnglish(
   "It is important to note that there are a number of issues due to the fact that the plan changed.",
 );
 assert(!/\bit is important to note\b|\bthere are a number of\b|\bdue to the fact that\b/i.test(directEnglishProbe), `Direct-English filler repair was incomplete: ${directEnglishProbe}`);
+const vagueReasonProbe = repairDirectEnglish("The whole thing fell apart because of reasons.");
+assert(/fell apart for unspecified reasons\./i.test(vagueReasonProbe), `Vague reason repair was incomplete: ${vagueReasonProbe}`);
 const gerundInfinitiveProbe = repairDirectEnglish("The team met for the purpose of making and reviewing the plan.");
 assert(/to make and reviewing the plan\./i.test(gerundInfinitiveProbe), `Gerund-to-infinitive repair produced a broken verb: ${gerundInfinitiveProbe}`);
 assert(!/\bto\s+mak\b/i.test(gerundInfinitiveProbe), `Gerund-to-infinitive repair left a truncated verb: ${gerundInfinitiveProbe}`);

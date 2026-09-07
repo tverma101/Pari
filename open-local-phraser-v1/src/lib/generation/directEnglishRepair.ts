@@ -86,6 +86,8 @@ export function repairDirectEnglish(
       .replace(/\bit\s+is\s+useful\s+to\s+remember\s+that\s+/gi, "")
       .replace(/\bthere\s+are\s+a\s+number\s+of\s+/gi, "several ")
       .replace(/\bthere\s+are\s+an\s+umber\s+of\s+/gi, "several ")
+      .replace(/\bbecause\s+of\s+(?:the\s+)?reasons?\b/gi, "for unspecified reasons")
+      .replace(/\bbecause\s+reasons?\b/gi, "for unspecified reasons")
       .replace(/\bnotwithstanding\s+the\s+fact\s+that\b/gi, "although")
       .replace(/\bdue\s+to\s+the\s+fact\s+that\b/gi, "because")
       .replace(/\bin\s+order\s+to\b/gi, "to")

@@ -137,6 +137,8 @@ Rules:
 - Improve sentence flow, cohesion, parallel structure, punctuation, and ordinary English grammar. Prefer clear, natural wording over thesaurus substitutions.
 - Keep the subject and the writer's point of view. Do not turn first person into a generic statement.
 - If the source is terse or fragmentary, connect the ideas into a readable paragraph instead of preserving choppy three-word fragments.
+- Make vague wording clearer only with facts already present; never invent a person, cause, amount, event, or outcome.
+- A standalone fragment beginning with “Because of …” or “Due to …” must become a complete sentence that names only that stated cause (for example, “The cause was …”); a standalone “Waiting …” fragment must keep its original object without inventing who is waiting.
 - {repair_block}
 - {variation}
 - {custom_block}
@@ -311,9 +313,20 @@ def plan_note_stream(value: str) -> str | None:
     return None
 
 
+def has_standalone_note_fragment(value: str) -> bool:
+    fragments = [part.strip() for part in re.split(r"(?:[.!?]+\s*|\r?\n+)", value) if part.strip()]
+    return any(
+        re.match(r"^(?:because\s+of|due\s+to)\s+[^,;:]+$", fragment, flags=re.IGNORECASE)
+        or re.match(r"^(?:still\s+)?waiting\s+(?:on|for)\s+.+$", fragment, flags=re.IGNORECASE)
+        or re.match(r"^(?:not\s+sure|no\s+idea)\s+.+$", fragment, flags=re.IGNORECASE)
+        for fragment in fragments
+    )
+
+
 def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
     """Repair obvious note fragments after generation without inventing facts."""
     protected = [str(span).strip() for span in request.get("protected_spans", []) if str(span).strip()]
+    repair_standalone_notes = has_standalone_note_fragment(str(request.get("original_text", "")))
     masked = value
     for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
         masked = masked.replace(span, f"\ue000{index}\ue001")
@@ -328,6 +341,16 @@ def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
         item = re.sub(r"^[-*•]+\s*", "", re.sub(r"\s+", " ", re.sub(r"\.{2,}", ".", fragment))).strip()
         if not item:
             return item
+        # Add grammatical scaffolding only when the source had the same
+        # subjectless note shape. This never supplies an invented actor or
+        # outcome to a fragment created by the model.
+        if repair_standalone_notes:
+            item = re.sub(r"^because\s+of\s+(.+)$", r"The cause was \1", item, flags=re.IGNORECASE)
+            item = re.sub(r"^due\s+to\s+(.+)$", r"The reason was \1", item, flags=re.IGNORECASE)
+            item = re.sub(r"^still\s+waiting\s+(on|for)\s+(.+)$", r"I am still waiting \1 \2", item, flags=re.IGNORECASE)
+            item = re.sub(r"^waiting\s+(on|for)\s+(.+)$", r"I am waiting \1 \2", item, flags=re.IGNORECASE)
+            item = re.sub(r"^not\s+sure\s+(.+)$", r"I am not sure \1", item, flags=re.IGNORECASE)
+            item = re.sub(r"^no\s+idea\s+(.+)$", r"I have no idea \1", item, flags=re.IGNORECASE)
         item = re.sub(r"\bthey\s+is\b", "they are", item, flags=re.IGNORECASE)
         item = re.sub(r"\b(we|you|these|those|people|students|writers|users)\s+was\b", r"\1 were", item, flags=re.IGNORECASE)
         item = re.sub(r"\b(he|she|it|this|that)\s+are\b", r"\1 is", item, flags=re.IGNORECASE)
@@ -383,6 +406,8 @@ def repair_direct_english(value: str, request: dict[str, Any]) -> str:
     masked = re.sub(r"\bit\s+should\s+be\s+noted\s+that\s+", "", masked, flags=re.IGNORECASE)
     masked = re.sub(r"\bit\s+is\s+useful\s+to\s+remember\s+that\s+", "", masked, flags=re.IGNORECASE)
     masked = re.sub(r"\bthere\s+are\s+(?:a\s+number|an\s+umber)\s+of\s+", "several ", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bbecause\s+of\s+(?:the\s+)?reasons?\b", "for unspecified reasons", masked, flags=re.IGNORECASE)
+    masked = re.sub(r"\bbecause\s+reasons?\b", "for unspecified reasons", masked, flags=re.IGNORECASE)
     masked = re.sub(r"\bnotwithstanding\s+the\s+fact\s+that\b", "although", masked, flags=re.IGNORECASE)
     masked = re.sub(r"\bdue\s+to\s+the\s+fact\s+that\b", "because", masked, flags=re.IGNORECASE)
     masked = re.sub(r"\bin\s+order\s+to\b", "to", masked, flags=re.IGNORECASE)

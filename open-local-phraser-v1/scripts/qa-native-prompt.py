@@ -49,6 +49,8 @@ assert_true("useful -> helpful" in prompt, "Approved replacement preference was 
 assert_true("do not copy their topic, names, numbers, links, dates, or claims" in prompt, "Native prompt lacks style-example fact isolation")
 assert_true("utilize" in prompt and "can't" in prompt, "Avoided phrase or contraction preference was not included")
 assert_true("usually approves sentence lengths that are similar" in prompt, "Sentence-shape preference was not included")
+assert_true("never invent a person, cause, amount, event, or outcome" in prompt, "Native prompt lacks the anti-invention constraint")
+assert_true("A standalone fragment beginning with “Because of …”" in prompt, "Native prompt lacks standalone-fragment guidance")
 
 empty_prompt = MODULE.build_instruction({"original_text": "A local draft.", "style_context": {}})
 assert_true("Learned local style context:" not in empty_prompt, "Empty approval context added an unnecessary prompt block")

@@ -49,13 +49,27 @@ function lowerSentenceStart(value: string): string {
   return value.charAt(0).toLowerCase() + value.slice(1);
 }
 
-function normalizeFragment(fragment: string): string {
+function normalizeFragment(fragment: string, repairStandaloneNotes = false): string {
   let value = fragment
     .replace(/^[-*•]+\s*/, "")
     .replace(/\s+/g, " ")
     .replace(/\s+([,;:!?])/g, "$1")
     .trim();
   if (!value) return value;
+
+  // Only add a grammatical subject when the original text contained the same
+  // standalone note shape. This repairs fragments such as “Because of the
+  // deadline.” without completing a model-created fragment with an invented
+  // actor or event.
+  if (repairStandaloneNotes) {
+    value = value
+      .replace(/^because\s+of\s+(.+)$/i, "The cause was $1")
+      .replace(/^due\s+to\s+(.+)$/i, "The reason was $1")
+      .replace(/^still\s+waiting\s+(on|for)\s+(.+)$/i, "I am still waiting $1 $2")
+      .replace(/^waiting\s+(on|for)\s+(.+)$/i, "I am waiting $1 $2")
+      .replace(/^not\s+sure\s+(.+)$/i, "I am not sure $1")
+      .replace(/^no\s+idea\s+(.+)$/i, "I have no idea $1");
+  }
 
   value = value
     .replace(/\bthey\s+is\b/gi, "they are")
@@ -270,9 +284,23 @@ function sourceNeedsStructuralRepair(text: string): boolean {
     totalWords < 180 || shortFragments / Math.max(1, fragments.length) >= 0.25
   );
   return denseFragmentation ||
+    hasStandaloneNoteFragment(text) ||
     /(?:^|[.!?]\s+)[a-z]/.test(text) ||
     /\b([A-Za-z]+)\s+\1\b/i.test(text) ||
     !TERMINAL_PUNCTUATION.test(text.trim());
+}
+
+/** Recognize only high-confidence subjectless note fragments. */
+export function hasStandaloneNoteFragment(text: string): boolean {
+  const fragments = text
+    .split(/(?:[.!?]+\s*|\r?\n+)/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return fragments.some((fragment) =>
+    /^(?:because\s+of|due\s+to)\s+[^,;:]+$/i.test(fragment) ||
+    /^(?:still\s+)?waiting\s+(?:on|for)\s+.+$/i.test(fragment) ||
+    /^(?:not\s+sure|no\s+idea)\s+.+$/i.test(fragment)
+  );
 }
 
 export function repairBrokenProse(
@@ -281,6 +309,7 @@ export function repairBrokenProse(
   protectedSpans: Array<{ text: string }>
 ): string {
   const protectedValues = protectedValuesFor(protectedSpans);
+  const repairStandaloneNotes = hasStandaloneNoteFragment(originalText);
   const restored = withProtectedPlaceholders(text, protectedValues, (masked) => {
     const planned = planNoteStream(masked);
     let repaired = planned ?? masked
@@ -305,7 +334,7 @@ export function repairBrokenProse(
 
     repaired = repaired
       .split(/(?<=[.!?])\s+|(?<=[.!?])(?=[A-Za-z])/)
-      .map(normalizeFragment)
+      .map((fragment) => normalizeFragment(fragment, repairStandaloneNotes))
       .filter(Boolean)
       .join(". ");
 
@@ -330,6 +359,7 @@ export function repairBrokenProse(
 }
 
 export function looksLikeUnrepairedFragmentaryProse(text: string): boolean {
+  if (hasStandaloneNoteFragment(text)) return true;
   const fragments = text
     .split(/(?:[.!?]+\s*|\r?\n+)/)
     .map((part) => part.trim())

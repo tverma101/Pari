@@ -44,6 +44,12 @@ Generic benchmark leadership is evidence to test a model, not evidence to promot
 
 These items are implemented but still require target-Mac validation before they should be treated as fully proven.
 
+## 2026-09-07 readiness checkpoint
+
+Pari is **not yet ready to claim a broadly reliable, QuillBot-class paraphraser**. The current local path is a strong safety-first prototype: Qwen3-4B scored 61/64 (95%) on the current automatic 64-case corpus, and the native worker, grammar gates, packaging, and installed native/missing-model/custom-mode checks pass. The raw score still has three fragment-category band-fit misses, and the automatic judge is not a substitute for human quality review.
+
+This checkpoint added source-aware repairs for standalone causal, waiting, and note fragments, plus stricter anti-invention instructions and regression fixtures. Qwen3 remains the production incumbent; the refreshed raw-model run did not justify a promotion or a FreeLLMAPI default. Before calling the product ready, complete P0.1/P0.2/P0.4: save a blind human spot-check on real paragraphs, compare against the same default/conservative QuillBot inputs, and verify that Pari wins or ties on sense, meaning preservation, and grammar across a larger held-out set.
+
 ---
 
 # P0 — prove the core local product

@@ -29,7 +29,8 @@ PROMPT = """Rewrite the text below so it is clear, coherent, and grammatically c
 Rules:
 - Keep the original meaning exactly. Do not add facts. Do not drop negations.
 - Keep every name, date, number, percentage, phone number, and link exactly as written.
-- Fix typos, broken grammar, fragments, and run-ons. Turn vague wording into clear, concrete statements.
+- Fix typos, broken grammar, fragments, and run-ons. Make vague wording clearer only with facts already present; never invent a person, cause, amount, event, or outcome.
+- Complete standalone “Because of …”, “Due to …”, or “Waiting …” fragments without inventing who acted or what happened.
 - Combine fragments into complete sentences where natural; split run-ons.
 - Output ONLY the rewritten text, nothing else.
 

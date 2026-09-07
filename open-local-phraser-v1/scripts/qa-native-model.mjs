@@ -121,6 +121,13 @@ const fixtures = [
     sameSentenceCount: false,
   },
   {
+    name: "standalone-causal-fragment",
+    mode: "personal",
+    text: "Because of the deadline situation.",
+    protectedSpans: [],
+    sameSentenceCount: true,
+  },
+  {
     name: "grammar-cascade",
     mode: "personal",
     text: "they is ready. the editor can explains the change. She wrote an useful summary. Between you and I, need help. send update. They could of written a lot more better.",
@@ -234,6 +241,10 @@ for (const fixture of fixtures) {
   }
   if (fixture.name === "broken-prose") {
     assert(!/\bthey\s+is\b/i.test(output), `${fixture.name}: agreement error remained: ${output}`);
+  }
+  if (fixture.name === "standalone-causal-fragment") {
+    assert(!/^(?:because\s+of|due\s+to)\b/i.test(output), `${fixture.name}: subjectless causal fragment remained: ${output}`);
+    assert(/\b(?:cause|reason|deadline\s+situation)\b/i.test(output), `${fixture.name}: the stated cause was lost: ${output}`);
   }
   if (fixture.name === "grammar-cascade") {
     assert(!/\bthey\s+is\b|\bcan\s+explains\b|\ban\s+useful\b|\bbetween\s+you\s+and\s+I\b|\bsend\s+update\b|\bcould\s+of\b|\balot\b|\bmore\s+better\b/i.test(output), `${fixture.name}: a grammar cascade remained: ${output}`);
