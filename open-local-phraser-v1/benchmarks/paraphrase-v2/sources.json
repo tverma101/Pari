@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "retrieved": "2026-09-08",
+  "note": "These sources define benchmark constructs. Corpus prose is original and is not copied from source examples.",
+  "sources": {
+    "CEFR-COHESION": {
+      "authority": "Council of Europe",
+      "title": "CEFR Companion Volume (2020) — Coherence and cohesion",
+      "url": "https://rm.coe.int/cefr-companion-volume-with-new-descriptors-2020/16809ea0d4",
+      "sourceType": "international language proficiency framework",
+      "claimsUsed": [
+        "Clear writing marks relationships between ideas with linking expressions and cohesive devices.",
+        "Higher-level writing is clear, smoothly flowing, well structured and coherent."
+      ]
+    },
+    "CEFR-PRECISION": {
+      "authority": "Council of Europe",
+      "title": "CEFR Companion Volume (2020) — Propositional precision",
+      "url": "https://rm.coe.int/cefr-companion-volume-with-new-descriptors-2020/16809ea0d4",
+      "sourceType": "international language proficiency framework",
+      "claimsUsed": [
+        "Precision includes communicating detail reliably and preserving shades of meaning.",
+        "Qualification of certainty, uncertainty, belief, doubt and likelihood is part of propositional precision."
+      ]
+    },
+    "IELTS-COHERENCE": {
+      "authority": "IELTS",
+      "title": "Official IELTS Writing Band Descriptors — Coherence and Cohesion",
+      "url": "https://ielts.org/cdn/Guides/ielts-writing-band-descriptors.pdf",
+      "sourceType": "official writing assessment rubric",
+      "claimsUsed": [
+        "High-quality writing has logical organization, clear progression and well-managed cohesion.",
+        "Cohesive devices should support rather than distract from the message."
+      ]
+    },
+    "IELTS-LEXICAL": {
+      "authority": "IELTS",
+      "title": "Official IELTS Writing Band Descriptors — Lexical Resource",
+      "url": "https://ielts.org/cdn/Guides/ielts-writing-band-descriptors.pdf",
+      "sourceType": "official writing assessment rubric",
+      "claimsUsed": [
+        "Vocabulary should be accurate and appropriate to context.",
+        "Natural control of word choice and collocation is part of high-level writing quality."
+      ]
+    },
+    "IELTS-GRAMMAR": {
+      "authority": "IELTS",
+      "title": "Official IELTS Writing Band Descriptors — Grammatical Range and Accuracy",
+      "url": "https://ielts.org/cdn/Guides/ielts-writing-band-descriptors.pdf",
+      "sourceType": "official writing assessment rubric",
+      "claimsUsed": [
+        "Grammar and punctuation should be well controlled.",
+        "Errors should be rare and should not impede communication."
+      ]
+    },
+    "CAMBRIDGE-IELTS": {
+      "authority": "Cambridge English",
+      "title": "IELTS test format and writing assessment criteria",
+      "url": "https://www.cambridgeenglish.org/exams-and-tests/ielts/test-format/",
+      "sourceType": "official exam guidance",
+      "claimsUsed": [
+        "Coherence and cohesion concern clarity, fluency, logical order and appropriate cohesive devices.",
+        "Lexical resource concerns range plus accurate and appropriate use; grammar is judged for range and accuracy."
+      ]
+    },
+    "ETS-WRITING": {
+      "authority": "Educational Testing Service",
+      "title": "TOEFL iBT Writing Section",
+      "url": "https://www.ets.org/toefl/test-takers/ibt/about/content/writing.html",
+      "sourceType": "official academic writing assessment guidance",
+      "claimsUsed": [
+        "Writing quality includes clear/effective communication, organization, accurate grammar and vocabulary, and fit to purpose/tone."
+      ]
+    },
+    "GMU-KNOWN-NEW": {
+      "authority": "George Mason University Writing Center",
+      "title": "Improving Cohesion: The Known/New Contract",
+      "url": "https://writingcenter.gmu.edu/writing-resources/grammar-style/improving-cohesion-the-known-new-contract",
+      "sourceType": "university writing-center guidance",
+      "claimsUsed": [
+        "Readers process paragraphs more easily when sentences connect familiar information to new information.",
+        "Sentence openings should connect to information readers already know when possible."
+      ]
+    },
+    "GMU-PARALLEL": {
+      "authority": "George Mason University Writing Center",
+      "title": "Parallel Structure",
+      "url": "https://writingcenter.gmu.edu/writing-resources/grammar-style/parallel-structure",
+      "sourceType": "university grammar/style guidance",
+      "claimsUsed": [
+        "Items with equivalent grammatical roles should use parallel structure."
+      ]
+    },
+    "UW-CONNECTIONS": {
+      "authority": "University of Wisconsin–Madison Writing Center",
+      "title": "Connecting Ideas Through Transitions",
+      "url": "https://writing.wisc.edu/handbook/style/connectingideas/",
+      "sourceType": "university writing-center guidance",
+      "claimsUsed": [
+        "Clear writing makes relationships such as contrast, causation and sequence understandable.",
+        "Cohesion links adjacent ideas; coherence makes the sentences contribute to a larger unified whole."
+      ]
+    },
+    "UW-PARAGRAPHS": {
+      "authority": "University of Wisconsin–Madison Writing Center",
+      "title": "Improve Your Paper by Writing Structured Paragraphs",
+      "url": "https://writing.wisc.edu/handbook/processandstructure/paragraphing/",
+      "sourceType": "university writing-center guidance",
+      "claimsUsed": [
+        "Paragraphs organize ideas into meaningful units and should develop a coherent point.",
+        "Transitions, topic development and linking sentences help readers follow the paragraph's logic."
+      ]
+    },
+    "UW-COMMON-ERRORS": {
+      "authority": "University of Wisconsin–Madison Writing Center",
+      "title": "Twelve Common Errors",
+      "url": "https://writing.wisc.edu/handbook/processandstructure/commonerrors/",
+      "sourceType": "university grammar/style guidance",
+      "claimsUsed": [
+        "Fragments should contain a complete independent thought when presented as sentences.",
+        "Sentence sprawl can reduce clarity even when technically grammatical.",
+        "Modifiers should be placed near what they modify."
+      ]
+    },
+    "UW-CONCISE": {
+      "authority": "University of Wisconsin–Madison Writing Center",
+      "title": "Tidy up wordy phrases",
+      "url": "https://writing.wisc.edu/handbook/grammarandstyle/css_wordyphrases/",
+      "sourceType": "university style guidance",
+      "claimsUsed": [
+        "Wordy phrases can often be replaced with direct, concise equivalents without changing meaning."
+      ]
+    },
+    "UW-ACTION-VERB": {
+      "authority": "University of Wisconsin–Madison Writing Center",
+      "title": "Put the action in the verb",
+      "url": "https://writing.wisc.edu/handbook/grammarandstyle/ccs_actionverb/",
+      "sourceType": "university style guidance",
+      "claimsUsed": [
+        "Clear sentences often express the main action in a precise verb rather than burying it in nominalizations."
+      ]
+    },
+    "PARA-EVAL": {
+      "authority": "Association for Computational Linguistics",
+      "title": "Paraphrases and Applications — evaluation criteria",
+      "url": "https://aclanthology.org/C/C10/C10-4001.pdf",
+      "sourceType": "paraphrase evaluation research",
+      "claimsUsed": [
+        "Paraphrase quality should distinguish adequacy/meaning preservation, fluency, usability and paraphrase rate."
+      ]
+    },
+    "REPROHUM-PARA": {
+      "authority": "ACL/ELRA HumEval 2024",
+      "title": "Reproducing Human Evaluation of Meaning Preservation in Paraphrase Generation",
+      "url": "https://aclanthology.org/2024.humeval-1.19/",
+      "sourceType": "human-evaluation research",
+      "claimsUsed": [
+        "Meaning preservation, fluency and dissimilarity are separable human-evaluation criteria for paraphrase generation."
+      ]
+    },
+    "BEA-MINIMAL-EDIT": {
+      "authority": "ACL BEA 2025",
+      "title": "Adapting LLMs for Minimal-edit Grammatical Error Correction",
+      "url": "https://aclanthology.org/2025.bea-1.9/",
+      "sourceType": "grammatical-error-correction research",
+      "claimsUsed": [
+        "Fluent LLM correction and minimal-edit correction are distinct behaviors; overcorrection must be measured rather than rewarded."
+      ]
+    },
+    "CLEME2": {
+      "authority": "ACL 2025",
+      "title": "CLEME2.0: Towards Interpretable Evaluation by Disentangling Edits for Grammatical Error Correction",
+      "url": "https://aclanthology.org/2025.acl-long.10/",
+      "sourceType": "grammatical-error-correction evaluation research",
+      "claimsUsed": [
+        "Evaluation benefits from distinguishing correct edits, wrong corrections, under-correction and over-correction."
+      ]
+    },
+    "GEC-HUMAN-AGG": {
+      "authority": "ACL 2025",
+      "title": "Rethinking Evaluation Metrics for Grammatical Error Correction: Why Use a Different Evaluation Process than Human?",
+      "url": "https://aclanthology.org/2025.acl-short.92/",
+      "sourceType": "evaluation methodology research",
+      "claimsUsed": [
+        "Human evaluation commonly relies on sentence-level relative comparisons; automatic corpus averages can rank systems differently.",
+        "Pairwise/relative aggregation is therefore useful for model selection."
+      ]
+    },
+    "GEC-POSTEDIT": {
+      "authority": "ACL BEA 2025",
+      "title": "LLM-based post-editing as reference-free GEC evaluation",
+      "url": "https://aclanthology.org/2025.bea-1.16/",
+      "sourceType": "evaluation methodology research",
+      "claimsUsed": [
+        "Traditional metrics can miss fluency, minimal-edit preference and multiple valid corrections; human preference remains important."
+      ]
+    }
+  }
+}
