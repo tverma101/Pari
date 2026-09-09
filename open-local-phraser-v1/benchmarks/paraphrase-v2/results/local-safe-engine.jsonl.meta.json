@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "pari-paraphrase-v2",
+  "generatedAt": "2026-09-09T00:36:54.104Z",
+  "corpusPath": "/Users/tejas/Projects/Pari/open-local-phraser-v1/benchmarks/paraphrase-v2/corpus.json",
+  "corpusVersion": 2,
+  "caseCount": 72,
+  "productInstruction": "Rewrite the paragraph so it is clear, natural, and grammatically correct. Preserve the writer's meaning, facts, uncertainty, relationships between ideas, and overall voice. Do not invent details. Return only the rewritten paragraph.",
+  "engine": {
+    "name": "local-safe-engine",
+    "role": "deterministic-safety-reference",
+    "runtime": "Pari TypeScript local-safe engine",
+    "license": "project code; see repository license",
+    "quantization": "deterministic rules and synonym bank",
+    "installedEvidence": false
+  },
+  "settings": {
+    "strength": 60,
+    "nativeModelUsed": false
+  },
+  "hardware": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "v22.23.1",
+    "macOS": "25.6.0",
+    "totalMemoryGiB": 16
+  },
+  "timing": {
+    "completedCases": 72,
+    "totalSeconds": 0.299,
+    "medianCaseSeconds": 0.003,
+    "peakProcessRssGiB": 0.168
+  }
+}

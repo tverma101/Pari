@@ -349,3 +349,242 @@
 - `next_action`: commit and push the audited topic-branch change; retain the
   optional FreeLLM route for users who prefer remote variety, with local Qwen3
   as the default quality baseline.
+
+## 2026-09-07 — Completed the automatic MiniCPM challenger check
+
+- `scope`: temporary Hugging Face MiniCPM5-2B-MLX download, frozen Pari
+  evaluator, current model-selection documentation, and automatic regression
+  suites on `feat/quality-judge-holdout`.
+- `goal`: continue the automatic quality push and close the model-comparison
+  portion of P0.1 without silently changing Pari's production model.
+- `changed_files`: `README.md`, `benchmarks/llm-shootout/README.md`,
+  `docs/remaining-work.md`, `benchmarks/llm-shootout/minicpm5-2b-mlx-outputs-20260907.jsonl`,
+  `benchmarks/eval/results-minicpm5-2b-mlx-outputs-20260907.jsonl.json`,
+  `benchmarks/eval/results-minicpm5-2b-mlx-outputs-20260907.jsonl_pari-postprocess.json`,
+  and this log. No application source or model weights were added.
+- `implementation`: used the Hugging Face CLI dry run before downloading the
+  Apache-2.0 MiniCPM5-2B-MLX checkpoint to an exact temporary directory. The
+  thinking-disabled 64-case MLX run completed all requests, then was scored
+  both raw and after Pari's real finalization boundary. MiniCPM scored 43/64
+  raw and 51/64 postprocessed, below Qwen3's retained 64/64 postprocessed
+  result; it is rejected for promotion. Corrected the README and shootout
+  documentation to distinguish the latest Gemma 59/64 FreeLLM snapshot from
+  the older 57/64 provider snapshot.
+- `validation`: MiniCPM MLX load and 64/64 generation requests; raw and
+  `--production-postprocess` evaluator runs; `npm run qa:approval`; `npm run
+  benchmark:quality`; `npm run qa:grammar:harper`; `npm run qa:grammar:ewt`;
+  `npm run qa:learned:judge`; `npm run qa:native:prompt`; and the full
+  `npm run qa:native:model` suite all passed. The native suite covered the
+  four-candidate flow, fragments, quantifier boundaries, protected facts,
+  meaning guardrails, and bookish negation.
+- `evidence_state`: automatic model comparison complete=yes; Qwen3 production
+  boundary retained=yes; source/docs changes implemented=yes; automatic QA
+  passed=yes; temporary challenger not bundled or installed=yes; packaged
+  artifact from the prior source commit remains signed and smoke-tested=yes;
+  blind human holdout=no; QuillBot parity/superiority=no; user visual
+  confirmation=no.
+- `blocker`: no automatic model-promotion blocker remains. Pari is still not
+  fully proven as a broadly reliable or QuillBot-class paraphraser because the
+  remaining readiness evidence is a blind real-paragraph comparison, actual
+  contextual synonym review, and target-Mac memory/latency capture. The
+  existing 18 npm vulnerability audit warning remains unchanged.
+- `cleanup`: the temporary 1.4 GB MiniCPM checkpoint remains outside the
+  repository and was not placed in the app bundle; the raw replay and compact
+  score reports are the only committed evaluation artifacts. No GitHub
+  Actions, PR, merge, default-branch mutation, force-push, or external
+  publication was performed in this evaluation turn.
+- `learning_checkpoint`: promoted the MiniCPM rejection and corrected dated
+  FreeLLM evidence because the claims are backed by current executable runs
+  and retained raw/effective scores. Quarantined any general claim that the
+  automatic judge proves human or QuillBot superiority. Skipped installing a
+  second production model.
+- `next_action`: if “fully ready” means the documented narrow v1 quality gate,
+  perform the remaining blind real-paragraph/synonym/QuillBot spot-check; if
+  automatic-only work is preferred, the next high-value experiment is a new
+  untouched corpus rather than more tuning on the frozen 64 cases.
+
+## 2026-09-08 — Fixed the rewrite amount slider and weak screenshot rewrite
+
+- `scope`: packaged Pari slider interaction, screenshot-paragraph native
+  generation, quantifier meaning guard, and regression coverage.
+- `goal`: make changing rewrite amount actually affect a current unedited
+  draft, and stop a strong native rewrite from being discarded into the weak
+  offline fallback shown in the supplied screenshot.
+- `changed_files`: `README.md`, `docs/remaining-work.md`, `src/App.tsx`,
+  `src/lib/generation/meaningContract.ts`, `native-runtime/paraphrase_worker.py`,
+  `scripts/qa-paraphrase.mjs`, and this log. Existing unrelated dirty work was
+  preserved.
+- `implementation`: replaced the four-step range with a continuous 0–100
+  range using live `input` and `change` handling, visible percentage semantics,
+  and a 450 ms regeneration debounce. Slider changes automatically regenerate
+  only an unedited draft; after manual edits Pari keeps the edit and explains
+  that Paraphrase must be pressed to apply a new amount. Added the natural
+  `some`/`certain` quantity class to the meaning contract and instructed the
+  native worker to preserve quantifier scope and strength. The supplied
+  boredom paragraph now stays on the native Qwen3 best-of-4 path and produces
+  a materially stronger 51-word rewrite.
+- `validation`: `npm run qa:approval`; `npx tsc -p tsconfig.json --noEmit`;
+  Python bytecode compilation; direct four-candidate Qwen3 probe on the exact
+  screenshot paragraph; `npm run build:desktop`; strict app signature
+  verification; `hdiutil verify release/Pari.dmg`; and `npm run qa:installed`
+  all passed. The freshly launched packaged app showed the real native Qwen3
+  output and no weak `receive a break` fallback. The live packaged web UI
+  slider was exercised through 100 → 0 → 100 with the Deep label present.
+- `evidence_state`: source implemented=yes; focused regression passed=yes;
+  packaged and signed=yes; DMG checksum-verified=yes; installed native
+  smoke-tested=yes; live app output user-visible-to-Codex=yes; user visual
+  confirmation=no.
+- `blocker`: no current local implementation blocker. Native-app coordinate
+  dragging was unavailable through the computer-use surface, but the same
+  packaged WebKit range accepted full-range keyboard interaction and the
+  native app completed the real rewrite flow. No claim of QuillBot parity or
+  human superiority is made.
+- `cleanup`: temporary local browser verification tab was closed. No model
+  weights, secrets, GitHub Actions, PR mutation, commit, push, merge, or
+  default-branch change was performed.
+- `learning_checkpoint`: promoted the slider debounce and quantifier fix
+  because both are covered by focused regression checks and installed/live
+  evidence. Quarantined any broader quality claim beyond this screenshot
+  flow. Skipped additional model downloads because the retained Qwen3 path
+  completed successfully.
+- `next_action`: use the running packaged Pari app; commit and push remain
+  separate actions requiring explicit publication authorization.
+
+## 2026-09-08 — Added high-amount sentence restructuring and majority-scope repair
+
+- `scope`: high/Deep Rewrite amount behavior across the native Qwen3 path and
+  the deterministic offline fallback, with prompt, meaning-contract, and
+  installed/live regressions.
+- `goal`: make a high Rewrite amount produce visible sentence-level reframing
+  while preserving sentence count, discourse relationships, protected terms,
+  and the stronger meaning of majority quantifiers.
+- `changed_files`: `native-runtime/paraphrase_worker.py`,
+  `src/lib/generation/localParaphrase.ts`,
+  `src/lib/generation/meaningContract.ts`, `scripts/qa-native-prompt.py`,
+  `scripts/qa-paraphrase.mjs`, `README.md`, `docs/remaining-work.md`, and
+  this log. Existing unrelated dirty work was preserved.
+- `implementation`: added high-amount native instructions to rebuild sentence
+  openings, clause order, and grammatical framing rather than only swapping
+  synonyms. Added a bounded shared structural pass for clear fronted
+  cause/contrast/condition/time/context clauses before native ranking and on
+  the offline fallback. Added a sentence-scoped repair for a native `most` →
+  `many` weakening, while allowing explicit `majority` equivalents; the
+  contract continues to permit broad `a number of`/`many`/`several` usage.
+- `validation`: `npm run qa:paraphrase`; `npm run qa:native:prompt`;
+  `npm run qa:native:model`; `npx tsc -p tsconfig.json --noEmit`;
+  Python bytecode compilation; repeated direct Qwen3 high-strength probes;
+  `npm run build:desktop`; strict `codesign --verify --deep --strict`;
+  `hdiutil verify release/Pari.dmg`; final `npm run qa:installed`; and
+  packaged WebKit slider interaction 56 → 100 → 0 → 100. The final visible
+  Deep run used Qwen/Qwen3-4B-MLX-4bit, preserved `Most`, kept four sentences,
+  and visibly reframed the last sentence to put `in certain contexts` after
+  the main clause.
+- `evidence_state`: source implemented=yes; focused regression passed=yes;
+  native fixture suite passed=yes; packaged and signed=yes; DMG checksum
+  verified=yes; installed native smoke-tested=yes; live Deep output
+  user-visible-to-Codex=yes; user visual confirmation=no.
+- `blocker`: no current local implementation blocker. The native candidate
+  may still be conservative on paragraphs without a safe fronted clause; the
+  open-ended generator remains model-dependent. No claim of QuillBot parity,
+  human superiority, or universal Deep restructuring is made.
+- `cleanup`: temporary packaged-browser range-check tab was closed; only the
+  final visible Pari process remains from this turn. No model weights or
+  secrets were copied into the repo. No commit, push, PR mutation, GitHub
+  Actions, merge, force-push, or default-branch change was performed.
+- `learning_checkpoint`: promoted the prompt contract, bounded structural
+  pass, and majority-scope repair because each is covered by current focused
+  tests plus packaged/native evidence. Quarantined the claim that every high
+  rewrite must restructure every sentence. Skipped additional model downloads
+  because the installed Qwen3 path completed successfully.
+- `next_action`: use the final packaged app; commit/push remain separate
+  publication actions requiring explicit authorization.
+
+## 2026-09-08 — Issue #11 v2 benchmark and user-stopped XL run
+
+- `scope`: canonical `/Users/tejas/Projects/Pari/open-local-phraser-v1`, issue
+  #11 standards-traced v2 model comparison, shared sentence/factual-anchor
+  safety boundary, and local model receipts.
+- `goal`: continue the v2 benchmark, test feasible required candidates, and
+  preserve a truthful promotion boundary for Pari's paragraph paraphraser.
+- `changed_files`: `src/lib/nlp/sentenceSplit.ts`,
+  `src/lib/safety/protectedContent.ts`, `scripts/qa-paraphrase.mjs`,
+  `benchmarks/llm-shootout/run_seq2seq.py`,
+  `benchmarks/llm-shootout/README.md`, `benchmarks/paraphrase-v2/README.md`,
+  `benchmarks/paraphrase-v2/model-receipts.md`,
+  `benchmarks/paraphrase-v2/model-status.json`,
+  `benchmarks/paraphrase-v2/report.mjs`, `docs/remaining-work.md`, and this
+  log. Existing unrelated dirty work was preserved.
+- `implementation`: protected `a.m./p.m.` markers and hardened the shared
+  sentence splitter against email/URL/decimal interior periods; added the
+  regression coverage; added the T5/seq2seq research runner; and wired
+  required-model status into the v2 report.
+- `benchmark`: CoEdIT-large completed 72/72 and scored 51/72 with 14
+  hard-safety failures. CoEdIT-XL loaded and passed one MPS smoke generation,
+  then the user explicitly stopped the 11.4 GB full run after 55/72 rows due
+  to memory pressure; the partial JSONL is valid but intentionally unscored.
+  ADAL's downloaded checkpoint contained NaN tensors; DIPPER exposed no
+  weights; Ling's required runtime was unavailable. Qwen3/Qwen3.5/MiniCPM
+  score bundles were refreshed where completed before the stop.
+- `validation`: `npm run qa:paraphrase`; Python bytecode compilation for the
+  new runner; v2 corpus validation; JSON/JSONL artifact parse checks; and
+  `git diff --check` passed. No benchmark, scorer, model, or XL process
+  remains; post-stop memory free percentage reported 64%.
+- `evidence_state`: source implemented=yes; focused QA passed=yes; v2
+  harness/receipts implemented=yes; CoEdIT-large benchmarked=yes; CoEdIT-XL
+  smoke-tested=yes and full benchmark=user-stopped; production promotion=no;
+  human preference evidence=no; installed/live evidence unchanged from the
+  prior checkpoint; user visual confirmation=no.
+- `blocker`: issue #11's human-rating gate and complete comparison of
+  unavailable/user-stopped candidates remain open. No claim of QuillBot
+  superiority or model promotion is made.
+- `cleanup`: exact orphaned Node scorer workers and the XL benchmark process
+  were terminated after the user stop; no model weights were copied into the
+  app or repository. The 11.4 GB checkpoint and 55 valid rows remain in `/tmp`
+  and the repo respectively for recoverable later work. No commit, push, PR
+  mutation, GitHub Actions, merge, force-push, or default-branch change was
+  performed.
+- `learning_checkpoint`: promoted the meridiem/decimal boundary regression
+  because focused QA reproduced and then prevented the factual-prefix loss.
+  Quarantined XL quality conclusions because the user stopped the run.
+  Recorded ADAL/DIPPER/Ling as candidate-state limitations rather than
+  substituting unverified runtimes. Skipped further benchmark execution after
+  the explicit memory stop.
+- `next_action`: keep the worktree and partial XL artifact paused; if resumed,
+  run only a memory-bounded plan or delete the exact temporary XL weights with
+  explicit authorization. Commit/push remain separate publication actions.
+
+## 2026-09-08 — Skipped CoEdIT-XL and refreshed the current leaderboard
+
+- `scope`: issue #11 v2 automatic leaderboard, complete scored bundles, and
+  the user-stopped CoEdIT-XL comparison boundary.
+- `goal`: continue the comparison without restarting the memory-intensive
+  11.4 GB model, and expose the strongest currently completed results.
+- `changed_files`: `benchmarks/paraphrase-v2/results/report-current/` generated
+  leaderboard artifacts and this log. No model runner, score bundle, or
+  production source was rerun or changed.
+- `implementation`: generated a consolidated report from the complete
+  original-reference, deterministic fallback, Qwen3 incumbent, Qwen3
+  best-of-four research selector, Qwen3.5, CoEdIT-large, and MiniCPM bundles.
+  The 55-row CoEdIT-XL partial remains excluded and its model status remains
+  `user-stopped`.
+- `validation`: `npm run benchmark:v2:report -- ... --out-dir
+  benchmarks/paraphrase-v2/results/report-current` completed with 7 engines,
+  72 cases, and 1,512 blinded pairwise rows. The refreshed report identifies
+  `qwen3-4b-incumbent-bestof4-raw` as the automatic diagnostic leader at
+  69/72; no human ratings were supplied.
+- `evidence_state`: complete automatic comparison=yes; CoEdIT-XL full
+  comparison=no/user-stopped; human preference=no; production promotion=no;
+  installed/live evidence unchanged; user visual confirmation=no.
+- `blocker`: automatic diagnostics remain supporting evidence only. The
+  human gate and production-safety/installed-runtime gates remain open.
+- `cleanup`: no benchmark process was started; the XL checkpoint and partial
+  rows remain recoverable. No commit, push, PR mutation, GitHub Actions,
+  merge, force-push, or default-branch change was performed.
+- `learning_checkpoint`: promoted the explicit exclusion of incomplete
+  candidates from the leaderboard because the report now records required
+  model status alongside complete score bundles. Quarantined any claim that
+  the best-of-four raw research selector is a shippable production winner.
+  Skipped all further XL execution.
+- `next_action`: use the refreshed report for issue #11 review; if quality
+  work continues, use human/blinded or new-corpus evidence rather than
+  restarting CoEdIT-XL without an explicit memory-bounded plan.

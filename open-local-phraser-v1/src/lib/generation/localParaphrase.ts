@@ -14,12 +14,14 @@ import {
   validateRewriteQuality,
 } from "@/lib/generation/rewriteQuality";
 import { repairSentenceFlow } from "@/lib/generation/sentenceFlow";
+import { splitSentences } from "@/lib/nlp/sentenceSplit";
 import { repairEnglishGrammar } from "@/lib/generation/englishGrammarRepair";
 import {
   looksLikeModelControlEcho,
   repairBrokenProse,
 } from "@/lib/generation/brokenProseRepair";
 import { infinitiveFromGerund, repairDirectEnglish } from "@/lib/generation/directEnglishRepair";
+import { repairPunctuationSpacing } from "@/lib/generation/punctuation";
 import { analyzeHarperGrammar } from "@/lib/nlp/harper";
 import {
   generateNativeParaphrase,
@@ -84,6 +86,53 @@ function withProtectedPlaceholders(
   return transformed.replace(
     /\uE000([\s\S])\uE001/g,
     (_match, index) => protectedValues[index.charCodeAt(0) - 0xE100] ?? ""
+  );
+}
+
+function repairMajorityScope(
+  originalText: string,
+  candidateText: string,
+): string {
+  const originalSentences = splitSentences(originalText);
+  const candidateSentences = splitSentences(candidateText);
+  if (originalSentences.length !== candidateSentences.length) return candidateText;
+
+  return candidateSentences
+    .map((candidateSentence, index) => {
+      const sourceSentence = originalSentences[index]?.text ?? "";
+      if (!/\bmost\b/i.test(sourceSentence) || /\b(?:the\s+)?majority\s+of\b/i.test(candidateSentence.text)) {
+        return candidateSentence.text;
+      }
+
+      let repaired = false;
+      return candidateSentence.text.replace(
+        /\b(?:many|several|a\s+number\s+of)\b/i,
+        (match) => {
+          if (repaired) return match;
+          repaired = true;
+          return /^[A-Z]/.test(match) ? "Most" : "most";
+        },
+      );
+    })
+    .join(" ");
+}
+
+/**
+ * Restore a weakened majority marker before the shared quality gate runs.
+ * Native candidates can otherwise be excellent except for “most” becoming
+ * “many”; rejecting every such candidate would unnecessarily expose a much
+ * weaker offline draft. The repair is sentence-scoped, changes one marker at
+ * most per source sentence, and leaves explicit “majority” wording intact.
+ */
+export function repairQuantityScope(
+  originalText: string,
+  candidateText: string,
+  protectedSpans: ProtectedSpan[] = [],
+): string {
+  if (!originalText.trim() || !candidateText.trim()) return candidateText;
+  const protectedValues = protectedValuesFor(originalText, protectedSpans);
+  return withProtectedPlaceholders(candidateText, protectedValues, (masked) =>
+    repairMajorityScope(originalText, masked)
   );
 }
 
@@ -240,7 +289,8 @@ export function finalizeDraft(
   mode: RewriteMode,
   warmthPolish = false
 ): string {
-  let repaired = repairBrokenProse(candidate, originalText, protectedSpans);
+  let repaired = repairQuantityScope(originalText, candidate, protectedSpans);
+  repaired = repairBrokenProse(repaired, originalText, protectedSpans);
   repaired = repairDirectEnglish(repaired, protectedSpans);
   repaired = repairLocalCollocations(repaired, originalText, protectedSpans);
   repaired = repairDirectEnglish(repaired, protectedSpans);
@@ -266,9 +316,7 @@ function repairLocalCollocations(
       .join("\uE000" + String.fromCharCode(0xE100 + index) + "\uE001");
   });
 
-  repaired = repaired
-    .replace(/\s+([,.;!?])/g, "$1")
-    .replace(/([,.;!?])(?=[A-Za-z])/g, "$1 ")
+  repaired = repairPunctuationSpacing(repaired.replace(/\s+([,.;!?])/g, "$1"))
     // Prefer the shorter, clearer construction when a synonym pass leaves
     // common nominalized or padded phrases behind. These edits preserve the
     // clause relationship and do not touch protected spans.
@@ -343,6 +391,47 @@ function automaticRewriteBudget(strength: number): number {
   if (strength >= 82) return 3;
   if (strength >= 42) return 2;
   return 1;
+}
+
+const FRONTED_RELATION_CLAUSE = /^(?<lead>(?:because|although|even though|even if|when|while|if|unless|since|after|before|once|as long as|provided that)\b[^,;:.!?]+),\s+(?<main>.+?)(?<punct>[.!?]+)$/i;
+const FRONTED_CONTEXT_PHRASE = /^(?<lead>(?:in some situations|in certain situations|in certain contexts|in some cases|at times)\b),\s+(?<main>.+?)(?<punct>[.!?]+)$/i;
+
+function moveFrontedStructure(sentence: string): string {
+  const match = sentence.trim().match(FRONTED_RELATION_CLAUSE) ?? sentence.trim().match(FRONTED_CONTEXT_PHRASE);
+  if (!match?.groups) return sentence;
+
+  const lead = match.groups.lead?.trim();
+  const main = match.groups.main?.trim();
+  const punctuation = match.groups.punct ?? ".";
+  if (!lead || !main || /^(?:and|or|but|which|that|who)\b/i.test(main)) return sentence;
+  if ((main.match(/[A-Za-z]+(?:['-][A-Za-z]+)*/g) ?? []).length < 3) return sentence;
+
+  // Keep the exact relation marker and clause words, but place the main
+  // clause first. This is a bounded structural rewrite for the offline path:
+  // it changes sentence framing without inventing a subject or weakening the
+  // source's cause, contrast, condition, time, or context relationship.
+  const capitalizedMain = main.replace(/^[a-z]/, (character) => character.toUpperCase());
+  return `${capitalizedMain} ${lead.toLowerCase()}${punctuation}`;
+}
+
+/**
+ * Give the high Rewrite amount a structural effect even when the native
+ * generator is unavailable. Only unambiguous fronted clauses/context phrases
+ * are moved; all other sentences keep the deterministic lexical rewrite.
+ */
+export function restructureHighStrength(
+  text: string,
+  strength: number,
+  protectedSpans: ProtectedSpan[] = [],
+): string {
+  if (strength < 69 || !text.trim()) return text;
+  const protectedValues = protectedValuesFor(text, protectedSpans);
+  return withProtectedPlaceholders(text, protectedValues, (masked) =>
+    splitSentences(masked)
+      .map((sentence) => moveFrontedStructure(sentence.text))
+      .join(" ")
+      .trim()
+  );
 }
 
 async function hasNewHighGrammarIssue(originalText: string, candidateText: string): Promise<string | null> {
@@ -526,7 +615,14 @@ export async function generateLocalParaphrase(
       // an already-completed remote response. Protected-content, deterministic
       // quality, and the bounded Harper grammar gate still apply.
       let inspection: { text: string; safe: boolean; reason?: string };
-      const candidateList = native.candidates ?? [{ text: native.text }];
+      const candidateList = (native.candidates ?? [{ text: native.text }]).map((candidate) => ({
+        ...candidate,
+        // Make the high amount observable even when the model's best safe
+        // candidate stays mostly lexical. The bounded pass only moves clear
+        // fronted relationship/context clauses and runs before ranking, so
+        // every backend is judged on the same user-visible structure.
+        text: restructureHighStrength(candidate.text, strength, protectedSpans),
+      }));
       if (native.backend === "freellm-api" && candidateList.length === 1) {
         inspection = await inspectNativeDraft(
           candidateList[0]?.text ?? native.text,
@@ -626,7 +722,7 @@ export async function generateLocalParaphrase(
         }, request.signal);
         throwIfAborted(request.signal);
         const retryInspection = await inspectNativeDraft(
-          repairedNative.text,
+          restructureHighStrength(repairedNative.text, strength, protectedSpans),
           originalText,
           protectedSpans,
           mode,
@@ -676,7 +772,13 @@ export async function generateLocalParaphrase(
   );
   throwIfAborted(request.signal);
 
-  const repairedText = finalizeDraft(first.outputText, originalText, protectedSpans, mode, warmthPolish);
+  const repairedText = finalizeDraft(
+    restructureHighStrength(first.outputText, strength, protectedSpans),
+    originalText,
+    protectedSpans,
+    mode,
+    warmthPolish,
+  );
   const firstValidation = validateProtectedContent(originalText, repairedText, protectedSpans);
   const firstQuality = validateRewriteQuality(originalText, repairedText, protectedSpans, {
     allowStructuralRepair: structuralRepair,
@@ -719,7 +821,13 @@ export async function generateLocalParaphrase(
       choices,
       extraAlternatives
     );
-    const retryText = finalizeDraft(retry.outputText, originalText, protectedSpans, mode, warmthPolish);
+    const retryText = finalizeDraft(
+      restructureHighStrength(retry.outputText, strength, protectedSpans),
+      originalText,
+      protectedSpans,
+      mode,
+      warmthPolish,
+    );
     const retryValidation = validateProtectedContent(originalText, retryText, protectedSpans);
     const retryQuality = validateRewriteQuality(originalText, retryText, protectedSpans, {
       allowStructuralRepair: structuralRepair,
@@ -755,7 +863,13 @@ export async function generateLocalParaphrase(
     },
     {}
   ).outputText;
-  const safeFallback = finalizeDraft(conservative, originalText, protectedSpans, mode, warmthPolish);
+  const safeFallback = finalizeDraft(
+    restructureHighStrength(conservative, strength, protectedSpans),
+    originalText,
+    protectedSpans,
+    mode,
+    warmthPolish,
+  );
   const fallbackValidation = validateProtectedContent(originalText, safeFallback, protectedSpans);
   const fallbackQuality = validateRewriteQuality(originalText, safeFallback, protectedSpans, {
     allowStructuralRepair: structuralRepair,

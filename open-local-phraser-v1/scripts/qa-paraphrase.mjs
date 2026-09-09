@@ -93,7 +93,7 @@ const {
   appendGroupedEdit,
   describeTextEdit,
 } = loadTsModule(path.join(ROOT_DIR, "src/lib/personalization/editHistory.ts"));
-const { buildNativeStyleContext, finalizeDraft, generateLocalParaphrase } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/localParaphrase.ts"));
+const { buildNativeStyleContext, finalizeDraft, generateLocalParaphrase, repairQuantityScope, restructureHighStrength } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/localParaphrase.ts"));
 const {
   hasStandaloneNoteFragment,
   looksLikeModelControlEcho,
@@ -112,7 +112,7 @@ const { repairEnglishGrammar } = loadTsModule(path.join(ROOT_DIR, "src/lib/gener
 const { meaningContractIssues } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/meaningContract.ts"));
 const { loadSettings, normalizeStoredRewriteMode } = loadTsModule(path.join(ROOT_DIR, "src/lib/settings/settingsStore.ts"));
 const { needsStructuralRepair } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/rewriteQuality.ts"));
-const { countSentences } = loadTsModule(path.join(ROOT_DIR, "src/lib/nlp/sentenceSplit.ts"));
+const { countSentences, splitSentences } = loadTsModule(path.join(ROOT_DIR, "src/lib/nlp/sentenceSplit.ts"));
 const { normalizeCustomStyle, customModeForStyle, effectiveStyleStrength, engineModeForStyle } = loadTsModule(path.join(ROOT_DIR, "src/lib/styles/customStyles.ts"));
 
 const grammarProbes = [
@@ -325,6 +325,45 @@ for (const id of ["negation-drift", "modality-drift", "quantity-drift"]) {
   assert(meaningDrift.some((issue) => issue.id === id), `Meaning contract missed ${id}`);
 }
 
+const naturalQuantifierParaphrase = meaningContractIssues(
+  "Most people avoid boredom. Some situations encourage reflection.",
+  "Most people avoid boredom. Certain contexts encourage reflection.",
+  "personal",
+);
+assert(
+  !naturalQuantifierParaphrase.some((issue) => issue.id === "quantity-drift"),
+  "Meaning contract rejected a natural some/certain quantifier paraphrase",
+);
+const majorityQuantifierParaphrase = meaningContractIssues(
+  "Most people avoid boredom.",
+  "The majority of people avoid boredom.",
+  "personal",
+);
+assert(
+  !majorityQuantifierParaphrase.some((issue) => issue.id === "quantity-drift"),
+  "Meaning contract rejected an explicit majority equivalent for most",
+);
+const weakenedMajorityParaphrase = meaningContractIssues(
+  "Most people avoid boredom.",
+  "Many people avoid boredom.",
+  "personal",
+);
+assert(
+  weakenedMajorityParaphrase.some((issue) => issue.id === "quantity-drift"),
+  "Meaning contract accepted most-to-many quantity weakening",
+);
+const realQuantifierDrift = meaningContractIssues(
+  "Most people avoid boredom. Some situations encourage reflection.",
+  "Few people avoid boredom. Certain contexts encourage reflection.",
+  "personal",
+);
+assert(realQuantifierDrift.some((issue) => issue.id === "quantity-drift"), "Meaning contract accepted a real quantifier-strength drift");
+const screenshotParagraph = "Boredom is usually seen as something negative. Most people try to avoid it by watching videos, scrolling through social media, playing games, or finding something else to do. However, boredom is not always a bad thing. In some situations, being bored can help people think more creatively, understand themselves better, and take a break from constant stimulation.";
+const screenshotNativeCandidate = "Boredom is often viewed as a negative experience. To combat it, most people turn to activities like watching videos, scrolling through social media, playing games, or engaging in other distractions. However, boredom is not inherently negative. In certain contexts, it can foster creative thinking, promote self-reflection, and provide a respite from ongoing stimulation.";
+const screenshotQuality = validateRewriteQuality(screenshotParagraph, screenshotNativeCandidate);
+assert(screenshotQuality.safe, `Screenshot-quality native candidate was rejected: ${screenshotQuality.issues.map((issue) => issue.id).join(", ")}`);
+assert(!/\breceive\s+a\s+break\b/i.test(screenshotNativeCandidate), "Screenshot-quality regression kept the weak receive-a-break wording");
+
 const targetTerms = ["narcissism", "because", "person", "different", "useful", "may", "show", "better"];
 for (const term of targetTerms) {
   const entry = getSynonymEntry(term);
@@ -446,6 +485,44 @@ const brokenResult = await generateLocalParaphrase({
 assert(brokenResult.text !== "they is ready. writing hard. need help", "Broken prose stayed unchanged");
 assert(!/\bthey\s+is\b/i.test(brokenResult.text), `Broken prose kept subject-verb disagreement: ${brokenResult.text}`);
 assert(/[.!?]$/.test(brokenResult.text), "Broken prose repair did not finish with punctuation");
+
+const finalizerRegressionCases = [
+  {
+    id: "meridiem",
+    original: "The system peak occurred at 3am and lead to alot of failed requests.",
+    candidate: "The system peak occurred at 3 a.m. and led to a lot of failed requests.",
+    expected: /3 a\.m\. and led/i,
+  },
+  {
+    id: "late-imperative",
+    original: "The meeting is moved to 3pm Thursday — same Zoom link https://example.com/meet/abc123, do not be late.",
+    candidate: "The meeting is moved to 3:00 pm Thursday — same Zoom link https://example.com/meet/abc123. Do not be late.",
+    expected: /Do not be late\.$/,
+  },
+  {
+    id: "version",
+    original: "Version 2.4.1 ships on 2026-03-15; see https://example.com/releases/v2.4.1 for notes.",
+    candidate: "Version 2.4.1 ships on 2026-03-15; see https://example.com/releases/v2.4.1 for notes.",
+    expected: /Version 2\.4\.1 ships/,
+  },
+  {
+    id: "adjective-clause",
+    original: "The seperate informations was recieved alot more later then we had hopped, alot was missing.",
+    candidate: "The separate information was received a lot more later than we had hoped, and a lot was missing.",
+    expected: /a lot was missing\.$/i,
+  },
+];
+for (const regressionCase of finalizerRegressionCases) {
+  const spans = extractProtectedSpans(regressionCase.original);
+  const finalized = finalizeDraft(regressionCase.candidate, regressionCase.original, spans, "personal", false);
+  assert(regressionCase.expected.test(finalized), `${regressionCase.id} finalizer regression: ${finalized}`);
+  assert(!/\b(?:be is|was are is)\b/i.test(finalized), `${regressionCase.id} introduced auxiliary duplication: ${finalized}`);
+  assert(validateProtectedContent(regressionCase.original, finalized, spans).safe, `${regressionCase.id} changed protected content: ${finalized}`);
+}
+assert(
+  extractProtectedSpans(finalizerRegressionCases[2].original).some((span) => span.text === "2.4.1"),
+  "Semantic version was not treated as one protected number"
+);
 const frameResult = rewriteText(
   "The manager asked me to follow up with the client.",
   {
@@ -983,6 +1060,58 @@ const sentenceRewriteResult = await generateLocalParaphrase({
 assert(sentenceRewriteResult.safe, "Sentence rewrite result was not safe");
 assert(sentenceRewriteResult.text !== sentenceRewriteInput, "Sentence rewrite did not change the selected sentence");
 assert((sentenceRewriteResult.text.match(/[.!?]/g) ?? []).length === 1, "Sentence rewrite changed sentence count");
+const highStructureInput = "Because the system is local, users can keep private drafts on the device. In some situations, being bored can help people think more creatively.";
+const highStructureOutput = restructureHighStrength(highStructureInput, 100);
+assert(
+  highStructureOutput === "Users can keep private drafts on the device because the system is local. Being bored can help people think more creatively in some situations.",
+  `High Rewrite amount did not restructure safe fronted clauses: ${highStructureOutput}`,
+);
+assert(
+  restructureHighStrength(highStructureInput, 56) === highStructureInput,
+  "Balanced Rewrite amount unexpectedly applied the high-strength structure pass",
+);
+const highNativeStructureOutput = restructureHighStrength(
+  "Boredom is often perceived as a negative experience. In certain contexts, it can foster creative thinking.",
+  100,
+);
+assert(
+  highNativeStructureOutput === "Boredom is often perceived as a negative experience. It can foster creative thinking in certain contexts.",
+  `High native candidate did not receive the bounded structural pass: ${highNativeStructureOutput}`,
+);
+const restoredQuantityOutput = repairQuantityScope(
+  "Most people avoid boredom.",
+  "Many individuals avoid boredom.",
+);
+assert(restoredQuantityOutput === "Most individuals avoid boredom.", `Native quantity repair did not restore most after a weakening drift: ${restoredQuantityOutput}`);
+assert(
+  repairQuantityScope("Most people avoid boredom.", "The majority of people avoid boredom.") === "The majority of people avoid boredom.",
+  "Native quantity repair overwrote an explicit majority equivalent",
+);
+const factualTimeInput = "Jordan Lee emailed the draft to review@example.org at 3:40 p.m. The subject line was 'Budget revision v2,' and the attachment was 2.8 MB.";
+const factualTimeSpans = extractProtectedSpans(factualTimeInput);
+const factualTimeSentences = splitSentences(factualTimeInput);
+assert(factualTimeSentences.length === 2, `Sentence splitter misread factual time anchors: ${factualTimeSentences.map((sentence) => sentence.text).join(" | ")}`);
+assert(factualTimeSentences[0]?.text.endsWith("3:40 p.m."), `Sentence splitter truncated a meridiem: ${factualTimeSentences[0]?.text ?? ""}`);
+assert(countSentences("The release is version 2.8.1. It is ready.") === 2, "Sentence splitter treated a decimal version as a sentence boundary");
+const factualTimeCandidate = "Jordan Lee sent the draft to review@example.org at 3:40 p.m. The subject line was \"Budget revision v2,\" and the attachment was 2.8 MB.";
+const factualTimeFinal = finalizeDraft(factualTimeCandidate, factualTimeInput, factualTimeSpans, "personal", false);
+assert(factualTimeFinal.startsWith("Jordan Lee sent the draft"), `Factual time finalizer dropped the sentence prefix: ${factualTimeFinal}`);
+assert(
+  factualTimeFinal.includes("review@example.org") && factualTimeFinal.includes("3:40 p.m.") && factualTimeFinal.includes("2.8 MB"),
+  `Factual time finalizer changed protected anchors: ${factualTimeFinal}`,
+);
+const factualTimeHigh = restructureHighStrength(factualTimeCandidate, 100, factualTimeSpans);
+assert(factualTimeHigh.startsWith("Jordan Lee sent the draft"), `High structure pass dropped factual prefix: ${factualTimeHigh}`);
+assert(
+  factualTimeHigh.includes("3:40 p.m.") && factualTimeHigh.includes("2.8 MB"),
+  `High structure pass changed factual time anchors: ${factualTimeHigh}`,
+);
+const protectedStructureOutput = restructureHighStrength(
+  "Because Pari is local, users can keep private drafts on the device.",
+  100,
+  [{ text: "Pari" }],
+);
+assert(protectedStructureOutput.includes("Pari"), "High-strength structure pass changed a protected span");
 const secondPassResult = await generateLocalParaphrase({
   originalText: (await generateLocalParaphrase({ originalText: modeProbeText, examples: [], memory: learnedMemory, strength: 76 })).text,
   examples: [],

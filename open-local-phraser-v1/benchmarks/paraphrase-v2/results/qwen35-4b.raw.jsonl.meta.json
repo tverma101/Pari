@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "pari-paraphrase-v2",
+  "generatedAt": "2026-09-09T00:50:19.758775+00:00",
+  "corpusPath": "/Users/tejas/Projects/Pari/open-local-phraser-v1/benchmarks/paraphrase-v2/corpus.json",
+  "corpusVersion": 2,
+  "caseCount": 72,
+  "productInstruction": "Rewrite the paragraph so it is clear, natural, and grammatically correct. Preserve the writer's meaning, facts, uncertainty, relationships between ideas, and overall voice. Do not invent details. Return only the rewritten paragraph.",
+  "engine": {
+    "name": "qwen35-4b-control",
+    "role": "benchmark-control",
+    "modelRepo": "mlx-community/Qwen3.5-4B-MLX-4bit",
+    "revision": "32f3e8ecf65426fc3306969496342d504bfa13f3",
+    "conversionRepo": null,
+    "conversionRevision": null,
+    "runtime": "mlx-lm",
+    "license": "apache-2.0",
+    "quantization": "mlx-4bit",
+    "modelPath": "/private/tmp/pari-v2-qwen35-4b-mlx-4bit",
+    "diskBytes": 3061136065,
+    "installedEvidence": false
+  },
+  "settings": {
+    "maxTokens": 256,
+    "temperature": 0.0,
+    "thinking": false
+  },
+  "hardware": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "arch": "arm64",
+    "macOS": "26.6.2",
+    "totalMemoryGiB": 16.0
+  },
+  "timing": {
+    "loadSeconds": 2.125,
+    "completedCases": 72,
+    "totalSeconds": 119.488,
+    "medianCaseSeconds": 1.685,
+    "peakMetalMemoryGiB": 2.52,
+    "peakProcessRssGiB": 1.862
+  }
+}

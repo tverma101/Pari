@@ -35,6 +35,33 @@ Priority order for quality decisions:
 
 Generic benchmark leadership is evidence to test a model, not evidence to promote it. MiniCPM5-2B currently has unusually strong small-model results and a much smaller footprint than the 4B control, but Pari must decide on its own paragraph-rewrite corpus.
 
+## Issue #11 benchmark checkpoint — 2026-09-08
+
+The standards-traced v2 benchmark is implemented and the feasible local
+comparison set has been exercised. The 72-case corpus, source trace, schema
+validator, MLX runner, Transformers/MPS seq2seq runner, raw/postprocessed
+scorer, blinded pairwise sheet, runtime receipts, and required-model status
+manifest are under `benchmarks/paraphrase-v2/`.
+
+Current automatic results are diagnostic only: Qwen3-4B scored 65/72 raw and
+65/72 after Pari finalization; Qwen3 best-of-four scored 69/72 as a raw
+research selection and 60/72 after the production-safe selector; Qwen3.5-4B
+scored 64/72 raw and 65/72 finalized; MiniCPM5-2B scored 21/72 raw and 24/72
+finalized; and CoEdIT-large scored 51/72 with 14 hard-safety failures. No
+candidate meets the promotion gates, so Qwen3 remains the incumbent.
+
+CoEdIT-XL loaded successfully for an MPS smoke test, but its 11.4 GB
+single-weight full-corpus run was **user-stopped** after 55/72 raw rows when
+memory pressure became unacceptable. Its partial JSONL is retained only for
+recoverable inspection/resume and is not scored. ADAL was rejected as an
+invalid NaN-containing checkpoint; DIPPER had no downloadable weights in the
+available snapshot; and Ling requires an unavailable `rapid-mlx` runtime.
+
+Issue #11 remains open for its formal human preference ratings, target-app
+installed-runtime evidence for the benchmark decision, and any future
+runtime-enabled candidate. The automatic report must not be used to claim
+QuillBot superiority or to promote a model.
+
 ## Recently completed quality work
 
 - ConCat-style synonym context and whole-sentence semantic reranking were added in `6602d84`.
@@ -44,14 +71,39 @@ Generic benchmark leadership is evidence to test a model, not evidence to promot
 - Native and deterministic finalization now repair the high-confidence
   note-style “is pending … status” noun stack without adding a cause, actor,
   or outcome; the native fixture and installed bundle cover this path.
+- Rewrite amount now uses a continuous 0–100 slider with debounced
+  regeneration for unedited drafts, while preserving manual output edits; the
+  installed UI and screenshot-paragraph native flow cover the interaction.
+- High/Deep Rewrite amounts now request paragraph-level sentence restructuring
+  from the native worker. The offline fallback also moves only bounded,
+  relationship-preserving fronted clauses or context phrases so high amount has
+  a structural effect without weakening the meaning gate.
 
 These items are implemented but still require target-Mac validation before they should be treated as fully proven.
 
 ## 2026-09-07 readiness checkpoint
 
-Pari is **not yet ready to claim a broadly reliable, QuillBot-class paraphraser**. The current local path is a strong safety-first prototype: Qwen3-4B scored 61/64 (95%) on the current automatic 64-case corpus, and the native worker, grammar gates, packaging, and installed native/missing-model/custom-mode checks pass. The raw score still has three fragment-category band-fit misses, and the automatic judge is not a substitute for human quality review.
+Pari is **not yet ready to claim a broadly reliable, QuillBot-class paraphraser**. The current local path is a strong safety-first prototype: Qwen3-4B scored 61/64 (95%) raw and 64/64 after Pari finalization on the original automatic 64-case corpus, and the native worker, grammar gates, packaging, and installed native/missing-model/custom-mode checks pass. The automatic judge is not a substitute for human quality review.
 
 This checkpoint added source-aware repairs for standalone causal, waiting, and note fragments, plus stricter anti-invention instructions and regression fixtures. A follow-up maintenance pass also normalizes a dense “pending … status” noun stack in both native and fallback finalization. Qwen3 remains the production incumbent; the refreshed raw-model run did not justify a promotion or a FreeLLMAPI default. Before calling the product ready, complete P0.1/P0.2/P0.4: save a blind human spot-check on real paragraphs, compare against the same default/conservative QuillBot inputs, and verify that Pari wins or ties on sense, meaning preservation, and grammar across a larger held-out set.
+
+The automatic challenger portion of P0.1 has now been exercised: temporary
+MiniCPM5-2B-MLX scored 43/64 raw and 51/64 after Pari finalization, while the
+retained Qwen3 path remains 64/64 after finalization. MiniCPM is therefore
+rejected for promotion on this corpus. P0.1 remains open for the required
+target-Mac memory/latency record and blind quality spot-check, and P0.2/P0.4
+still require human in-app synonym and QuillBot comparisons.
+
+The expanded 2026-09-07 frozen holdout contains 300 cases and is a harder
+automatic check than the original 64-case set. Qwen3 scored 222/300 raw and
+228/300 after the current Pari finalizer. A production-schedule best-of-four
+replay scored 236/300 when selected only against the normalized benchmark
+judge, but fell to 227/300 when the exact protected-content gate was required;
+that result is not a production promotion. The remaining hard failures are
+mostly strict negation/NLI rejections on typo-heavy repairs and identity or
+cautious outputs on vague/ambiguity cases. The product should keep failing
+closed on those safety boundaries until a better generator or a reviewed rule
+can improve them without weakening protection.
 
 ---
 

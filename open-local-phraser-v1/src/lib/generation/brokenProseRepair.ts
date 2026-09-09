@@ -1,4 +1,5 @@
 import { countWords } from "@/lib/nlp/tokenizer";
+import { repairPunctuationSpacing } from "@/lib/generation/punctuation";
 
 const TERMINAL_PUNCTUATION = /[.!?]["'”’)]?$/;
 
@@ -48,9 +49,12 @@ function lowerFirstCharacter(value: string): string {
 }
 
 function looseFragments(value: string): string[] {
-  return value
+  const meridiemMarker = "\uE200";
+  const maskedValue = value.replace(/\b([ap])\.m\./gi, (_match, marker: string) => `${marker}${meridiemMarker}m${meridiemMarker}`);
+  return maskedValue
     .split(/(?:[.!?]+\s*|\r?\n+)/)
     .map((part) => part.trim())
+    .map((part) => part.replace(new RegExp(meridiemMarker, "g"), "."))
     .filter(Boolean);
 }
 
@@ -218,7 +222,13 @@ function normalizeFragment(fragment: string, repairStandaloneNotes = false): str
       const normalizedSubject = /^(?:project|work|draft|plan|task|request)$/i.test(subject.trim()) ? `the ${subject.trim().toLowerCase()}` : subject.trim();
       return `${normalizedSubject} is not ${adjective}`;
     })
-    .replace(/^(.+?)\s+(hard|difficult|easy|important|unclear|missing|gone|ready|late|broken|obvious|unacceptable)$/i, (_match, subject: string, adjective: string) => {
+    .replace(/^(.+?)\s+(hard|difficult|easy|important|unclear|missing|gone|ready|late|broken|obvious|unacceptable)$/i, (match, subject: string, adjective: string) => {
+      // A complete clause such as “Do not be late” already has a verb. Treat
+      // only noun-like note fragments as subjectless adjective fragments;
+      // otherwise the scaffolding would create “be is late”.
+      if (/\b(?:am|is|are|was|were|be|been|being|has|have|had|do|does|did|can|could|may|might|must|shall|should|will|would)\b/i.test(subject)) {
+        return match;
+      }
       const verb = isPluralSubject(subject) ? "are" : "is";
       return `${subject.trim()} ${verb} ${adjective.toLowerCase()}`;
     })
@@ -382,7 +392,11 @@ function shouldJoinShortSentences(left: string, right: string): boolean {
 }
 
 function joinShortSentences(value: string): string {
-  const sentences = value.match(/[^.!?]+[.!?]?["'”’)]?/g)?.map((part) => part.trim()).filter(Boolean) ?? [value];
+  const meridiemMarker = "\uE200";
+  const maskedValue = value.replace(/\b([ap])\.m\./gi, (_match, marker: string) => `${marker}${meridiemMarker}m${meridiemMarker}`);
+  const sentences = maskedValue.match(/[^.!?]+[.!?]?["'”’)]?/g)
+    ?.map((part) => part.replace(new RegExp(meridiemMarker, "g"), ".").trim())
+    .filter(Boolean) ?? [value];
   const merged: string[] = [];
   for (const sentence of sentences) {
     const previous = merged.at(-1);
@@ -396,10 +410,7 @@ function joinShortSentences(value: string): string {
 }
 
 function sourceNeedsStructuralRepair(text: string): boolean {
-  const fragments = text
-    .split(/(?:[.!?]+\s*|\r?\n+)/)
-    .map((part) => part.trim())
-    .filter(Boolean);
+  const fragments = looseFragments(text);
   const shortFragments = fragments.filter((fragment) => countWords(fragment) <= 3).length;
   const totalWords = countWords(text);
   const denseFragmentation = shortFragments >= 2 && (
@@ -414,10 +425,7 @@ function sourceNeedsStructuralRepair(text: string): boolean {
 
 /** Recognize only high-confidence subjectless note fragments. */
 export function hasStandaloneNoteFragment(text: string): boolean {
-  const fragments = text
-    .split(/(?:[.!?]+\s*|\r?\n+)/)
-    .map((part) => part.trim())
-    .filter(Boolean);
+  const fragments = looseFragments(text);
   return fragments.some((fragment) =>
     /^(?:because\s+of|due\s+to)\s+[^,;:]+$/i.test(fragment) ||
     /^(?:still\s+)?waiting\s+(?:on|for)\s+.+$/i.test(fragment) ||
@@ -434,12 +442,13 @@ export function repairBrokenProse(
   const repairStandaloneNotes = hasStandaloneNoteFragment(originalText);
   const restored = withProtectedPlaceholders(text, protectedValues, (masked) => {
     const planned = planNoteStream(masked);
-    let repaired = planned ?? repairFragmentSequences(masked, originalText)
+    let repaired = planned ?? repairFragmentSequences(masked, originalText);
+    repaired = repaired
       .replace(/\r?\n+/g, " ")
       .replace(/[ \t]{2,}/g, " ")
       .replace(/\.{2,}/g, ".")
-      .replace(/\s+([,.;!?])/g, "$1")
-      .replace(/([,.;!?])(?=[A-Za-z])/g, "$1 ")
+      .replace(/\s+([,.;!?])/g, "$1");
+    repaired = repairPunctuationSpacing(repaired)
       .replace(/\b([A-Za-z]+)\s+\1\b/gi, "$1")
       .replace(/\b(?:require|requires)\s+fix\s+this\s+text\b/gi, "This text needs fixing")
       .replace(/\bno\s+grammar\b/gi, "the grammar needs work")
@@ -455,17 +464,14 @@ export function repairBrokenProse(
       .trim();
 
     repaired = repaired
-      .split(/(?<=[.!?])\s+|(?<=[.!?])(?=[A-Za-z])/)
+      .split(/(?<![ap]\.m\.)(?<=[.!?])\s+|(?<![ap]\.)(?<=[.!?])(?=[A-Za-z])/i)
       .map((fragment) => normalizeFragment(fragment, repairStandaloneNotes))
       .filter(Boolean)
       .join(". ");
 
     if (sourceNeedsStructuralRepair(originalText) && !planned) repaired = joinShortSentences(repaired);
 
-    repaired = repaired
-      .replace(/\s+([,.;!?])/g, "$1")
-      .replace(/([,.;!?])(?=[A-Za-z])/g, "$1 ")
-      .trim();
+    repaired = repairPunctuationSpacing(repaired.replace(/\s+([,.;!?])/g, "$1")).trim();
 
     if (repaired && !TERMINAL_PUNCTUATION.test(repaired)) repaired += ".";
     return repaired;
@@ -483,10 +489,7 @@ export function repairBrokenProse(
 
 export function looksLikeUnrepairedFragmentaryProse(text: string): boolean {
   if (hasStandaloneNoteFragment(text)) return true;
-  const fragments = text
-    .split(/(?:[.!?]+\s*|\r?\n+)/)
-    .map((part) => part.trim())
-    .filter(Boolean);
+  const fragments = looseFragments(text);
   return fragments.some((fragment) =>
     /^(?:need(?:\s+to)?|reason(?:s)?\s+unclear|ideas?\s+missing|deadline\s+missed|[A-Za-z][A-Za-z'-]*\s+(?:hard|difficult|missing|gone|unclear|ready|late|broken|unacceptable))\b/i.test(fragment)
   );

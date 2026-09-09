@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "pari-paraphrase-v2",
+  "generatedAt": "2026-09-09T00:56:47.807Z",
+  "corpus": {
+    "path": "/Users/tejas/Projects/Pari/open-local-phraser-v1/benchmarks/paraphrase-v2/corpus.json",
+    "version": 2,
+    "cases": 72
+  },
+  "automaticDiagnostics": [
+    {
+      "name": "original-reference",
+      "role": "no-rewrite-safety-reference",
+      "runtime": "none",
+      "license": "source text",
+      "modelRepo": null,
+      "revision": null,
+      "cases": 72,
+      "passRate": 0,
+      "meaningSafeRate": 1,
+      "englishQualityRate": 0,
+      "automaticDiagnosticIndex": 39.74,
+      "hardSafetyFailures": 0,
+      "medianSeconds": 0,
+      "peakMemoryGiB": 0.042,
+      "diskBytes": null,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "local-safe-engine",
+      "role": "deterministic-safety-reference",
+      "runtime": "Pari TypeScript local-safe engine",
+      "license": "project code; see repository license",
+      "modelRepo": null,
+      "revision": null,
+      "cases": 72,
+      "passRate": 0.306,
+      "meaningSafeRate": 1,
+      "englishQualityRate": 0.306,
+      "automaticDiagnosticIndex": 56.44,
+      "hardSafetyFailures": 0,
+      "medianSeconds": 0.003,
+      "peakMemoryGiB": 0.168,
+      "diskBytes": null,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "qwen3-4b-incumbent",
+      "role": "production-incumbent",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "cases": 72,
+      "passRate": 0.903,
+      "meaningSafeRate": 0.944,
+      "englishQualityRate": 0.958,
+      "automaticDiagnosticIndex": 89.31,
+      "hardSafetyFailures": 4,
+      "medianSeconds": 1.45,
+      "peakMemoryGiB": 2.258,
+      "diskBytes": 2153299755,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "qwen3-4b-incumbent-pari-boundary",
+      "role": "production-incumbent",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "cases": 72,
+      "passRate": 0.889,
+      "meaningSafeRate": 0.931,
+      "englishQualityRate": 0.944,
+      "automaticDiagnosticIndex": 88.03,
+      "hardSafetyFailures": 5,
+      "medianSeconds": 1.45,
+      "peakMemoryGiB": 2.258,
+      "diskBytes": 2153299755,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "qwen35-4b-control",
+      "role": "benchmark-control",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "mlx-community/Qwen3.5-4B-MLX-4bit",
+      "revision": "32f3e8ecf65426fc3306969496342d504bfa13f3",
+      "cases": 72,
+      "passRate": 0.889,
+      "meaningSafeRate": 0.889,
+      "englishQualityRate": 1,
+      "automaticDiagnosticIndex": 88.04,
+      "hardSafetyFailures": 8,
+      "medianSeconds": 1.685,
+      "peakMemoryGiB": 2.52,
+      "diskBytes": 3061136065,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "minicpm5-2b",
+      "role": "challenger",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "openbmb/MiniCPM5-2B-MLX",
+      "revision": "014e7591ff4b1b6330cda7f45803b27f46288261",
+      "cases": 72,
+      "passRate": 0.292,
+      "meaningSafeRate": 0.986,
+      "englishQualityRate": 0.306,
+      "automaticDiagnosticIndex": 55.89,
+      "hardSafetyFailures": 1,
+      "medianSeconds": 0.868,
+      "peakMemoryGiB": 1.536,
+      "diskBytes": 1426232184,
+      "installedEvidence": false,
+      "complete": true
+    }
+  ],
+  "pareto": [
+    {
+      "name": "original-reference",
+      "role": "no-rewrite-safety-reference",
+      "runtime": "none",
+      "license": "source text",
+      "modelRepo": null,
+      "revision": null,
+      "cases": 72,
+      "passRate": 0,
+      "meaningSafeRate": 1,
+      "englishQualityRate": 0,
+      "automaticDiagnosticIndex": 39.74,
+      "hardSafetyFailures": 0,
+      "medianSeconds": 0,
+      "peakMemoryGiB": 0.042,
+      "diskBytes": null,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": true
+    },
+    {
+      "name": "local-safe-engine",
+      "role": "deterministic-safety-reference",
+      "runtime": "Pari TypeScript local-safe engine",
+      "license": "project code; see repository license",
+      "modelRepo": null,
+      "revision": null,
+      "cases": 72,
+      "passRate": 0.306,
+      "meaningSafeRate": 1,
+      "englishQualityRate": 0.306,
+      "automaticDiagnosticIndex": 56.44,
+      "hardSafetyFailures": 0,
+      "medianSeconds": 0.003,
+      "peakMemoryGiB": 0.168,
+      "diskBytes": null,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": true
+    },
+    {
+      "name": "qwen3-4b-incumbent",
+      "role": "production-incumbent",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "cases": 72,
+      "passRate": 0.903,
+      "meaningSafeRate": 0.944,
+      "englishQualityRate": 0.958,
+      "automaticDiagnosticIndex": 89.31,
+      "hardSafetyFailures": 4,
+      "medianSeconds": 1.45,
+      "peakMemoryGiB": 2.258,
+      "diskBytes": 2153299755,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": true
+    },
+    {
+      "name": "qwen3-4b-incumbent-pari-boundary",
+      "role": "production-incumbent",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "cases": 72,
+      "passRate": 0.889,
+      "meaningSafeRate": 0.931,
+      "englishQualityRate": 0.944,
+      "automaticDiagnosticIndex": 88.03,
+      "hardSafetyFailures": 5,
+      "medianSeconds": 1.45,
+      "peakMemoryGiB": 2.258,
+      "diskBytes": 2153299755,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": false
+    },
+    {
+      "name": "qwen35-4b-control",
+      "role": "benchmark-control",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "mlx-community/Qwen3.5-4B-MLX-4bit",
+      "revision": "32f3e8ecf65426fc3306969496342d504bfa13f3",
+      "cases": 72,
+      "passRate": 0.889,
+      "meaningSafeRate": 0.889,
+      "englishQualityRate": 1,
+      "automaticDiagnosticIndex": 88.04,
+      "hardSafetyFailures": 8,
+      "medianSeconds": 1.685,
+      "peakMemoryGiB": 2.52,
+      "diskBytes": 3061136065,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": false
+    },
+    {
+      "name": "minicpm5-2b",
+      "role": "challenger",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "openbmb/MiniCPM5-2B-MLX",
+      "revision": "014e7591ff4b1b6330cda7f45803b27f46288261",
+      "cases": 72,
+      "passRate": 0.292,
+      "meaningSafeRate": 0.986,
+      "englishQualityRate": 0.306,
+      "automaticDiagnosticIndex": 55.89,
+      "hardSafetyFailures": 1,
+      "medianSeconds": 0.868,
+      "peakMemoryGiB": 1.536,
+      "diskBytes": 1426232184,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": false
+    }
+  ],
+  "humanRatings": {
+    "supplied": false,
+    "rows": 0,
+    "byEngine": {
+      "original-reference": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "local-safe-engine": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "qwen3-4b-incumbent": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "qwen3-4b-incumbent-pari-boundary": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "qwen35-4b-control": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "minicpm5-2b": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      }
+    },
+    "winner": null
+  },
+  "decision": {
+    "humanQualityWinner": null,
+    "automaticDiagnosticLeader": "qwen3-4b-incumbent",
+    "shippableLeader": null,
+    "promotionDecision": "not decided by automatic diagnostics; production promotion requires the issue's safety, meaning, human preference, and installed-runtime gates"
+  }
+}

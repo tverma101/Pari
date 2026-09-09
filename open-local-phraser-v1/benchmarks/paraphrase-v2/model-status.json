@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "pari-paraphrase-v2",
+  "lastVerified": "2026-09-08",
+  "models": [
+    {
+      "name": "qwen3-4b-incumbent",
+      "repo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "status": "benchmarked",
+      "v2": "65/72 raw; 65/72 Pari-finalized",
+      "oldSuite": "59/64",
+      "note": "Current production incumbent; no promotion change."
+    },
+    {
+      "name": "qwen3-4b-incumbent-bestof4",
+      "repo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "status": "benchmarked",
+      "v2": "69/72 raw research selection; 60/72 production-safe selection",
+      "note": "Best-of-four is an automatic experiment, not the installed production ranker."
+    },
+    {
+      "name": "qwen35-4b-control",
+      "repo": "mlx-community/Qwen3.5-4B-MLX-4bit",
+      "revision": "32f3e8ecf65426fc3306969496342d504bfa13f3",
+      "status": "benchmarked",
+      "v2": "64/72 raw; 65/72 Pari-finalized",
+      "oldSuite": "61/64",
+      "note": "Benchmark control only; not promoted."
+    },
+    {
+      "name": "minicpm5-2b",
+      "repo": "openbmb/MiniCPM5-2B-MLX",
+      "revision": "014e7591ff4b1b6330cda7f45803b27f46288261",
+      "status": "benchmarked",
+      "v2": "21/72 raw; 24/72 Pari-finalized",
+      "oldSuite": "43/64",
+      "note": "Rejected for promotion on this corpus because quality and gate acceptance declined."
+    },
+    {
+      "name": "coedit-large-research",
+      "repo": "grammarly/coedit-large",
+      "revision": "5637bcdf9d8d4419f97c8cfea36f7d35c79232b6",
+      "status": "benchmarked",
+      "v2": "51/72 raw and Pari-finalized",
+      "note": "Research-only reference; official checkpoint is CC-BY-NC-4.0."
+    },
+    {
+      "name": "coedit-xl-research",
+      "repo": "grammarly/coedit-xl",
+      "revision": "be7d1aeebbaa0e5c6b97dcf110dd4ba22096d3cf",
+      "status": "user-stopped",
+      "v2": "55/72 raw rows written; not scored",
+      "note": "11.4 GB single-safetensor checkpoint loaded and passed one-paragraph MPS smoke; user stopped the full run before completion."
+    },
+    {
+      "name": "adal-paraphraser-large",
+      "repo": "Shushant/adal-paraphraser-large",
+      "revision": "828faaeec56bd2b1365535c0fd6a7c4415cf407f",
+      "status": "invalid-checkpoint",
+      "v2": "not run",
+      "note": "Downloaded safetensor contains non-finite NaN values in encoder/decoder tensors; generation is not a valid comparison."
+    },
+    {
+      "name": "dipper-paraphraser-xxl",
+      "repo": "fahmid/dipper-paraphraser-xxl",
+      "revision": "c3afe16e3f40c299e99b05d023a3ad928e11bcd2",
+      "status": "unavailable",
+      "v2": "not run",
+      "note": "Unauthenticated Hub snapshot exposed only README/handler files and no model weights."
+    },
+    {
+      "name": "ling-3.0-tiny",
+      "repo": "rapid-mlx/Ling-3.0-tiny-MLX-4bit",
+      "revision": "328a497f3eb2cdd3d064f1da2b1084a2791387d5",
+      "status": "unavailable",
+      "v2": "not run",
+      "note": "Pinned conversion requires rapid-mlx; that runtime is not installed, and upstream mlx-lm does not support the bailing_hybrid architecture."
+    }
+  ]
+}

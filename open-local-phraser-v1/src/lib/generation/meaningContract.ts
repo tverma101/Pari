@@ -16,7 +16,10 @@ const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no|without|cannot|can
 const MODALITY_RE = /\b(?:may|might|could|can|must|should|will|would|shall)\b/gi;
 // “More” and “less” are excluded because they are frequently ordinary
 // comparatives (for example, “read more smoothly”), not quantity claims.
-const QUANTITY_RE = /\b(?:a\s+number\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|any|enough)\b/gi;
+// “Certain” commonly replaces “some” in a natural rewrite without changing
+// the open-ended subset being described. Keep it in the same contract class
+// so a good native draft is not discarded merely for choosing that wording.
+const QUANTITY_RE = /\b(?:a\s+number\s+of|a\s+majority\s+of|the\s+majority\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|certain|any|enough)\b/gi;
 const RELATION_RE = /\b(?:due\s+to\s+the\s+fact\s+that|notwithstanding\s+the\s+fact\s+that|in\s+the\s+event\s+that|for\s+unspecified\s+reasons|because|since|although|though|even\s+though|if|unless|when|while|therefore|thus|so|however|but|yet|as\s+a\s+result)\b/gi;
 // Expletive “it” is not a writer perspective marker. Keeping it out avoids
 // rejecting a direct repair such as “It is important to note that …” -> “Several …”.
@@ -49,8 +52,14 @@ function quantityClass(value: string): string {
   if (/^(?:all|every|each|both|only)$/.test(value)) return "bounded-total";
   if (/^(?:none|neither)$/.test(value)) return "none";
   if (/^(?:few|little|less)$/.test(value)) return "small";
-  if (/^(?:most|many|several)$/.test(value)) return "large";
-  if (/^(?:some|any|enough)$/.test(value)) return "open";
+  if (/^(?:most|a majority of|the majority of)$/.test(value)) return "majority";
+  // “A number of,” “many,” and “several” are intentionally kept in the same
+  // broad plural class: the deterministic engine and native model commonly
+  // use these as ordinary paraphrases for an unspecified large group. The
+  // majority claim above is stricter because “most” carries a clear >50%
+  // entailment that “many” and “several” do not.
+  if (/^(?:many|several)$/.test(value)) return "large";
+  if (/^(?:some|certain|any|enough)$/.test(value)) return "open";
   return value;
 }
 

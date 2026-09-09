@@ -41,6 +41,69 @@ Keep both numbers: a postprocessed score measures the product boundary, while
 the raw score remains the fair comparison of generator quality. Neither score
 is a substitute for a held-out human comparison.
 
+## Best-of-N candidate experiments
+
+`run_candidates.py` keeps the model loaded while generating multiple drafts;
+`select-best.mjs` applies the evaluator to every draft and can require the
+production protected-content gate before choosing a winner. The default
+schedule preserves the older greedy-first experiment. To mirror the
+production Qwen3 schedule on the frozen 300-case corpus, run:
+
+```bash
+python benchmarks/llm-shootout/run_candidates.py \
+  "/path/to/Qwen3-4B-MLX-4bit" \
+  /tmp/pari-qwen3-frozen-candidates.jsonl \
+  --corpus benchmarks/quillbot/corpus.frozen.json \
+  --temperatures 0.24,0.46,0.68,0.9 --top-p 0.86 --max-tokens 220
+
+node benchmarks/llm-shootout/select-best.mjs \
+  /tmp/pari-qwen3-frozen-candidates.jsonl \
+  /tmp/pari-qwen3-frozen-winners.jsonl \
+  --corpus benchmarks/quillbot/corpus.frozen.json \
+  --production-postprocess --production-safety
+
+node benchmarks/eval/run-eval.mjs \
+  --corpus benchmarks/quillbot/corpus.frozen.json \
+  --outputs /tmp/pari-qwen3-frozen-winners.jsonl
+```
+
+The selector is an automatic research aid, not a replacement for the
+production TypeScript ranker or a human/QuillBot comparison.
+
+## Encoder-decoder research runner
+
+T5-family editing checkpoints are not direct `mlx-lm` models. Use
+`run_seq2seq.py` with the local Transformers/MPS runtime so the raw output,
+task prefix, revision, license, model size, peak memory, and timing receipt
+are preserved:
+
+```bash
+python benchmarks/llm-shootout/run_seq2seq.py \
+  /path/to/coedit-large \
+  benchmarks/paraphrase-v2/results/coedit-large.raw.jsonl \
+  --corpus benchmarks/paraphrase-v2/corpus.json \
+  --prompt-prefix 'Paraphrase this:' \
+  --model-repo grammarly/coedit-large \
+  --model-revision '<pinned-commit>' \
+  --license cc-by-nc-4.0 \
+  --role research-reference \
+  --engine-name coedit-large-research
+```
+
+This runner is for reproducible research comparisons only; the official
+CoEdIT checkpoint is non-commercial and cannot be promoted into the shipped
+Pari bundle without a separate licensing decision.
+
+The 2026-09-07 frozen-corpus replay recorded 222/300 raw and 228/300 after
+Pari finalization for the deterministic Qwen3 incumbent. The production-like
+best-of-four replay produced 236/300 under the normalized benchmark judge,
+but 227/300 after requiring exact protected-content preservation; it was not a
+production promotion. The retained artifacts are
+[`raw Qwen3 output`](qwen3-4b-corpus-frozen-20260907.jsonl),
+[`best-of-four candidates`](qwen3-4b-corpus-frozen-bestof4-candidates-20260907.jsonl),
+[`safe winners`](qwen3-4b-corpus-frozen-bestof4-winners-safe-20260907.jsonl),
+and the corresponding reports under [`../eval/`](../eval/).
+
 ## OpenAI-compatible local runner
 
 Use `run_openai_compatible.py` for local runtimes that expose `/v1/chat/completions` but are not yet supported by Pari's direct `mlx-lm` path.
@@ -62,12 +125,13 @@ node benchmarks/eval/run-eval.mjs --outputs /tmp/pari-gemma431.jsonl
 ```
 
 Use `--offset` and `--limit` for bounded availability probes and preserve the
-raw JSONL before scoring. On 2026-09-07 the full 64-case FreeLLMAPI comparison
-selected `gemma-4-31b` over `llama-3.3-70b-fp8-fast`: Gemma scored 57/64 with
-two hard-gate failures and a 0.51-second median; Llama scored 59/64 with three
-hard-gate failures and a 0.62-second median. These automatic scores are
-selection evidence only; the production app still applies its own gates and
-falls back closed.
+raw JSONL before scoring. In the latest 2026-09-07 full 64-case FreeLLMAPI
+comparison, `gemma-4-31b` scored 59/64 raw and 59/64 after Pari finalization;
+`gpt-oss-120b` scored 50/64 in both views and exposed control-text/empty-style
+responses. An earlier provider snapshot recorded Gemma at 57/64 versus
+`llama-3.3-70b-fp8-fast` at 59/64, so dated captures should not be treated as
+stable provider guarantees. These automatic scores are selection evidence
+only; the production app still applies its own gates and falls back closed.
 
 ## MiniCPM5-2B candidate
 
@@ -87,6 +151,14 @@ Why it is a high-priority test:
 - substantially smaller weight footprint than the 4B benchmark control.
 
 Those generic results do **not** establish that MiniCPM is the better Pari paraphraser. The exact test is MiniCPM5-2B vs Qwen3.5-4B vs the production Qwen3-4B backend on the frozen Pari corpus, with reasoning/thinking disabled for the normal rewrite path unless separately justified.
+
+The 2026-09-07 temporary MLX run completed all 64 MiniCPM5-2B cases. It scored
+43/64 raw and 51/64 after Pari finalization, below the retained Qwen3 product
+boundary of 64/64 after finalization, so it was not promoted or installed.
+The replay and both score reports are committed as
+[`minicpm5-2b-mlx-outputs-20260907.jsonl`](minicpm5-2b-mlx-outputs-20260907.jsonl),
+[`raw results`](../eval/results-minicpm5-2b-mlx-outputs-20260907.jsonl.json),
+and [`Pari-finalized results`](../eval/results-minicpm5-2b-mlx-outputs-20260907.jsonl_pari-postprocess.json).
 
 Save raw outputs/candidates before changing the production backend. Promotion requires zero new hard safety regressions, comparable-or-better coherence/meaning preservation, and either a product-quality win or a meaningful memory/latency win at comparable quality.
 

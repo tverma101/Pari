@@ -1,0 +1,2038 @@
+{
+  "engine": "qwen35-4b-old.raw.jsonl",
+  "generatedAt": "2026-09-09T00:56:02.591Z",
+  "postprocessedByPari": false,
+  "byCategory": {
+    "broken_words": {
+      "total": 8,
+      "passed": 8
+    },
+    "fragment": {
+      "total": 8,
+      "passed": 6
+    },
+    "vague": {
+      "total": 8,
+      "passed": 8
+    },
+    "run_on": {
+      "total": 8,
+      "passed": 8
+    },
+    "word_salad": {
+      "total": 8,
+      "passed": 7
+    },
+    "tense_agreement": {
+      "total": 8,
+      "passed": 8
+    },
+    "register_shift": {
+      "total": 8,
+      "passed": 8
+    },
+    "canary": {
+      "total": 8,
+      "passed": 8
+    }
+  },
+  "overall": {
+    "passed": 61,
+    "total": 64
+  },
+  "results": [
+    {
+      "id": "bw-01",
+      "category": "broken_words",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.993; reverse deberta label=entailment id=1 score=0.990; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=3.39 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.634,
+        "grammarGain": 0,
+        "englishQualityScore": 0.907,
+        "fluencyScore": 0.847,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.229,
+        "contentOverlap": 0.333,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "I don't know what happened, but it looked like the meeting went badly."
+    },
+    {
+      "id": "bw-02",
+      "category": "broken_words",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=neutral id=2 score=0.996; reverse deberta label=entailment id=1 score=0.965; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=47.59 tokens=10",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.928,
+        "grammarGain": 0,
+        "englishQualityScore": 0.598,
+        "fluencyScore": 0.517,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.458,
+        "contentOverlap": 0.429,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "I cannot make it tomorrow because something came up. Sorry."
+    },
+    {
+      "id": "bw-03",
+      "category": "broken_words",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.991; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=5.37 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.986,
+        "grammarGain": 0,
+        "englishQualityScore": 0.873,
+        "fluencyScore": 0.79,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.164,
+        "contentOverlap": 0.4,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "I will definitely be there at 8; do not worry about the rest."
+    },
+    {
+      "id": "bw-04",
+      "category": "broken_words",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.990; reverse deberta label=entailment id=1 score=0.985; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=21.76 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.61,
+        "grammarGain": 23.08,
+        "englishQualityScore": 0.768,
+        "fluencyScore": 0.615,
+        "errorsInPer100": 23.08,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.195,
+        "contentOverlap": 0.429,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The package arrived yesterday but was damaged, so I called customer service."
+    },
+    {
+      "id": "bw-05",
+      "category": "broken_words",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.968; reverse deberta label=entailment id=1 score=0.974; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=17.91 tokens=10",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "englishQualityScore": 0.779,
+        "fluencyScore": 0.639,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.213,
+        "contentOverlap": 0.6,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "We should have left earlier because the traffic was terrible."
+    },
+    {
+      "id": "bw-06",
+      "category": "broken_words",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=8.49 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.983,
+        "grammarGain": 0,
+        "englishQualityScore": 0.839,
+        "fluencyScore": 0.733,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.299,
+        "contentOverlap": 0.5,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "He has been working on the report all night, and it is almost done."
+    },
+    {
+      "id": "bw-07",
+      "category": "broken_words",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.991; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=5.91 tokens=9",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.652,
+        "grammarGain": 0,
+        "englishQualityScore": 0.866,
+        "fluencyScore": 0.778,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.149,
+        "contentOverlap": 0.5,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "I appreciate your help a lot with this project."
+    },
+    {
+      "id": "bw-08",
+      "category": "broken_words",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=neutral id=2 score=0.852; reverse deberta label=neutral id=2 score=0.397; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=7.12 tokens=10",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.844,
+        "grammarGain": 0,
+        "englishQualityScore": 0.741,
+        "fluencyScore": 0.755,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.125,
+        "contentOverlap": 0.571,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "They did not tell me anything about the schedule change."
+    },
+    {
+      "id": "fr-01",
+      "category": "fragment",
+      "passed": false,
+      "meaningSafe": false,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.844; reverse deberta label=entailment id=1 score=0.988; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=53.54 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.959,
+        "grammarGain": 0,
+        "englishQualityScore": 0.68,
+        "fluencyScore": 0.502,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.395,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [
+        "anchorSafe"
+      ],
+      "missingAnchors": [
+        "Maybe Friday"
+      ],
+      "clauseWellFormedIssues": [],
+      "output": "Not sure yet, but maybe Friday; if that works, otherwise sometime next week."
+    },
+    {
+      "id": "fr-02",
+      "category": "fragment",
+      "passed": false,
+      "meaningSafe": true,
+      "englishQuality": false,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.987; reverse deberta label=entailment id=1 score=0.987; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=137.49 tokens=5",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "englishQualityScore": 0.629,
+        "fluencyScore": 0.385,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Because of the deadline situation."
+    },
+    {
+      "id": "fr-03",
+      "category": "fragment",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.972; reverse deberta label=entailment id=1 score=0.992; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=19.65 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.946,
+        "grammarGain": 0,
+        "englishQualityScore": 0.773,
+        "fluencyScore": 0.628,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.387,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Honestly, this is the best pizza in town. There is no contest."
+    },
+    {
+      "id": "fr-04",
+      "category": "fragment",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=61.64 tokens=10",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.963,
+        "grammarGain": 0,
+        "englishQualityScore": 0.69,
+        "fluencyScore": 0.485,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.13,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "This explains the delay and the extra cost, sort of."
+    },
+    {
+      "id": "fr-05",
+      "category": "fragment",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.987; reverse deberta label=entailment id=1 score=0.989; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=14.63 tokens=11",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.95,
+        "grammarGain": 0,
+        "englishQualityScore": 0.797,
+        "fluencyScore": 0.665,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.053,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "A difficult conversation that nobody wanted to have, especially on Monday."
+    },
+    {
+      "id": "fr-06",
+      "category": "fragment",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.973; reverse deberta label=entailment id=1 score=0.990; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=241.83 tokens=8",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.966,
+        "grammarGain": 0,
+        "englishQualityScore": 0.585,
+        "fluencyScore": 0.314,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.08,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Still waiting on the numbers from finance, again."
+    },
+    {
+      "id": "fr-07",
+      "category": "fragment",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.986; reverse deberta label=entailment id=1 score=0.987; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=145.87 tokens=8",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.985,
+        "grammarGain": 0,
+        "englishQualityScore": 0.624,
+        "fluencyScore": 0.377,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.049,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "If the weather holds, which it might not."
+    },
+    {
+      "id": "fr-08",
+      "category": "fragment",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=neutral id=2 score=0.806; reverse deberta label=entailment id=1 score=0.982; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=9.79 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.896,
+        "grammarGain": 0,
+        "englishQualityScore": 0.717,
+        "fluencyScore": 0.715,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.427,
+        "contentOverlap": 0.857,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 2,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "I have no idea where the file went; it is probably on the shared drive, though I am not certain."
+    },
+    {
+      "id": "vg-01",
+      "category": "vague",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=10.45 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.902,
+        "grammarGain": 5.88,
+        "englishQualityScore": 0.823,
+        "fluencyScore": 0.707,
+        "errorsInPer100": 5.88,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.114,
+        "contentOverlap": 0.889,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The thing with the guy from before didn't really go the way I wanted it to go, honestly."
+    },
+    {
+      "id": "vg-02",
+      "category": "vague",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.989; reverse deberta label=entailment id=1 score=0.988; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=4.12 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.868,
+        "grammarGain": 0,
+        "englishQualityScore": 0.892,
+        "fluencyScore": 0.823,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.087,
+        "contentOverlap": 0.875,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "We should do something about the matter soon before it becomes a bigger problem."
+    },
+    {
+      "id": "vg-03",
+      "category": "vague",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.994; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=5.24 tokens=10",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.965,
+        "grammarGain": 0,
+        "englishQualityScore": 0.875,
+        "fluencyScore": 0.793,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.115,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "So, basically, the whole thing fell apart because of reasons."
+    },
+    {
+      "id": "vg-04",
+      "category": "vague",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.991; reverse deberta label=entailment id=1 score=0.992; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=13.73 tokens=9",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.902,
+        "grammarGain": 0,
+        "englishQualityScore": 0.802,
+        "fluencyScore": 0.673,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.068,
+        "contentOverlap": 0.8,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "You were right about the thing with the guy."
+    },
+    {
+      "id": "vg-05",
+      "category": "vague",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.993; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=12.59 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.976,
+        "grammarGain": 0,
+        "englishQualityScore": 0.809,
+        "fluencyScore": 0.683,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.041,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "That situation last week was not great, and we need to handle it somehow."
+    },
+    {
+      "id": "vg-06",
+      "category": "vague",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.990; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=7.28 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.85,
+        "grammarGain": 0,
+        "englishQualityScore": 0.85,
+        "fluencyScore": 0.752,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.41,
+        "contentOverlap": 0.333,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The meeting went well, though some issues arose, and we will see what happens."
+    },
+    {
+      "id": "vg-07",
+      "category": "vague",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.992; reverse deberta label=entailment id=1 score=0.987; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=4.90 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.985,
+        "grammarGain": 0,
+        "englishQualityScore": 0.88,
+        "fluencyScore": 0.801,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.033,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "There are concerns about how things are being handled lately, and people are saying things."
+    },
+    {
+      "id": "vg-08",
+      "category": "vague",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.994; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=6.85 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.97,
+        "grammarGain": 0,
+        "englishQualityScore": 0.855,
+        "fluencyScore": 0.76,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.044,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "It kinda worked out in the end, even though there were some issues along the way, sort of."
+    },
+    {
+      "id": "ro-01",
+      "category": "run_on",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=7.10 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.949,
+        "grammarGain": 0,
+        "englishQualityScore": 0.852,
+        "fluencyScore": 0.755,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.23,
+        "contentOverlap": 0.923,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "I woke up late, missed the bus, forgot my laptop, and the meeting started without me, with nobody telling me anything."
+    },
+    {
+      "id": "ro-02",
+      "category": "run_on",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=32.47 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.962,
+        "grammarGain": 0,
+        "englishQualityScore": 0.738,
+        "fluencyScore": 0.565,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.099,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "We met the team, the deadline was missed, nobody said anything, and it kept happening."
+    },
+    {
+      "id": "ro-03",
+      "category": "run_on",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=6.93 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.983,
+        "grammarGain": 0,
+        "englishQualityScore": 0.854,
+        "fluencyScore": 0.758,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.157,
+        "contentOverlap": 1,
+        "distinctBigram": 0.917,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The report was due on Friday; I sent it on Saturday, my manager noticed it on Monday, and the client heard about it on Tuesday."
+    },
+    {
+      "id": "ro-04",
+      "category": "run_on",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=140.91 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.979,
+        "grammarGain": 0,
+        "englishQualityScore": 0.628,
+        "fluencyScore": 0.381,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.069,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "She finished the slides, he ordered the food, we booked the room, everyone arrived early, and the demo still failed."
+    },
+    {
+      "id": "ro-05",
+      "category": "run_on",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=26.44 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.948,
+        "grammarGain": 0,
+        "englishQualityScore": 0.754,
+        "fluencyScore": 0.591,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.151,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "I called support twice; I was put on hold both times. The issue is still open, and nobody has followed up."
+    },
+    {
+      "id": "ro-06",
+      "category": "run_on",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.985; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=32.47 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.98,
+        "grammarGain": 0,
+        "englishQualityScore": 0.738,
+        "fluencyScore": 0.565,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.133,
+        "contentOverlap": 0.818,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The course covers grammar and style; there are weekly assignments, and the final project is a portfolio."
+    },
+    {
+      "id": "ro-07",
+      "category": "run_on",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.993; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=8.44 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.971,
+        "grammarGain": 0,
+        "englishQualityScore": 0.839,
+        "fluencyScore": 0.733,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.049,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "First, we draft the outline; then, we split the sections; after that, we merge everything; and finally, someone proofreads the whole document."
+    },
+    {
+      "id": "ro-08",
+      "category": "run_on",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.994; reverse deberta label=entailment id=1 score=0.992; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=43.11 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.98,
+        "grammarGain": 0,
+        "englishQualityScore": 0.717,
+        "fluencyScore": 0.53,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.054,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The app runs offline, so your notes never leave the laptop; updates are optional, and support is by email only."
+    },
+    {
+      "id": "ws-01",
+      "category": "word_salad",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.994; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=39.79 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.94,
+        "grammarGain": 0,
+        "englishQualityScore": 0.723,
+        "fluencyScore": 0.54,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.518,
+        "contentOverlap": 0.6,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The deadline was moved because the client's late feedback caused the project delay."
+    },
+    {
+      "id": "ws-02",
+      "category": "word_salad",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.978; reverse deberta label=entailment id=1 score=0.794; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=157.06 tokens=8",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.989,
+        "grammarGain": 0,
+        "englishQualityScore": 0.618,
+        "fluencyScore": 0.368,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.096,
+        "contentOverlap": 0.857,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The decision implementation progress review is pending completion."
+    },
+    {
+      "id": "ws-03",
+      "category": "word_salad",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.992; reverse deberta label=neutral id=2 score=0.928; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=44.19 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.855,
+        "grammarGain": 0,
+        "englishQualityScore": 0.715,
+        "fluencyScore": 0.526,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.613,
+        "contentOverlap": 0.6,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "A schedule conflict exists regarding the double booking of the meeting room."
+    },
+    {
+      "id": "ws-04",
+      "category": "word_salad",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.811; reverse deberta label=entailment id=1 score=0.811; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=4842.63 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "englishQualityScore": 0.374,
+        "fluencyScore": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.022,
+        "contentOverlap": 0.833,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Budget approval pending status update email thread reply waiting manager response needed."
+    },
+    {
+      "id": "ws-05",
+      "category": "word_salad",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.989; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=113.77 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.995,
+        "grammarGain": 0,
+        "englishQualityScore": 0.644,
+        "fluencyScore": 0.408,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.097,
+        "contentOverlap": 0.8,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The data analysis results interpretation confusion team discussion clarification requirement has been identified."
+    },
+    {
+      "id": "ws-06",
+      "category": "word_salad",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.824; reverse deberta label=entailment id=1 score=0.864; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=136.79 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.929,
+        "grammarGain": 0,
+        "englishQualityScore": 0.607,
+        "fluencyScore": 0.385,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.392,
+        "contentOverlap": 0.75,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Client presentation feedback was negative; a second revision was requested, and the scope change implication remains pending."
+    },
+    {
+      "id": "ws-07",
+      "category": "word_salad",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.956; reverse deberta label=entailment id=1 score=0.982; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=64.72 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.946,
+        "grammarGain": 0,
+        "englishQualityScore": 0.681,
+        "fluencyScore": 0.479,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.117,
+        "contentOverlap": 0.909,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Training session attendance is low. Participation improvement plan creation and responsibility assignment are completed."
+    },
+    {
+      "id": "ws-08",
+      "category": "word_salad",
+      "passed": false,
+      "meaningSafe": false,
+      "englishQuality": true,
+      "nliReason": "nli=quantity/quantifier mismatch; bidir source-to-candidate deberta label=entailment id=1 score=0.989; reverse deberta label=entailment id=1 score=0.989; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=61.29 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.812,
+        "grammarGain": 0,
+        "englishQualityScore": 0,
+        "fluencyScore": 0.486,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.312,
+        "contentOverlap": 0.75,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [
+        "negationSafe",
+        "nliContradictionFree"
+      ],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The system migration downtime window is scheduled for the weekend. Notification, user communication, preparation, and checklist finalization are all ongoing."
+    },
+    {
+      "id": "ta-01",
+      "category": "tense_agreement",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.994; reverse deberta label=entailment id=1 score=0.996; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=4.97 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.909,
+        "grammarGain": 0,
+        "englishQualityScore": 0.879,
+        "fluencyScore": 0.799,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.23,
+        "contentOverlap": 0.667,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Last week she said she would call me back, but she never did."
+    },
+    {
+      "id": "ta-02",
+      "category": "tense_agreement",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=6.53 tokens=11",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.979,
+        "grammarGain": 0,
+        "englishQualityScore": 0.859,
+        "fluencyScore": 0.765,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.105,
+        "contentOverlap": 0.833,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The results were not good, and nobody was happy about it."
+    },
+    {
+      "id": "ta-03",
+      "category": "tense_agreement",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.994; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=88.40 tokens=10",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.973,
+        "grammarGain": 0,
+        "englishQualityScore": 0.663,
+        "fluencyScore": 0.44,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.089,
+        "contentOverlap": 0.857,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Yesterday, they announced the new policy, and everyone complained immediately."
+    },
+    {
+      "id": "ta-04",
+      "category": "tense_agreement",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=7.80 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.986,
+        "grammarGain": 16.67,
+        "englishQualityScore": 0.845,
+        "fluencyScore": 0.743,
+        "errorsInPer100": 16.67,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.091,
+        "contentOverlap": 0.6,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "He doesn't think the numbers are right, but she believes they are."
+    },
+    {
+      "id": "ta-05",
+      "category": "tense_agreement",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=41.75 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.992,
+        "grammarGain": 7.69,
+        "englishQualityScore": 0.719,
+        "fluencyScore": 0.534,
+        "errorsInPer100": 7.69,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.063,
+        "contentOverlap": 0.833,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "We were planning to ship on time, but the bug keeps delaying us."
+    },
+    {
+      "id": "ta-06",
+      "category": "tense_agreement",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.972; reverse deberta label=entailment id=1 score=0.987; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=3.84 tokens=10",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.928,
+        "grammarGain": 0,
+        "englishQualityScore": 0.895,
+        "fluencyScore": 0.832,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.133,
+        "contentOverlap": 0.833,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "When I arrived, she had already left without saying goodbye."
+    },
+    {
+      "id": "ta-07",
+      "category": "tense_agreement",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.996; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=21.25 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.984,
+        "grammarGain": 0,
+        "englishQualityScore": 0.77,
+        "fluencyScore": 0.618,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.154,
+        "contentOverlap": 0.875,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The team has finished their part, but the vendor has not yet delivered theirs."
+    },
+    {
+      "id": "ta-08",
+      "category": "tense_agreement",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.996; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=2.77 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.97,
+        "grammarGain": 8.33,
+        "englishQualityScore": 0.923,
+        "fluencyScore": 0.872,
+        "errorsInPer100": 8.33,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.169,
+        "contentOverlap": 0.857,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Next month, we will launch the feature we have been working on since January."
+    },
+    {
+      "id": "rs-01",
+      "category": "register_shift",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.858; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=24.05 tokens=11",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.882,
+        "grammarGain": 0,
+        "englishQualityScore": 0.761,
+        "fluencyScore": 0.602,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.591,
+        "contentOverlap": 0.6,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The results came back and were mostly fine, though somewhat mixed."
+    },
+    {
+      "id": "rs-02",
+      "category": "register_shift",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.994; reverse deberta label=entailment id=1 score=0.994; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=319.91 tokens=9",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.908,
+        "grammarGain": 0,
+        "englishQualityScore": 0.567,
+        "fluencyScore": 0.279,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.089,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Kinda over it, tbh, like, why bother anymore?"
+    },
+    {
+      "id": "rs-03",
+      "category": "register_shift",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.990; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=38.22 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.923,
+        "grammarGain": 0,
+        "englishQualityScore": 0.726,
+        "fluencyScore": 0.545,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.205,
+        "contentOverlap": 0.727,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "lol, the demo crashed again, classic. Anyway, I'm sure it will be fixed eventually."
+    },
+    {
+      "id": "rs-04",
+      "category": "register_shift",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.994; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=12.40 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.879,
+        "grammarGain": 0,
+        "englishQualityScore": 0.811,
+        "fluencyScore": 0.685,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.214,
+        "contentOverlap": 0.667,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The onboarding was confusing and took me about three hours to figure out the basics."
+    },
+    {
+      "id": "rs-05",
+      "category": "register_shift",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.985; reverse deberta label=entailment id=1 score=0.983; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=8.53 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.845,
+        "grammarGain": 12.5,
+        "englishQualityScore": 0.837,
+        "fluencyScore": 0.732,
+        "errorsInPer100": 12.5,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.248,
+        "contentOverlap": 0.636,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 2,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Okay, so the thing is we can't really afford the upgrade right now; maybe next quarter, I don't know."
+    },
+    {
+      "id": "rs-06",
+      "category": "register_shift",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.996; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=14.92 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.966,
+        "grammarGain": 0,
+        "englishQualityScore": 0.797,
+        "fluencyScore": 0.662,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.198,
+        "contentOverlap": 0.818,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "To be honest, the whole process feels somewhat rigged, like why do we even fill out these forms?"
+    },
+    {
+      "id": "rs-07",
+      "category": "register_shift",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.995; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=56.06 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.971,
+        "grammarGain": 0,
+        "englishQualityScore": 0.697,
+        "fluencyScore": 0.497,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.105,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Yeah, the update bricked my laptop, lol. I spent all night fixing it. Super fun times."
+    },
+    {
+      "id": "rs-08",
+      "category": "register_shift",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.996; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=44.54 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.975,
+        "grammarGain": 11.76,
+        "englishQualityScore": 0.715,
+        "fluencyScore": 0.525,
+        "errorsInPer100": 11.76,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.141,
+        "contentOverlap": 0.667,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "IMO, the proposal is solid, but the budget part is a bit sketchy; we should double-check it."
+    },
+    {
+      "id": "cn-01",
+      "category": "canary",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": false,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.996; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=10.45 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.997,
+        "grammarGain": 0,
+        "englishQualityScore": 0.823,
+        "fluencyScore": 0.707,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.014,
+        "contentOverlap": 1,
+        "distinctBigram": 0.923,
+        "negationCuesIn": 2,
+        "negationCuesOut": 2,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "I never said the report was wrong; I said the numbers were not final."
+    },
+    {
+      "id": "cn-02",
+      "category": "canary",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": false,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.981; reverse deberta label=entailment id=1 score=0.981; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=1186.96 tokens=9",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.998,
+        "grammarGain": 0,
+        "englishQualityScore": 0.466,
+        "fluencyScore": 0.115,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.014,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Send the 42.5% summary to Maya Chen by 2026-08-25, or call +1-555-0142."
+    },
+    {
+      "id": "cn-03",
+      "category": "canary",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": false,
+      "nliReason": "nli=format-equivalent override; invented number 50; bidir source-to-candidate deberta label=entailment id=1 score=0.994; reverse deberta label=entailment id=1 score=0.995; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=35.16 tokens=8",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.978,
+        "grammarGain": 0,
+        "englishQualityScore": 0.732,
+        "fluencyScore": 0.555,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.019,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "The doctor prescribed 50 mg twice daily after meals."
+    },
+    {
+      "id": "cn-04",
+      "category": "canary",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.992; reverse deberta label=entailment id=1 score=0.987; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=7.57 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.925,
+        "grammarGain": 0,
+        "englishQualityScore": 0.847,
+        "fluencyScore": 0.747,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.23,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Payment is due within 30 days of invoice receipt; otherwise, service will be suspended."
+    },
+    {
+      "id": "cn-05",
+      "category": "canary",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": true,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.994; reverse deberta label=entailment id=1 score=0.994; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=4.85 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 0.995,
+        "grammarGain": 0,
+        "englishQualityScore": 0.881,
+        "fluencyScore": 0.803,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.027,
+        "contentOverlap": 0.875,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "I don't think we should ignore this feedback, even if it is hard to hear."
+    },
+    {
+      "id": "cn-06",
+      "category": "canary",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": false,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.992; reverse deberta label=entailment id=1 score=0.992; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=13.78 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "englishQualityScore": 0.802,
+        "fluencyScore": 0.672,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 2,
+        "negationCuesOut": 2,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Neither the manager nor the team lead approved the refund of $1,240.50."
+    },
+    {
+      "id": "cn-07",
+      "category": "canary",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": false,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.990; reverse deberta label=entailment id=1 score=0.990; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=238.68 tokens=12",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "englishQualityScore": 0.588,
+        "fluencyScore": 0.316,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Do not share the draft outside the company until legal signs off on 12 August."
+    },
+    {
+      "id": "cn-08",
+      "category": "canary",
+      "passed": true,
+      "meaningSafe": true,
+      "englishQuality": false,
+      "nliReason": "nli=bidir source-to-candidate deberta label=entailment id=1 score=0.989; reverse deberta label=entailment id=1 score=0.989; fluency=Xenova/distilbert-base-uncased masked-lm pseudo-ppl=10.45 tokens=9",
+      "learnedJudge": {
+        "learned": true,
+        "nli": true,
+        "fluency": true
+      },
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "englishQualityScore": 0.823,
+        "fluencyScore": 0.707,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 2,
+        "negationCuesOut": 2,
+        "clauseIssues": []
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "clauseWellFormedIssues": [],
+      "output": "Without the permit, construction cannot legally begin before March 2027."
+    }
+  ]
+}

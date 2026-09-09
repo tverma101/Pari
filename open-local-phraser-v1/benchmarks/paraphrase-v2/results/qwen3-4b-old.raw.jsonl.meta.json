@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "pari-model-runner",
+  "generatedAt": "2026-09-09T00:52:48.441664+00:00",
+  "corpusPath": "/Users/tejas/Projects/Pari/open-local-phraser-v1/benchmarks/eval/corpus.json",
+  "corpusVersion": 1,
+  "caseCount": 64,
+  "productInstruction": null,
+  "engine": {
+    "name": "qwen3-4b-incumbent-old-suite",
+    "role": "production-incumbent",
+    "modelRepo": "Qwen/Qwen3-4B-MLX-4bit",
+    "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+    "conversionRepo": null,
+    "conversionRevision": null,
+    "runtime": "mlx-lm",
+    "license": "apache-2.0",
+    "quantization": "mlx-4bit",
+    "modelPath": "/Users/tejas/Library/Application Support/Open Local Phraser/Models/native-models/Qwen/Qwen3-4B-MLX-4bit",
+    "diskBytes": 2153299755,
+    "installedEvidence": false
+  },
+  "settings": {
+    "maxTokens": 220,
+    "temperature": 0.0,
+    "thinking": false
+  },
+  "hardware": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "arch": "arm64",
+    "macOS": "26.6.2",
+    "totalMemoryGiB": 16.0
+  },
+  "timing": {
+    "loadSeconds": 1.336,
+    "completedCases": 64,
+    "totalSeconds": 81.454,
+    "medianCaseSeconds": 1.207,
+    "peakMetalMemoryGiB": 2.395,
+    "peakProcessRssGiB": 1.823
+  }
+}

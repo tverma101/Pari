@@ -56,7 +56,18 @@ const PROTECTED_PATTERNS: Array<{
     pattern: /\b(?:\d{1,4}[-/]\d{1,2}[-/]\d{1,4}|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:,\s*\d{4})?)\b/gi,
     priority: 78,
   },
-  { kind: "time", pattern: /\b\d{1,2}:\d{2}(?:\s?[AP]M)?\b/gi, priority: 78 },
+  // Treat semantic versions as one protected number. Protecting only each
+  // decimal component lets sentence repair split `2.4.1` at its periods.
+  {
+    kind: "number",
+    pattern: /\b\d+(?:\.\d+){2,}(?:[-+][A-Za-z0-9.-]+)?\b/gi,
+    priority: 74,
+  },
+  // Keep the meridiem marker with its clock time during sentence-level
+  // repairs. Treating the periods in `p.m.`/`a.m.` as sentence punctuation
+  // can drop the beginning of a factual sentence when the shared splitter is
+  // used by a quantity or structural repair.
+  { kind: "time", pattern: /\b\d{1,2}:\d{2}(?:\s?[AP]M)?\b|\b[AP]\.M\.(?=\s|$|[),.;:!?])/gi, priority: 78 },
   {
     kind: "number",
     pattern: /\b\d[\d,]*(?:\.\d+)?(?:\s?(?:kg|g|lb|lbs|km|mi|MB|GB|ms|s|hours?|minutes?|years?))?\b/gi,

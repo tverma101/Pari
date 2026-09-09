@@ -12,7 +12,7 @@ Pari is a local-first paraphrasing tool with shared Personal and Warmth styles. 
 - `Discard`, copy, abandoned drafts, and failed approvals save and learn nothing.
 - Generation requests can be cancelled, and stale requests cannot replace newer output.
 - Personal keeps the writer's voice warm, clear, and explanatory. Warmth makes robotic, cynical, or unnecessarily cold wording noticeably more human while preserving honest negative facts and the writer's intent. Both styles use the same learned approval memory and grammar/protection gates.
-- The four-level Rewrite amount control bounds how much wording changes without exposing technical ranking controls.
+- The continuous 0–100 Rewrite amount control bounds how much wording changes without exposing technical ranking controls. On an unedited draft, changing it regenerates the draft after a short debounce; manual edits are preserved until the user presses Paraphrase.
 - The packaged macOS app includes standard Edit and Window menus, native Command-C/V/X/A shortcuts, Undo/Redo, and an NSPasteboard bridge for the in-app Copy and Paste actions.
 
 ## Local persistence
@@ -125,20 +125,29 @@ npm run build:desktop
 npm run qa:installed:freellm
 ```
 
-The selected FreeLLMAPI model is `gemma-4-31b`. On 2026-09-07 it passed 57/64
-cases (89%) on the frozen Pari corpus with two hard-gate failures, versus
-Llama 3.3 70B at 59/64 (92%) with three hard-gate failures. Gemma was selected
-for the lower meaning/safety failure count and a 0.51-second median response in
-the 64-case run; this is a measured FreeLLM candidate choice, not a claim that
-the remote model beats the local Qwen3 incumbent or QuillBot. The benchmark
-also quarantined GPT-OSS for visible reasoning/truncation, Qwen3.6 for visible
-thinking plus a provider token-rate cap, and listed models that returned
-provider-side 404/502/503 responses. Free-tier availability and provider
-limits are live service state; confirm them in the [FreeLLMAPI model catalog](https://freellmapi.co/models) before changing the configured model.
+The selected FreeLLMAPI model is `gemma-4-31b`. In the latest 2026-09-07
+64-case rerun it scored 59/64 (92%) both raw and after Pari finalization;
+`gpt-oss-120b` scored 50/64 (78%) and exposed control-text/empty-style
+responses, so it was rejected. An earlier provider snapshot recorded Gemma at
+57/64 and Llama 3.3 70B at 59/64; those results are retained as dated research
+evidence because free-provider routing can change. Gemma remains an optional
+remote candidate, not a claim that FreeLLM beats the local Qwen3 incumbent or
+QuillBot. The benchmark also quarantined Qwen3.6 for visible thinking plus a
+provider token-rate cap, and listed models that returned provider-side
+404/502/503 responses. Free-tier availability and provider limits are live
+service state; confirm them in the [FreeLLMAPI model catalog](https://freellmapi.co/models) before changing the configured model.
+
+The expanded frozen 300-case holdout is the stronger current automatic check:
+Qwen3 scored 222/300 raw and 228/300 after the real Pari finalizer. A
+production-schedule best-of-four replay with the exact protected-content gate
+scored 227/300, so candidate sampling did not justify changing the default.
+These are engineering signals, not human-quality or QuillBot-parity claims;
+the held-out results and raw replays live under
+[`benchmarks/llm-shootout/`](benchmarks/llm-shootout/).
 
 Pari also ships a separate local agent style backend. Run `npm run backend:styles` or `./script/build_and_run.sh --agent-style-backend` to start only the loopback API; it prints an ephemeral `127.0.0.1` URL, persists validated custom styles to `~/Library/Application Support/Open Local Phraser/custom-styles.json`, and exits after ten minutes without activity. Set `PARI_AGENT_STYLE_IDLE_TIMEOUT_SECONDS=60` for a shorter session. This mode does not create a WebKit window or change the visible app's rewrite behavior. The API supports `GET /health`, `GET /v1/styles`, `POST /v1/styles`, `PATCH /v1/styles/:id`, `DELETE /v1/styles/:id`, and `POST /v1/shutdown`. A style body contains `name`, `description`, `instructions`, `baseMode` (`personal` or `warmth`), `strength` (0–100), and optional bounded `tweaks` (`strengthOffset` -24…24, `warmthPolish`, and `preserveSentenceCount`). Saved styles appear as custom modes in Pari on the next load/focus refresh. Every custom mode routes through the same shared protection, grammar, flow, native-model, critic, fallback, and approval-learning engine; custom instructions and tweaks only add bounded preferences. `npm run qa:agent:styles` verifies headless startup, CRUD persistence, validation boundaries, and idle shutdown against the packaged binary. `npm run qa:installed:custom` additionally creates an agent style, launches the installed app headlessly, connects the separately stored model, selects that saved mode, and verifies native MLX generation plus the existing UI probes before cleaning it up.
 
-The rewrite quality gates also check sentence-flow preservation, known-to-new information order, parallel verb series (including conservative repair of simple mixed gerund lists), vague sentence openings, safe concision of padded phrases, protected spans, approval-only learning, model control-text echoes, duplicate punctuation, note-fragment repair, direct-English filler removal, collocations/verb frames, broad plural-noun and determiner-led sentence-boundary agreement, and a conservative meaning contract for negation, modality, quantity, discourse relationships, and point of view. High-severity hard grammar defects are never accepted in a generated candidate, even when the source already contains a defect of the same class. A rejected native draft receives one stricter local critic/repair pass before the deterministic fallback is used. These checks follow established revision guidance on sentence clarity and purposeful variety from [Purdue OWL](https://owl.purdue.edu/owl/graduate_writing/introduction_to_writing/documents/revising-and-editing/sentence-clarity-transcript.pdf) and cohesion/parallel structure from the [George Mason University Writing Center](https://writingcenter.gmu.edu/writing-resources/grammar-style/improving-cohesion-the-known-new-contract).
+The rewrite quality gates also check sentence-flow preservation, known-to-new information order, parallel verb series (including conservative repair of simple mixed gerund lists), vague sentence openings, safe concision of padded phrases, protected spans, approval-only learning, model control-text echoes, duplicate punctuation, note-fragment repair, direct-English filler removal, collocations/verb frames, broad plural-noun and determiner-led sentence-boundary agreement, and a conservative meaning contract for negation, modality, quantity, discourse relationships, and point of view. High/Deep amounts additionally ask the native generator for paragraph-level sentence restructuring; the offline fallback applies only bounded fronted-clause/context moves that preserve the relationship markers. High-severity hard grammar defects are never accepted in a generated candidate, even when the source already contains a defect of the same class. A rejected native draft receives one stricter local critic/repair pass before the deterministic fallback is used. These checks follow established revision guidance on sentence clarity and purposeful variety from [Purdue OWL](https://owl.purdue.edu/owl/graduate_writing/introduction_to_writing/documents/revising-and-editing/sentence-clarity-transcript.pdf) and cohesion/parallel structure from the [George Mason University Writing Center](https://writingcenter.gmu.edu/writing-resources/grammar-style/improving-cohesion-the-known-new-contract).
 
 `research:grammar:download` fetches four pinned, license-tracked development snapshots in parallel: Harper for rule research alongside the bundled `harper.js` runtime, LanguageTool for broad rule coverage research, GECToR for edit-tagging correction research, and UD English EWT for held-out grammar-flow evaluation. They live under `research/grammar-sources/`, do not receive user text, and the research snapshots are not themselves bundled into the app. See [`research/quality-roadmap.md`](research/quality-roadmap.md) and [`research/grammar-sources/README.md`](research/grammar-sources/README.md) for the 80/20 quality plan and shipping constraints.
 

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "pari-paraphrase-v2",
+  "generatedAt": "2026-09-09T00:39:34.616956+00:00",
+  "corpusPath": "/Users/tejas/Projects/Pari/open-local-phraser-v1/benchmarks/paraphrase-v2/corpus.json",
+  "corpusVersion": 2,
+  "caseCount": 72,
+  "productInstruction": "Rewrite the paragraph so it is clear, natural, and grammatically correct. Preserve the writer's meaning, facts, uncertainty, relationships between ideas, and overall voice. Do not invent details. Return only the rewritten paragraph.",
+  "engine": {
+    "name": "qwen3-4b-incumbent",
+    "role": "production-incumbent",
+    "modelRepo": "Qwen/Qwen3-4B-MLX-4bit",
+    "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+    "conversionRepo": null,
+    "conversionRevision": null,
+    "runtime": "mlx-lm",
+    "license": "apache-2.0",
+    "quantization": "mlx-4bit",
+    "modelPath": "/Users/tejas/Library/Application Support/Open Local Phraser/Models/native-models/Qwen/Qwen3-4B-MLX-4bit",
+    "diskBytes": 2153299755,
+    "installedEvidence": false
+  },
+  "settings": {
+    "maxTokens": 256,
+    "temperature": 0.0,
+    "thinking": false
+  },
+  "hardware": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "arch": "arm64",
+    "macOS": "26.6.2",
+    "totalMemoryGiB": 16.0
+  },
+  "timing": {
+    "loadSeconds": 1.045,
+    "completedCases": 72,
+    "totalSeconds": 103.819,
+    "medianCaseSeconds": 1.45,
+    "peakMetalMemoryGiB": 2.258,
+    "peakProcessRssGiB": 0.878
+  }
+}

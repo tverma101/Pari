@@ -113,6 +113,14 @@ def build_instruction(request: dict[str, Any]) -> str:
         if strength < 42
         else "Make a balanced wording change while keeping the original voice and detail."
     )
+    structure_guidance = (
+        "At this high Rewrite amount, make a deep structural paraphrase: rebuild sentence openings, clause order, and grammatical framing across the paragraph instead of merely replacing isolated words. Recast at least one substantial clause in each intact sentence when natural, while keeping the same sentence count, every proposition, and every cause, contrast, condition, and time relationship explicit. Keep the result natural and readable; do not make it artificially formal."
+        if strength >= 82
+        else
+        "At this Rewrite amount, vary sentence openings and clause framing across the paragraph when natural. Use more than isolated synonym substitutions while preserving the source sentence count, propositions, and relationships."
+        if strength >= 69
+        else ""
+    )
 
     protected_block = protected_text or "None detected; still preserve all names, numbers, links, dates, and quoted text."
     repair_block = (
@@ -136,12 +144,14 @@ Rules:
 - Keep the same number of sentences unless the source is genuinely broken or fragmentary. When the source has fragments, missing punctuation, bad capitalization, repeated words, or broken grammar, rebuild it into complete, grammatical sentences while preserving every recoverable fact; do not invent information.
 - Improve sentence flow, cohesion, parallel structure, punctuation, and ordinary English grammar. Prefer clear, natural wording over thesaurus substitutions.
 - Keep the subject and the writer's point of view. Do not turn first person into a generic statement.
+- Keep every quantity word's scope and strength exactly. In particular, do not turn “most” into “many”, “some” into “few”, or “all” into “many” just to make the wording different.
 - If the source is terse or fragmentary, connect the ideas into a readable paragraph instead of preserving choppy three-word fragments.
 - Make vague wording clearer only with facts already present; never invent a person, cause, amount, event, or outcome.
 - A standalone fragment beginning with “Because of …” or “Due to …” must become a complete sentence that names only that stated cause (for example, “The cause was …”); a standalone “Waiting …” fragment must keep its original object without inventing who is waiting.
 - When a dense noun stack ends with “is pending … status,” make it grammatical by putting the stated status first (for example, “The completion status of the implementation review is pending”); preserve every stated noun and do not add a cause or outcome.
 - {repair_block}
 - {variation}
+- {structure_guidance}
 - {custom_block}
 {style_context_block}
 - Protected spans that must appear exactly in the result: {protected_block}
@@ -209,6 +219,47 @@ def _lower_sentence_start(value: str) -> str:
     if not value or re.match(r"I(?:\b|')", value):
         return value
     return value[:1].lower() + value[1:]
+
+
+def _repair_punctuation_spacing(value: str) -> str:
+    """Keep standard meridiem abbreviations intact during repair passes."""
+    value = re.sub(r"\b([ap])\.\s*m\.?", lambda match: f"{match.group(1).lower()}.m.", value, flags=re.IGNORECASE)
+
+    def spacing(match: re.Match[str]) -> str:
+        punctuation = match.group(1)
+        before = value[:match.start() + 1]
+        after = value[match.end():]
+        if punctuation == "." and re.search(r"(?:^|\s)(?:a|p)\.$", before, flags=re.IGNORECASE) and re.match(r"\s*m(?:\b|[.\s])", after, flags=re.IGNORECASE):
+            return punctuation
+        return f"{punctuation} "
+
+    return re.sub(r"([,.;!?])(?=[A-Za-z])", spacing, value)
+
+
+def _capitalize_sentence_starts(value: str) -> str:
+    def capitalize(match: re.Match[str]) -> str:
+        before = value[:match.start() + 1]
+        if re.search(r"\b(?:a|p)\.m\.$", before, flags=re.IGNORECASE):
+            return match.group(0)
+        return f"{match.group(1)}{match.group(2).upper()}"
+
+    return re.sub(r"(^|[.!?]\s+)([a-z])", capitalize, value)
+
+
+def _split_repair_fragments(value: str) -> list[str]:
+    """Split repair fragments while treating `a.m.`/`p.m.` as one token."""
+    marker = "\ue200"
+    masked = re.sub(
+        r"\b([ap])\.m\.",
+        lambda match: f"{match.group(1)}{marker}m{marker}",
+        value,
+        flags=re.IGNORECASE,
+    )
+    return [
+        part.replace(marker, ".").strip()
+        for part in re.split(r"(?:[.!?]+\s*|\r?\n+)", masked)
+        if part.strip()
+    ]
 
 
 def _normalize_note_action(action: str, issue: str | None = None) -> str | None:
@@ -361,7 +412,7 @@ def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
     protected = [str(span).strip() for span in request.get("protected_spans", []) if str(span).strip()]
     original_text = str(request.get("original_text", ""))
     repair_standalone_notes = has_standalone_note_fragment(original_text)
-    original_fragments = [part.strip() for part in re.split(r"(?:[.!?]+\s*|\r?\n+)", original_text) if part.strip()]
+    original_fragments = _split_repair_fragments(original_text)
     masked = value
     for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
         masked = masked.replace(span, f"\ue000{index}\ue001")
@@ -406,7 +457,15 @@ def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
         item = re.sub(r"^(.+?)\s+performance\s+unacceptable$", r"The \1's performance is unacceptable", item, flags=re.IGNORECASE)
         item = re.sub(r"^meeting\s+(today|tomorrow)\s+with\s+(.+)$", r"The meeting with \2 is \1", item, flags=re.IGNORECASE)
         item = re.sub(r"^(.+?)\s+not\s+(finished|ready|clear|complete)$", r"\1 is not \2", item, flags=re.IGNORECASE)
-        item = re.sub(r"^(.+?)\s+(hard|difficult|easy|important|unclear|missing|gone|ready|late|broken|obvious|unacceptable)$", lambda match: f"{match.group(1).strip()} {'are' if plural_subject(match.group(1)) else 'is'} {match.group(2).lower()}", item, flags=re.IGNORECASE)
+        def adjective_fragment(match: re.Match[str]) -> str:
+            subject = match.group(1)
+            # A complete clause such as “Do not be late” already has a verb;
+            # only noun-like note fragments should receive a new copula.
+            if re.search(r"\b(?:am|is|are|was|were|be|been|being|has|have|had|do|does|did|can|could|may|might|must|shall|should|will|would)\b", subject, flags=re.IGNORECASE):
+                return match.group(0)
+            return f"{subject.strip()} {'are' if plural_subject(subject) else 'is'} {match.group(2).lower()}"
+
+        item = re.sub(r"^(.+?)\s+(hard|difficult|easy|important|unclear|missing|gone|ready|late|broken|obvious|unacceptable)$", adjective_fragment, item, flags=re.IGNORECASE)
         item = re.sub(r"^need\s+to\s+(.+)$", r"I need to \1", item, flags=re.IGNORECASE)
         def normalize_need(match: re.Match[str]) -> str:
             remainder = match.group(1)
@@ -416,7 +475,7 @@ def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
         item = re.sub(r"^send\s+update\b", "Send an update", item, flags=re.IGNORECASE)
         return item[:1].upper() + item[1:]
 
-    fragments_before_normalize = [part.strip() for part in re.split(r"(?:[.!?]+\s*|\r?\n+)", masked) if part.strip()]
+    fragments_before_normalize = _split_repair_fragments(masked)
     source_has_honest_best = (
         any(re.match(r"^honestly[?!]?$", part, flags=re.IGNORECASE) for part in original_fragments)
         and any(re.match(r"^best\s+.+$", part, flags=re.IGNORECASE) for part in original_fragments)
@@ -478,7 +537,7 @@ def repair_fragmentary_prose(value: str, request: dict[str, Any]) -> str:
     masked = re.sub(r"\bteam\s+say\b", "the team says", masked, flags=re.IGNORECASE)
     masked = re.sub(r"\bmanager\s+want\b", "the manager wants", masked, flags=re.IGNORECASE)
     masked = re.sub(r"\bthe manager wants answer\b", "the manager wants an answer", masked, flags=re.IGNORECASE)
-    fragments = [part.strip() for part in re.split(r"(?<=[.!?])\s+|(?<=[.!?])(?=[A-Za-z])", masked) if part.strip()]
+    fragments = _split_repair_fragments(masked)
     repaired = ". ".join(normalize(fragment).rstrip(".!?") for fragment in fragments)
     repaired = re.sub(r"\s+([,.;!?])", r"\1", repaired).strip()
     if repaired and not re.search(r"[.!?][\"'”’)]?$", repaired):
@@ -601,12 +660,12 @@ def repair_direct_english(value: str, request: dict[str, Any]) -> str:
     )
     masked = re.sub(r"\s{2,}", " ", masked)
     masked = re.sub(r"\s+([,.;!?])", r"\1", masked)
-    masked = re.sub(r"([,.;!?])(?=[A-Za-z])", r"\1 ", masked).strip()
+    masked = _repair_punctuation_spacing(masked).strip()
 
     repaired = masked
     for index, span in enumerate(sorted(set(protected), key=len, reverse=True)):
         repaired = repaired.replace(f"\ue000{index}\ue001", span)
-    repaired = re.sub(r"(^|[.!?]\s+)([a-z])", lambda match: f"{match.group(1)}{match.group(2).upper()}", repaired)
+    repaired = _capitalize_sentence_starts(repaired)
     return repaired
 
 
@@ -843,8 +902,8 @@ def repair_english_grammar(value: str, request: dict[str, Any]) -> str:
 
     masked = re.sub(r"\b(a|an)\s+([A-Za-z][A-Za-z'-]*)\b", article, masked, flags=re.IGNORECASE)
     masked = re.sub(r"\s+([,.;!?])", r"\1", masked)
-    masked = re.sub(r"([,.;!?])(?=[A-Za-z])", r"\1 ", masked)
-    masked = re.sub(r"(^|[.!?]\s+)([a-z])", lambda match: f"{match.group(1)}{match.group(2).upper()}", masked)
+    masked = _repair_punctuation_spacing(masked)
+    masked = _capitalize_sentence_starts(masked)
     masked = re.sub(r"\s{2,}", " ", masked).strip()
 
     for index, span in enumerate(ordered_protected):

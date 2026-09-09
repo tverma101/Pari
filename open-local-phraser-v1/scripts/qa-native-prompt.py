@@ -52,6 +52,25 @@ assert_true("usually approves sentence lengths that are similar" in prompt, "Sen
 assert_true("never invent a person, cause, amount, event, or outcome" in prompt, "Native prompt lacks the anti-invention constraint")
 assert_true("A standalone fragment beginning with “Because of …”" in prompt, "Native prompt lacks standalone-fragment guidance")
 
+deep_prompt = MODULE.build_instruction({
+    "original_text": "Although the schedule was tight, the team completed the review because everyone shared the work.",
+    "mode": "personal",
+    "strength": 90,
+    "protected_spans": [],
+})
+assert_true("deep structural paraphrase" in deep_prompt, "High Rewrite amount lacks deep structural guidance")
+assert_true("sentence openings, clause order, and grammatical framing" in deep_prompt, "High Rewrite amount lacks sentence and clause restructuring guidance")
+assert_true("instead of merely replacing isolated words" in deep_prompt, "High Rewrite amount still permits synonym-only rewriting")
+assert_true("same sentence count" in deep_prompt, "High Rewrite amount dropped the sentence-count safeguard")
+
+balanced_prompt = MODULE.build_instruction({
+    "original_text": "The local editor helps writers review drafts.",
+    "mode": "personal",
+    "strength": 56,
+    "protected_spans": [],
+})
+assert_true("deep structural paraphrase" not in balanced_prompt, "Balanced Rewrite amount received deep-only structural guidance")
+
 empty_prompt = MODULE.build_instruction({"original_text": "A local draft.", "style_context": {}})
 assert_true("Learned local style context:" not in empty_prompt, "Empty approval context added an unnecessary prompt block")
 

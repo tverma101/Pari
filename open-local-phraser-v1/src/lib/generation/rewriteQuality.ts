@@ -120,7 +120,9 @@ function maskProtectedFragments(text: string, protectedSpans: ProtectedSpan[]): 
 
 function punctuationSpacingIssues(text: string, protectedSpans: ProtectedSpan[]): RewriteQualityIssue[] {
   const maskedText = maskProtectedFragments(text, protectedSpans);
-  const punctuationPattern = /\s+[,.;!?]|[,.;!?](?=[A-Za-z])/g;
+  // A period inside the standard "a.m."/"p.m." abbreviation is not a
+  // sentence boundary and should not be reported as malformed spacing.
+  const punctuationPattern = /\s+[,.;!?]|[,;!?](?=[A-Za-z])|(?<!\b[ap])\.(?=[A-Za-z])/gi;
   if (punctuationPattern.test(maskedText)) {
     return [{
       id: "punctuation-spacing",

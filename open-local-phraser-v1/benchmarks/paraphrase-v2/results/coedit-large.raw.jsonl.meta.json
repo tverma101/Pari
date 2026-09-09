@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "pari-paraphrase-v2",
+  "generatedAt": "2026-09-09T01:28:43.884292+00:00",
+  "corpusPath": "/Users/tejas/Projects/Pari/open-local-phraser-v1/benchmarks/paraphrase-v2/corpus.json",
+  "corpusVersion": 2,
+  "caseCount": 72,
+  "productInstruction": "Rewrite the paragraph so it is clear, natural, and grammatically correct. Preserve the writer's meaning, facts, uncertainty, relationships between ideas, and overall voice. Do not invent details. Return only the rewritten paragraph.",
+  "promptTemplate": "Paraphrase this: {text}",
+  "engine": {
+    "name": "coedit-large-research",
+    "role": "research-reference",
+    "modelRepo": "grammarly/coedit-large",
+    "revision": "5637bcdf9d8d4419f97c8cfea36f7d35c79232b6",
+    "conversionRepo": null,
+    "conversionRevision": null,
+    "runtime": "transformers 5.14.1 / torch 2.12.1 / mps",
+    "license": "cc-by-nc-4.0",
+    "quantization": "fp16",
+    "modelPath": "/private/tmp/pari-v2-coedit-large",
+    "diskBytes": 3134871148,
+    "installedEvidence": false
+  },
+  "settings": {
+    "maxInputTokens": 512,
+    "maxNewTokens": 256,
+    "numBeams": 4,
+    "doSample": false,
+    "topP": null,
+    "temperature": null,
+    "dtype": "torch.float16",
+    "device": "mps"
+  },
+  "hardware": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "arch": "arm64",
+    "macOS": "26.6.2",
+    "totalMemoryGiB": 16.0
+  },
+  "timing": {
+    "loadSeconds": 4.18,
+    "completedCases": 72,
+    "totalSeconds": 144.084,
+    "medianCaseSeconds": 2.051,
+    "peakMpsMemoryGiB": 2.303,
+    "peakProcessRssGiB": 2.962
+  }
+}

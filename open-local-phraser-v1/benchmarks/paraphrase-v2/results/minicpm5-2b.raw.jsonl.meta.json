@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "pari-paraphrase-v2",
+  "generatedAt": "2026-09-09T00:45:46.461904+00:00",
+  "corpusPath": "/Users/tejas/Projects/Pari/open-local-phraser-v1/benchmarks/paraphrase-v2/corpus.json",
+  "corpusVersion": 2,
+  "caseCount": 72,
+  "productInstruction": "Rewrite the paragraph so it is clear, natural, and grammatically correct. Preserve the writer's meaning, facts, uncertainty, relationships between ideas, and overall voice. Do not invent details. Return only the rewritten paragraph.",
+  "engine": {
+    "name": "minicpm5-2b",
+    "role": "challenger",
+    "modelRepo": "openbmb/MiniCPM5-2B-MLX",
+    "revision": "014e7591ff4b1b6330cda7f45803b27f46288261",
+    "conversionRepo": null,
+    "conversionRevision": null,
+    "runtime": "mlx-lm",
+    "license": "apache-2.0",
+    "quantization": "mlx-4bit",
+    "modelPath": "/private/tmp/pari-v2-minicpm5-2b-mlx",
+    "diskBytes": 1426232184,
+    "installedEvidence": false
+  },
+  "settings": {
+    "maxTokens": 256,
+    "temperature": 0.0,
+    "thinking": false
+  },
+  "hardware": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "arch": "arm64",
+    "macOS": "26.6.2",
+    "totalMemoryGiB": 16.0
+  },
+  "timing": {
+    "loadSeconds": 0.917,
+    "completedCases": 72,
+    "totalSeconds": 61.863,
+    "medianCaseSeconds": 0.868,
+    "peakMetalMemoryGiB": 1.536,
+    "peakProcessRssGiB": 2.004
+  }
+}

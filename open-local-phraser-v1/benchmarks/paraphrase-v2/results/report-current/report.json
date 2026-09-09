@@ -1,0 +1,447 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "pari-paraphrase-v2",
+  "generatedAt": "2026-09-09T01:50:39.154Z",
+  "corpus": {
+    "path": "/Users/tejas/Projects/Pari/open-local-phraser-v1/benchmarks/paraphrase-v2/corpus.json",
+    "version": 2,
+    "cases": 72
+  },
+  "modelStatus": [
+    {
+      "name": "qwen3-4b-incumbent",
+      "repo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "status": "benchmarked",
+      "v2": "65/72 raw; 65/72 Pari-finalized",
+      "oldSuite": "59/64",
+      "note": "Current production incumbent; no promotion change."
+    },
+    {
+      "name": "qwen3-4b-incumbent-bestof4",
+      "repo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "status": "benchmarked",
+      "v2": "69/72 raw research selection; 60/72 production-safe selection",
+      "note": "Best-of-four is an automatic experiment, not the installed production ranker."
+    },
+    {
+      "name": "qwen35-4b-control",
+      "repo": "mlx-community/Qwen3.5-4B-MLX-4bit",
+      "revision": "32f3e8ecf65426fc3306969496342d504bfa13f3",
+      "status": "benchmarked",
+      "v2": "64/72 raw; 65/72 Pari-finalized",
+      "oldSuite": "61/64",
+      "note": "Benchmark control only; not promoted."
+    },
+    {
+      "name": "minicpm5-2b",
+      "repo": "openbmb/MiniCPM5-2B-MLX",
+      "revision": "014e7591ff4b1b6330cda7f45803b27f46288261",
+      "status": "benchmarked",
+      "v2": "21/72 raw; 24/72 Pari-finalized",
+      "oldSuite": "43/64",
+      "note": "Rejected for promotion on this corpus because quality and gate acceptance declined."
+    },
+    {
+      "name": "coedit-large-research",
+      "repo": "grammarly/coedit-large",
+      "revision": "5637bcdf9d8d4419f97c8cfea36f7d35c79232b6",
+      "status": "benchmarked",
+      "v2": "51/72 raw and Pari-finalized",
+      "note": "Research-only reference; official checkpoint is CC-BY-NC-4.0."
+    },
+    {
+      "name": "coedit-xl-research",
+      "repo": "grammarly/coedit-xl",
+      "revision": "be7d1aeebbaa0e5c6b97dcf110dd4ba22096d3cf",
+      "status": "user-stopped",
+      "v2": "55/72 raw rows written; not scored",
+      "note": "11.4 GB single-safetensor checkpoint loaded and passed one-paragraph MPS smoke; user stopped the full run before completion."
+    },
+    {
+      "name": "adal-paraphraser-large",
+      "repo": "Shushant/adal-paraphraser-large",
+      "revision": "828faaeec56bd2b1365535c0fd6a7c4415cf407f",
+      "status": "invalid-checkpoint",
+      "v2": "not run",
+      "note": "Downloaded safetensor contains non-finite NaN values in encoder/decoder tensors; generation is not a valid comparison."
+    },
+    {
+      "name": "dipper-paraphraser-xxl",
+      "repo": "fahmid/dipper-paraphraser-xxl",
+      "revision": "c3afe16e3f40c299e99b05d023a3ad928e11bcd2",
+      "status": "unavailable",
+      "v2": "not run",
+      "note": "Unauthenticated Hub snapshot exposed only README/handler files and no model weights."
+    },
+    {
+      "name": "ling-3.0-tiny",
+      "repo": "rapid-mlx/Ling-3.0-tiny-MLX-4bit",
+      "revision": "328a497f3eb2cdd3d064f1da2b1084a2791387d5",
+      "status": "unavailable",
+      "v2": "not run",
+      "note": "Pinned conversion requires rapid-mlx; that runtime is not installed, and upstream mlx-lm does not support the bailing_hybrid architecture."
+    }
+  ],
+  "automaticDiagnostics": [
+    {
+      "name": "original-reference",
+      "role": "no-rewrite-safety-reference",
+      "runtime": "none",
+      "license": "source text",
+      "modelRepo": null,
+      "revision": null,
+      "cases": 72,
+      "passRate": 0,
+      "meaningSafeRate": 1,
+      "englishQualityRate": 0,
+      "automaticDiagnosticIndex": 39.74,
+      "hardSafetyFailures": 0,
+      "medianSeconds": 0,
+      "peakMemoryGiB": 0.042,
+      "diskBytes": null,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "local-safe-engine",
+      "role": "deterministic-safety-reference",
+      "runtime": "Pari TypeScript local-safe engine",
+      "license": "project code; see repository license",
+      "modelRepo": null,
+      "revision": null,
+      "cases": 72,
+      "passRate": 0.306,
+      "meaningSafeRate": 1,
+      "englishQualityRate": 0.306,
+      "automaticDiagnosticIndex": 56.44,
+      "hardSafetyFailures": 0,
+      "medianSeconds": 0.003,
+      "peakMemoryGiB": 0.168,
+      "diskBytes": null,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "qwen3-4b-incumbent-bestof4-raw",
+      "role": "production-incumbent",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "cases": 72,
+      "passRate": 0.958,
+      "meaningSafeRate": 0.958,
+      "englishQualityRate": 1,
+      "automaticDiagnosticIndex": 92.59,
+      "hardSafetyFailures": 3,
+      "medianSeconds": 5.675,
+      "peakMemoryGiB": 2.258,
+      "diskBytes": 2153299755,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "qwen3-4b-incumbent",
+      "role": "production-incumbent",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "cases": 72,
+      "passRate": 0.903,
+      "meaningSafeRate": 0.944,
+      "englishQualityRate": 0.958,
+      "automaticDiagnosticIndex": 89.17,
+      "hardSafetyFailures": 4,
+      "medianSeconds": 1.45,
+      "peakMemoryGiB": 2.258,
+      "diskBytes": 2153299755,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "qwen35-4b-control",
+      "role": "benchmark-control",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "mlx-community/Qwen3.5-4B-MLX-4bit",
+      "revision": "32f3e8ecf65426fc3306969496342d504bfa13f3",
+      "cases": 72,
+      "passRate": 0.903,
+      "meaningSafeRate": 0.903,
+      "englishQualityRate": 1,
+      "automaticDiagnosticIndex": 88.82,
+      "hardSafetyFailures": 7,
+      "medianSeconds": 1.685,
+      "peakMemoryGiB": 2.52,
+      "diskBytes": 3061136065,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "coedit-large-research",
+      "role": "research-reference",
+      "runtime": "transformers 5.14.1 / torch 2.12.1 / mps",
+      "license": "cc-by-nc-4.0",
+      "modelRepo": "grammarly/coedit-large",
+      "revision": "5637bcdf9d8d4419f97c8cfea36f7d35c79232b6",
+      "cases": 72,
+      "passRate": 0.708,
+      "meaningSafeRate": 0.806,
+      "englishQualityRate": 0.875,
+      "automaticDiagnosticIndex": 76.9,
+      "hardSafetyFailures": 14,
+      "medianSeconds": 2.051,
+      "peakMemoryGiB": 2.962,
+      "diskBytes": 3134871148,
+      "installedEvidence": false,
+      "complete": true
+    },
+    {
+      "name": "minicpm5-2b",
+      "role": "challenger",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "openbmb/MiniCPM5-2B-MLX",
+      "revision": "014e7591ff4b1b6330cda7f45803b27f46288261",
+      "cases": 72,
+      "passRate": 0.333,
+      "meaningSafeRate": 0.986,
+      "englishQualityRate": 0.347,
+      "automaticDiagnosticIndex": 58.13,
+      "hardSafetyFailures": 1,
+      "medianSeconds": 0.865,
+      "peakMemoryGiB": 1.536,
+      "diskBytes": 1426232184,
+      "installedEvidence": false,
+      "complete": true
+    }
+  ],
+  "pareto": [
+    {
+      "name": "original-reference",
+      "role": "no-rewrite-safety-reference",
+      "runtime": "none",
+      "license": "source text",
+      "modelRepo": null,
+      "revision": null,
+      "cases": 72,
+      "passRate": 0,
+      "meaningSafeRate": 1,
+      "englishQualityRate": 0,
+      "automaticDiagnosticIndex": 39.74,
+      "hardSafetyFailures": 0,
+      "medianSeconds": 0,
+      "peakMemoryGiB": 0.042,
+      "diskBytes": null,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": true
+    },
+    {
+      "name": "local-safe-engine",
+      "role": "deterministic-safety-reference",
+      "runtime": "Pari TypeScript local-safe engine",
+      "license": "project code; see repository license",
+      "modelRepo": null,
+      "revision": null,
+      "cases": 72,
+      "passRate": 0.306,
+      "meaningSafeRate": 1,
+      "englishQualityRate": 0.306,
+      "automaticDiagnosticIndex": 56.44,
+      "hardSafetyFailures": 0,
+      "medianSeconds": 0.003,
+      "peakMemoryGiB": 0.168,
+      "diskBytes": null,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": true
+    },
+    {
+      "name": "qwen3-4b-incumbent-bestof4-raw",
+      "role": "production-incumbent",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "cases": 72,
+      "passRate": 0.958,
+      "meaningSafeRate": 0.958,
+      "englishQualityRate": 1,
+      "automaticDiagnosticIndex": 92.59,
+      "hardSafetyFailures": 3,
+      "medianSeconds": 5.675,
+      "peakMemoryGiB": 2.258,
+      "diskBytes": 2153299755,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": true
+    },
+    {
+      "name": "qwen3-4b-incumbent",
+      "role": "production-incumbent",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "Qwen/Qwen3-4B-MLX-4bit",
+      "revision": "52a5ab34fa604bc8af6d3ce0cac0cab10b7eb495",
+      "cases": 72,
+      "passRate": 0.903,
+      "meaningSafeRate": 0.944,
+      "englishQualityRate": 0.958,
+      "automaticDiagnosticIndex": 89.17,
+      "hardSafetyFailures": 4,
+      "medianSeconds": 1.45,
+      "peakMemoryGiB": 2.258,
+      "diskBytes": 2153299755,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": true
+    },
+    {
+      "name": "qwen35-4b-control",
+      "role": "benchmark-control",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "mlx-community/Qwen3.5-4B-MLX-4bit",
+      "revision": "32f3e8ecf65426fc3306969496342d504bfa13f3",
+      "cases": 72,
+      "passRate": 0.903,
+      "meaningSafeRate": 0.903,
+      "englishQualityRate": 1,
+      "automaticDiagnosticIndex": 88.82,
+      "hardSafetyFailures": 7,
+      "medianSeconds": 1.685,
+      "peakMemoryGiB": 2.52,
+      "diskBytes": 3061136065,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": false
+    },
+    {
+      "name": "coedit-large-research",
+      "role": "research-reference",
+      "runtime": "transformers 5.14.1 / torch 2.12.1 / mps",
+      "license": "cc-by-nc-4.0",
+      "modelRepo": "grammarly/coedit-large",
+      "revision": "5637bcdf9d8d4419f97c8cfea36f7d35c79232b6",
+      "cases": 72,
+      "passRate": 0.708,
+      "meaningSafeRate": 0.806,
+      "englishQualityRate": 0.875,
+      "automaticDiagnosticIndex": 76.9,
+      "hardSafetyFailures": 14,
+      "medianSeconds": 2.051,
+      "peakMemoryGiB": 2.962,
+      "diskBytes": 3134871148,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": false
+    },
+    {
+      "name": "minicpm5-2b",
+      "role": "challenger",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "modelRepo": "openbmb/MiniCPM5-2B-MLX",
+      "revision": "014e7591ff4b1b6330cda7f45803b27f46288261",
+      "cases": 72,
+      "passRate": 0.333,
+      "meaningSafeRate": 0.986,
+      "englishQualityRate": 0.347,
+      "automaticDiagnosticIndex": 58.13,
+      "hardSafetyFailures": 1,
+      "medianSeconds": 0.865,
+      "peakMemoryGiB": 1.536,
+      "diskBytes": 1426232184,
+      "installedEvidence": false,
+      "complete": true,
+      "paretoEfficient": true
+    }
+  ],
+  "humanRatings": {
+    "supplied": false,
+    "rows": 0,
+    "byEngine": {
+      "original-reference": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "local-safe-engine": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "qwen3-4b-incumbent-bestof4-raw": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "qwen3-4b-incumbent": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "qwen35-4b-control": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "coedit-large-research": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      },
+      "minicpm5-2b": {
+        "cases": 0,
+        "means": {
+          "meaningAdequacy": null,
+          "coherenceCohesion": null,
+          "grammarFluency": null,
+          "lexicalCollocation": null,
+          "editDiscipline": null
+        }
+      }
+    },
+    "winner": null
+  },
+  "decision": {
+    "humanQualityWinner": null,
+    "automaticDiagnosticLeader": "qwen3-4b-incumbent-bestof4-raw",
+    "shippableLeader": null,
+    "promotionDecision": "not decided by automatic diagnostics; production promotion requires the issue's safety, meaning, human preference, and installed-runtime gates"
+  }
+}

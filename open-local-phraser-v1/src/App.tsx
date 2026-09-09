@@ -63,7 +63,6 @@ const SAMPLE_TEXT =
   "Artificial intelligence is changing the way people work and learn. It can help students improve their writing, find new ideas quickly, and understand difficult topics. Many companies use these powerful tools to make their work more efficient.";
 
 const SYNONYM_LIMIT = MAX_VISIBLE_SYNONYMS;
-const REWRITE_AMOUNT_VALUES = [16, 40, 60, 90] as const;
 const INLINE_WORD_TOOL_STOP_WORDS = new Set([
   "a", "about", "after", "again", "also", "an", "and", "are", "as", "been", "before", "being", "between", "both",
   "can", "could", "does", "each", "for", "from", "have", "if", "in", "into", "is", "it", "just", "more", "most", "much", "must", "of", "on", "only", "or",
@@ -444,7 +443,8 @@ function RewriteControls({
   onStrengthChange: (strength: number) => void;
   disabled: boolean;
 }) {
-  const strengthLevel = percentToStrengthLevel(strength);
+  const normalizedStrength = clamp(Math.round(strength), 0, 100);
+  const strengthLevel = percentToStrengthLevel(normalizedStrength);
   const options = [
     ...MODE_OPTIONS,
     ...customStyles.map((style) => ({
@@ -480,7 +480,7 @@ function RewriteControls({
         <div className="strength-control">
           <div className="strength-heading">
             <span className="control-label">Rewrite amount</span>
-            <span className="strength-value">{strengthLabel(strength)}</span>
+            <span className="strength-value">{strengthLabel(normalizedStrength)}</span>
           </div>
           <div className="strength-meter" aria-hidden="true">
             {[1, 2, 3, 4].map((level) => (
@@ -489,18 +489,24 @@ function RewriteControls({
           </div>
           <input
             type="range"
-            min="1"
-            max="4"
+            min="0"
+            max="100"
             step="1"
-            value={strengthLevel}
+            value={normalizedStrength}
             disabled={disabled}
+            onInput={(event) => {
+              onStrengthChange(clamp(Number(event.currentTarget.value), 0, 100));
+            }}
             onChange={(event) => {
-              const level = clamp(Number(event.target.value), 1, 4);
-              onStrengthChange(REWRITE_AMOUNT_VALUES[level - 1]);
+              onStrengthChange(clamp(Number(event.currentTarget.value), 0, 100));
             }}
             className="strength-range"
             aria-label="Rewrite amount"
-            aria-valuetext={`${strengthLabel(strength)}, level ${strengthLevel} of 4`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={normalizedStrength}
+            aria-valuetext={`${strengthLabel(normalizedStrength)} (${normalizedStrength}%)`}
+            title="Drag to choose how much wording changes"
           />
         </div>
       </div>
@@ -589,6 +595,13 @@ export default function App() {
   const outputEditSourceRef = useRef<"typed" | "paste">("typed");
   const outputEditorRef = useRef<HTMLDivElement | null>(null);
   const contextualRequestRef = useRef(0);
+  const strengthRegenerationTimerRef = useRef<number | null>(null);
+
+  const clearStrengthRegeneration = () => {
+    if (strengthRegenerationTimerRef.current === null) return;
+    window.clearTimeout(strengthRegenerationTimerRef.current);
+    strengthRegenerationTimerRef.current = null;
+  };
 
   useEffect(() => {
     saveSettings(settings);
@@ -825,6 +838,7 @@ export default function App() {
   );
 
   const handleInputChange = (value: string) => {
+    clearStrengthRegeneration();
     contextualRequestRef.current += 1;
     setContextualLoadingTokenId(null);
     setContextualAlternatives({});
@@ -889,14 +903,25 @@ export default function App() {
       });
   };
 
-  const handleParaphrase = async () => {
+  const handleParaphrase = async (strengthOverride?: number) => {
     if (!hasDraft) return;
+    clearStrengthRegeneration();
     controllerRef.current?.abort();
     const controller = new AbortController();
     controllerRef.current = controller;
     const requestId = requestIdRef.current + 1;
     requestIdRef.current = requestId;
     const originalText = input.trim();
+    const requestedStrength = clamp(Math.round(strengthOverride ?? settings.strength), 0, 100);
+    const requestedStyle = activeCustomStyle
+      ? { ...activeCustomStyle, strength: requestedStrength }
+      : null;
+    const requestedMode = requestedStyle
+      ? engineModeForStyle(requestedStyle)
+      : settings.mode === "warmth" ? "warmth" : "personal";
+    const requestedEngineStrength = requestedStyle
+      ? effectiveStyleStrength(requestedStyle, requestedStrength)
+      : requestedStrength;
 
     setIsParaphrasing(true);
     contextualRequestRef.current += 1;
@@ -912,9 +937,9 @@ export default function App() {
         originalText,
         examples: approvedExamples,
         memory: preferenceMemory,
-        mode: engineMode,
-        strength: engineStrength,
-        style: generationStyle ?? undefined,
+        mode: requestedMode,
+        strength: requestedEngineStrength,
+        style: requestedStyle ?? undefined,
         signal: controller.signal,
       });
       if (requestId !== requestIdRef.current || controller.signal.aborted) return;
@@ -944,7 +969,32 @@ export default function App() {
     }
   };
 
+  const handleStrengthChange = (nextStrength: number) => {
+    const normalizedStrength = clamp(Math.round(nextStrength), 0, 100);
+    setSettings((current) => ({ ...current, strength: normalizedStrength }));
+
+    if (!session || isParaphrasing) {
+      setGenerationNotice(null);
+      return;
+    }
+
+    clearStrengthRegeneration();
+    if (session.currentEditedText !== session.generatedText) {
+      setGenerationNotice(
+        `Rewrite amount set to ${strengthLabel(normalizedStrength)}. Press Paraphrase to apply it without replacing your manual edits.`
+      );
+      return;
+    }
+
+    setGenerationNotice(`Rewriting at ${strengthLabel(normalizedStrength)}…`);
+    strengthRegenerationTimerRef.current = window.setTimeout(() => {
+      strengthRegenerationTimerRef.current = null;
+      void handleParaphrase(normalizedStrength);
+    }, 450);
+  };
+
   const handleCancel = () => {
+    clearStrengthRegeneration();
     controllerRef.current?.abort();
     requestIdRef.current += 1;
     setIsParaphrasing(false);
@@ -1016,6 +1066,7 @@ export default function App() {
 
   const handleApprove = async () => {
     if (!session || isApproving) return;
+    clearStrengthRegeneration();
     // Read the live editor once more at the approval boundary. This keeps a
     // direct contenteditable edit from being lost if a browser/WebView input
     // event arrives between the last React state update and Save & learn.
@@ -1067,6 +1118,7 @@ export default function App() {
   };
 
   const handleDiscard = () => {
+    clearStrengthRegeneration();
     controllerRef.current?.abort();
     requestIdRef.current += 1;
     setIsParaphrasing(false);
@@ -1142,7 +1194,7 @@ export default function App() {
               setGenerationNotice(null);
             }}
             strength={settings.strength}
-            onStrengthChange={(strength) => setSettings((current) => ({ ...current, strength }))}
+            onStrengthChange={handleStrengthChange}
             disabled={isParaphrasing}
           />
         </section>
@@ -1178,7 +1230,7 @@ export default function App() {
               <div className="muted-text text-[12px]">{inputWordCount} words · {inputSentenceCount} sentences · {input.length}/10,000</div>
               <button
                 type="button"
-                onClick={isParaphrasing ? handleCancel : handleParaphrase}
+                onClick={isParaphrasing ? handleCancel : () => { void handleParaphrase(); }}
                 disabled={!hasDraft && !isParaphrasing}
                 className="primary-button rounded-full px-5 py-[9px] text-[13px] font-[650] shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50"
               >

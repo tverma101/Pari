@@ -228,15 +228,39 @@ export function distinctN(text, n) {
 // Guards
 // ---------------------------------------------------------------------------
 
+const DATE_ANCHOR_PATTERN = /\b(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:,?\s+\d{4})?)\b/gi;
+const VERSION_ANCHOR_PATTERN = /\b\d+(?:\.\d+){2,}(?:[-+][A-Za-z0-9.-]+)?\b/g;
+
+function normalizeAnchorValue(value) {
+  return value.trim().replace(/[.,;:!?]+$/g, "");
+}
+
 export function anchorValues(text) {
-  return [
-    ...(text.match(/https?:\/\/[^\s)]+/gi) ?? []),
-    ...(text.match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g) ?? []),
-    ...(text.match(/\+?\d[\d\s().-]{5,}\d/g) ?? []), // phone-like
-    ...(text.match(/\b\d+(?:[.,]\d+)?%?\b/g) ?? []),
-    ...(text.match(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g) ?? []), // Person Name
-    ...(text.match(/[“"]([^”"]+)[”"]/g) ?? []),
-  ].map((v) => v.trim());
+  const candidates = [];
+  const collect = (pattern, priority) => {
+    for (const match of text.matchAll(pattern)) {
+      const value = normalizeAnchorValue(match[0]);
+      if (value) candidates.push({ value, start: match.index ?? 0, end: (match.index ?? 0) + value.length, priority });
+    }
+  };
+
+  // Select the most meaningful span first. This keeps a date, version, URL,
+  // or phone number from also becoming a bag of component-number anchors.
+  collect(/https?:\/\/[^\s)]+/gi, 100);
+  collect(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, 95);
+  collect(/(?:\+\d[\d\s().-]{5,}\d|\(?\d{3}\)?[\s.-]\d{3,4}[\s.-]\d{4})/g, 90);
+  collect(DATE_ANCHOR_PATTERN, 85);
+  collect(/[“"]([^”"]+)[”"]/g, 80);
+  collect(VERSION_ANCHOR_PATTERN, 75);
+  collect(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g, 70); // Person Name
+  collect(/\b\d+(?:[.,]\d+)?%?\b/g, 60);
+
+  const selected = [];
+  for (const candidate of candidates.sort((left, right) => right.priority - left.priority || left.start - right.start)) {
+    if (selected.some((existing) => candidate.start < existing.end && candidate.end > existing.start)) continue;
+    selected.push(candidate);
+  }
+  return selected.sort((left, right) => left.start - right.start).map((candidate) => candidate.value);
 }
 
 const NUMBER_WORDS = {
@@ -245,10 +269,37 @@ const NUMBER_WORDS = {
   twenty: 20, thirty: 30, fifty: 50, hundred: 100, thousand: 1000,
 };
 
+const MONTH_NUMBERS = {
+  jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3,
+  apr: 4, april: 4, may: 5, jun: 6, june: 6, jul: 7, july: 7,
+  aug: 8, august: 8, sep: 9, sept: 9, september: 9, oct: 10,
+  october: 10, nov: 11, november: 11, dec: 12, december: 12,
+};
+
+function canonicalDateKey(value) {
+  const normalized = normalizeAnchorValue(value).toLowerCase().replace(/\s+/g, " ");
+  const numeric = normalized.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  if (numeric) {
+    return `${numeric[1]}-${numeric[2].padStart(2, "0")}-${numeric[3].padStart(2, "0")}`;
+  }
+
+  const named = normalized.match(/^([a-z]+)\s+(\d{1,2})(?:,?\s+(\d{4}))?$/);
+  if (!named) return null;
+  const month = MONTH_NUMBERS[named[1]];
+  if (!month) return null;
+  const day = named[2].padStart(2, "0");
+  return named[3]
+    ? `${named[3]}-${String(month).padStart(2, "0")}-${day}`
+    : `${String(month).padStart(2, "0")}-${day}`;
+}
+
 function anchorKeys(value) {
   // A digit anchor also matches its spelled-out form ("3" ~ "three"),
   // and vice versa, so "took me about three hours" preserves the anchor "3".
-  const keys = new Set([value.toLowerCase().replace(/\s+/g, " ")]);
+  const normalized = normalizeAnchorValue(value).toLowerCase().replace(/\s+/g, " ");
+  const keys = new Set([normalized]);
+  const dateKey = canonicalDateKey(normalized);
+  if (dateKey) keys.add(`date:${dateKey}`);
   const digit = value.match(/\d+(?:[.,]\d+)?/);
   if (digit) {
     for (const [word, num] of Object.entries(NUMBER_WORDS)) {

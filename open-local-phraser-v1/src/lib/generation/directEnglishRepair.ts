@@ -1,4 +1,5 @@
 import type { ProtectedSpan } from "@/lib/safety/protectedContent";
+import { capitalizeSentenceStarts, repairPunctuationSpacing } from "@/lib/generation/punctuation";
 
 function protectedValuesFor(spans: ProtectedSpan[]): string[] {
   return [...new Set(spans.map((span) => span.text))]
@@ -145,12 +146,12 @@ export function repairDirectEnglish(
 
     // Collapse whitespace created when a filler opener was removed, while
     // leaving punctuation and protected placeholders untouched.
-    return repaired
-      .replace(/\s{2,}/g, " ")
-      .replace(/\s+([,.;!?])/g, "$1")
-      .replace(/([,.;!?])(?=[A-Za-z])/g, "$1 ")
-      .trim();
+    return repairPunctuationSpacing(
+      repaired
+        .replace(/\s{2,}/g, " ")
+        .replace(/\s+([,.;!?])/g, "$1")
+    ).trim();
   });
 
-  return repaired.replace(/(^|[.!?]\s+)([a-z])/g, (_match, prefix: string, letter: string) => `${prefix}${letter.toUpperCase()}`);
+  return capitalizeSentenceStarts(repaired);
 }

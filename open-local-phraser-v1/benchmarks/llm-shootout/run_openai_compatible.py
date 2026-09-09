@@ -31,16 +31,19 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CORPUS = ROOT / "benchmarks/eval/corpus.json"
 
 
-def load_corpus(corpus_arg: str | None) -> list[dict[str, Any]]:
+def load_corpus_data(corpus_arg: str | None) -> dict[str, Any] | list[dict[str, Any]]:
     p = Path(corpus_arg) if corpus_arg else DEFAULT_CORPUS
     if not p.is_absolute():
         p = (Path.cwd() / p).resolve() if p.exists() else (ROOT / p).resolve()
         # fallback: try relative to ROOT
         if not p.exists():
             p = (ROOT / corpus_arg).resolve() if corpus_arg else DEFAULT_CORPUS
-    data = json.loads(p.read_text())
-    cases = data["cases"] if isinstance(data, dict) and "cases" in data else data
-    return cases
+    return json.loads(p.read_text())
+
+
+def load_corpus(corpus_arg: str | None) -> list[dict[str, Any]]:
+    data = load_corpus_data(corpus_arg)
+    return data["cases"] if isinstance(data, dict) and "cases" in data else data
 
 PROMPT = """Rewrite the text below so it is clear, coherent, and grammatically correct English.
 Rules:
@@ -66,6 +69,12 @@ def strip_control_text(text: str) -> str:
     if "Text:" in value or value.lower().startswith("rewritten:"):
         value = value.split("Rewritten:", 1)[-1].strip()
     return value.strip().strip('"“”')
+
+
+def render_prompt(corpus_data: dict[str, Any] | list[dict[str, Any]], text: str) -> str:
+    if isinstance(corpus_data, dict) and isinstance(corpus_data.get("defaultInstruction"), str):
+        return f"{corpus_data['defaultInstruction'].strip()}\n\nText: {text}\n\nRewritten:"
+    return PROMPT.format(text=text)
 
 
 def endpoint(base_url: str) -> str:
@@ -167,7 +176,8 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    corpus = load_corpus(args.corpus)
+    corpus_data = load_corpus_data(args.corpus)
+    corpus = corpus_data["cases"] if isinstance(corpus_data, dict) and "cases" in corpus_data else corpus_data
     if args.offset < 0:
         raise SystemExit("--offset must be non-negative")
     if args.limit is not None and args.limit < 1:
@@ -199,7 +209,7 @@ def main() -> None:
             text, usage, metadata = request_completion(
                 base_url=args.base_url,
                 model=args.model,
-                prompt=PROMPT.format(text=case["input"]),
+                prompt=render_prompt(corpus_data, case["input"]),
                 max_tokens=max(32, args.max_tokens),
                 temperature=max(0.0, args.temperature),
                 timeout=max(1.0, args.timeout),

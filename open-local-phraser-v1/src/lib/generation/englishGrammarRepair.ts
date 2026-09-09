@@ -1,4 +1,5 @@
 import type { ProtectedSpan } from "@/lib/safety/protectedContent";
+import { capitalizeSentenceStarts, repairPunctuationSpacing } from "@/lib/generation/punctuation";
 
 const PLACEHOLDER_RE = /\uE000([\s\S])\uE001/g;
 
@@ -234,9 +235,7 @@ function repairNoteOpenings(text: string): string {
 }
 
 function repairSentenceStarts(text: string): string {
-  return text.replace(/(^|[.!?]\s+)([a-z])/g, (_match, prefix: string, letter: string) =>
-    prefix + letter.toUpperCase()
-  );
+  return capitalizeSentenceStarts(text);
 }
 
 /**
@@ -251,10 +250,11 @@ export function repairEnglishGrammar(
 ): string {
   const protectedValues = protectedValuesFor(protectedSpans);
   return withProtectedPlaceholders(candidate, protectedValues, (masked) => {
-    let repaired = masked
-      .replace(/\s+/g, " ")
-      .replace(/\s+([,.;!?])/g, "$1")
-      .replace(/([,.;!?])(?=[A-Za-z])/g, "$1 ");
+    let repaired = repairPunctuationSpacing(
+      masked
+        .replace(/\s+/g, " ")
+        .replace(/\s+([,.;!?])/g, "$1")
+    );
 
     repaired = repairNoteOpenings(repaired);
     repaired = repairAgreement(repaired);
@@ -266,9 +266,6 @@ export function repairEnglishGrammar(
     repaired = repairArticles(repaired);
     repaired = repairSentenceStarts(repaired);
 
-    return repaired
-      .replace(/\s+([,.;!?])/g, "$1")
-      .replace(/([,.;!?])(?=[A-Za-z])/g, "$1 ")
-      .trim();
+    return repairPunctuationSpacing(repaired.replace(/\s+([,.;!?])/g, "$1")).trim();
   });
 }

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "benchmark": "pari-model-runner",
+  "generatedAt": "2026-09-09T00:53:43.663316+00:00",
+  "corpusPath": "/Users/tejas/Projects/Pari/open-local-phraser-v1/benchmarks/eval/corpus.json",
+  "corpusVersion": 1,
+  "caseCount": 64,
+  "productInstruction": null,
+  "engine": {
+    "name": "minicpm5-2b-old-suite",
+    "role": "challenger",
+    "modelRepo": "openbmb/MiniCPM5-2B-MLX",
+    "revision": "014e7591ff4b1b6330cda7f45803b27f46288261",
+    "conversionRepo": null,
+    "conversionRevision": null,
+    "runtime": "mlx-lm",
+    "license": "apache-2.0",
+    "quantization": "mlx-4bit",
+    "modelPath": "/private/tmp/pari-v2-minicpm5-2b-mlx",
+    "diskBytes": 1426232184,
+    "installedEvidence": false
+  },
+  "settings": {
+    "maxTokens": 220,
+    "temperature": 0.0,
+    "thinking": false
+  },
+  "hardware": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "arch": "arm64",
+    "macOS": "26.6.2",
+    "totalMemoryGiB": 16.0
+  },
+  "timing": {
+    "loadSeconds": 0.932,
+    "completedCases": 64,
+    "totalSeconds": 44.724,
+    "medianCaseSeconds": 0.691,
+    "peakMetalMemoryGiB": 1.634,
+    "peakProcessRssGiB": 2.018
+  }
+}
