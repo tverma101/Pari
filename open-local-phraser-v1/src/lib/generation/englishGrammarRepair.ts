@@ -1,3 +1,4 @@
+import { preferredIndefiniteArticle } from "@/lib/nlp/articleSound";
 import type { ProtectedSpan } from "@/lib/safety/protectedContent";
 import { capitalizeSentenceStarts, repairPunctuationSpacing } from "@/lib/generation/punctuation";
 
@@ -39,16 +40,6 @@ function withProtectedPlaceholders(
   );
 }
 
-function startsWithVowelSound(value: string): boolean {
-  const normalized = value.trim().toLowerCase();
-  if (!normalized) return false;
-  if (/^(?:honest|honor|honour|hour|heir|herb)\b/.test(normalized)) return true;
-  if (/^(?:ewe|euro|one|once|uniform|unique|unit|united|university|use|useful|user|usual)\b/.test(normalized)) {
-    return false;
-  }
-  return /^[aeiou]/.test(normalized);
-}
-
 function preserveCase(original: string, replacement: string): string {
   if (original === original.toUpperCase()) return replacement.toUpperCase();
   if (original[0] === original[0].toUpperCase()) {
@@ -57,18 +48,10 @@ function preserveCase(original: string, replacement: string): string {
   return replacement;
 }
 
-function looksLikeInitialismOrLetterName(value: string): boolean {
-  // Written initials do not reveal pronunciation. “URL”, “MRI”, “FBI”, and
-  // “X-ray” need different article sounds despite their first letters, so a
-  // deterministic repair should preserve the writer's article instead of
-  // guessing and creating errors such as “an URL” or “a MRI”.
-  return /^[A-Z]{2,}(?:[0-9]*|[-'][A-Za-z0-9-]+)?$/.test(value) || /^[A-Z]-[A-Za-z]/.test(value);
-}
-
 function repairArticles(text: string): string {
   return text.replace(/\b(a|an)\s+([A-Za-z][A-Za-z'-]*)\b/g, (_match, article: string, word: string) => {
-    if (looksLikeInitialismOrLetterName(word)) return `${article} ${word}`;
-    const expected = startsWithVowelSound(word) ? "an" : "a";
+    const expected = preferredIndefiniteArticle(word);
+    if (!expected) return `${article} ${word}`;
     return preserveCase(article, expected) + " " + word;
   });
 }
