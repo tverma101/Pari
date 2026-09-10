@@ -59,14 +59,14 @@ function ids(original, candidate) {
 function expectQuantitySafe(original, candidate, label) {
   assert(
     !ids(original, candidate).has("quantity-drift"),
-    `${label}: equivalent numeric quantity relation was rejected`,
+    `${label}: equivalent quantity relation was rejected`,
   );
 }
 
 function expectQuantityDrift(original, candidate, label) {
   assert(
     ids(original, candidate).has("quantity-drift"),
-    `${label}: numeric quantity drift was accepted`,
+    `${label}: quantity drift was accepted`,
   );
 }
 
@@ -100,6 +100,11 @@ expectQuantitySafe(
   "Almost 100 users responded.",
   "near-below synonyms",
 );
+expectQuantitySafe(
+  "A number of students asked questions.",
+  "Several students asked questions.",
+  "a-number-of several equivalence",
+);
 
 expectQuantityDrift(
   "At least 10 students attended.",
@@ -130,6 +135,16 @@ expectQuantityDrift(
   "Nearly 100 users responded.",
   "About 100 users responded.",
   "below-target quantity changed to two-sided approximation",
+);
+expectQuantityDrift(
+  "Several students asked questions.",
+  "Many students asked questions.",
+  "several strengthened to many",
+);
+expectQuantityDrift(
+  "Many students asked questions.",
+  "Several students asked questions.",
+  "many weakened to several",
 );
 
 // Numeric-bound words should remain inert when they are not actually modifying
