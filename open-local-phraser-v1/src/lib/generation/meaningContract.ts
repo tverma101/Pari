@@ -5,7 +5,7 @@ export interface MeaningContractIssue {
   detail: string;
 }
 
-type MarkerFamily = "negation" | "modality" | "certainty" | "quantity" | "relation" | "person";
+type MarkerFamily = "negation" | "modality" | "certainty" | "degree" | "quantity" | "relation" | "person";
 
 interface Marker {
   family: MarkerFamily;
@@ -16,8 +16,9 @@ interface Marker {
 // “no less than 10” / “no more than 10” that force is already represented by
 // the bound's quantity class. Counting it again as a free-standing negation
 // would falsely reject safe equivalents such as “at least 10” and “at most
-// 10”.
-const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no(?!\s+(?:more|less)\s+than\s+(?:[$€£¥]\s*)?\d)|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|hardly|rarely|seldom|invalid|unacceptable|impossible)\b/gi;
+// 10”. Barely/hardly/scarcely also carry near-zero force, so keep all three
+// aligned here as well as in the degree contract below.
+const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no(?!\s+(?:more|less)\s+than\s+(?:[$€£¥]\s*)?\d)|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|barely|hardly|scarcely|rarely|seldom|invalid|unacceptable|impossible)\b/gi;
 // Include negative contractions as modality markers as well as negation
 // markers. Otherwise a harmless contraction edit such as “couldn't” ->
 // “could not” looks like a modal was added because `could` is only visible in
@@ -33,6 +34,13 @@ const CERTAINTY_RE = /\b(?:maybe|perhaps|possible|possibly|probable|probably|lik
 // bare `certain` in either global regex; collect only high-confidence frames.
 const CERTAIN_EPISTEMIC_RE = /\bcertain(?=\s+(?:that|whether|if|how|why|what|when|where|who|to|of|about)\b|\s*[,.;:!?—-]|\s*$)/gi;
 const CERTAIN_SUBSET_RE = /\bcertain(?=\s+(?:people|persons|individuals|things|items|times|days|weeks|months|years|students?|users?|writers?|readers?|workers?|files?|records?|examples?|cases?|situations?|circumstances?|conditions?|types?|groups?|areas?|places?|words?|phrases?|sentences?|paragraphs?|tasks?|assignments?)\b)/gi;
+// Preserve explicit degree/extent when the wording is high-confidence. The
+// near-zero, small-degree, and large-degree families are semantically distinct:
+// “barely changed”, “slightly changed”, and “changed considerably” do not make
+// the same claim. `significantly` has a separate parenthetical discourse sense
+// ("Significantly, ..."), so collect it only when it is not followed by a comma.
+const DEGREE_RE = /\b(?:barely|hardly|scarcely|slightly|marginally|considerably|greatly)\b/gi;
+const SIGNIFICANT_DEGREE_RE = /\bsignificantly\b(?!\s*,)/gi;
 // “More” and “less” are excluded because they are frequently ordinary
 // comparatives (for example, “read more smoothly”), not quantity claims.
 const QUANTITY_RE = /\b(?:a\s+number\s+of|a\s+majority\s+of|the\s+majority\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|any|enough)\b/gi;
@@ -101,6 +109,8 @@ function markerProfile(text: string): Marker[] {
     ...collect(text, "modality", MODALITY_RE),
     ...collect(text, "certainty", CERTAINTY_RE),
     ...collect(text, "certainty", CERTAIN_EPISTEMIC_RE),
+    ...collect(text, "degree", DEGREE_RE),
+    ...collect(text, "degree", SIGNIFICANT_DEGREE_RE),
     ...collect(text, "quantity", QUANTITY_RE),
     ...collect(text, "quantity", CERTAIN_SUBSET_RE),
     ...collect(text, "quantity", NUMERIC_QUANTITY_RE),
@@ -130,6 +140,13 @@ function certaintyClass(value: string): string {
   if (/^(?:probable|probably|likely)$/.test(value)) return "probable-likely";
   if (/^unlikely$/.test(value)) return "unlikely";
   if (/^(?:certain|certainly|definitely)$/.test(value)) return "no-doubt-certain";
+  return value;
+}
+
+function degreeClass(value: string): string {
+  if (/^(?:barely|hardly|scarcely)$/.test(value)) return "near-zero";
+  if (/^(?:slightly|marginally)$/.test(value)) return "small-degree";
+  if (/^(?:significantly|considerably|greatly)$/.test(value)) return "large-degree";
   return value;
 }
 
@@ -237,9 +254,9 @@ function hasSameFamilyShape(original: string[], candidate: string[], normalize: 
  *
  * It does not pretend to solve entailment. It catches high-cost drift that a
  * local text editor can detect reliably: negation, modal force, non-verbal
- * certainty, quantifier scope, discourse relation, and writer perspective.
- * More nuanced meaning is still protected by the model prompt, protected-span
- * gate, and native/local quality checks.
+ * certainty, degree/extent, quantifier scope, discourse relation, and writer
+ * perspective. More nuanced meaning is still protected by the model prompt,
+ * protected-span gate, and native/local quality checks.
  */
 export function meaningContractIssues(
   original: string,
@@ -273,6 +290,12 @@ export function meaningContractIssues(
       id: "certainty-drift",
       detail: "The rewrite changed the source's stated possibility, likelihood, or certainty.",
       normalize: certaintyClass,
+    },
+    {
+      family: "degree",
+      id: "degree-drift",
+      detail: "The rewrite changed an explicit near-zero, small, or large degree/extent qualifier.",
+      normalize: degreeClass,
     },
     {
       family: "quantity",
