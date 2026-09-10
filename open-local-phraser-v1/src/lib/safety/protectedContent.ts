@@ -38,7 +38,10 @@ interface CandidateSpan {
 const TIME_ZONE = "(?:ET|CT|MT|PT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|UTC|GMT|BST|CET|CEST|EET|EEST|IST|JST|KST|AEST|AEDT|ACST|ACDT|AWST)";
 const MONTH = "(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)";
 const WEEKDAY = "(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)";
-const MEASUREMENT_UNIT = "(?:kg|mg|mcg|µg|g|oz|lb|lbs|mm|cm|km|mL|ml|L|mi|ft|yd|MB|GB|TB|KiB|MiB|GiB|ms|sec|secs|seconds?|min|mins|minutes?|hours?|days?|weeks?|months?|years?|°C|°F|Hz|kHz|MHz|GHz|Mbps|Gbps|tokens?|words?|pages?)";
+// Include the SI metre symbol `m` explicitly. The number pattern below keeps
+// the quantity and unit as one factual anchor, so `5 m` cannot silently turn
+// into another length such as `5 ft` while retaining the same numeral.
+const MEASUREMENT_UNIT = "(?:kg|mg|mcg|µg|g|oz|lb|lbs|mm|cm|m|km|mL|ml|L|mi|ft|yd|MB|GB|TB|KiB|MiB|GiB|ms|sec|secs|seconds?|min|mins|minutes?|hours?|days?|weeks?|months?|years?|°C|°F|Hz|kHz|MHz|GHz|Mbps|Gbps|tokens?|words?|pages?)";
 const NEGATIVE_AUXILIARY = "(?:can|could|do|does|did|have|has|had|is|are|was|were|will|would|should|must|might|shall|need)";
 
 const PROTECTED_PATTERNS: Array<{
