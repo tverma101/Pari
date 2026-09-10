@@ -1,4 +1,10 @@
 import { preferredIndefiniteArticle } from "@/lib/nlp/articleSound";
+import {
+  detectAdjectiveDegree,
+  detectNounNumber,
+  detectVerbForm,
+  morphologyCompatibility,
+} from "@/lib/nlp/morphology";
 import { grammarCompatibility } from "@/lib/nlp/posTagger";
 import { isWarmthMode, type RewriteMode, type RiskLevel } from "@/lib/types";
 
@@ -111,9 +117,6 @@ const CONSERVATIVE_LABELS = new Set([
   "warm",
 ]);
 
-// These are legitimate dictionary relationships in some contexts, but they
-// are too ambiguous for an automatic word-by-word paragraph pass. They stay
-// available in the inline chooser where the writer can inspect the sentence.
 const CONSERVATIVE_AMBIGUOUS_REPLACEMENTS = new Set([
   "although",
   "as",
@@ -138,11 +141,6 @@ function normalizedLabel(option: CandidateOption): string {
   return option.label?.trim().toLowerCase() ?? "";
 }
 
-/**
- * Automatic paragraph output needs a smaller, safer candidate set than the
- * inline chooser. Deep clusters are useful for discovery but are not
- * reliable enough to combine word-by-word without a language model.
- */
 export function isConservativeAutomaticCandidate(
   option: CandidateOption,
   mode: RewriteMode
@@ -184,13 +182,6 @@ function articleBeforeSelection(context: RankingContext): "a" | "an" | "the" | n
   return match[1].toLowerCase() as "a" | "an" | "the";
 }
 
-function looksPluralNoun(value: string): boolean {
-  const normalized = value.trim().toLowerCase();
-  if (normalized.includes(" ")) return false;
-  if (/(ss|us|is)$/.test(normalized)) return false;
-  return normalized.endsWith("s");
-}
-
 function articleFitPenalty(option: CandidateOption, context: RankingContext): number {
   const article = articleBeforeSelection(context);
   if (!article) return 0;
@@ -208,7 +199,7 @@ function articleFitPenalty(option: CandidateOption, context: RankingContext): nu
     if (expected && article !== expected) penalty += 0.2;
   }
 
-  if ((article === "a" || article === "an") && looksPluralNoun(replacement)) {
+  if ((article === "a" || article === "an") && detectNounNumber(replacement) === "plural") {
     penalty += 0.26;
   }
 
@@ -266,13 +257,21 @@ function wordBeforeSelection(context: RankingContext): string | null {
   return match ? match[1].toLowerCase() : null;
 }
 
-function wordAfterSelection(context: RankingContext): string | null {
+function wordsAfterSelection(context: RankingContext, limit = 3): string[] {
   const range = selectionLocalRange(context);
-  if (!range) return null;
+  if (!range) return [];
+  return (context.sentence.slice(range.end).match(/[A-Za-z]+(?:[-'][A-Za-z]+)?/g) ?? [])
+    .slice(0, limit)
+    .map((word) => word.toLowerCase());
+}
 
-  const after = context.sentence.slice(range.end);
-  const match = after.match(/^\s*([A-Za-z]+(?:[-'][A-Za-z]+)?)/);
-  return match ? match[1].toLowerCase() : null;
+function wordAfterSelection(context: RankingContext): string | null {
+  return wordsAfterSelection(context, 1)[0] ?? null;
+}
+
+function replacementBoundaryWords(replacement: string): { first: string | null; last: string | null } {
+  const words = replacement.toLowerCase().match(/[a-z]+(?:[-'][a-z]+)*/g) ?? [];
+  return { first: words[0] ?? null, last: words[words.length - 1] ?? null };
 }
 
 function sentenceDuplicatePenalty(option: CandidateOption, context: RankingContext): number {
@@ -310,14 +309,63 @@ function comparisonLinkPenalty(context: RankingContext, replacement: string): nu
   const selectedWord = context.selectedText.trim().toLowerCase().match(/^[a-z]+/)?.[0] ?? "";
   const replacementWord = replacement.match(/^[a-z]+/)?.[0] ?? "";
 
-  // Only police the comparison link itself. The old rule penalized every
-  // replacement after words such as “same” or “different”, so a harmless
-  // noun rewrite like “the same process” -> “the same method” lost 0.24.
   if (!COMPARISON_LINK_WORDS.has(selectedWord) && !COMPARISON_LINK_WORDS.has(replacementWord)) {
     return 0;
   }
 
   return allowed.has(replacementWord) ? 0 : 0.24;
+}
+
+const SINGULAR_DETERMINERS = new Set(["a", "an", "another", "each", "every", "one", "that", "this"]);
+const PLURAL_DETERMINERS = new Set(["both", "few", "many", "multiple", "numerous", "several", "these", "those"]);
+const MODAL_AUXILIARIES = new Set(["can", "could", "may", "might", "must", "shall", "should", "will", "would"]);
+const BE_AUXILIARIES = new Set(["am", "are", "be", "been", "being", "is", "was", "were"]);
+const HAVE_AUXILIARIES = new Set(["had", "has", "have"]);
+const PREPOSITIONS = new Set(["about", "at", "by", "for", "from", "in", "into", "of", "on", "through", "to", "with"]);
+
+function morphologyFitPenalty(option: CandidateOption, context: RankingContext): number {
+  const partOfSpeech = context.partOfSpeech ?? option.partOfSpeech ?? "unknown";
+  const compatibility = morphologyCompatibility(context.selectedText, option.replacement, partOfSpeech);
+  return (1 - compatibility) * 0.42;
+}
+
+/**
+ * Generic surface-slot constraints. These are intentionally about English
+ * grammar classes rather than topics or named vocabulary, so one rule covers
+ * many domains and unseen words.
+ */
+function surfaceSlotPenalty(option: CandidateOption, context: RankingContext): number {
+  const partOfSpeech = context.partOfSpeech ?? option.partOfSpeech ?? "unknown";
+  const previous = wordBeforeSelection(context);
+  const following = wordsAfterSelection(context, 2);
+  const next = following[0] ?? null;
+  const { first, last } = replacementBoundaryWords(option.replacement);
+  let penalty = 0;
+
+  if (previous && first === previous) penalty += 0.22;
+  if (next && last === next) penalty += 0.22;
+  if (next && last && PREPOSITIONS.has(next) && PREPOSITIONS.has(last)) penalty += 0.18;
+
+  if (partOfSpeech === "noun" && previous) {
+    const number = detectNounNumber(option.replacement);
+    if (SINGULAR_DETERMINERS.has(previous) && number === "plural") penalty += 0.3;
+    if (PLURAL_DETERMINERS.has(previous) && number === "singular") penalty += 0.28;
+  }
+
+  if (partOfSpeech === "verb" && previous) {
+    const sourceForm = detectVerbForm(context.selectedText);
+    const replacementForm = detectVerbForm(option.replacement);
+    if (MODAL_AUXILIARIES.has(previous) && replacementForm !== "base") penalty += 0.34;
+    if (previous === "to" && replacementForm !== "base") penalty += 0.3;
+    if (BE_AUXILIARIES.has(previous) && sourceForm === "gerund" && replacementForm !== "gerund") penalty += 0.32;
+    if (HAVE_AUXILIARIES.has(previous) && sourceForm === "past" && replacementForm !== "past") penalty += 0.3;
+  }
+
+  if (partOfSpeech === "adjective" && next === "than") {
+    if (detectAdjectiveDegree(option.replacement) !== "comparative") penalty += 0.28;
+  }
+
+  return penalty;
 }
 
 function localGrammarPenalty(option: CandidateOption, context: RankingContext): number {
@@ -362,6 +410,7 @@ function localGrammarPenalty(option: CandidateOption, context: RankingContext): 
   }
 
   penalty += comparisonLinkPenalty(context, replacement);
+  penalty += surfaceSlotPenalty(option, context);
 
   return penalty;
 }
@@ -393,6 +442,7 @@ export function rankCandidatesByRule(
         labelBonus(context.mode, option.label) +
         sourceFitBonus(context.mode, option) +
         (grammarScore - 0.5) * 0.38 -
+        morphologyFitPenalty(option, context) -
         riskPenalty(option.risk ?? "low") -
         articleFitPenalty(option, context) -
         specificityPenalty(option, context) -
