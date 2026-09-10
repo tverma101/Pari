@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { scoreCase } from "../eval/metrics.mjs";
 import { meaningContractIssuesForBenchmark } from "./meaning-contract-bridge.mjs";
+import { protectedContentValidationForBenchmark } from "./protected-content-bridge.mjs";
 import {
   DEFAULT_CORPUS_PATH,
   loadV2Corpus,
@@ -89,18 +90,22 @@ for (const item of corpus) {
   const scored = await scoreCase(item, output);
   const meaningContractIssues = meaningContractIssuesForBenchmark(item.input, output);
   const meaningContractSafe = meaningContractIssues.length === 0;
-  const failedChecks = meaningContractSafe
-    ? (scored.failedChecks ?? [])
-    : [...new Set([...(scored.failedChecks ?? []), "meaningContractSafe"])];
+  const protectedContent = protectedContentValidationForBenchmark(item.input, output);
+  const protectedContentSafe = protectedContent.safe;
+  const productionMeaningSafe = meaningContractSafe && protectedContentSafe;
+  const failedChecks = [...(scored.failedChecks ?? [])];
+  if (!meaningContractSafe) failedChecks.push("meaningContractSafe");
+  if (!protectedContentSafe) failedChecks.push("protectedContentSafe");
   results.push({
     ...scored,
-    passed: scored.passed && meaningContractSafe,
-    meaningSafe: scored.meaningSafe && meaningContractSafe,
-    failedChecks,
+    passed: scored.passed && productionMeaningSafe,
+    meaningSafe: scored.meaningSafe && productionMeaningSafe,
+    failedChecks: [...new Set(failedChecks)],
     meaningContract: {
       safe: meaningContractSafe,
       issues: meaningContractIssues,
     },
+    protectedContent,
     output,
     ...(Number.isFinite(rawRow.seconds) ? { seconds: rawRow.seconds } : {}),
     ...(Number.isFinite(rawRow.totalSeconds) ? { totalSeconds: rawRow.totalSeconds } : {}),
