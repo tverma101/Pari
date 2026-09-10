@@ -29,29 +29,78 @@ function capitalize(value: string): string {
 }
 
 const GERUND_BASE_FORMS: Record<string, string> = {
-  being: "be",
-  doing: "do",
-  going: "go",
-  making: "make",
-  using: "use",
-  writing: "write",
-  taking: "take",
-  giving: "give",
-  having: "have",
-  seeing: "see",
-  coming: "come",
+  adding: "add",
+  analyzing: "analyze",
   becoming: "become",
-  moving: "move",
-  living: "live",
+  beginning: "begin",
+  calculating: "calculate",
+  calling: "call",
+  cancelling: "cancel",
+  canceling: "cancel",
+  coming: "come",
+  comparing: "compare",
+  controlling: "control",
+  creating: "create",
+  cutting: "cut",
+  decreasing: "decrease",
+  doing: "do",
   driving: "drive",
-  improving: "improve",
-  proving: "prove",
-  lying: "lie",
-  tying: "tie",
   dying: "die",
+  editing: "edit",
+  evaluating: "evaluate",
+  generating: "generate",
+  getting: "get",
+  giving: "give",
+  going: "go",
+  having: "have",
+  hitting: "hit",
+  improving: "improve",
+  increasing: "increase",
+  indicating: "indicate",
+  letting: "let",
+  living: "live",
+  lying: "lie",
+  making: "make",
+  moving: "move",
+  noticing: "notice",
+  operating: "operate",
+  organizing: "organize",
+  organising: "organise",
+  passing: "pass",
+  planning: "plan",
+  practicing: "practice",
+  preferring: "prefer",
+  preparing: "prepare",
+  producing: "produce",
+  proving: "prove",
+  putting: "put",
+  recognizing: "recognize",
+  recognising: "recognise",
+  reducing: "reduce",
+  referring: "refer",
+  revising: "revise",
+  running: "run",
+  seeing: "see",
+  setting: "set",
+  sitting: "sit",
+  stopping: "stop",
+  swimming: "swim",
+  taking: "take",
+  tying: "tie",
+  using: "use",
+  winning: "win",
+  writing: "write",
 };
 
-/** Convert a gerund to an infinitive complement without producing forms such as “to mak”. */
+/**
+ * Convert a gerund to an infinitive complement conservatively.
+ *
+ * The old implementation removed any doubled final consonant after stripping
+ * `-ing`, which produced invalid bases such as `calling -> cal` and
+ * `passing -> pas`; silent-e verbs such as `creating` also became `creat`.
+ * Common irregular/silent-e/doubling forms are explicit above. The fallback
+ * handles only spelling patterns that are safe enough for a final repair.
+ */
 export function infinitiveFromGerund(value: string): string {
   const normalized = value.toLowerCase();
   const known = GERUND_BASE_FORMS[normalized];
@@ -63,7 +112,18 @@ export function infinitiveFromGerund(value: string): string {
   if (!normalized.endsWith("ing") || normalized.length <= 4) return value;
 
   let stem = value.slice(0, -3);
-  if (/([b-df-hj-np-tv-z])\1$/i.test(stem)) stem = stem.slice(0, -1);
+  // Productive consonant doubling usually adds the second consonant before
+  // `-ing`. Do not strip l/s/z because those letters are commonly doubled in
+  // the base itself (`call`, `pass`, `buzz`). Known ambiguous forms are listed
+  // above instead of guessed here.
+  if (/([b-df-hj-km-np-rt-vx-y])\1$/i.test(stem)) stem = stem.slice(0, -1);
+
+  // Several productive silent-e families are recoverable from their stems.
+  // Keep this deliberately narrow; common exceptions live in the map above.
+  if (/v$/i.test(stem) || /c$/i.test(stem) || /(?:bl|dl|gl|pl|tl)$/i.test(stem)) {
+    stem += "e";
+  }
+
   return stem;
 }
 
@@ -98,13 +158,10 @@ export function repairDirectEnglish(
         `to ${infinitiveFromGerund(verb)}`,
       );
 
-    // “There is no indication that …” is a classic vague noun plus expletive.
-    // Keep the exact negation (including its protected placeholder) while
-    // giving it a real subject.
-    repaired = repaired.replace(
-      new RegExp(`\\bthere\\s+is\\s+(${negation})\\s+indication\\s+that\\s+`, "gi"),
-      "$1 evidence shows that ",
-    );
+    // Do not rewrite “There is no indication that …” to “No evidence shows
+    // that …”. `Indication` and `evidence` are not interchangeable in every
+    // domain, and “shows” can strengthen an uncertainty statement. The phrase
+    // is already grammatical, so a deterministic safety pass should leave it.
 
     // “It is not the case that the method is …” can be made direct without
     // weakening the negation. Restrict this to a copular clause so we do not
