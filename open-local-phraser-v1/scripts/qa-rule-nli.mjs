@@ -50,6 +50,7 @@ function loadTsModule(filePath) {
 
 const { createRuleNliJudge } = loadTsModule(path.join(ROOT_DIR, "src/lib/scoring/nliJudge.ts"));
 const { meaningContractIssues } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/meaningContract.ts"));
+const { repairSentenceFlow } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/sentenceFlow.ts"));
 const judge = createRuleNliJudge();
 
 async function expectContradiction(premise, hypothesis, label) {
@@ -137,5 +138,37 @@ const doubleNegativeUnless = meaningIds(
   "If the editor approves the draft, we can ship it.",
 );
 assert(doubleNegativeUnless.has("negation-drift"), "unless-not collapsed two negative forces into a positive condition");
+
+assert.equal(
+  repairSentenceFlow(
+    "I focus better when the room is quiet.",
+    "I focus better, and the room is quiet.",
+  ),
+  "I focus better when the room is quiet.",
+  "dropped embedded time relation produced a coordinator fragment",
+);
+assert.equal(
+  repairSentenceFlow(
+    "The team revised the plan because the deadline changed.",
+    "The team revised the plan, and the deadline changed.",
+  ),
+  "The team revised the plan because the deadline changed.",
+  "dropped embedded causal relation produced a coordinator fragment",
+);
+assert.equal(
+  repairSentenceFlow(
+    "The draft was ready, although the review was late.",
+    "The draft was ready, and the review was late.",
+  ),
+  "The draft was ready, although the review was late.",
+  "source comma before embedded relation was not preserved",
+);
+assert(
+  !repairSentenceFlow(
+    "I focus better when the room is quiet.",
+    "I focus better, and the room is quiet.",
+  ).includes("especially"),
+  "relation repair invented emphasis",
+);
 
 console.log("qa:rule:nli passed");

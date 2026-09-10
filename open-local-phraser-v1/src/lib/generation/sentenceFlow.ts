@@ -134,15 +134,29 @@ function restoreDroppedEmbeddedRelation(
   const body = segment.slice(leadingWhitespace.length);
   const coordinatorMatch = body.match(/^(?:and|or|but)\s+/i);
   const leadingCoordinator = coordinatorMatch?.[0] ?? "";
-  const remainder = body.slice(leadingCoordinator.length);
+  const remainder = body.slice(leadingCoordinator.length).replace(/^\s+/, "");
   if (!remainder.trim()) return candidateSentence;
 
-  // Restore only the missing relationship marker. The previous implementation
-  // replaced the candidate segment with the source clause and, for embedded
-  // time clauses, invented the word “especially”. Prefixing the existing
-  // candidate clause preserves its wording/details and cannot add emphasis
-  // that was absent from the source.
-  commaSegments[targetIndex] = `${leadingWhitespace}${leadingCoordinator}${originalRelation.text} ${remainder.replace(/^\s+/, "")}`;
+  // For a relation that was embedded in the source, restore the source's
+  // subordinate-clause boundary as well as its marker. Keeping a candidate
+  // coordinator here creates fragments such as “I focus better, and when the
+  // room is quiet.” When the source had no comma before the relation, remove
+  // the candidate comma/coordinator; when it did, preserve that comma.
+  if (originalRelation.start > 0) {
+    const sourcePrefix = originalSentence.slice(0, originalRelation.start);
+    const sourceHadComma = /,\s*$/.test(sourcePrefix);
+    const before = commaSegments.slice(0, targetIndex).join(",").replace(/\s+$/, "");
+    const after = commaSegments.slice(targetIndex + 1).join(",");
+    const separator = sourceHadComma ? ", " : " ";
+    let restored = `${before}${separator}${originalRelation.text} ${remainder}`;
+    if (after) restored += `,${after}`;
+    return restored;
+  }
+
+  // For a genuinely leading relation, keep the existing conservative segment
+  // behavior. The target-index guard above means this path is rare, but it is
+  // safer than guessing a new whole-sentence order.
+  commaSegments[targetIndex] = `${leadingWhitespace}${leadingCoordinator}${originalRelation.text} ${remainder}`;
   return commaSegments.join(",");
 }
 
