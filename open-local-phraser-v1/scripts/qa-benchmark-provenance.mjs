@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { buildJudgeProvenance, sha256File } from "../benchmarks/paraphrase-v2/judge-provenance.mjs";
+import { buildJudgeProvenance, judgeSourceFiles, sha256File } from "../benchmarks/paraphrase-v2/judge-provenance.mjs";
 
 const ROOT_DIR = path.resolve(new URL("..", import.meta.url).pathname);
 const first = buildJudgeProvenance();
@@ -11,10 +11,18 @@ const second = buildJudgeProvenance();
 assert.match(first.fingerprint, /^[0-9a-f]{64}$/, "judge fingerprint is not SHA-256 hex");
 assert.equal(first.fingerprint, second.fingerprint, "judge fingerprint is not deterministic within one checkout");
 assert.equal(first.algorithm, "sha256", "judge fingerprint algorithm is not explicit");
+assert.equal(first.schemaVersion, 2, "transitive provenance schema version was not recorded");
 assert.equal(first.runtime.node, process.version, "Node runtime provenance is incorrect");
 assert(first.dependencies["@huggingface/transformers"], "transformers dependency version is missing");
 assert(first.dependencies["harper.js"], "Harper dependency version is missing");
 assert(first.dependencies.typescript, "TypeScript dependency version is missing");
+
+const discovered = judgeSourceFiles();
+assert.deepEqual(discovered, [...discovered].sort(), "judge source discovery is not deterministic");
+assert(
+  discovered.includes("src/lib/nlp/articleSound.ts"),
+  "transitive judge source discovery missed articleSound imported by meaningContract",
+);
 
 const byPath = new Map(first.files.map((entry) => [entry.path, entry.sha256]));
 for (const required of [
@@ -22,6 +30,7 @@ for (const required of [
   "benchmarks/paraphrase-v2/score.mjs",
   "benchmarks/paraphrase-v2/judge-provenance.mjs",
   "src/lib/generation/meaningContract.ts",
+  "src/lib/nlp/articleSound.ts",
   "src/lib/safety/protectedContent.ts",
   "src/lib/scoring/englishQuality.ts",
   "src/lib/scoring/nliJudge.ts",
