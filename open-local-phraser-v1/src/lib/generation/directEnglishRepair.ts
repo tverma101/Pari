@@ -112,18 +112,10 @@ export function infinitiveFromGerund(value: string): string {
   if (!normalized.endsWith("ing") || normalized.length <= 4) return value;
 
   let stem = value.slice(0, -3);
-  // Productive consonant doubling usually adds the second consonant before
-  // `-ing`. Do not strip l/s/z because those letters are commonly doubled in
-  // the base itself (`call`, `pass`, `buzz`). Known ambiguous forms are listed
-  // above instead of guessed here.
   if (/([b-df-hj-km-np-rt-vx-y])\1$/i.test(stem)) stem = stem.slice(0, -1);
-
-  // Several productive silent-e families are recoverable from their stems.
-  // Keep this deliberately narrow; common exceptions live in the map above.
   if (/v$/i.test(stem) || /c$/i.test(stem) || /(?:bl|dl|gl|pl|tl)$/i.test(stem)) {
     stem += "e";
   }
-
   return stem;
 }
 
@@ -139,8 +131,21 @@ export function repairDirectEnglish(
   protectedSpans: ProtectedSpan[] = [],
 ): string {
   const protectedValues = protectedValuesFor(protectedSpans);
-  const repaired = withProtectedPlaceholders(candidate, protectedValues, (masked) => {
-    const negation = "(?:no|not|never|without|\\uE000[\\s\\S]\\uE001)";
+
+  // `extractProtectedSpans` deliberately protects expanded auxiliary negation
+  // as one unit (`is not`). If masking happens first, "It is not the case ..."
+  // becomes "It <placeholder> the case ..." and the structural repair cannot
+  // see its grammar. Perform only the high-confidence singular-copula recast
+  // first, preserving the exact `is not`/`isn't` text so the protected anchor
+  // still survives unchanged. Plural/past inner copulas fail closed because
+  // moving `is not` to `are not`/`was not` would mutate that protected span.
+  const directBookishNegation = candidate.replace(
+    /\bit\s+(is\s+not|isn['’]t)\s+the\s+case\s+that\s+(.+?)\s+is\s+([^.!?]+)([.!?]?)/gi,
+    (_match, marker: string, subject: string, complement: string, punctuation: string) =>
+      `${capitalize(subject.trim())} ${marker} ${complement.trim()}${punctuation}`,
+  );
+
+  const repaired = withProtectedPlaceholders(directBookishNegation, protectedValues, (masked) => {
     let repaired = masked
       .replace(/\bit\s+is\s+(?:important|worth)\s+to\s+note\s+that\s+/gi, "")
       .replace(/\bit\s+should\s+be\s+noted\s+that\s+/gi, "")
@@ -163,22 +168,6 @@ export function repairDirectEnglish(
     // domain, and “shows” can strengthen an uncertainty statement. The phrase
     // is already grammatical, so a deterministic safety pass should leave it.
 
-    // “It is not the case that the method is …” can be made direct without
-    // weakening the negation. Restrict this to a copular clause so we do not
-    // guess at a more complex proposition.
-    repaired = repaired.replace(
-      new RegExp(
-        `\\bit\\s+is\\s+(${negation})\\s+the\\s+case\\s+that\\s+(.+?)\\s+(is|are|was|were)\\s+([^.!?]+)`,
-        "gi",
-      ),
-      (_match, marker: string, subject: string, verb: string, complement: string) =>
-        `${capitalize(subject.trim())} ${verb} ${marker} ${complement.trim()}`,
-    );
-
-    // “The reason is not because the process was lacking in effectiveness”
-    // contains a vague reason frame plus a nominalized adjective. Convert the
-    // clause to a direct subject without turning the negation into a claim
-    // that the process itself was effective or ineffective.
     repaired = repaired.replace(
       /\bthe\s+reason\s+is\s+(not\s+)?because\s+([^.!?]+)([.!?])/gi,
       (_match, marker: string | undefined, clause: string, punctuation: string) => {
@@ -191,8 +180,6 @@ export function repairDirectEnglish(
       },
     );
 
-    // Replace the expletive “there is a need for us to …” with a real subject
-    // and collapse the common “make improvements” nominalization.
     repaired = repaired.replace(
       /\bthere\s+is\s+a\s+need\s+for\s+us\s+to\s+([^.!?]+)([.!?])/gi,
       (_match, action: string, punctuation: string) => {
@@ -201,8 +188,6 @@ export function repairDirectEnglish(
       },
     );
 
-    // Collapse whitespace created when a filler opener was removed, while
-    // leaving punctuation and protected placeholders untouched.
     return repairPunctuationSpacing(
       repaired
         .replace(/\s{2,}/g, " ")
