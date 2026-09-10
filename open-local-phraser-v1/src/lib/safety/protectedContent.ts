@@ -138,6 +138,12 @@ export function extractProtectedSpans(text: string): ProtectedSpan[] {
     // inventions/removals even though the clock value itself is unchanged.
     if ((candidate.kind === "name" || candidate.kind === "number") && selected.some((existing) => existing.kind === "time" && existing.start <= candidate.start && existing.end >= candidate.end)) continue;
 
+    // A single source range should have one authoritative protection role.
+    // Weekdays and similar factual tokens can also look like proper names;
+    // counting both labels makes one literal occurrence look like two facts.
+    // The earlier/higher-priority semantic span owns an identical range.
+    if (candidate.kind === "name" && selected.some((existing) => existing.kind !== "name" && existing.start === candidate.start && existing.end === candidate.end)) continue;
+
     const duplicate = selected.some((existing) => existing.kind === candidate.kind && existing.start === candidate.start && existing.end === candidate.end);
     if (!duplicate) selected.push(candidate);
   }
