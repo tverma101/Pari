@@ -68,6 +68,12 @@ const {
   strengthFitScore,
   sortRankedNativeCandidates,
 } = loadTsModule(rankerPath);
+const { meaningContractIssues } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/meaningContract.ts"));
+const { repairSentenceFlow } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/sentenceFlow.ts"));
+
+const issueIds = (original, candidate) => new Set(
+  meaningContractIssues(original, candidate).map((issue) => issue.id),
+);
 
 const unchanged = rewriteChangeProfile(
   "The editor revised the paragraph carefully.",
@@ -142,6 +148,81 @@ const ranked = sortRankedNativeCandidates([
 ]);
 assert(ranked[0]?.text === "safe-strong-quality", "Meaningful English-quality advantage did not remain primary");
 assert(ranked.at(-1)?.text === "unsafe", "Unsafe candidate outranked a safe candidate");
+
+// Meaning-contract regressions are pure deterministic checks. They deliberately
+// avoid the ONNX/embedding path so this QA remains useful on a machine with no
+// inference assets installed.
+for (const [source, expanded] of [
+  ["The editor couldn't change the quote.", "The editor could not change the quote."],
+  ["The editor couldn’t change the quote.", "The editor could not change the quote."],
+  ["The editor won't change the quote.", "The editor will not change the quote."],
+]) {
+  const ids = issueIds(source, expanded);
+  assert(!ids.has("modality-drift"), `Contraction expansion looked like modality drift: ${source}`);
+  assert(!ids.has("negation-drift"), `Contraction expansion looked like negation drift: ${source}`);
+}
+
+assert(
+  !issueIds("My draft needs work.", "I need to work on the draft.").has("point-of-view-drift"),
+  "A first-person possessive recast looked like a speaker change",
+);
+const directAddressIds = issueIds("Their draft is ready.", "Your draft is ready.");
+assert(directAddressIds.has("point-of-view-drift"), "Third-person to second-person drift was missed");
+assert(directAddressIds.has("unexpected-direct-address"), "Invented direct address was missed");
+
+assert(
+  !issueIds("The tool is so useful for editing.", "The tool is extremely useful for editing.").has("discourse-relation-drift"),
+  "Intensifier 'so' was misread as a causal connector",
+);
+assert(
+  issueIds("The deadline moved, so we revised the plan.", "The deadline moved, but we revised the plan.").has("discourse-relation-drift"),
+  "Punctuation-delimited causal 'so' was not protected",
+);
+assert(
+  issueIds("The team revised the plan because the deadline moved.", "The team revised the plan; therefore, the deadline moved.").has("discourse-relation-drift"),
+  "Cause/result direction reversal was not rejected",
+);
+assert(
+  issueIds("If the file exists, save it.", "Unless the file exists, save it.").has("discourse-relation-drift"),
+  "If/unless polarity reversal was not rejected",
+);
+assert(
+  issueIds("Before the meeting starts, send the draft.", "After the meeting starts, send the draft.").has("discourse-relation-drift"),
+  "Before/after reversal was not rejected",
+);
+assert(
+  issueIds("Even if the test passes, review the logs.", "If the test passes, review the logs.").has("discourse-relation-drift"),
+  "Concessive force from 'even if' was silently weakened",
+);
+assert(
+  !issueIds("Provided that the file exists, save it.", "If the file exists, save it.").has("discourse-relation-drift"),
+  "Equivalent positive-condition markers were falsely rejected",
+);
+
+assert(
+  issueIds("All students submitted the draft.", "Both students submitted the draft.").has("quantity-drift"),
+  "All/both quantity drift was not rejected",
+);
+assert(
+  issueIds("Only students can enter.", "All students can enter.").has("quantity-drift"),
+  "Exclusive 'only' was treated as universal quantity",
+);
+assert(
+  issueIds("Enough students responded.", "Some students responded.").has("quantity-drift"),
+  "Sufficiency was treated as an open subset",
+);
+assert(
+  !issueIds("Some students responded.", "Certain students responded.").has("quantity-drift"),
+  "Some/certain open-subset rewrite was falsely rejected",
+);
+
+const restoredRelation = repairSentenceFlow(
+  "The team kept working, although the deadline changed.",
+  "The team kept working, the deadline changed again.",
+);
+assert(/, although the deadline changed again\./i.test(restoredRelation), `Dropped relation was not restored safely: ${restoredRelation}`);
+assert(!/\bespecially\b/i.test(restoredRelation), `Relation repair invented emphasis: ${restoredRelation}`);
+assert(/\bagain\b/i.test(restoredRelation), `Relation repair overwrote candidate clause content: ${restoredRelation}`);
 
 const rankerSource = fs.readFileSync(rankerPath, "utf8");
 const finalizeIndex = rankerSource.indexOf("const finalizedCandidates = candidates.map");
