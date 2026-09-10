@@ -132,16 +132,8 @@ export function extractProtectedSpans(text: string): ProtectedSpan[] {
   })) {
     if (candidate.kind === "modality" && selected.some((existing) => existing.kind === "negation" && existing.start <= candidate.start && existing.end >= candidate.end)) continue;
 
-    // A protected clock expression owns its internal formatting tokens. If a
-    // style variant exposes `3` or `AM` as a separately matchable number/name,
-    // retaining those lower-priority component anchors creates false
-    // inventions/removals even though the clock value itself is unchanged.
     if ((candidate.kind === "name" || candidate.kind === "number") && selected.some((existing) => existing.kind === "time" && existing.start <= candidate.start && existing.end >= candidate.end)) continue;
 
-    // A single source range should have one authoritative protection role.
-    // Weekdays and similar factual tokens can also look like proper names;
-    // counting both labels makes one literal occurrence look like two facts.
-    // The earlier/higher-priority semantic span owns an identical range.
     if (candidate.kind === "name" && selected.some((existing) => existing.kind !== "name" && existing.start === candidate.start && existing.end === candidate.end)) continue;
 
     const duplicate = selected.some((existing) => existing.kind === candidate.kind && existing.start === candidate.start && existing.end === candidate.end);
@@ -228,7 +220,10 @@ function countEquivalentMeasurement(text: string, fragment: string): number {
 
 function canonicalTimeKey(fragment: string): string | null {
   const normalized = fragment.trim().replace(/\s+/g, " ");
-  const zonePattern = new RegExp(`\\s+(${TIME_ZONE})$`, "i");
+  // Spacing around an already-recognized timezone is formatting, not meaning.
+  // Accept both `15:30 UTC` and `15:30UTC` while keeping the zone identity in
+  // the canonical key so UTC cannot silently turn into EST/PST/etc.
+  const zonePattern = new RegExp(`\\s*(${TIME_ZONE})$`, "i");
   const zoneMatch = normalized.match(zonePattern);
   const zone = zoneMatch?.[1]?.toUpperCase() ?? "";
   const clock = zoneMatch ? normalized.slice(0, zoneMatch.index).trim() : normalized;
