@@ -24,6 +24,10 @@ assert(
   "benchmark bridge missed certainty strengthening",
 );
 assert(
+  ids("The interface barely changed.", "The interface slightly changed.").has("degree-drift"),
+  "benchmark bridge missed degree/extent strengthening",
+);
+assert(
   ids("At least 10 records remain.", "At most 10 records remain.").has("quantity-drift"),
   "benchmark bridge missed numeric bound reversal",
 );
