@@ -321,7 +321,7 @@ const noteStreamProbe = repairBrokenProse(
   "meeting tomorrow client upset delay need explain no blame and keep message short",
   extractProtectedSpans("meeting tomorrow client upset delay need explain no blame and keep message short"),
 );
-assert(/Tomorrow's meeting is with a client who is upset about the delay\./i.test(noteStreamProbe), `Meeting note planner missed the subject/state frame: ${noteStreamProbe}`);
+assert(/(?:Tomorrow's meeting|The meeting tomorrow) is with a client who is upset about the delay\./i.test(noteStreamProbe), `Meeting note planner missed the subject/state frame: ${noteStreamProbe}`);
 assert(/I need to explain the delay, with no blame, and keep the message short\./i.test(noteStreamProbe), `Meeting note planner produced broken action flow: ${noteStreamProbe}`);
 const meaningDrift = meaningContractIssues(
   "Not all users approved the plan. The model may fail. Only students reviewed the draft.",
@@ -1296,7 +1296,7 @@ const nuclearFixtures = [
     mode: "personal",
     text: "meeting tomorrow client upset delay need explain no blame and keep message short",
     forbidden: [/^Meeting tomorrow/i, /\bneed\s+explain\b/i, /\bno\s+blame\s+and\s+keep\b/i],
-    required: [/Tomorrow's meeting is with a client/i, /(?:explain|describe) the delay, with no blame, and keep the message short/i],
+    required: [/(?:Tomorrow's meeting|The meeting tomorrow) is with a client/i, /(?:explain|describe) the delay, with no blame, and keep the message short/i],
   },
   {
     name: "agreement-collapse",
