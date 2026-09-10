@@ -6,6 +6,7 @@ import { ROOT_DIR } from "./schema.mjs";
 const JUDGE_SOURCE_FILES = [
   "benchmarks/eval/metrics.mjs",
   "benchmarks/paraphrase-v2/score.mjs",
+  "benchmarks/paraphrase-v2/judge-provenance.mjs",
   "benchmarks/paraphrase-v2/meaning-contract-bridge.mjs",
   "benchmarks/paraphrase-v2/protected-content-bridge.mjs",
   "src/lib/generation/meaningContract.ts",
