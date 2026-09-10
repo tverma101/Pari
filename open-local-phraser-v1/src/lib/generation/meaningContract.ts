@@ -121,10 +121,12 @@ function quantityClass(value: string): string {
   if (/^(?:nearly|almost)$/.test(value)) return "numeric-near-below";
   if (/^(?:exactly|precisely)$/.test(value)) return "numeric-exact";
 
-  // Keep materially different scopes separate. The old broad
-  // “bounded-total” bucket treated `all`, `both`, and `only` as equivalent,
-  // which can certify a real factual change without any model involvement.
-  if (/^(?:a number of|many|several)$/.test(value)) return "large-unspecified";
+  // `a number of` is explicitly glossed as “several” by Cambridge, while
+  // `many` denotes a large number and `several` is described as fewer than
+  // many. Keep the supported a-number-of↔several paraphrase, but do not let a
+  // rule-only contract certify several↔many as a neutral strength change.
+  if (/^(?:a number of|several)$/.test(value)) return "several-unspecified";
+  if (/^many$/.test(value)) return "large-number";
   if (/^all$/.test(value)) return "universal-collective";
   if (/^(?:every|each)$/.test(value)) return "universal-distributive";
   if (/^both$/.test(value)) return "pair-total";
