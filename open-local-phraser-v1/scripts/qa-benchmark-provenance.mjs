@@ -2,16 +2,25 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { buildJudgeProvenance, judgeSourceFiles, sha256File } from "../benchmarks/paraphrase-v2/judge-provenance.mjs";
+import {
+  buildJudgeProvenance,
+  judgeModelArtifacts,
+  judgeSourceFiles,
+  sha256File,
+} from "../benchmarks/paraphrase-v2/judge-provenance.mjs";
 
 const ROOT_DIR = path.resolve(new URL("..", import.meta.url).pathname);
 const first = buildJudgeProvenance();
 const second = buildJudgeProvenance();
 
 assert.match(first.fingerprint, /^[0-9a-f]{64}$/, "judge fingerprint is not SHA-256 hex");
+assert.match(first.sourceFingerprint, /^[0-9a-f]{64}$/, "source fingerprint is not SHA-256 hex");
+assert.match(first.modelFingerprint, /^[0-9a-f]{64}$/, "model artifact fingerprint is not SHA-256 hex");
 assert.equal(first.fingerprint, second.fingerprint, "judge fingerprint is not deterministic within one checkout");
+assert.equal(first.sourceFingerprint, second.sourceFingerprint, "source fingerprint is not deterministic");
+assert.equal(first.modelFingerprint, second.modelFingerprint, "model fingerprint is not deterministic");
 assert.equal(first.algorithm, "sha256", "judge fingerprint algorithm is not explicit");
-assert.equal(first.schemaVersion, 2, "transitive provenance schema version was not recorded");
+assert.equal(first.schemaVersion, 3, "composite provenance schema version was not recorded");
 assert.equal(first.runtime.node, process.version, "Node runtime provenance is incorrect");
 assert(first.dependencies["@huggingface/transformers"], "transformers dependency version is missing");
 assert(first.dependencies["harper.js"], "Harper dependency version is missing");
@@ -41,6 +50,29 @@ for (const required of [
     sha256File(path.join(ROOT_DIR, required)),
     `recorded hash does not match ${required}`,
   );
+}
+
+const artifacts = judgeModelArtifacts();
+assert.deepEqual(
+  artifacts.map((entry) => entry.path),
+  [
+    "public/models/Xenova/all-MiniLM-L6-v2",
+    "public/models/Xenova/nli-deberta-v3-xsmall",
+    "public/models/Xenova/distilbert-base-uncased",
+  ],
+  "judge model provenance does not cover the three scoring assets",
+);
+for (const artifact of artifacts) {
+  assert.match(artifact.fingerprint, /^[0-9a-f]{64}$/, `${artifact.path}: artifact fingerprint is invalid`);
+  if (artifact.present) {
+    assert(artifact.files.length > 0, `${artifact.path}: present model directory has no recorded files`);
+    for (const file of artifact.files) {
+      assert.match(file.sha256, /^[0-9a-f]{64}$/, `${file.path}: model file hash is invalid`);
+      assert(Number.isInteger(file.size) && file.size >= 0, `${file.path}: model file size is invalid`);
+    }
+  } else {
+    assert.deepEqual(artifact.files, [], `${artifact.path}: missing artifact unexpectedly recorded files`);
+  }
 }
 
 const scoreSource = fs.readFileSync(path.join(ROOT_DIR, "benchmarks/paraphrase-v2/score.mjs"), "utf8");
