@@ -12,7 +12,12 @@ interface Marker {
   value: string;
 }
 
-const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|hardly|rarely|seldom|invalid|unacceptable|impossible)\b/gi;
+// `no` normally carries negative force, but in numeric bound phrases such as
+// “no less than 10” / “no more than 10” that force is already represented by
+// the bound's quantity class. Counting it again as a free-standing negation
+// would falsely reject safe equivalents such as “at least 10” and “at most
+// 10”.
+const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no(?!\s+(?:more|less)\s+than\s+(?:[$€£¥]\s*)?\d)|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|hardly|rarely|seldom|invalid|unacceptable|impossible)\b/gi;
 // Include negative contractions as modality markers as well as negation
 // markers. Otherwise a harmless contraction edit such as “couldn't” ->
 // “could not” looks like a modal was added because `could` is only visible in
