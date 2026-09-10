@@ -52,14 +52,23 @@ const { meaningContractIssues } = loadTsModule(
   path.join(ROOT_DIR, "src/lib/generation/meaningContract.ts"),
 );
 
-function ids(original, candidate) {
-  return new Set(meaningContractIssues(original, candidate).map((issue) => issue.id));
+function issues(original, candidate) {
+  return meaningContractIssues(original, candidate);
 }
 
-function expectQuantitySafe(original, candidate, label) {
+function ids(original, candidate) {
+  return new Set(issues(original, candidate).map((issue) => issue.id));
+}
+
+function expectContractSafe(original, candidate, label) {
+  const found = issues(original, candidate);
+  assert.deepEqual(found, [], `${label}: equivalent wording produced contract issues ${JSON.stringify(found)}`);
+}
+
+function expectNoQuantityDrift(original, candidate, label) {
   assert(
     !ids(original, candidate).has("quantity-drift"),
-    `${label}: equivalent quantity relation was rejected`,
+    `${label}: non-quantity prose created a quantity failure`,
   );
 }
 
@@ -70,37 +79,37 @@ function expectQuantityDrift(original, candidate, label) {
   );
 }
 
-expectQuantitySafe(
+expectContractSafe(
   "At least 10 students attended.",
   "No less than 10 students attended.",
   "lower-inclusive synonyms",
 );
-expectQuantitySafe(
+expectContractSafe(
   "The room holds at most 30 people.",
   "The room holds up to 30 people.",
   "upper-inclusive synonyms",
 );
-expectQuantitySafe(
+expectContractSafe(
   "Approximately 200 records remain.",
   "Roughly 200 records remain.",
   "approximation synonyms",
 );
-expectQuantitySafe(
+expectContractSafe(
   "About 50% of the files changed.",
   "Around 50% of the files changed.",
   "about-around approximation synonyms",
 );
-expectQuantitySafe(
+expectContractSafe(
   "Exactly 12 examples are required.",
   "Precisely 12 examples are required.",
   "exactness synonyms",
 );
-expectQuantitySafe(
+expectContractSafe(
   "Nearly 100 users responded.",
   "Almost 100 users responded.",
   "near-below synonyms",
 );
-expectQuantitySafe(
+expectContractSafe(
   "A number of students asked questions.",
   "Several students asked questions.",
   "a-number-of several equivalence",
@@ -149,8 +158,8 @@ expectQuantityDrift(
 
 // Numeric-bound words should remain inert when they are not actually modifying
 // a written number. These prose-only changes are outside this deterministic
-// quantity contract and must not create a false hard failure.
-expectQuantitySafe(
+// quantity contract and must not create a false hard quantity failure.
+expectNoQuantityDrift(
   "We talked about the schedule.",
   "We talked around the schedule.",
   "non-numeric about-around prose",
