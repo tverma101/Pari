@@ -184,7 +184,18 @@ function articleBeforeSelection(context: RankingContext): "a" | "an" | "the" | n
 }
 
 function startsWithVowelSound(value: string): boolean {
-  return /^[aeiou]/i.test(value.trim());
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return false;
+
+  // Indefinite articles follow pronunciation, not spelling. Keep this list
+  // intentionally small and high-confidence so the rule ranker does not try
+  // to infer pronunciation for arbitrary acronyms or names.
+  if (/^(?:honest|honor|honour|hour|heir|herb)\b/.test(normalized)) return true;
+  if (/^(?:ewe|euro|one|once|uniform|unique|unit|united|university|use|useful|usefully|user|usual)\b/.test(normalized)) {
+    return false;
+  }
+
+  return /^[aeiou]/.test(normalized);
 }
 
 function looksPluralNoun(value: string): boolean {
@@ -298,6 +309,34 @@ function sentenceDuplicatePenalty(option: CandidateOption, context: RankingConte
   return pattern.test(remainingSentence) ? 0.28 : 0;
 }
 
+const COMPARISON_LINK_WORDS = new Set(["as", "to", "from", "than"]);
+const COMPARISON_LINKS: Record<string, ReadonlySet<string>> = {
+  similar: new Set(["to"]),
+  same: new Set(["as"]),
+  different: new Set(["from", "than", "to"]),
+  distinct: new Set(["from"]),
+};
+
+function comparisonLinkPenalty(context: RankingContext, replacement: string): number {
+  const previous = wordBeforeSelection(context);
+  if (!previous) return 0;
+
+  const allowed = COMPARISON_LINKS[previous];
+  if (!allowed) return 0;
+
+  const selectedWord = context.selectedText.trim().toLowerCase().match(/^[a-z]+/)?.[0] ?? "";
+  const replacementWord = replacement.match(/^[a-z]+/)?.[0] ?? "";
+
+  // Only police the comparison link itself. The old rule penalized every
+  // replacement after words such as “same” or “different”, so a harmless
+  // noun rewrite like “the same process” -> “the same method” lost 0.24.
+  if (!COMPARISON_LINK_WORDS.has(selectedWord) && !COMPARISON_LINK_WORDS.has(replacementWord)) {
+    return 0;
+  }
+
+  return allowed.has(replacementWord) ? 0 : 0.24;
+}
+
 function localGrammarPenalty(option: CandidateOption, context: RankingContext): number {
   const replacement = option.replacement.trim().toLowerCase();
   const previous = wordBeforeSelection(context);
@@ -339,9 +378,7 @@ function localGrammarPenalty(option: CandidateOption, context: RankingContext): 
     penalty += 0.22;
   }
 
-  if (previous && /^(similar|alike|same|different|distinct)$/.test(previous) && replacement !== "since") {
-    penalty += 0.24;
-  }
+  penalty += comparisonLinkPenalty(context, replacement);
 
   return penalty;
 }
