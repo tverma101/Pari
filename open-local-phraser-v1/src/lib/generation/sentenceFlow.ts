@@ -11,7 +11,6 @@ type TransitionFamily =
   | "contrast"
   | "condition"
   | "concessive-condition"
-  | "negative-condition"
   | "example"
   | "result"
   | "time-before"
@@ -57,7 +56,10 @@ const LEADING_TRANSITIONS: Array<{ phrase: string; family: TransitionFamily }> =
   { phrase: "once", family: "time-after" },
   { phrase: "after", family: "time-after" },
   { phrase: "before", family: "time-before" },
-  { phrase: "unless", family: "negative-condition" },
+  // Polarity for `unless` is modeled in meaningContract. Keep its flow family
+  // aligned with `if` so a valid `unless P` -> `if not P` rewrite is not
+  // mechanically turned into the opposite `unless not P`.
+  { phrase: "unless", family: "condition" },
   { phrase: "also", family: "addition" },
   { phrase: "thus", family: "result" },
   { phrase: "but", family: "contrast" },
