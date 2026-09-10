@@ -46,19 +46,12 @@ const LEADING_TRANSITIONS: Array<{ phrase: string; family: TransitionFamily }> =
   { phrase: "however", family: "contrast" },
   { phrase: "whereas", family: "contrast" },
   { phrase: "though", family: "contrast" },
-  // `while` and `since` are lexically ambiguous: each can carry a temporal
-  // sense, while `while` can also contrast and `since` can give a reason.
-  // Preserve the exact marker instead of guessing its sense in a rule-only
-  // finalizer.
   { phrase: "while", family: "while" },
   { phrase: "since", family: "since" },
   { phrase: "when", family: "time-concurrent" },
   { phrase: "once", family: "time-after" },
   { phrase: "after", family: "time-after" },
   { phrase: "before", family: "time-before" },
-  // Polarity for `unless` is modeled in meaningContract. Keep its flow family
-  // aligned with `if` so a valid `unless P` -> `if not P` rewrite is not
-  // mechanically turned into the opposite `unless not P`.
   { phrase: "unless", family: "condition" },
   { phrase: "also", family: "addition" },
   { phrase: "thus", family: "result" },
@@ -75,10 +68,6 @@ function escapeRegExp(value: string): string {
 }
 
 function embeddedTransition(sentence: string): LeadingTransition | null {
-  // Prefer the transition that appears first in the sentence. The previous
-  // loop returned the first phrase in the transition table that happened to
-  // match anywhere, so a later long phrase could hide an earlier relationship.
-  // Longer phrases still win ties at the same character position.
   const ordered = [...LEADING_TRANSITIONS].sort((left, right) => right.phrase.length - left.phrase.length);
   let best: LeadingTransition | null = null;
   for (const transition of ordered) {
@@ -139,25 +128,25 @@ function restoreDroppedEmbeddedRelation(
   const remainder = body.slice(leadingCoordinator.length).replace(/^\s+/, "");
   if (!remainder.trim()) return candidateSentence;
 
-  // For a relation that was embedded in the source, restore the source's
-  // subordinate-clause boundary as well as its marker. Keeping a candidate
-  // coordinator here creates fragments such as “I focus better, and when the
-  // room is quiet.” When the source had no comma before the relation, remove
-  // the candidate comma/coordinator; when it did, preserve that comma.
   if (originalRelation.start > 0) {
     const sourcePrefix = originalSentence.slice(0, originalRelation.start);
     const sourceHadComma = /,\s*$/.test(sourcePrefix);
     const before = commaSegments.slice(0, targetIndex).join(",").replace(/\s+$/, "");
     const after = commaSegments.slice(targetIndex + 1).join(",");
     const separator = sourceHadComma ? ", " : " ";
-    let restored = `${before}${separator}${originalRelation.text} ${remainder}`;
+
+    // When a candidate drops an embedded relationship entirely, do not glue
+    // the source marker onto an arbitrary candidate fragment (for example
+    // `when handle distractions`). The source subordinate clause is the one
+    // structure whose relation and proposition are known to be valid, so use
+    // it verbatim while retaining safe candidate material before/after it.
+    // This is deliberately domain-agnostic: it applies to cause, time,
+    // condition and contrast clauses alike.
+    let restored = `${before}${separator}${sourceClause}`;
     if (after) restored += `,${after}`;
     return restored;
   }
 
-  // For a genuinely leading relation, keep the existing conservative segment
-  // behavior. The target-index guard above means this path is rare, but it is
-  // safer than guessing a new whole-sentence order.
   commaSegments[targetIndex] = `${leadingWhitespace}${leadingCoordinator}${originalRelation.text} ${remainder}`;
   return commaSegments.join(",");
 }
@@ -206,9 +195,6 @@ function parallelStructureIssues(text: string): SentenceFlowIssue[] {
     const hasVerbLead = Boolean(match[1]) && VERB_LIST_LEAD.test(match[1].trim());
     const mixedForms = new Set(forms).size > 1;
 
-    // Only treat a list as verbal when a modal/infinitive introduces it or
-    // enough items carry an unmistakable verb inflection. This avoids
-    // flagging ordinary adjective lists such as "clear, direct, and simple."
     if (mixedForms && (hasVerbLead || inflectedCount >= 2)) {
       issues.push({
         id: "parallel-verb-series",
@@ -246,9 +232,6 @@ function toGerund(value: string): string {
 }
 
 function repairParallelVerbSeries(text: string): string {
-  // This is deliberately limited to verbs that select a gerund complement.
-  // It repairs “likes reading, writing, and revise” without trying to infer
-  // tense or rewrite arbitrary noun/adjective lists.
   return text.replace(
     /\b((?:likes?|enjoys?|keeps?|starts?|stops?|avoids?|finishes?|continues?|prefers?)\s+)([A-Za-z]+ing),\s+([A-Za-z]+ing),\s+and\s+([A-Za-z]+)\b/gi,
     (_match, lead: string, first: string, second: string, final: string) =>
@@ -298,10 +281,6 @@ export function repairSentenceFlow(original: string, candidate: string): string 
   let repaired = repairParallelVerbSeries(candidate);
   if (originalSentences.length !== candidateSentences.length) return repaired;
 
-  // Preserve relationships inside a sentence as well as at its opening.
-  // Native drafts often turn “when there are distractions” into “although
-  // there are distractions” while keeping every content word; this is a
-  // fluent sentence with the wrong logic, so restore the source transition.
   let repairedSentences = splitSentences(repaired);
   if (repairedSentences.length === originalSentences.length) {
     for (let index = repairedSentences.length - 1; index >= 0; index -= 1) {
