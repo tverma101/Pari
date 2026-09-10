@@ -276,9 +276,13 @@ function countExact(text: string, fragment: string): number {
   return count;
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function countCaseInsensitive(text: string, fragment: string): number {
   if (!fragment) return 0;
-  const pattern = new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+  const pattern = new RegExp(escapeRegExp(fragment), "gi");
   return [...text.matchAll(pattern)].length;
 }
 
@@ -335,6 +339,19 @@ function countEquivalentNegation(text: string, fragment: string): number {
   return [...text.matchAll(pattern)].length;
 }
 
+function measurementParts(fragment: string): { number: string; unit: string } | null {
+  const pattern = new RegExp(`^(\\d[\\d,]*(?:\\.\\d+)?)\\s*(${MEASUREMENT_UNIT})$`);
+  const match = fragment.match(pattern);
+  return match ? { number: match[1], unit: match[2] } : null;
+}
+
+function countEquivalentMeasurement(text: string, fragment: string): number {
+  const parts = measurementParts(fragment);
+  if (!parts) return 0;
+  const pattern = new RegExp(`\\b${escapeRegExp(parts.number)}\\s*${escapeRegExp(parts.unit)}\\b`, "g");
+  return [...text.matchAll(pattern)].length;
+}
+
 function uniqueTexts(spans: ProtectedSpan[]): string[] {
   return [...new Set(spans.map((span) => span.text))];
 }
@@ -344,6 +361,10 @@ const FACTUAL_ADDITION_KINDS = new Set<ProtectedSpanKind>([
 ]);
 
 function spanCountKey(span: Pick<ProtectedSpan, "kind" | "text">): string {
+  if (span.kind === "number") {
+    const measurement = measurementParts(span.text);
+    if (measurement) return `${span.kind}\u0000${measurement.number}\u0000${measurement.unit}`;
+  }
   return `${span.kind}\u0000${span.text}`;
 }
 
@@ -387,7 +408,10 @@ export function validateProtectedContent(
     const actual = countExact(candidateText, text);
     const equivalentNegation = matchingSpans.every((span) => span.kind === "negation") &&
       countEquivalentNegation(candidateText, text) >= expected;
-    if (actual < expected && !equivalentNegation) {
+    const equivalentMeasurement = matchingSpans.every(
+      (span) => span.kind === "number" && measurementParts(span.text) !== null,
+    ) && countEquivalentMeasurement(candidateText, text) >= expected;
+    if (actual < expected && !equivalentNegation && !equivalentMeasurement) {
       const missing = protectedSpans.find((span) => span.text === text);
       return {
         safe: false,
