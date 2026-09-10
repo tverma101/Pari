@@ -345,15 +345,24 @@ function planNoteStream(value: string): string | null {
     .trim();
   if (!normalized || /[.!?]/.test(normalized) || countWords(normalized) < 6) return null;
 
+  // Relative dates such as `today` and `tomorrow` are protected factual
+  // anchors. `repairBrokenProse` masks protected anchors before planning, so
+  // recognize the placeholder in the day slot without unmasking or changing
+  // it. When the day is protected, keep it mid-sentence so its exact casing is
+  // preserved while the generated sentence still begins grammatically.
   const meetingMatch = normalized.match(
-    /^meeting\s+(today|tomorrow)\s+(?:(?:with\s+)?(?:the\s+)?)(client|customer|team|manager|user)\s+(?:who\s+)?(?:is\s+)?(upset|concerned|angry|frustrated)\s+(?:(?:about|over|due\s+to)\s+)?(?:the\s+)?(delay|problem|issue|change)\s+need\s+(.+)$/i,
+    /^meeting\s+(today|tomorrow|\uE000[\s\S]\uE001)\s+(?:(?:with\s+)?(?:the\s+)?)(client|customer|team|manager|user)\s+(?:who\s+)?(?:is\s+)?(upset|concerned|angry|frustrated)\s+(?:(?:about|over|due\s+to)\s+)?(?:the\s+)?(delay|problem|issue|change)\s+need\s+(.+)$/i,
   );
   if (meetingMatch) {
     const [, day, entity, emotion, issue, action] = meetingMatch;
     const entityText = /^(?:client|customer)$/i.test(entity) ? `a ${entity.toLowerCase()}` : `the ${entity.toLowerCase()}`;
     const actionSentence = normalizeNoteAction(action, issue.toLowerCase());
     if (actionSentence) {
-      return `${capitalizeSentence(day)}'s meeting is with ${entityText} who is ${emotion.toLowerCase()} about the ${issue.toLowerCase()}. ${actionSentence}.`;
+      const protectedDay = /^\uE000[\s\S]\uE001$/.test(day);
+      const meetingLead = protectedDay
+        ? `The meeting ${day} is`
+        : `${capitalizeSentence(day)}'s meeting is`;
+      return `${meetingLead} with ${entityText} who is ${emotion.toLowerCase()} about the ${issue.toLowerCase()}. ${actionSentence}.`;
     }
   }
 
