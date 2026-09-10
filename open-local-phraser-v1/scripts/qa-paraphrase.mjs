@@ -366,7 +366,7 @@ const realQuantifierDrift = meaningContractIssues(
 );
 assert(realQuantifierDrift.some((issue) => issue.id === "quantity-drift"), "Meaning contract accepted a real quantifier-strength drift");
 const screenshotParagraph = "Boredom is usually seen as something negative. Most people try to avoid it by watching videos, scrolling through social media, playing games, or finding something else to do. However, boredom is not always a bad thing. In some situations, being bored can help people think more creatively, understand themselves better, and take a break from constant stimulation.";
-const screenshotNativeCandidate = "Boredom is often viewed as a negative experience. To combat it, most people turn to activities like watching videos, scrolling through social media, playing games, or engaging in other distractions. However, boredom is not inherently negative. In certain contexts, it can foster creative thinking, promote self-reflection, and provide a respite from ongoing stimulation.";
+const screenshotNativeCandidate = "Boredom is usually viewed as a negative experience. To combat it, most people turn to activities like watching videos, scrolling through social media, playing games, or engaging in other distractions. However, boredom is not always negative. In certain contexts, it can foster creative thinking, help people understand themselves better, and provide a respite from ongoing stimulation.";
 const screenshotQuality = validateRewriteQuality(screenshotParagraph, screenshotNativeCandidate);
 assert(screenshotQuality.safe, `Screenshot-quality native candidate was rejected: ${screenshotQuality.issues.map((issue) => issue.id).join(", ")}`);
 assert(!/\breceive\s+a\s+break\b/i.test(screenshotNativeCandidate), "Screenshot-quality regression kept the weak receive-a-break wording");
@@ -394,7 +394,7 @@ const choosingResult = rewriteText(
   { mode: "personal", strength: 100, freezeWords: "", disableAutomaticRewrites: false },
   {}
 );
-const choosingToken = choosingResult.tokens.find((token) => token.originalText.toLowerCase() === "choosing");
+const choosingToken = choosingResult.tokens.find((entry) => entry.originalText.toLowerCase() === "choosing");
 assert(choosingToken?.text.toLowerCase() === "choosing", "Automatic paragraph rewriting changed choosing unexpectedly");
 assert((choosingToken?.alternatives.length ?? 0) >= 35, "Automatic path did not preserve the broad manual choosing suggestions");
 
