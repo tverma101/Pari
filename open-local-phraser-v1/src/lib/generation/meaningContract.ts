@@ -23,7 +23,11 @@ const MODALITY_RE = /\b(?:cannot|can['’]t|couldn['’]t|mightn['’]t|mustn['�
 // “Certain” commonly replaces “some” in a natural rewrite without changing
 // the open-ended subset being described. Keep it in the same contract class.
 const QUANTITY_RE = /\b(?:a\s+number\s+of|a\s+majority\s+of|the\s+majority\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|certain|any|enough)\b/gi;
-const RELATION_RE = /\b(?:due\s+to\s+the\s+fact\s+that|notwithstanding\s+the\s+fact\s+that|in\s+the\s+event\s+that|for\s+unspecified\s+reasons|as\s+long\s+as|provided\s+that|given\s+that|as\s+a\s+result|even\s+though|even\s+if|because|since|although|though|if|unless|when|while|once|after|before|therefore|thus|consequently|however|but|yet)\b/gi;
+// Keep longest multiword relations first so one semantic marker is collected
+// for a construction such as “because of” instead of separately matching the
+// shorter “because”. These are high-confidence cause, contrast, condition,
+// and temporal relations; ambiguous words such as bare “as” remain excluded.
+const RELATION_RE = /\b(?:due\s+to\s+the\s+fact\s+that|notwithstanding\s+the\s+fact\s+that|in\s+spite\s+of\s+the\s+fact\s+that|despite\s+the\s+fact\s+that|in\s+the\s+event\s+that|for\s+unspecified\s+reasons|because\s+of|owing\s+to|due\s+to|in\s+spite\s+of|as\s+soon\s+as|as\s+long\s+as|provided\s+that|given\s+that|as\s+a\s+result|even\s+though|even\s+if|because|since|although|though|despite|whereas|if|unless|when|whilst|while|once|after|before|until|till|therefore|thus|consequently|however|but|yet)\b|(?:^|[^A-Za-z])['’]til\b/gi;
 // Bare “so” is intentionally excluded above. It is often an intensifier (“so
 // useful”, “so much”) rather than a cause/result marker. A separate collector
 // recognizes it only in punctuation-delimited coordinator positions.
@@ -39,7 +43,11 @@ function collect(text: string, family: MarkerFamily, pattern: RegExp): Marker[] 
   pattern.lastIndex = 0;
   return [...text.matchAll(pattern)].map((match) => ({
     family,
-    value: match[0].toLowerCase().replace(/[’]/g, "'").replace(/\s+/g, " "),
+    value: match[0]
+      .toLowerCase()
+      .replace(/^[^a-z'’]+/i, "")
+      .replace(/[’]/g, "'")
+      .replace(/\s+/g, " "),
   }));
 }
 
@@ -113,26 +121,29 @@ function quantityClass(value: string): string {
 }
 
 function relationClass(value: string): string {
-  // Keep cause-subordinators separate from result-connectors. Turning
-  // “X because Y” into “X; therefore Y” reverses causal direction even though
-  // both contain causal vocabulary.
-  if (/^(?:due to the fact that|for unspecified reasons|given that|because)$/.test(value)) return "cause";
+  // Keep cause-subordinators/prepositions separate from result-connectors.
+  // Turning “X because Y” into “X; therefore Y” reverses causal direction even
+  // though both contain causal vocabulary.
+  if (/^(?:due to the fact that|for unspecified reasons|given that|because|because of|due to|owing to)$/.test(value)) return "cause";
   if (/^(?:therefore|thus|so|consequently|as a result)$/.test(value)) return "result";
-  if (/^(?:notwithstanding the fact that|although|though|even though|however|but|yet)$/.test(value)) return "contrast";
+  if (/^(?:notwithstanding the fact that|in spite of the fact that|despite the fact that|in spite of|despite|although|though|even though|whereas|however|but|yet)$/.test(value)) return "contrast";
   // “Even if” carries concessive force beyond a plain condition.
   if (/^even if$/.test(value)) return "concessive-condition";
   // `unless` joins the positive-condition surface class because its negative
   // force is represented separately by collectImplicitNegations().
   if (/^(?:in the event that|if|unless|provided that|as long as)$/.test(value)) return "positive-condition";
-  // `since` and `while` are ambiguous without syntax/semantics. A rule-only
-  // contract should preserve them rather than assuming `since = because` or
-  // `while = when` and silently accepting the wrong sense.
+  // `since` and `while/whilst` are ambiguous without syntax/semantics. A
+  // rule-only contract should preserve the sense instead of assuming
+  // `since = because` or `while = when` and silently accepting the wrong use.
   if (/^since$/.test(value)) return "ambiguous-since";
-  if (/^while$/.test(value)) return "ambiguous-while";
-  // Temporal direction is semantic, not stylistic. In particular, `before`
-  // and `after` must never normalize to the same marker class.
+  if (/^(?:while|whilst)$/.test(value)) return "ambiguous-while";
+  // Temporal direction/boundary is semantic, not stylistic. In particular,
+  // `before`, `after`, `until`, and the immediacy in `as soon as` remain
+  // distinct so a rewrite cannot weaken or reverse the timeline.
   if (/^before$/.test(value)) return "time-before";
   if (/^(?:after|once)$/.test(value)) return "time-after";
+  if (/^as soon as$/.test(value)) return "time-immediate-after";
+  if (/^(?:until|till|'til)$/.test(value)) return "time-until";
   if (/^when$/.test(value)) return "time-concurrent";
   return value;
 }
