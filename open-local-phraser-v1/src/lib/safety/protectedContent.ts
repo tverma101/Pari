@@ -356,7 +356,11 @@ function uniqueTexts(spans: ProtectedSpan[]): string[] {
   return [...new Set(spans.map((span) => span.text))];
 }
 
+// New anchors are inventions, not paraphrases. Names are handled separately
+// below because repeating an existing name can be a legitimate coreference
+// clarification; these exact anchor kinds should never appear from nowhere.
 const FACTUAL_ADDITION_KINDS = new Set<ProtectedSpanKind>([
+  "url", "email", "quote", "citation",
   "date", "time", "number", "percentage", "currency",
 ]);
 
