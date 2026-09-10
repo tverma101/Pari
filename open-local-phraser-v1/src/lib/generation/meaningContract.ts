@@ -5,7 +5,7 @@ export interface MeaningContractIssue {
   detail: string;
 }
 
-type MarkerFamily = "negation" | "modality" | "quantity" | "relation" | "person";
+type MarkerFamily = "negation" | "modality" | "certainty" | "quantity" | "relation" | "person";
 
 interface Marker {
   family: MarkerFamily;
@@ -23,6 +23,11 @@ const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no(?!\s+(?:more|less)
 // “could not” looks like a modal was added because `could` is only visible in
 // the expanded form.
 const MODALITY_RE = /\b(?:cannot|can['’]t|couldn['’]t|mightn['’]t|mustn['’]t|shouldn['’]t|shan['’]t|won['’]t|wouldn['’]t|may|might|could|can|must|should|will|would|shall)\b/gi;
+// English also expresses epistemic force without modal verbs. Keep a narrow
+// high-confidence set whose probability strength is explicit. `surely` is
+// intentionally excluded: Cambridge distinguishes it from `certainly` because
+// it commonly seeks agreement rather than expressing no-doubt certainty.
+const CERTAINTY_RE = /\b(?:maybe|perhaps|possible|possibly|probable|probably|likely|unlikely|certainly|definitely)\b/gi;
 // “More” and “less” are excluded because they are frequently ordinary
 // comparatives (for example, “read more smoothly”), not quantity claims.
 // “Certain” commonly replaces “some” in a natural rewrite without changing
@@ -91,6 +96,7 @@ function markerProfile(text: string): Marker[] {
     ...collect(text, "negation", NEGATION_RE),
     ...collectImplicitNegations(text),
     ...collect(text, "modality", MODALITY_RE),
+    ...collect(text, "certainty", CERTAINTY_RE),
     ...collect(text, "quantity", QUANTITY_RE),
     ...collect(text, "quantity", NUMERIC_QUANTITY_RE),
     ...collectRelations(text),
@@ -111,6 +117,14 @@ function modalityClass(value: string): string {
   if (/^shan't$/.test(value)) return "shall";
   if (/^won't$/.test(value)) return "will";
   if (/^wouldn't$/.test(value)) return "would";
+  return value;
+}
+
+function certaintyClass(value: string): string {
+  if (/^(?:maybe|perhaps|possible|possibly)$/.test(value)) return "possible-not-certain";
+  if (/^(?:probable|probably|likely)$/.test(value)) return "probable-likely";
+  if (/^unlikely$/.test(value)) return "unlikely";
+  if (/^(?:certainly|definitely)$/.test(value)) return "no-doubt-certain";
   return value;
 }
 
@@ -217,10 +231,10 @@ function hasSameFamilyShape(original: string[], candidate: string[], normalize: 
  * A conservative semantic contract for automatic paraphrasing.
  *
  * It does not pretend to solve entailment. It catches high-cost drift that a
- * local text editor can detect reliably: negation, modal force, quantifier
- * scope, discourse relation, and writer perspective. More nuanced meaning is
- * still protected by the model prompt, protected-span gate, and native/local
- * quality checks.
+ * local text editor can detect reliably: negation, modal force, non-verbal
+ * certainty, quantifier scope, discourse relation, and writer perspective.
+ * More nuanced meaning is still protected by the model prompt, protected-span
+ * gate, and native/local quality checks.
  */
 export function meaningContractIssues(
   original: string,
@@ -248,6 +262,12 @@ export function meaningContractIssues(
       id: "modality-drift",
       detail: "The rewrite changed the presence or force of a modal verb.",
       normalize: modalityClass,
+    },
+    {
+      family: "certainty",
+      id: "certainty-drift",
+      detail: "The rewrite changed the source's stated possibility, likelihood, or certainty.",
+      normalize: certaintyClass,
     },
     {
       family: "quantity",
