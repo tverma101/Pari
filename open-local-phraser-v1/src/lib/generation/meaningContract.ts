@@ -5,7 +5,7 @@ export interface MeaningContractIssue {
   detail: string;
 }
 
-type MarkerFamily = "negation" | "modality" | "certainty" | "degree" | "quantity" | "relation" | "person";
+type MarkerFamily = "negation" | "modality" | "certainty" | "degree" | "frequency" | "quantity" | "relation" | "person";
 
 interface Marker {
   family: MarkerFamily;
@@ -17,7 +17,7 @@ interface Marker {
 // the bound's quantity class. Counting it again as a free-standing negation
 // would falsely reject safe equivalents such as “at least 10” and “at most
 // 10”. Barely/hardly/scarcely also carry near-zero force, so keep all three
-// aligned here as well as in the degree contract below.
+// aligned here as well as in the degree/frequency contracts below.
 const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no(?!\s+(?:more|less)\s+than\s+(?:[$€£¥]\s*)?\d)|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|barely|hardly|scarcely|rarely|seldom|invalid|unacceptable|impossible)\b/gi;
 // Include negative contractions as modality markers as well as negation
 // markers. Otherwise a harmless contraction edit such as “couldn't” ->
@@ -37,10 +37,18 @@ const CERTAIN_SUBSET_RE = /\bcertain(?=\s+(?:people|persons|individuals|things|i
 // Preserve explicit degree/extent when the wording is high-confidence. The
 // near-zero, small-degree, and large-degree families are semantically distinct:
 // “barely changed”, “slightly changed”, and “changed considerably” do not make
-// the same claim. `significantly` has a separate parenthetical discourse sense
-// ("Significantly, ..."), so collect it only when it is not followed by a comma.
-const DEGREE_RE = /\b(?:barely|hardly|scarcely|slightly|marginally|considerably|greatly)\b/gi;
+// the same claim. `hardly ever` is a frequency expression, so keep that phrase
+// out of the degree family. `significantly` has a separate parenthetical
+// discourse sense ("Significantly, ..."), so collect it only when it is not
+// followed by a comma.
+const DEGREE_RE = /\b(?:(?:hardly(?!\s+ever)|barely|scarcely)|slightly|marginally|considerably|greatly)\b/gi;
 const SIGNIFICANT_DEGREE_RE = /\bsignificantly\b(?!\s*,)/gi;
+// Keep frequency strength separate from degree and negation. Cambridge groups
+// `hardly ever`, `rarely`, and `seldom` as frequency adverbs meaning not very
+// often, and explicitly treats `often` and `frequently` as synonyms. More
+// distant strengths stay separate so a rewrite cannot turn `sometimes` into
+// `always` without a semantic veto.
+const FREQUENCY_RE = /\b(?:not\s+ever|hardly\s+ever|never|rarely|seldom|occasionally|sometimes|frequently|often|usually|always)\b/gi;
 // “More” and “less” are excluded because they are frequently ordinary
 // comparatives (for example, “read more smoothly”), not quantity claims.
 const QUANTITY_RE = /\b(?:a\s+number\s+of|a\s+majority\s+of|the\s+majority\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|any|enough)\b/gi;
@@ -111,6 +119,7 @@ function markerProfile(text: string): Marker[] {
     ...collect(text, "certainty", CERTAIN_EPISTEMIC_RE),
     ...collect(text, "degree", DEGREE_RE),
     ...collect(text, "degree", SIGNIFICANT_DEGREE_RE),
+    ...collect(text, "frequency", FREQUENCY_RE),
     ...collect(text, "quantity", QUANTITY_RE),
     ...collect(text, "quantity", CERTAIN_SUBSET_RE),
     ...collect(text, "quantity", NUMERIC_QUANTITY_RE),
@@ -147,6 +156,17 @@ function degreeClass(value: string): string {
   if (/^(?:barely|hardly|scarcely)$/.test(value)) return "near-zero";
   if (/^(?:slightly|marginally)$/.test(value)) return "small-degree";
   if (/^(?:significantly|considerably|greatly)$/.test(value)) return "large-degree";
+  return value;
+}
+
+function frequencyClass(value: string): string {
+  if (/^(?:never|not ever)$/.test(value)) return "zero-frequency";
+  if (/^(?:hardly ever|rarely|seldom)$/.test(value)) return "near-zero-frequency";
+  if (/^occasionally$/.test(value)) return "occasional";
+  if (/^sometimes$/.test(value)) return "sometimes";
+  if (/^(?:often|frequently)$/.test(value)) return "frequent";
+  if (/^usually$/.test(value)) return "usual-frequency";
+  if (/^always$/.test(value)) return "universal-frequency";
   return value;
 }
 
@@ -254,9 +274,9 @@ function hasSameFamilyShape(original: string[], candidate: string[], normalize: 
  *
  * It does not pretend to solve entailment. It catches high-cost drift that a
  * local text editor can detect reliably: negation, modal force, non-verbal
- * certainty, degree/extent, quantifier scope, discourse relation, and writer
- * perspective. More nuanced meaning is still protected by the model prompt,
- * protected-span gate, and native/local quality checks.
+ * certainty, degree/extent, frequency, quantifier scope, discourse relation,
+ * and writer perspective. More nuanced meaning is still protected by the model
+ * prompt, protected-span gate, and native/local quality checks.
  */
 export function meaningContractIssues(
   original: string,
@@ -296,6 +316,12 @@ export function meaningContractIssues(
       id: "degree-drift",
       detail: "The rewrite changed an explicit near-zero, small, or large degree/extent qualifier.",
       normalize: degreeClass,
+    },
+    {
+      family: "frequency",
+      id: "frequency-drift",
+      detail: "The rewrite changed how often the source says an event happens.",
+      normalize: frequencyClass,
     },
     {
       family: "quantity",
