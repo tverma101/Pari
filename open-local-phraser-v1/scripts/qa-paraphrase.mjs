@@ -311,7 +311,7 @@ assert(!/\bto\s+mak\b/i.test(gerundInfinitiveProbe), `Gerund-to-infinitive repai
 const bookishNegationProbe = repairDirectEnglish("It is not the case that the method is useless.", extractProtectedSpans("It is not the case that the method is useless."));
 assert(/The method is not useless\./i.test(bookishNegationProbe), `Bookish negation was not made direct: ${bookishNegationProbe}`);
 const vagueNegationProbe = repairDirectEnglish("There is no indication that the method is useless.", extractProtectedSpans("There is no indication that the method is useless."));
-assert(/No evidence shows that the method is useless\./i.test(vagueNegationProbe), `Vague negation was not made direct: ${vagueNegationProbe}`);
+assert(vagueNegationProbe === "There is no indication that the method is useless.", `Vague negation was changed despite uncertain semantics: ${vagueNegationProbe}`);
 const nominalizationProbe = repairDirectEnglish(
   "The reason is not because the process was lacking in effectiveness. There is a need for us to make improvements.",
 );
@@ -1334,7 +1334,8 @@ const nuclearFixtures = [
     name: "bookish-negation",
     mode: "personal",
     text: "It is not the case that the method is useless. There is no indication that the team agrees.",
-    forbidden: [/\bit is not the case that\b/i, /\bthere is no indication that\b/i],
+    forbidden: [/\bit is not the case that\b/i],
+    required: [/\bthere is no indication that the team agrees\b/i],
   },
 ];
 
