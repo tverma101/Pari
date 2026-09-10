@@ -74,5 +74,20 @@ assert.equal(
   false,
   "metre quantity mutation was accepted",
 );
+assert.equal(
+  validateProtectedContent("The cable is 5m long.", "The cable is 5 m long.").safe,
+  true,
+  "standards-compliant measurement spacing repair was falsely rejected",
+);
+assert.equal(
+  validateProtectedContent("The cable is 5 m long.", "The cable is 5m long.").safe,
+  true,
+  "measurement spacing alone was treated as factual drift",
+);
+assert.equal(
+  validateProtectedContent("The dose is 50mg.", "The dose is 50 mg.").safe,
+  true,
+  "measurement spacing equivalence did not generalize beyond metres",
+);
 
 console.log("qa:protected:units passed");
