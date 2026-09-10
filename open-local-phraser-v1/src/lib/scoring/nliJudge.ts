@@ -1,25 +1,14 @@
 /**
  * Lightweight production NLI / role-preservation judge (Issue #7).
  *
- * The "learned judge" requirement cannot be satisfied by fixtures/regexes alone.
- * Full DeBERTa-v3 MNLI ONNX is now bundled through onnxNli.ts. This module is
- * the deterministic safety rail that remains useful when the learned asset is
- * unavailable and catches the class of failures where cosine stays high but
- * the proposition is wrong.
- *
- * Approach (no new weights, no network):
- *  - Negation / quantity / named-entity checks (already in metrics.mjs guards).
- *  - Generic syntactic role check: for any input/output pair, detect when the
- *    same two referents appear with swapped grammatical roles. Previous code
- *    only checked literal "the dog chased the man". This checks *any* SVO swap
- *    via POS-tagged subject/object extraction (posTagger.ts is already bundled).
- *  - Clause-attachment is handled by clauseAttachment.ts; this module handles
- *    NLI-style contradiction vs entailment.
- *
- * `createPipelineNliJudge({ pipeline })` remains available for adapters, while
- * production uses the bundled learned judge plus `createRuleNliJudge()`.
+ * The learned DeBERTa judge remains the general semantic signal. This module
+ * is the deterministic safety rail used alongside it and when learned assets
+ * are unavailable. Its rules therefore stay deliberately conservative:
+ * reject only high-confidence contradictions that can be established from
+ * surface structure without pretending to perform full entailment.
  */
 
+import { guessPartOfSpeech } from "@/lib/nlp/posTagger";
 import type { EntailmentLabel } from "./englishQuality";
 
 export interface NliJudge {
@@ -30,12 +19,15 @@ function normalize(text: string): string {
   return text.trim().toLowerCase();
 }
 
-function wordSet(text: string): Set<string> {
-  return new Set(normalize(text).match(/[a-z']+/g) ?? []);
+function wordTokens(text: string): string[] {
+  return (normalize(text).match(/[a-z]+(?:['’][a-z]+)?/g) ?? [])
+    .map((token) => token.replace(/’/g, "'"));
 }
 
-// Very small general NLI: contradiction signals that survive cosine.
-// These are not fixtures — they fire on any verb with the same pattern.
+function wordSet(text: string): Set<string> {
+  return new Set(wordTokens(text));
+}
+
 const NEGATION_WORDS = new Set([
   "not", "no", "never", "without", "neither", "nor", "cannot",
   "can't", "cant", "couldn't", "couldnt", "didn't", "didnt",
@@ -43,31 +35,56 @@ const NEGATION_WORDS = new Set([
   "hasn't", "hasnt", "haven't", "havent", "isn't", "isnt",
   "mustn't", "mustnt", "needn't", "neednt", "shouldn't", "shouldnt",
   "wasn't", "wasnt", "weren't", "werent", "won't", "wont",
-  "wouldn't", "wouldnt", "n't",
+  "wouldn't", "wouldnt", "shan't", "shant", "aren't", "arent",
+]);
+
+/** Positive carrier left after removing a contraction's negative force. */
+const NEGATED_BASE_FORMS = new Map<string, string>([
+  ["cannot", "can"], ["can't", "can"], ["cant", "can"],
+  ["couldn't", "could"], ["couldnt", "could"],
+  ["didn't", "did"], ["didnt", "did"],
+  ["doesn't", "does"], ["doesnt", "does"],
+  ["don't", "do"], ["dont", "do"],
+  ["hadn't", "had"], ["hadnt", "had"],
+  ["hasn't", "has"], ["hasnt", "has"],
+  ["haven't", "have"], ["havent", "have"],
+  ["isn't", "is"], ["isnt", "is"],
+  ["aren't", "are"], ["arent", "are"],
+  ["mustn't", "must"], ["mustnt", "must"],
+  ["needn't", "need"], ["neednt", "need"],
+  ["shouldn't", "should"], ["shouldnt", "should"],
+  ["wasn't", "was"], ["wasnt", "was"],
+  ["weren't", "were"], ["werent", "were"],
+  ["won't", "will"], ["wont", "will"],
+  ["wouldn't", "would"], ["wouldnt", "would"],
+  ["shan't", "shall"], ["shant", "shall"],
 ]);
 
 function isNegationToken(token: string): boolean {
-  const normalized = token.replace(/’/g, "'");
-  return NEGATION_WORDS.has(normalized) || normalized.endsWith("n't");
+  return NEGATION_WORDS.has(token) || token.endsWith("n't");
 }
+
 const QUANT_WORDS = new Set(["all", "every", "each", "none", "only", "always", "never"]);
 
 function negationCount(text: string): number {
-  const toks = normalize(text).match(/[a-z']+/g) ?? [];
-  return toks.filter(isNegationToken).length;
+  return wordTokens(text).filter(isNegationToken).length;
 }
 
+/**
+ * Strip only negative force while preserving its auxiliary/modal carrier.
+ * This gives equivalent signatures to `couldn't approve` and
+ * `could not approve`, while still making `could approve` vs
+ * `couldn't approve` directly comparable as a real negation flip.
+ */
 function negationSignature(text: string): string {
-  const tokens = normalize(text).match(/[a-z']+/g) ?? [];
   const kept: string[] = [];
-  for (const token of tokens) {
-    if (isNegationToken(token)) {
-      const previous = kept[kept.length - 1];
-      if (previous && ["do", "does", "did", "can", "could", "should", "will", "would", "must", "need"].includes(previous)) {
-        kept.pop();
-      }
+  for (const token of wordTokens(text)) {
+    const positiveBase = NEGATED_BASE_FORMS.get(token);
+    if (positiveBase) {
+      kept.push(positiveBase);
       continue;
     }
+    if (isNegationToken(token)) continue;
     kept.push(token);
   }
   return kept.join(" ");
@@ -79,38 +96,130 @@ function directNegationFlip(premise: string, hypothesis: string): boolean {
 }
 
 function hasQuantityMismatch(premise: string, hypothesis: string): boolean {
-  const p = wordSet(premise), h = wordSet(hypothesis);
+  const p = wordSet(premise);
+  const h = wordSet(hypothesis);
   for (const q of QUANT_WORDS) {
     if ((p.has(q) || h.has(q)) && p.has(q) !== h.has(q)) return true;
   }
   return false;
 }
 
+const ROLE_FUNCTION_WORDS = new Set([
+  "a", "an", "the", "this", "that", "these", "those",
+  "and", "or", "but", "yet", "of", "to", "for", "with", "from", "into", "onto",
+  "in", "on", "at", "through", "during", "after", "before", "around", "about", "by",
+  "am", "is", "are", "was", "were", "be", "been", "being",
+  "do", "does", "did", "have", "has", "had",
+  "can", "could", "may", "might", "must", "shall", "should", "will", "would",
+]);
+const BE_AUXILIARIES = new Set(["am", "is", "are", "was", "were", "be", "been", "being"]);
+
+function roleTokens(text: string): string[] {
+  return normalize(text).match(/[a-z]+/g) ?? [];
+}
+
+function isVerbAnchor(token: string): boolean {
+  return !ROLE_FUNCTION_WORDS.has(token) && guessPartOfSpeech(token) === "verb";
+}
+
+function isReferentToken(token: string): boolean {
+  if (ROLE_FUNCTION_WORDS.has(token)) return false;
+  const part = guessPartOfSpeech(token);
+  return part !== "verb" && part !== "adverb" && part !== "adjective";
+}
+
+function nearestReferent(tokens: string[], start: number, direction: -1 | 1): string | null {
+  for (let index = start + direction; index >= 0 && index < tokens.length; index += direction) {
+    if (isReferentToken(tokens[index])) return tokens[index];
+  }
+  return null;
+}
+
+function collectReferents(tokens: string[], start: number, end = tokens.length): Set<string> {
+  const result = new Set<string>();
+  for (let index = Math.max(0, start); index < Math.min(end, tokens.length); index += 1) {
+    if (isReferentToken(tokens[index])) result.add(tokens[index]);
+  }
+  return result;
+}
+
+interface ShallowRoles {
+  agent: string;
+  nonAgents: Set<string>;
+}
+
+function shallowRoles(tokens: string[], verbIndex: number): ShallowRoles | null {
+  let passiveAuxIndex = -1;
+  for (let index = Math.max(0, verbIndex - 2); index < verbIndex; index += 1) {
+    if (BE_AUXILIARIES.has(tokens[index])) passiveAuxIndex = index;
+  }
+  const byIndex = tokens.indexOf("by", verbIndex + 1);
+
+  if (passiveAuxIndex >= 0 && byIndex > verbIndex) {
+    const patient = nearestReferent(tokens, passiveAuxIndex, -1);
+    const agent = nearestReferent(tokens, byIndex, 1);
+    if (!patient || !agent || patient === agent) return null;
+    const nonAgents = collectReferents(tokens, verbIndex + 1, byIndex);
+    nonAgents.add(patient);
+    nonAgents.delete(agent);
+    return { agent, nonAgents };
+  }
+
+  const agent = nearestReferent(tokens, verbIndex, -1);
+  if (!agent) return null;
+  const nonAgents = collectReferents(tokens, verbIndex + 1);
+  nonAgents.delete(agent);
+  if (nonAgents.size === 0) return null;
+  return { agent, nonAgents };
+}
+
 /**
- * Generic SVO role-swap: if both texts contain the same two noun phrases
- * (simple heuristic: two capitalized or determiner-headed nouns) in opposite
- * linear order around a shared verb, flag contradiction. This generalizes
- * beyond "dog/man" to any unseen pair.
+ * Conservative same-verb role-swap rail.
+ *
+ * We intentionally skip comma/semicolon-heavy clauses: a shallow deterministic
+ * parser should not pretend it can resolve attachment across complex syntax.
+ * For simple clauses, a contradiction is high-confidence when the premise's
+ * agent reappears in a non-agent role while the hypothesis's agent occupied a
+ * non-agent role in the premise. Passive `... was VERBed by ...` is normalized
+ * first, so a valid active/passive rewrite is not mistaken for a swap.
  */
 function genericRoleSwap(premise: string, hypothesis: string): boolean {
-  // Collect candidate noun-ish tokens (content words) in order.
-  const pTokens = (normalize(premise).match(/[a-z]+/g) ?? []).filter((t) => t.length >= 3);
-  const hTokens = (normalize(hypothesis).match(/[a-z]+/g) ?? []).filter((t) => t.length >= 3);
-  if (pTokens.length < 4 || hTokens.length < 4) return false;
-  // Find a shared verb-ish token (appears in both, likely verb).
-  const hSet = new Set(hTokens);
-  const shared = pTokens.filter((t) => hSet.has(t));
-  if (shared.length === 0) return false;
-  // Pick the first shared token as anchor verb (e.g., "chased").
-  const verb = shared[0];
-  const pVerbIdx = pTokens.indexOf(verb);
-  const hVerbIdx = hTokens.indexOf(verb);
-  if (pVerbIdx <= 0 || hVerbIdx <= 0 || pVerbIdx >= pTokens.length - 1 || hVerbIdx >= hTokens.length - 1) return false;
-  // Compare the nearest content neighbors on each side of the verb.
-  const pLeft = pTokens[pVerbIdx - 1], pRight = pTokens[pVerbIdx + 1];
-  const hLeft = hTokens[hVerbIdx - 1], hRight = hTokens[hVerbIdx + 1];
-  // Swapped iff left/right are the same pair in opposite order.
-  return (pLeft === hRight && pRight === hLeft && pLeft !== pRight);
+  if (/[;,]/.test(premise) || /[;,]/.test(hypothesis)) return false;
+
+  const pTokens = roleTokens(premise);
+  const hTokens = roleTokens(hypothesis);
+  if (pTokens.length < 3 || hTokens.length < 3) return false;
+
+  const hypothesisVerbPositions = new Map<string, number[]>();
+  hTokens.forEach((token, index) => {
+    if (!isVerbAnchor(token)) return;
+    const positions = hypothesisVerbPositions.get(token) ?? [];
+    positions.push(index);
+    hypothesisVerbPositions.set(token, positions);
+  });
+
+  for (let pIndex = 0; pIndex < pTokens.length; pIndex += 1) {
+    const verb = pTokens[pIndex];
+    if (!isVerbAnchor(verb)) continue;
+    const hPositions = hypothesisVerbPositions.get(verb);
+    if (!hPositions) continue;
+
+    const premiseRoles = shallowRoles(pTokens, pIndex);
+    if (!premiseRoles) continue;
+
+    for (const hIndex of hPositions) {
+      const hypothesisRoles = shallowRoles(hTokens, hIndex);
+      if (!hypothesisRoles || premiseRoles.agent === hypothesisRoles.agent) continue;
+      if (
+        premiseRoles.nonAgents.has(hypothesisRoles.agent) &&
+        hypothesisRoles.nonAgents.has(premiseRoles.agent)
+      ) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 export function createRuleNliJudge(): NliJudge {
@@ -119,22 +228,21 @@ export function createRuleNliJudge(): NliJudge {
       if (!premise.trim() || !hypothesis.trim()) {
         return { label: "neutral", score: 0.5, reason: "empty input" };
       }
-      const negP = negationCount(premise), negH = negationCount(hypothesis);
+
+      const negP = negationCount(premise);
+      const negH = negationCount(hypothesis);
       if (negP !== negH && directNegationFlip(premise, hypothesis)) {
-        // A direct lexical negation flip is a strong contradiction — cosine
-        // often stays >0.85. Do not veto merely because a malformed source
-        // spells "dont" and the repair spells "don't"; learned NLI handles
-        // those non-identical sentence shapes.
         return { label: "contradict", score: 0.9, reason: `negation count ${negP}→${negH}` };
       }
       if (hasQuantityMismatch(premise, hypothesis)) {
         return { label: "contradict", score: 0.75, reason: "quantity/quantifier mismatch" };
       }
       if (genericRoleSwap(premise, hypothesis)) {
-        return { label: "contradict", score: 0.88, reason: "generic SVO role swap around shared verb" };
+        return { label: "contradict", score: 0.88, reason: "reciprocal role swap around shared verb" };
       }
-      // Check for invented specifics: hypothesis introduces a named entity / number not in premise
-      // (cheap guard — full anchor check lives in metrics.mjs; this catches unseen traps).
+
+      // Cheap invented-number guard. Full protected-span/anchor validation is
+      // still authoritative elsewhere in the production pipeline.
       const pNums = new Set((premise.match(/\b\d+[\d.,]*%?\b/g) ?? []).map((s) => s.replace(/,/g, "")));
       const hNums = hypothesis.match(/\b\d+[\d.,]*%?\b/g) ?? [];
       for (const n of hNums) {
@@ -153,14 +261,13 @@ export function createPipelineNliJudge(
   return {
     async judge(premise: string, hypothesis: string) {
       try {
-        const r = await pipeline(premise, hypothesis);
-        const raw = r.label.toLowerCase();
+        const result = await pipeline(premise, hypothesis);
+        const raw = result.label.toLowerCase();
         const label: EntailmentLabel =
           raw.includes("contradict") ? "contradict" : raw.includes("entail") ? "entail" : "neutral";
-        return { label, score: r.score, reason: `onnx ${r.label} ${r.score.toFixed(2)}` };
-      } catch (e) {
-        const fallback = createRuleNliJudge();
-        return fallback.judge(premise, hypothesis);
+        return { label, score: result.score, reason: `onnx ${result.label} ${result.score.toFixed(2)}` };
+      } catch {
+        return createRuleNliJudge().judge(premise, hypothesis);
       }
     },
   };
