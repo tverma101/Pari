@@ -1,3 +1,4 @@
+import { preferredIndefiniteArticle } from "./articleSound";
 import { splitSentences } from "./sentenceSplit";
 
 export type GrammarIssueSeverity = "low" | "medium" | "high";
@@ -19,18 +20,6 @@ function wordCount(value: string): number {
 function compactSample(value: string, maxLength = 72): string {
   const compacted = value.trim().replace(/\s+/g, " ");
   return compacted.length > maxLength ? `${compacted.slice(0, maxLength - 1)}...` : compacted;
-}
-
-function startsWithVowelSound(value: string): boolean {
-  const normalized = value.trim().toLowerCase();
-  if (!normalized) return false;
-
-  if (/^(?:honest|honor|honour|hour|heir|herb)\b/.test(normalized)) return true;
-  if (/^(?:ewe|euro|one|once|uniform|unique|unit|united|university|use|useful|usefully|user|usual)\b/.test(normalized)) {
-    return false;
-  }
-
-  return /^[aeiou]/.test(normalized);
 }
 
 function hardIssue(
@@ -74,8 +63,8 @@ function hardGrammarIssues(text: string): GrammarIssue[] {
   while ((articleMatch = articlePattern.exec(text)) !== null) {
     const article = articleMatch[1].toLowerCase();
     const word = articleMatch[2];
-    const expected = startsWithVowelSound(word) ? "an" : "a";
-    if (article !== expected) {
+    const expected = preferredIndefiniteArticle(word);
+    if (expected && article !== expected) {
       add(hardIssue(
         "article-mismatch",
         "Article agreement",
