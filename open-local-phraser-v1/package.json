@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "qa:paraphrase": "node scripts/qa-paraphrase.mjs && node scripts/qa-native-ranker.mjs && node scripts/qa-rule-nli.mjs && node scripts/qa-rule-ranker.mjs && node scripts/qa-meaning-audit.mjs && node scripts/qa-protected-units.mjs && node scripts/qa-article-sound.mjs && node scripts/qa-meaning-agreement.mjs && node scripts/qa-meaning-bounds.mjs && node scripts/qa-protected-additions.mjs && node scripts/qa-meaning-certainty.mjs && node scripts/qa-benchmark-meaning-contract.mjs && node scripts/qa-meaning-degree.mjs && node scripts/qa-meaning-frequency.mjs && node scripts/qa-meaning-comparative.mjs && node scripts/qa-benchmark-provenance.mjs && node scripts/qa-benchmark-comparability.mjs",
+    "qa:paraphrase": "node scripts/qa-protected-times.mjs && node scripts/qa-paraphrase.mjs && node scripts/qa-native-ranker.mjs && node scripts/qa-rule-nli.mjs && node scripts/qa-rule-ranker.mjs && node scripts/qa-meaning-audit.mjs && node scripts/qa-protected-units.mjs && node scripts/qa-article-sound.mjs && node scripts/qa-meaning-agreement.mjs && node scripts/qa-meaning-bounds.mjs && node scripts/qa-protected-additions.mjs && node scripts/qa-meaning-certainty.mjs && node scripts/qa-benchmark-meaning-contract.mjs && node scripts/qa-meaning-degree.mjs && node scripts/qa-meaning-frequency.mjs && node scripts/qa-meaning-comparative.mjs && node scripts/qa-benchmark-provenance.mjs && node scripts/qa-benchmark-comparability.mjs",
     "qa:approval": "node scripts/qa-paraphrase.mjs",
     "qa:grammar:harper": "node scripts/qa-harper.mjs",
     "qa:native:model": "node scripts/qa-native-model.mjs",
@@ -24,6 +24,7 @@
     "qa:benchmark:provenance": "node scripts/qa-benchmark-provenance.mjs",
     "qa:benchmark:comparability": "node scripts/qa-benchmark-comparability.mjs",
     "qa:protected:units": "node scripts/qa-protected-units.mjs",
+    "qa:protected:times": "node scripts/qa-protected-times.mjs",
     "qa:protected:additions": "node scripts/qa-protected-additions.mjs",
     "qa:article:sound": "node scripts/qa-article-sound.mjs",
     "qa:agent:styles": "node scripts/qa-agent-style-backend.mjs",
