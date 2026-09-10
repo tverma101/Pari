@@ -33,6 +33,7 @@ const SO_RELATION_RE = /(?:[,;]\s+so\b|(?:^|[.!?]\s+)so,\s+)/gi;
 // “Several …”. Possessive and reflexive forms are included so a grammatical
 // recast does not look like a change of speaker or participant.
 const PERSON_RE = /\b(?:I|me|my|mine|myself|we|us|our|ours|ourselves|you|your|yours|yourself|yourselves|he|him|his|himself|she|her|hers|herself|they|them|their|theirs|themselves)\b/gi;
+const UNLESS_RE = /\bunless\b/gi;
 
 function collect(text: string, family: MarkerFamily, pattern: RegExp): Marker[] {
   pattern.lastIndex = 0;
@@ -51,9 +52,24 @@ function collectRelations(text: string): Marker[] {
   return markers;
 }
 
+/**
+ * `unless P` is semantically equivalent to a negative condition such as
+ * `if not P`. Represent that negative force explicitly in the contract so
+ * safe unless↔if-not rewrites are accepted, while unless↔if still fails on
+ * negation. This also composes correctly with `unless not P` (two negatives).
+ */
+function collectImplicitNegations(text: string): Marker[] {
+  UNLESS_RE.lastIndex = 0;
+  return [...text.matchAll(UNLESS_RE)].map(() => ({
+    family: "negation" as const,
+    value: "implicit-unless",
+  }));
+}
+
 function markerProfile(text: string): Marker[] {
   return [
     ...collect(text, "negation", NEGATION_RE),
+    ...collectImplicitNegations(text),
     ...collect(text, "modality", MODALITY_RE),
     ...collect(text, "quantity", QUANTITY_RE),
     ...collectRelations(text),
@@ -105,8 +121,9 @@ function relationClass(value: string): string {
   if (/^(?:notwithstanding the fact that|although|though|even though|however|but|yet)$/.test(value)) return "contrast";
   // “Even if” carries concessive force beyond a plain condition.
   if (/^even if$/.test(value)) return "concessive-condition";
-  if (/^(?:in the event that|if|provided that|as long as)$/.test(value)) return "positive-condition";
-  if (/^unless$/.test(value)) return "negative-condition";
+  // `unless` joins the positive-condition surface class because its negative
+  // force is represented separately by collectImplicitNegations().
+  if (/^(?:in the event that|if|unless|provided that|as long as)$/.test(value)) return "positive-condition";
   // Temporal direction is semantic, not stylistic. In particular, `before`
   // and `after` must never normalize to the same marker class.
   if (/^before$/.test(value)) return "time-before";
