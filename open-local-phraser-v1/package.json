@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "qa:paraphrase": "node scripts/qa-paraphrase.mjs",
+    "qa:paraphrase": "node scripts/qa-paraphrase.mjs && node scripts/qa-native-ranker.mjs",
     "qa:approval": "node scripts/qa-paraphrase.mjs",
     "qa:grammar:harper": "node scripts/qa-harper.mjs",
     "qa:native:model": "node scripts/qa-native-model.mjs",
     "qa:native:prompt": "python3 scripts/qa-native-prompt.py",
+    "qa:native:ranker": "node scripts/qa-native-ranker.mjs",
     "qa:agent:styles": "node scripts/qa-agent-style-backend.mjs",
     "benchmark:local": "node scripts/benchmark-paraphrase.mjs",
     "benchmark:quality": "node scripts/benchmark-paraphrase.mjs",
