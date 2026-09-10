@@ -23,6 +23,12 @@ const MODALITY_RE = /\b(?:cannot|can['’]t|couldn['’]t|mightn['’]t|mustn['�
 // “Certain” commonly replaces “some” in a natural rewrite without changing
 // the open-ended subset being described. Keep it in the same contract class.
 const QUANTITY_RE = /\b(?:a\s+number\s+of|a\s+majority\s+of|the\s+majority\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|certain|any|enough)\b/gi;
+// Numeric bounds can reverse a factual claim while leaving the protected
+// numeral unchanged (`at least 10` -> `at most 10`). Collect these phrases
+// only when they directly modify a written number/currency amount, which keeps
+// ambiguous ordinary uses of words such as “about” and “around” out of the
+// contract.
+const NUMERIC_QUANTITY_RE = /\b(?:at\s+least|no\s+less\s+than|at\s+most|no\s+more\s+than|more\s+than|less\s+than|fewer\s+than|up\s+to|approximately|roughly|about|around|nearly|almost|exactly|precisely)(?=\s+(?:[$€£¥]\s*)?\d)/gi;
 // Keep longest multiword relations first so one semantic marker is collected
 // for a construction such as “because of” instead of separately matching the
 // shorter “because”. These are high-confidence cause, contrast, condition,
@@ -36,7 +42,7 @@ const SO_RELATION_RE = /(?:[,;]\s+so\b|(?:^|[.!?]\s+)so,\s+)/gi;
 // rejecting a direct repair such as “It is important to note that …” ->
 // “Several …”. Possessive and reflexive forms are included so a grammatical
 // recast does not look like a change of speaker or participant.
-const PERSON_RE = /\b(?:I|me|my|mine|myself|we|us|our|ours|ourselves|you|your|yours|yourself|yourselves|he|him|his|himself|she|her|hers|herself|they|them|their|theirs|themselves)\b/gi;
+const PERSON_RE = /\b(?:I|me|my|mine|myself|we|us|our|ourselves|you|your|yours|yourself|yourselves|he|him|his|himself|she|her|hers|herself|they|them|their|theirs|themselves)\b/gi;
 const UNLESS_RE = /\bunless\b/gi;
 
 function collect(text: string, family: MarkerFamily, pattern: RegExp): Marker[] {
@@ -47,7 +53,8 @@ function collect(text: string, family: MarkerFamily, pattern: RegExp): Marker[] 
       .toLowerCase()
       .replace(/^[^a-z'’]+/i, "")
       .replace(/[’]/g, "'")
-      .replace(/\s+/g, " "),
+      .replace(/\s+/g, " ")
+      .trim(),
   }));
 }
 
@@ -80,6 +87,7 @@ function markerProfile(text: string): Marker[] {
     ...collectImplicitNegations(text),
     ...collect(text, "modality", MODALITY_RE),
     ...collect(text, "quantity", QUANTITY_RE),
+    ...collect(text, "quantity", NUMERIC_QUANTITY_RE),
     ...collectRelations(text),
     ...collect(text, "person", PERSON_RE),
   ];
@@ -102,6 +110,17 @@ function modalityClass(value: string): string {
 }
 
 function quantityClass(value: string): string {
+  // Numeric bounds need their own classes. Inclusive and exclusive bounds are
+  // kept separate because `at least 10` and `more than 10` differ at exactly
+  // 10 even though they point in the same direction.
+  if (/^(?:at least|no less than)$/.test(value)) return "numeric-lower-inclusive";
+  if (/^more than$/.test(value)) return "numeric-lower-exclusive";
+  if (/^(?:at most|no more than|up to)$/.test(value)) return "numeric-upper-inclusive";
+  if (/^(?:less than|fewer than)$/.test(value)) return "numeric-upper-exclusive";
+  if (/^(?:approximately|roughly|about|around)$/.test(value)) return "numeric-approximate";
+  if (/^(?:nearly|almost)$/.test(value)) return "numeric-near-below";
+  if (/^(?:exactly|precisely)$/.test(value)) return "numeric-exact";
+
   // Keep materially different scopes separate. The old broad
   // “bounded-total” bucket treated `all`, `both`, and `only` as equivalent,
   // which can certify a real factual change without any model involvement.
@@ -226,7 +245,7 @@ export function meaningContractIssues(
     {
       family: "quantity",
       id: "quantity-drift",
-      detail: "The rewrite changed the scope or strength of a quantity word.",
+      detail: "The rewrite changed the scope or strength of a quantity word or numeric bound.",
       normalize: quantityClass,
     },
     {
