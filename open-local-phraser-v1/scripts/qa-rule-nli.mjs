@@ -68,6 +68,20 @@ function meaningIds(original, candidate) {
   return new Set(meaningContractIssues(original, candidate).map((issue) => issue.id));
 }
 
+function expectNoRelationDrift(original, candidate, label) {
+  assert(
+    !meaningIds(original, candidate).has("discourse-relation-drift"),
+    `${label}: equivalent relation was rejected`,
+  );
+}
+
+function expectRelationDrift(original, candidate, label) {
+  assert(
+    meaningIds(original, candidate).has("discourse-relation-drift"),
+    `${label}: relation drift was accepted`,
+  );
+}
+
 function expectProtectedSafe(original, candidate, label) {
   const result = validateProtectedContent(original, candidate, extractProtectedSpans(original));
   assert.equal(result.safe, true, `${label}: false protected-content rejection ${JSON.stringify(result)}`);
@@ -149,6 +163,47 @@ const doubleNegativeUnless = meaningIds(
   "If the editor approves the draft, we can ship it.",
 );
 assert(doubleNegativeUnless.has("negation-drift"), "unless-not collapsed two negative forces into a positive condition");
+
+expectNoRelationDrift(
+  "The flight was delayed because of fog.",
+  "The flight was delayed due to fog.",
+  "because-of↔due-to cause equivalence",
+);
+expectNoRelationDrift(
+  "The team shipped despite the delay.",
+  "Although there was a delay, the team shipped.",
+  "despite↔although contrast equivalence",
+);
+expectNoRelationDrift(
+  "The first version is shorter, whereas the second is clearer.",
+  "The first version is shorter, but the second is clearer.",
+  "whereas↔but contrast equivalence",
+);
+expectNoRelationDrift(
+  "The service stays open until Friday.",
+  "The service stays open till Friday.",
+  "until↔till time-boundary equivalence",
+);
+expectRelationDrift(
+  "The flight was delayed because of fog.",
+  "The flight was delayed after fog.",
+  "cause changed to chronology",
+);
+expectRelationDrift(
+  "The service stays open until Friday.",
+  "The service stays open before Friday.",
+  "until changed to before",
+);
+expectRelationDrift(
+  "Call me as soon as the result arrives.",
+  "Call me once the result arrives.",
+  "immediate time relation weakened to once",
+);
+expectRelationDrift(
+  "The team shipped despite the delay.",
+  "The team shipped after the delay.",
+  "contrast changed to chronology",
+);
 
 assert.equal(
   repairSentenceFlow(
