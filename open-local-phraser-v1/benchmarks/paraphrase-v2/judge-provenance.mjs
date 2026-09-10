@@ -21,7 +21,17 @@ const JUDGE_ENTRY_FILES = [
   "src/lib/scoring/nliJudge.ts",
 ];
 
+// These three local assets directly affect v2 automatic quality/meaning scores.
+// Hashing bytes is intentionally separate from inference: provenance must change
+// if a model/config/tokenizer changes under the same local path.
+const JUDGE_MODEL_DIRS = [
+  "public/models/Xenova/all-MiniLM-L6-v2",
+  "public/models/Xenova/nli-deberta-v3-xsmall",
+  "public/models/Xenova/distilbert-base-uncased",
+];
+
 const SOURCE_EXTENSIONS = ["", ".ts", ".tsx", ".js", ".mjs", ".cjs", ".json"];
+const IGNORED_ARTIFACT_FILES = new Set([".DS_Store"]);
 
 export function sha256Buffer(value) {
   return crypto.createHash("sha256").update(value).digest("hex");
@@ -99,33 +109,92 @@ export function judgeSourceFiles() {
   return [...seen].sort();
 }
 
+function walkFiles(directory) {
+  const files = [];
+  if (!fs.existsSync(directory)) return files;
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    if (IGNORED_ARTIFACT_FILES.has(entry.name)) continue;
+    const absolutePath = path.join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...walkFiles(absolutePath));
+    else if (entry.isFile()) files.push(absolutePath);
+  }
+  return files;
+}
+
+export function judgeModelArtifacts() {
+  return JUDGE_MODEL_DIRS.map((relativeDirectory) => {
+    const absoluteDirectory = path.join(ROOT_DIR, relativeDirectory);
+    if (!fs.existsSync(absoluteDirectory) || !fs.statSync(absoluteDirectory).isDirectory()) {
+      return {
+        path: relativeDirectory,
+        present: false,
+        fingerprint: sha256Buffer(`missing\0${relativeDirectory}`),
+        files: [],
+      };
+    }
+
+    const files = walkFiles(absoluteDirectory)
+      .map((absolutePath) => ({
+        path: relativeRepoPath(absolutePath),
+        size: fs.statSync(absolutePath).size,
+        sha256: sha256File(absolutePath),
+      }))
+      .sort((left, right) => left.path.localeCompare(right.path));
+    const fingerprint = sha256Buffer(
+      files.map((entry) => `${entry.path}\0${entry.size}\0${entry.sha256}`).join("\n"),
+    );
+    return {
+      path: relativeDirectory,
+      present: true,
+      fingerprint,
+      files,
+    };
+  });
+}
+
 export function buildJudgeProvenance() {
   const files = judgeSourceFiles().map((relativePath) => ({
     path: relativePath,
     sha256: sha256File(path.join(ROOT_DIR, relativePath)),
   }));
-  const fingerprint = sha256Buffer(
+  const sourceFingerprint = sha256Buffer(
     files.map((entry) => `${entry.path}\0${entry.sha256}`).join("\n"),
+  );
+  const modelArtifacts = judgeModelArtifacts();
+  const modelFingerprint = sha256Buffer(
+    modelArtifacts.map((entry) => `${entry.path}\0${entry.present}\0${entry.fingerprint}`).join("\n"),
   );
 
   const packageJson = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, "package.json"), "utf8"));
   const dependency = (name) =>
     packageJson.dependencies?.[name] ?? packageJson.devDependencies?.[name] ?? null;
+  const runtime = {
+    node: process.version,
+    platform: process.platform,
+    arch: process.arch,
+  };
+  const dependencies = {
+    "@huggingface/transformers": dependency("@huggingface/transformers"),
+    "harper.js": dependency("harper.js"),
+    typescript: dependency("typescript"),
+  };
+
+  const fingerprint = sha256Buffer(JSON.stringify({
+    sourceFingerprint,
+    modelFingerprint,
+    runtime,
+    dependencies,
+  }));
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     algorithm: "sha256",
     fingerprint,
+    sourceFingerprint,
+    modelFingerprint,
     files,
-    runtime: {
-      node: process.version,
-      platform: process.platform,
-      arch: process.arch,
-    },
-    dependencies: {
-      "@huggingface/transformers": dependency("@huggingface/transformers"),
-      "harper.js": dependency("harper.js"),
-      typescript: dependency("typescript"),
-    },
+    modelArtifacts,
+    runtime,
+    dependencies,
   };
 }
