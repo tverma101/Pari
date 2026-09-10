@@ -1,3 +1,4 @@
+import { articleSound } from "@/lib/nlp/articleSound";
 import type { RewriteMode } from "@/lib/types";
 
 export interface MeaningContractIssue {
@@ -17,12 +18,11 @@ interface ComparativeCue {
   head: string;
 }
 
-// `no` normally carries negative force, but in numeric bound phrases such as
-// “no less than 10” / “no more than 10” that force is already represented by
-// the bound's quantity class. Counting it again as a free-standing negation
-// would falsely reject safe equivalents such as “at least 10” and “at most
-// 10”. Barely/hardly/scarcely also carry near-zero force, so keep all three
-// aligned here as well as in the degree/frequency contracts below.
+interface ArticleCue {
+  article: "a" | "an";
+  word: string;
+}
+
 const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no(?!\s+(?:more|less)\s+than\s+(?:[$€£¥]\s*)?\d)|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|barely|hardly|scarcely|rarely|seldom|invalid|unacceptable|impossible)\b/gi;
 const MODALITY_RE = /\b(?:cannot|can['’]t|couldn['’]t|mightn['’]t|mustn['’]t|shouldn['’]t|shan['’]t|won['’]t|wouldn['’]t|may|might|could|can|must|should|will|would|shall)\b/gi;
 const CERTAINTY_RE = /\b(?:maybe|perhaps|possible|possibly|probable|probably|likely|unlikely|certainly|definitely)\b/gi;
@@ -39,6 +39,7 @@ const PERSON_RE = /\b(?:I|me|my|mine|myself|we|us|our|ourselves|you|your|yours|y
 const UNLESS_RE = /\bunless\b/gi;
 const COMPARATIVE_DIRECTION_RE = /\b(more|less|fewer|higher|lower|greater|smaller)\s+([A-Za-z][A-Za-z'-]*)\b/gi;
 const COMPARATIVE_NON_HEADS = new Set(["and", "of", "or", "than"]);
+const ARTICLE_CUE_RE = /\b(a|an)\s+([A-Za-z][A-Za-z0-9'-]*)\b/g;
 
 function collect(text: string, family: MarkerFamily, pattern: RegExp): Marker[] {
   pattern.lastIndex = 0;
@@ -190,9 +191,6 @@ function comparativeCues(text: string): ComparativeCue[] {
   for (const match of text.matchAll(COMPARATIVE_DIRECTION_RE)) {
     const word = match[1].toLowerCase();
     const head = match[2].toLowerCase();
-    // Exclude fixed/compositional frames whose semantic direction is already
-    // handled elsewhere or is not the literal comparative head: “more or
-    // less”, “more than 10”, “less of the work”, “more and more”.
     if (COMPARATIVE_NON_HEADS.has(head)) continue;
     cues.push({
       direction: /^(?:more|higher|greater)$/.test(word) ? "higher" : "lower",
@@ -208,6 +206,24 @@ function hasDirectComparativeDirectionFlip(original: string, candidate: string):
   return originalCues.some((source) =>
     candidateCues.some((rewrite) => source.head === rewrite.head && source.direction !== rewrite.direction)
   );
+}
+
+function articleCues(text: string): ArticleCue[] {
+  ARTICLE_CUE_RE.lastIndex = 0;
+  return [...text.matchAll(ARTICLE_CUE_RE)].map((match) => ({
+    article: match[1].toLowerCase() as "a" | "an",
+    word: match[2],
+  }));
+}
+
+function hasAmbiguousArticleChoiceDrift(original: string, candidate: string): boolean {
+  const sourceCues = articleCues(original).filter((cue) => articleSound(cue.word) === "ambiguous");
+  if (!sourceCues.length) return false;
+  const candidateCues = articleCues(candidate);
+  return sourceCues.some((source) => {
+    const sameWord = candidateCues.filter((cue) => cue.word.toLowerCase() === source.word.toLowerCase());
+    return sameWord.length > 0 && sameWord.every((cue) => cue.article !== source.article);
+  });
 }
 
 function counts(values: string[]): Map<string, number> {
@@ -231,13 +247,6 @@ function hasSameFamilyShape(original: string[], candidate: string[], normalize: 
   return sameCounts(original.map(normalize), candidate.map(normalize));
 }
 
-/**
- * A conservative semantic contract for automatic paraphrasing. It catches
- * high-cost deterministic drift without pretending to solve open-ended
- * entailment: negation, modal/certainty force, degree, frequency, quantifier
- * scope, discourse relations, participant perspective, and direct comparative
- * polarity reversals on the same lexical head.
- */
 export function meaningContractIssues(
   original: string,
   candidate: string,
@@ -276,6 +285,13 @@ export function meaningContractIssues(
     issues.push({
       id: "comparative-direction-drift",
       detail: "The rewrite reversed a direct comparative direction on the same quality or quantity.",
+    });
+  }
+
+  if (hasAmbiguousArticleChoiceDrift(original, candidate)) {
+    issues.push({
+      id: "ambiguous-article-drift",
+      detail: "The rewrite changed an indefinite article where pronunciation or dialect is intentionally left ambiguous.",
     });
   }
 
