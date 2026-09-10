@@ -27,7 +27,7 @@ const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no(?!\s+(?:more|less)
 const MODALITY_RE = /\b(?:cannot|can['’]t|couldn['’]t|mightn['’]t|mustn['’]t|shouldn['’]t|shan['’]t|won['’]t|wouldn['’]t|may|might|could|can|must|should|will|would|shall)\b/gi;
 const CERTAINTY_RE = /\b(?:maybe|perhaps|possible|possibly|probable|probably|likely|unlikely|certainly|definitely)\b/gi;
 const CERTAIN_EPISTEMIC_RE = /\bcertain(?=\s+(?:that|whether|if|how|why|what|when|where|who|to|of|about)\b|\s*[,.;:!?—-]|\s*$)/gi;
-const CERTAIN_SUBSET_RE = /\bcertain(?=\s+(?:people|persons|individuals|things|items|times|days|weeks|months|years|students?|users?|writers?|readers?|workers?|files?|records?|examples?|cases?|situations?|circumstances?|conditions?|types?|groups?|areas?|places?|words?|phrases?|sentences?|paragraphs?|tasks?|assignments?)\b)/gi;
+const CERTAIN_SUBSET_RE = /\bcertain(?=\s+(?:people|persons|individuals|things|items|times|days|weeks|months|years|students?|users?|writers?|readers?|workers?|files?|records?|examples?|cases?|situations?|contexts?|circumstances?|conditions?|types?|groups?|areas?|places?|words?|phrases?|sentences?|paragraphs?|tasks?|assignments?)\b)/gi;
 const DEGREE_RE = /\b(?:(?:hardly(?!\s+ever)|barely|scarcely)|slightly|marginally|considerably|greatly)\b/gi;
 const SIGNIFICANT_DEGREE_RE = /\bsignificantly\b(?!\s*,)/gi;
 const FREQUENCY_RE = /\b(?:not\s+ever|hardly\s+ever|never|rarely|seldom|occasionally|sometimes|frequently|often|usually|always)\b/gi;
