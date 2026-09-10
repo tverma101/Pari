@@ -31,6 +31,15 @@ export interface RankedNativeCandidate {
   safe: boolean;
 }
 
+export interface RewriteChangeProfile {
+  /** Word additions/removals/substitutions, ignoring word order. */
+  lexicalChangeRate: number;
+  /** Sequence movement/change measured without position-shift inflation. */
+  orderChangeRate: number;
+  /** Slider-facing blend: vocabulary change plus structural movement. */
+  combinedChangeRate: number;
+}
+
 function compareRankedCandidates(left: RankedNativeCandidate, right: RankedNativeCandidate): number {
   if (left.safe !== right.safe) return left.safe ? -1 : 1;
   // Issue #7: English quality is primary; similarity is a hard floor (see above).
@@ -68,29 +77,82 @@ function normalizedWords(text: string): string[] {
   return (text.toLowerCase().match(/[a-z0-9]+(?:['-][a-z0-9]+)*/g) ?? []);
 }
 
-function lexicalChangeRate(originalText: string, candidateText: string): number {
+function multisetOverlap(left: string[], right: string[]): number {
+  const remaining = new Map<string, number>();
+  for (const word of right) remaining.set(word, (remaining.get(word) ?? 0) + 1);
+
+  let overlap = 0;
+  for (const word of left) {
+    const count = remaining.get(word) ?? 0;
+    if (count <= 0) continue;
+    overlap += 1;
+    if (count === 1) remaining.delete(word);
+    else remaining.set(word, count - 1);
+  }
+  return overlap;
+}
+
+function longestCommonSubsequenceLength(left: string[], right: string[]): number {
+  if (left.length === 0 || right.length === 0) return 0;
+
+  // Keep the DP row on the shorter side. Candidate paragraphs are small, but
+  // O(min(n,m)) memory avoids turning a long pasted paragraph into a large
+  // temporary matrix while still giving clause movement a stable score.
+  const short = left.length <= right.length ? left : right;
+  const long = left.length <= right.length ? right : left;
+  let previous = new Uint32Array(short.length + 1);
+  let current = new Uint32Array(short.length + 1);
+
+  for (const word of long) {
+    for (let index = 1; index <= short.length; index += 1) {
+      current[index] = word === short[index - 1]
+        ? previous[index - 1] + 1
+        : Math.max(previous[index], current[index - 1]);
+    }
+    const swap = previous;
+    previous = current;
+    current = swap;
+    current.fill(0);
+  }
+
+  return previous[short.length] ?? 0;
+}
+
+/**
+ * Estimate how much a candidate actually changed without treating one moved
+ * clause as if every word after the move had been replaced. The previous
+ * position-by-position comparison dramatically inflated Strong/Deep drafts:
+ * inserting or moving a phrase shifted the rest of the sentence and made
+ * unchanged words look different.
+ *
+ * Lexical change is multiset-based, so repeated words are counted correctly
+ * while order is ignored. Structural/order change uses token LCS, so a moved
+ * clause contributes roughly its real span instead of poisoning every later
+ * position. The blend lets Deep rewrites receive credit for restructuring
+ * without making thesaurus churn the easiest way to satisfy the slider.
+ */
+export function rewriteChangeProfile(originalText: string, candidateText: string): RewriteChangeProfile {
   const originalWords = normalizedWords(originalText);
   const candidateWords = normalizedWords(candidateText);
   const width = Math.max(originalWords.length, candidateWords.length, 1);
-  const compared = Math.min(originalWords.length, candidateWords.length);
-  let changed = Math.abs(originalWords.length - candidateWords.length);
+  const lexicalOverlap = multisetOverlap(originalWords, candidateWords);
+  const sequenceOverlap = longestCommonSubsequenceLength(originalWords, candidateWords);
+  const lexicalChangeRate = Math.min(1, Math.max(0, 1 - lexicalOverlap / width));
+  const orderChangeRate = Math.min(1, Math.max(0, 1 - sequenceOverlap / width));
+  const combinedChangeRate = Math.min(1, 0.55 * lexicalChangeRate + 0.45 * orderChangeRate);
 
-  for (let index = 0; index < compared; index += 1) {
-    if (originalWords[index] !== candidateWords[index]) changed += 1;
-  }
-
-  return Math.min(1, changed / width);
+  return { lexicalChangeRate, orderChangeRate, combinedChangeRate };
 }
 
 function targetChangeRate(strength: number): number {
   const normalized = Math.max(0, Math.min(100, strength)) / 100;
-  // Aim for restrained lexical difference even at Deep: structure and phrase
-  // framing provide additional variety without encouraging word dumping.
+  // Aim for restrained difference even at Deep: sentence structure carries
+  // part of the requested change, so the target must not reward word dumping.
   return 0.035 + normalized * 0.22;
 }
 
-function strengthFitScore(originalText: string, candidateText: string, strength: number): number {
-  const distance = Math.abs(lexicalChangeRate(originalText, candidateText) - targetChangeRate(strength));
+export function strengthFitScore(originalText: string, candidateText: string, strength: number): number {
+  const distance = Math.abs(rewriteChangeProfile(originalText, candidateText).combinedChangeRate - targetChangeRate(strength));
   return Math.max(0, 1 - distance / 0.2);
 }
 
@@ -112,6 +174,21 @@ export async function rankNativeCandidates(
     warmthPolish: boolean;
   }
 ): Promise<RankedNativeCandidate[]> {
+  // Finalization is part of the candidate. Score the exact text that can be
+  // returned to the user, not the pre-repair model draft. Previously MiniLM
+  // embeddings were computed before finalization, so the semantic floor could
+  // be stale after a quantity, grammar, collocation, warmth, or flow repair.
+  const finalizedCandidates = candidates.map((candidate) => ({
+    ...candidate,
+    text: options.finalizeDraft(
+      candidate.text,
+      options.originalText,
+      options.protectedSpans,
+      options.mode,
+      options.warmthPolish,
+    ),
+  }));
+
   // Lazy-load the embedding stack: it uses import.meta (browser/orchestrator
   // only) and must not break plain-Node callers, which get grammar-only ranking.
   let cosine: (a: number[], b: number[]) => number;
@@ -125,7 +202,7 @@ export async function rankNativeCandidates(
     const extractor = await getEmbeddingExtractor("Xenova/all-MiniLM-L6-v2", {
       allowRemoteFallback: false,
     });
-    const texts = [options.originalText, ...candidates.map((candidate) => candidate.text)];
+    const texts = [options.originalText, ...finalizedCandidates.map((candidate) => candidate.text)];
     const embeddings = await extractor(texts, { pooling: "mean", normalize: true });
     const values = Array.from(embeddings.data);
     const dims = embeddings.dims ?? [];
@@ -149,14 +226,8 @@ export async function rankNativeCandidates(
   const inputRate = inputIssues / tokensOf(options.originalText);
 
   const ranked = await Promise.all(
-    candidates.map(async (candidate, index) => {
-      const repairedText = options.finalizeDraft(
-        candidate.text,
-        options.originalText,
-        options.protectedSpans,
-        options.mode,
-        options.warmthPolish,
-      );
+    finalizedCandidates.map(async (candidate, index) => {
+      const repairedText = candidate.text;
       const validation = validateProtectedContent(options.originalText, repairedText, options.protectedSpans);
       const quality = validateRewriteQuality(options.originalText, repairedText, options.protectedSpans, {
         allowStructuralRepair: options.structuralRepair,
