@@ -1,3 +1,4 @@
+import { preferredIndefiniteArticle } from "@/lib/nlp/articleSound";
 import { grammarCompatibility } from "@/lib/nlp/posTagger";
 import { isWarmthMode, type RewriteMode, type RiskLevel } from "@/lib/types";
 
@@ -183,21 +184,6 @@ function articleBeforeSelection(context: RankingContext): "a" | "an" | "the" | n
   return match[1].toLowerCase() as "a" | "an" | "the";
 }
 
-function startsWithVowelSound(value: string): boolean {
-  const normalized = value.trim().toLowerCase();
-  if (!normalized) return false;
-
-  // Indefinite articles follow pronunciation, not spelling. Keep this list
-  // intentionally small and high-confidence so the rule ranker does not try
-  // to infer pronunciation for arbitrary acronyms or names.
-  if (/^(?:honest|honor|honour|hour|heir|herb)\b/.test(normalized)) return true;
-  if (/^(?:ewe|euro|one|once|uniform|unique|unit|united|university|use|useful|usefully|user|usual)\b/.test(normalized)) {
-    return false;
-  }
-
-  return /^[aeiou]/.test(normalized);
-}
-
 function looksPluralNoun(value: string): boolean {
   const normalized = value.trim().toLowerCase();
   if (normalized.includes(" ")) return false;
@@ -217,12 +203,9 @@ function articleFitPenalty(option: CandidateOption, context: RankingContext): nu
     penalty += 0.34;
   }
 
-  if (article === "a" && startsWithVowelSound(replacement)) {
-    penalty += 0.2;
-  }
-
-  if (article === "an" && !startsWithVowelSound(replacement)) {
-    penalty += 0.2;
+  if (article === "a" || article === "an") {
+    const expected = preferredIndefiniteArticle(replacement);
+    if (expected && article !== expected) penalty += 0.2;
   }
 
   if ((article === "a" || article === "an") && looksPluralNoun(replacement)) {
