@@ -363,6 +363,106 @@ const CURATED_BANK: Record<string, SynonymBankEntry> = {
       { replacement: "have to", label: "natural", risk: "low" },
     ],
   },
+  "simple tools": {
+    key: "simple tools",
+    pos: "phrase",
+    source: "phrase-bank",
+    options: [
+      { replacement: "basic tools", label: "natural", risk: "low" },
+      { replacement: "straightforward tools", label: "clear", risk: "low" },
+      { replacement: "everyday tools", label: "warm", risk: "low", modePreference: ["warm"] },
+    ],
+  },
+  "clear suggestions": {
+    key: "clear suggestions",
+    pos: "phrase",
+    source: "phrase-bank",
+    options: [
+      { replacement: "helpful suggestions", label: "natural", risk: "low" },
+      { replacement: "straightforward suggestions", label: "clear", risk: "low" },
+      { replacement: "clear recommendations", label: "formal", risk: "low", modePreference: ["formal"] },
+    ],
+  },
+  "clear suggestions that make sentences easier to read": {
+    key: "clear suggestions that make sentences easier to read",
+    pos: "phrase",
+    source: "phrase-bank",
+    options: [
+      { replacement: "helpful suggestions that make sentences easier to read", label: "natural", risk: "low" },
+      { replacement: "practical guidance that makes sentences easier to read", label: "clear", risk: "low" },
+      { replacement: "clear suggestions that improve readability", label: "concise", risk: "low" },
+    ],
+  },
+  "review difficult ideas": {
+    key: "review difficult ideas",
+    pos: "phrase",
+    source: "phrase-bank",
+    options: [
+      { replacement: "examine challenging ideas", label: "natural", risk: "low" },
+      { replacement: "review complex ideas", label: "clear", risk: "low" },
+      { replacement: "work through difficult ideas", label: "warm", risk: "low", modePreference: ["warm"] },
+    ],
+  },
+  "improve communication": {
+    key: "improve communication",
+    pos: "phrase",
+    source: "phrase-bank",
+    options: [
+      { replacement: "strengthen communication", label: "natural", risk: "low" },
+      { replacement: "enhance communication", label: "formal", risk: "low", modePreference: ["formal"] },
+      { replacement: "support better communication", label: "warm", risk: "low", modePreference: ["warm"] },
+    ],
+  },
+  "faster feedback": {
+    key: "faster feedback",
+    pos: "phrase",
+    source: "phrase-bank",
+    options: [
+      { replacement: "quicker feedback", label: "natural", risk: "low" },
+      { replacement: "more timely feedback", label: "clear", risk: "low" },
+      { replacement: "prompt feedback", label: "formal", risk: "low", modePreference: ["formal"] },
+    ],
+  },
+  "understand themselves better": {
+    key: "understand themselves better",
+    pos: "phrase",
+    source: "phrase-bank",
+    options: [
+      { replacement: "learn more about themselves", label: "natural", risk: "low" },
+      { replacement: "gain a clearer understanding of themselves", label: "clear", risk: "low" },
+      { replacement: "develop greater self-understanding", label: "formal", risk: "low", modePreference: ["formal"] },
+      { replacement: "understand themselves more clearly", label: "natural", risk: "low" },
+    ],
+  },
+  "take a break from": {
+    key: "take a break from",
+    pos: "phrase",
+    source: "phrase-bank",
+    options: [
+      { replacement: "step away from", label: "natural", risk: "low" },
+      { replacement: "take time away from", label: "clear", risk: "low" },
+      { replacement: "pause from", label: "shorter", risk: "medium", modePreference: ["shorten"] },
+    ],
+  },
+  "being bored can help people think more creatively": {
+    key: "being bored can help people think more creatively",
+    pos: "phrase",
+    source: "phrase-bank",
+    options: [
+      { replacement: "boredom can help people think more creatively", label: "natural", risk: "low" },
+      { replacement: "feeling bored can help people think more creatively", label: "clear", risk: "low" },
+    ],
+  },
+  "it may take time to understand": {
+    key: "it may take time to understand",
+    pos: "phrase",
+    source: "phrase-bank",
+    options: [
+      { replacement: "it may take a while to understand", label: "natural", risk: "low" },
+      { replacement: "it may require time to understand", label: "clear", risk: "low" },
+      { replacement: "understanding it may take time", label: "natural", risk: "low" },
+    ],
+  },
   "your help with": {
     key: "your help with",
     pos: "phrase",

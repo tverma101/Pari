@@ -9,18 +9,69 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
+export type StrengthBand = "light" | "balanced" | "strong" | "deep";
+
+/**
+ * Keep the visible slider, automatic rewrite policy, and native prompt on
+ * one scale. A 0-100 control is easier to tune than four disconnected modes,
+ * but the engine still needs explicit bands for safe policy decisions.
+ */
+export function strengthBand(value: number): StrengthBand {
+  const normalized = clamp(Math.round(value), 0, 100);
+  if (normalized <= 24) return "light";
+  if (normalized <= 49) return "balanced";
+  if (normalized <= 74) return "strong";
+  return "deep";
+}
+
 export function strengthLabel(value: number): string {
-  if (value <= 18) return "Light";
-  if (value <= 40) return "Balanced";
-  if (value <= 68) return "Strong";
-  return "Deep";
+  const labels: Record<StrengthBand, string> = {
+    light: "Light",
+    balanced: "Balanced",
+    strong: "Strong",
+    deep: "Deep",
+  };
+  return labels[strengthBand(value)];
 }
 
 export function percentToStrengthLevel(value: number): StrengthLevel {
-  if (value <= 24) return 1;
-  if (value <= 49) return 2;
-  if (value <= 74) return 3;
-  return 4;
+  switch (strengthBand(value)) {
+    case "light":
+      return 1;
+    case "balanced":
+      return 2;
+    case "strong":
+      return 3;
+    case "deep":
+      return 4;
+  }
+}
+
+/** Minimum safe lexical/phrase edits to seek per sentence in the fallback. */
+export function minimumAutomaticRewrites(value: number): number {
+  switch (strengthBand(value)) {
+    case "light":
+      return 0;
+    case "balanced":
+    case "strong":
+      return 1;
+    case "deep":
+      return 2;
+  }
+}
+
+/** Maximum automatic edits per sentence before the final quality gates run. */
+export function maximumAutomaticRewrites(value: number): number {
+  switch (strengthBand(value)) {
+    case "light":
+      return 1;
+    case "balanced":
+      return 2;
+    case "strong":
+      return 3;
+    case "deep":
+      return 4;
+  }
 }
 
 export function rewriteChance(mode: RewriteMode, strength: number, word: string): number {

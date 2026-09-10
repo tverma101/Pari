@@ -75,9 +75,12 @@ QuillBot superiority or to promote a model.
   regeneration for unedited drafts, while preserving manual output edits; the
   installed UI and screenshot-paragraph native flow cover the interaction.
 - High/Deep Rewrite amounts now request paragraph-level sentence restructuring
-  from the native worker. The offline fallback also moves only bounded,
-  relationship-preserving fronted clauses or context phrases so high amount has
-  a structural effect without weakening the meaning gate.
+  from the native worker. The offline fallback also applies only bounded,
+  relationship-preserving fronted or trailing clauses/context phrases,
+  gerund-method movement, and a small safe subject recast. Strength bands,
+  phrase-level alternatives, contextual candidate filters, and final repairs
+  are aligned so the slider has a stronger effect without weakening the
+  meaning gate.
 
 These items are implemented but still require target-Mac validation before they should be treated as fully proven.
 

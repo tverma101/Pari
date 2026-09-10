@@ -190,6 +190,86 @@ function contextualNaturalnessIssues(original: string, candidate: string): Rewri
     });
   }
 
+  if (
+    /\bunderstand\s+(?:myself|yourself|himself|herself|ourselves|themselves|itself)\s+(?:better|clearly|more clearly)\b/i.test(original) &&
+    /\b(?:grasp|comprehend|recognize|fathom)\s+(?:myself|yourself|himself|herself|ourselves|themselves|itself)\s+(?:better|clearer|clearly|more clearly)\b/i.test(candidate)
+  ) {
+    issues.push({
+      id: "reflexive-understand-frame",
+      detail: "Keep the natural self-understanding frame instead of using a dictionary synonym for “understand.”",
+    });
+  }
+
+  if (
+    /\btake\s+a\s+break\s+from\b/i.test(original) &&
+    /\b(?:receive|get|accept|obtain)\s+a\s+break\s+from\b/i.test(candidate)
+  ) {
+    issues.push({
+      id: "take-a-break-frame",
+      detail: "Keep the natural phrase “take a break from.”",
+    });
+  }
+
+  if (
+    /\bsimple\s+tools\b/i.test(original) &&
+    /\b(?:easy|uncomplicated)\s+(?:tools?|devices?)\b/i.test(candidate)
+  ) {
+    issues.push({
+      id: "simple-tools-frame",
+      detail: "Use “basic tools” or keep “simple tools” in this software-writing context.",
+    });
+  }
+
+  if (
+    /\bclear\s+suggestions\b/i.test(original) &&
+    /\b(?:direct|plain|readable)\s+ideas?\b/i.test(candidate)
+  ) {
+    issues.push({
+      id: "clear-suggestions-frame",
+      detail: "Keep “clear suggestions” together as the natural noun phrase.",
+    });
+  }
+
+  if (
+    /\b(?:fast|faster|rapid|timely)\s+feedback\b/i.test(original) &&
+    /\b(?:fast|faster|rapid|timely)\s+(?:advice|guidance|comments?)\b/i.test(candidate)
+  ) {
+    issues.push({
+      id: "feedback-frame",
+      detail: "Keep “feedback” when the source describes responses to writing or work.",
+    });
+  }
+
+  if (
+    /\bit\s+(?:may|might|could|can)\s+take\s+time\s+to\s+understand\b/i.test(original) &&
+    /\bit\s+(?:may|might|could|can)\s+(?:spend\s+time\s+learning|need\s+time\s+to\s+grasp)\b/i.test(candidate)
+  ) {
+    issues.push({
+      id: "modal-take-time-frame",
+      detail: "Keep the source meaning: understanding may take time; the subject is not learning on its own.",
+    });
+  }
+
+  if (
+    /\basked\s+the\s+class\s+to\b/i.test(original) &&
+    /\binvited\s+the\s+class\s+to\b/i.test(candidate)
+  ) {
+    issues.push({
+      id: "asked-class-frame",
+      detail: "Keep “asked the class to” when the source gives an instruction.",
+    });
+  }
+
+  if (
+    /\b(?:improve|improves|improved|strengthen|strengthens|strengthened|enhance|enhances|enhanced)\s+communication\b/i.test(original) &&
+    /\b(?:improve|improves|improved|strengthen|strengthens|strengthened|enhance|enhances|enhanced)\s+(?:dialogue|interaction|exchange|conversation)\b/i.test(candidate)
+  ) {
+    issues.push({
+      id: "improve-communication-frame",
+      detail: "Keep broad “communication” wording in this improvement frame.",
+    });
+  }
+
   const namedTool = original.match(/\bused\s+([A-Z][A-Za-z0-9-]*(?:\s+[A-Z][A-Za-z0-9-]*)*)/);
   if (namedTool) {
     const escapedName = namedTool[1].replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -654,6 +734,80 @@ export function repairContextualNaturalness(original: string, candidate: string)
     repaired = repaired.replace(
       new RegExp(`\\b(?:drew on|turned to|relied on)\\s+${escapedName}\\b`, "gi"),
       `used ${namedTool[1]}`
+    );
+  }
+
+  if (/\bunderstand\s+(?:myself|yourself|himself|herself|ourselves|themselves|itself)\s+(?:better|clearly|more clearly)\b/i.test(original)) {
+    repaired = repaired.replace(
+      /\b(?:grasp|comprehend|recognize|fathom)\s+(myself|yourself|himself|herself|ourselves|themselves|itself)\s+(better|clearer|clearly|more clearly)\b/gi,
+      (match, pronoun: string, degree: string) => {
+        const verb = /^[A-Z]/.test(match) ? "Understand" : "understand";
+        const normalizedDegree = degree.toLowerCase() === "clearer" ? "more clearly" : degree.toLowerCase();
+        return `${verb} ${pronoun} ${normalizedDegree}`;
+      }
+    );
+  }
+
+  if (
+    /\bteam\b/i.test(original) &&
+    /\b(?:writing|drafts?|ideas?|students?|teachers?|editor|review)\b/i.test(original)
+  ) {
+    repaired = repaired.replace(/\b(?:crew|unit)\b/gi, (match) => /^[A-Z]/.test(match) ? "Team" : "team");
+  }
+
+  if (/\bsimple\s+tools\b/i.test(original)) {
+    repaired = repaired.replace(
+      /\b(?:easy|uncomplicated)\s+(?:tools?|devices?)\b/gi,
+      (match) => /^[A-Z]/.test(match) ? "Basic tools" : "basic tools"
+    );
+  }
+
+  if (/\bclear\s+suggestions\b/i.test(original)) {
+    repaired = repaired.replace(
+      /\b(?:direct|plain|readable)\s+ideas?\b/gi,
+      (match) => /^[A-Z]/.test(match) ? "Clear suggestions" : "clear suggestions"
+    );
+  }
+
+  if (/\bit\s+(may|might|could|can)\s+take\s+time\s+to\s+understand\b/i.test(original)) {
+    repaired = repaired.replace(
+      /\bit\s+(may|might|could|can)\s+(?:spend\s+time\s+learning|need\s+time\s+to\s+grasp|take\s+time\s+to\s+comprehend)\b/gi,
+      (_match, modal: string) =>
+        (/^[A-Z]/.test(_match) ? "It" : "it") + " " + modal + " take time to understand"
+    );
+  }
+
+  if (/\b(?:fast|faster|rapid|timely)\s+feedback\b/i.test(original)) {
+    repaired = repaired.replace(
+      /\b(fast|faster|rapid|timely)\s+(?:advice|guidance|comments?)\b/gi,
+      (_match, speed: string) => `${speed} feedback`
+    );
+  }
+
+  if (/\basked\s+the\s+class\s+to\b/i.test(original)) {
+    repaired = repaired.replace(
+      /\binvited\s+the\s+class\s+to\b/gi,
+      (match) => /^[A-Z]/.test(match) ? "Asked the class to" : "asked the class to"
+    );
+  }
+
+  const communicationFrame = original.match(
+    /\b(improve|improves|improved|strengthen|strengthens|strengthened|enhance|enhances|enhanced)\s+communication\b/i
+  );
+  if (communicationFrame) {
+    repaired = repaired.replace(
+      new RegExp(`\\b(?:improve|improves|improved|strengthen|strengthens|strengthened|enhance|enhances|enhanced)\\s+(?:dialogue|interaction|exchange|conversation)\\b`, "gi"),
+      (match) => {
+        const verb = match.match(/^[A-Za-z]+/)?.[0] ?? communicationFrame[1];
+        return `${verb} communication`;
+      }
+    );
+  }
+
+  if (/\btake\s+a\s+break\s+from\b/i.test(original)) {
+    repaired = repaired.replace(
+      /\b(?:receive|get|accept|obtain)\s+a\s+break\s+from\b/gi,
+      (match) => /^[A-Z]/.test(match) ? "Take a break from" : "take a break from"
     );
   }
 

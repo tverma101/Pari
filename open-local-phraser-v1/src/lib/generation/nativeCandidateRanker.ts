@@ -23,6 +23,7 @@ export interface RankedNativeCandidate {
   temperature?: number;
   semanticScore: number;
   grammarGain: number;
+  strengthFitScore: number;
   englishQualityScore: number;
   learnedNli: boolean;
   learnedFluency: boolean;
@@ -33,7 +34,15 @@ export interface RankedNativeCandidate {
 function compareRankedCandidates(left: RankedNativeCandidate, right: RankedNativeCandidate): number {
   if (left.safe !== right.safe) return left.safe ? -1 : 1;
   // Issue #7: English quality is primary; similarity is a hard floor (see above).
-  // Among safe candidates, prefer higher learned English quality, then grammarGain, then similarity.
+  // Among similarly good safe candidates, strength fit prevents the high
+  // slider from selecting a barely changed draft simply because it is a few
+  // hundredths ahead on fluency. Quality still wins by a meaningful margin.
+  if (Math.abs(right.englishQualityScore - left.englishQualityScore) > 0.035) {
+    return right.englishQualityScore - left.englishQualityScore;
+  }
+  if (Math.abs(right.strengthFitScore - left.strengthFitScore) > 0.06) {
+    return right.strengthFitScore - left.strengthFitScore;
+  }
   if (Math.abs(right.englishQualityScore - left.englishQualityScore) > 0.01) {
     return right.englishQualityScore - left.englishQualityScore;
   }
@@ -55,6 +64,36 @@ function tokensOf(text: string): number {
   return Math.max(1, (text.match(/[A-Za-z0-9']+/g) ?? []).length);
 }
 
+function normalizedWords(text: string): string[] {
+  return (text.toLowerCase().match(/[a-z0-9]+(?:['-][a-z0-9]+)*/g) ?? []);
+}
+
+function lexicalChangeRate(originalText: string, candidateText: string): number {
+  const originalWords = normalizedWords(originalText);
+  const candidateWords = normalizedWords(candidateText);
+  const width = Math.max(originalWords.length, candidateWords.length, 1);
+  const compared = Math.min(originalWords.length, candidateWords.length);
+  let changed = Math.abs(originalWords.length - candidateWords.length);
+
+  for (let index = 0; index < compared; index += 1) {
+    if (originalWords[index] !== candidateWords[index]) changed += 1;
+  }
+
+  return Math.min(1, changed / width);
+}
+
+function targetChangeRate(strength: number): number {
+  const normalized = Math.max(0, Math.min(100, strength)) / 100;
+  // Aim for restrained lexical difference even at Deep: structure and phrase
+  // framing provide additional variety without encouraging word dumping.
+  return 0.035 + normalized * 0.22;
+}
+
+function strengthFitScore(originalText: string, candidateText: string, strength: number): number {
+  const distance = Math.abs(lexicalChangeRate(originalText, candidateText) - targetChangeRate(strength));
+  return Math.max(0, 1 - distance / 0.2);
+}
+
 async function highSeverityIssueCount(text: string): Promise<number> {
   const issues = await analyzeHarperGrammar(text);
   return issues.filter((issue) => issue.severity === "high").length;
@@ -66,6 +105,8 @@ export async function rankNativeCandidates(
     originalText: string;
     protectedSpans: ProtectedSpan[];
     mode: RewriteMode;
+    /** Requested slider strength, used only to rank similarly safe drafts. */
+    strength?: number;
     structuralRepair: boolean;
     finalizeDraft: (nativeText: string, originalText: string, protectedSpans: ProtectedSpan[], mode: RewriteMode, warmthPolish: boolean) => string;
     warmthPolish: boolean;
@@ -134,6 +175,7 @@ export async function rankNativeCandidates(
         temperature: candidate.temperature,
         semanticScore,
         grammarGain: (inputRate - outRate) * 100,
+        strengthFitScore: strengthFitScore(options.originalText, repairedText, options.strength ?? 56),
         englishQualityScore: englishQuality.englishQualityScore,
         learnedNli: englishQuality.learnedNli,
         learnedFluency: englishQuality.learnedFluency,

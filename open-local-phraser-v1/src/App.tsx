@@ -339,31 +339,32 @@ function SynonymPopover({
       aria-modal="false"
       aria-label={`Local word choices for ${token.text}`}
       style={style}
-      className="synonym-popover z-50 max-h-[360px] overflow-hidden rounded-[14px] shadow-xl animate-fade-in"
+      className="synonym-popover z-50 max-h-[360px] overflow-hidden shadow-xl animate-fade-in"
       onMouseDown={(event) => event.stopPropagation()}
     >
-      <div className="synonym-header flex items-start justify-between gap-3 px-3 py-3">
-        <div>
-          <div className="synonym-eyebrow text-[9px] font-semibold uppercase tracking-[0.18em]">Personal suggestions</div>
-          <div className="synonym-title mt-1 text-[14px] font-semibold">{token.text}</div>
+      <div className="synonym-header flex items-start justify-between gap-3 px-3.5 py-3">
+        <div className="min-w-0">
+          <div className="synonym-eyebrow text-[10px] font-semibold uppercase tracking-[0.16em]">Local choices</div>
+          <div className="synonym-title mt-0.5 truncate text-[15px] font-semibold">{token.text}</div>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="ghost-button rounded-md px-2 py-1 text-[10px]"
+          className="ghost-button rounded-full px-2.5 py-1 text-[11px]"
+          aria-label="Close word choices"
         >
           Close
         </button>
       </div>
 
-      <div className="synonym-list max-h-[250px] overflow-auto px-2 py-2">
+      <div className="synonym-list max-h-[248px] overflow-auto px-2 py-2">
         <button
           type="button"
           onClick={() => onSelect(null)}
-          className="synonym-original mb-1.5 flex w-full items-center justify-between rounded-[9px] px-3 py-2 text-left text-[12px] font-medium"
+          className="synonym-original mb-1.5 flex w-full items-center justify-between rounded-[10px] px-3 py-2 text-left text-[12.5px] font-medium"
         >
-          <span>{token.originalText}</span>
-          <span className="synonym-label text-[10px]">Original</span>
+          <span className="truncate">{token.originalText}</span>
+          <span className="synonym-label ml-2 flex-none text-[10px]">Original</span>
         </button>
 
         {results.map((result) => (
@@ -371,26 +372,26 @@ function SynonymPopover({
             key={result.option.id}
             type="button"
             onClick={() => onSelect(result.option.replacement)}
-            className="synonym-option flex w-full items-center justify-between rounded-[9px] px-3 py-2 text-left text-[12px]"
+            className="synonym-option flex w-full items-center justify-between rounded-[10px] px-3 py-2 text-left text-[12.5px]"
           >
             <span className="font-semibold">{result.option.replacement}</span>
-            {result.option.label && <span className="synonym-label text-[10px]">{result.option.label}</span>}
+            {result.option.label && <span className="synonym-label ml-2 flex-none text-[10px]">{result.option.label}</span>}
           </button>
         ))}
 
         {loadingAlternatives && (
-          <div className="empty-note rounded-[9px] px-3 py-2 text-[11px]" aria-live="polite">
+          <div className="empty-note rounded-[10px] px-3 py-2 text-[11.5px]" aria-live="polite">
             Finding local context-aware alternatives…
           </div>
         )}
         {!loadingAlternatives && results.length === 0 && (
-          <div className="empty-note rounded-[9px] px-3 py-2 text-[11px]">
+          <div className="empty-note rounded-[10px] px-3 py-2 text-[11.5px]">
             No safe local alternatives for this word.
           </div>
         )}
       </div>
 
-      <div className="synonym-footer flex flex-wrap gap-1.5 px-2 py-2">
+      <div className="synonym-footer flex flex-wrap gap-1.5 px-2.5 py-2.5">
         <button
           type="button"
           onClick={onRevertWord}
@@ -453,13 +454,14 @@ function RewriteControls({
       hint: style.description || "Agent-created custom mode using Pari's shared engine",
     })),
   ];
+  const selectedOption = options.find((option) => option.value === mode) ?? options[0];
 
   return (
     <div className="rewrite-controls">
       <div className="rewrite-controls-top">
-        <div>
+        <div className="min-w-0">
           <div className="control-label">Rewrite style</div>
-          <div className="control-hint">Every mode uses Pari’s same engine, learned preferences, and grammar safeguards.</div>
+          <div className="control-hint">{selectedOption.hint}. Pari learns from the edits you approve.</div>
           <div className="mode-picker mt-2" role="radiogroup" aria-label="Rewrite style">
             {options.map((option) => (
               <button
@@ -1137,48 +1139,52 @@ export default function App() {
   };
 
   const storageLabel = usesNativePersistence() ? "Private app storage" : "Private local storage";
-  const isDarkMode = settings.theme === "dark";
-  const toggleTheme = () => {
-    setSettings((current) => ({ ...current, theme: current.theme === "dark" ? "light" : "dark" }));
+  const setTheme = (theme: AppSettings["theme"]) => {
+    setSettings((current) => (current.theme === theme ? current : { ...current, theme }));
   };
 
   return (
-    <div className="app-shell min-h-[100dvh] antialiased" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif" }}>
+    <div className="app-shell min-h-[100dvh] antialiased">
+      <a href="#workspace" className="skip-link">Skip to workspace</a>
       <header className="app-header sticky top-0 z-40 backdrop-blur">
-        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <div className="brand-mark flex h-[34px] w-[34px] items-center justify-center rounded-[9px] text-[16px] font-bold">P</div>
-            <div>
-              <div className="brand-name text-[19px] font-[700] tracking-[-0.015em]">Pari</div>
-              <div className="muted-text text-[12px]">Local paraphrasing tool</div>
+        <div className="app-header-inner mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="brand-mark flex h-[36px] w-[36px] flex-none items-center justify-center rounded-[11px] text-[17px]">P</div>
+            <div className="min-w-0">
+              <div className="brand-name text-[20px] font-[700]">Pari</div>
+              <div className="brand-sub text-[12px]">Local paraphrasing tool</div>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-[11px]">
-            <span className="status-badge">Runs locally</span>
-            <span className="status-badge hidden sm:inline-flex">{storageLabel}</span>
+          <div className="flex flex-wrap items-center gap-2 text-[11px]">
+            <span className="status-badge"><span className="status-dot" aria-hidden="true" />Runs locally</span>
+            <span className="status-badge hidden md:inline-flex">{storageLabel}</span>
             {isLoadingMemory && <span className="muted-text">Loading preferences…</span>}
-            <button
-              type="button"
-              className="theme-toggle"
-              onClick={toggleTheme}
-              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-              title={isDarkMode ? "Light mode" : "Dark mode"}
-            >
-              <span aria-hidden="true">{isDarkMode ? "☀" : "☾"}</span>
-              <span className="hidden sm:inline">{isDarkMode ? "Light" : "Dark"}</span>
-            </button>
+            <div className="theme-segmented" role="group" aria-label="Color theme">
+              {(["light", "dark", "system"] as const).map((theme) => (
+                <button
+                  key={theme}
+                  type="button"
+                  className={cn("theme-seg-btn", settings.theme === theme && "is-active")}
+                  aria-pressed={settings.theme === theme}
+                  onClick={() => setTheme(theme)}
+                  title={theme === "system" ? "Follow system appearance" : `Use ${theme} mode`}
+                >
+                  {theme === "light" ? "Light" : theme === "dark" ? "Dark" : "Auto"}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1240px] px-3 py-4 sm:px-5 lg:px-8">
-        <section className="intro-card mb-4 rounded-[16px] px-4 py-3 shadow-sm">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="eyebrow text-[12px] font-[700] uppercase tracking-[0.14em]">{activeMode.label}</div>
-              <div className="muted-text mt-1 text-[13px]">{activeMode.hint}. Pari learns from the edits you approve.</div>
+      <main id="workspace" className="mx-auto max-w-[1240px] scroll-mt-20 px-3 py-4 sm:px-5 sm:py-5 lg:px-8">
+        <section className="intro-card mb-4 rounded-[18px] px-4 py-3.5 sm:px-5" aria-label="Rewrite settings">
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+            <div className="min-w-0">
+              <div className="eyebrow text-[11px] font-[700] uppercase tracking-[0.14em]">Current style · <span className="eyebrow-strong">{activeMode.label}</span></div>
+              <div className="muted-text mt-1 max-w-[72ch] text-[13px] leading-relaxed">{activeMode.hint}. Private by default, no remote requests.</div>
             </div>
-            <div className="muted-text text-[12px]">Private by default · no remote requests</div>
+            <div className="muted-text count-num flex-none text-[12px]">{approvedExamples.length} saved preference{approvedExamples.length === 1 ? "" : "s"}</div>
           </div>
           <RewriteControls
             mode={settings.mode}
@@ -1199,19 +1205,19 @@ export default function App() {
           />
         </section>
 
-        <section className="grid gap-4 lg:grid-cols-[minmax(320px,0.9fr)_minmax(460px,1.1fr)]">
-          <div className="app-panel flex min-h-[500px] flex-col rounded-[16px] shadow-sm">
-            <div className="panel-header flex items-center justify-between px-4 py-3">
-              <div>
-                <div className="panel-title text-[13px] font-[650]">Original text</div>
-                <div className="muted-text text-[12px]">Paste or type the paragraph you want to reshape.</div>
+        <section className="grid items-start gap-4 lg:grid-cols-[minmax(320px,0.92fr)_minmax(460px,1.08fr)]" aria-label="Paraphrase workspace">
+          <div className="app-panel workspace-panel-a flex min-h-[520px] flex-col rounded-[18px]">
+            <div className="panel-header flex items-start justify-between gap-3 px-4 py-3 sm:px-5">
+              <div className="min-w-0">
+                <div className="panel-title text-[13.5px] font-[650]">Original text</div>
+                <div className="panel-sub mt-0.5 text-[12px] leading-relaxed">Paste or type the paragraph you want to reshape.</div>
               </div>
-              <div className="muted-actions flex items-center gap-3 text-[12px]">
+              <div className="flex flex-none items-center gap-1.5 text-[12px]">
                 <button type="button" onClick={async () => {
                   try { const text = await readClipboardText(); if (text) handleInputChange(text); }
                   catch { setApprovalError("Paste is unavailable in this environment."); }
-                }} className="text-action">Paste</button>
-                <button type="button" onClick={() => handleInputChange(input ? "" : SAMPLE_TEXT)} className="text-action underline decoration-dotted underline-offset-2">
+                }} className="text-action px-2.5 py-1">Paste</button>
+                <button type="button" onClick={() => handleInputChange(input ? "" : SAMPLE_TEXT)} className="text-action px-2.5 py-1 underline decoration-dotted underline-offset-2">
                   {input ? "Clear" : "Example"}
                 </button>
               </div>
@@ -1222,17 +1228,17 @@ export default function App() {
               onChange={(event) => handleInputChange(event.target.value)}
               placeholder="Paste text to paraphrase…"
               maxLength={10000}
-              className="input-editor min-h-[390px] flex-1 resize-none px-4 py-4 text-[15px] leading-[1.72] outline-none"
+              className="input-editor min-h-[380px] flex-1 resize-none text-[15px] leading-[1.72] outline-none"
               aria-label="Original text"
             />
 
-            <div className="panel-footer flex items-center justify-between px-4 py-3">
-              <div className="muted-text text-[12px]">{inputWordCount} words · {inputSentenceCount} sentences · {input.length}/10,000</div>
+            <div className="panel-footer flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
+              <div className="muted-text count-num text-[12px]">{inputWordCount} words · {inputSentenceCount} sentences · {input.length}/10,000</div>
               <button
                 type="button"
                 onClick={isParaphrasing ? handleCancel : () => { void handleParaphrase(); }}
                 disabled={!hasDraft && !isParaphrasing}
-                className="primary-button rounded-full px-5 py-[9px] text-[13px] font-[650] shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50"
+                className="primary-button rounded-full px-5 py-[9px] text-[13px] font-[650] transition disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isParaphrasing ? "Cancel" : "Paraphrase"}
               </button>
@@ -1240,14 +1246,14 @@ export default function App() {
           </div>
 
           <div
-            className="app-panel flex min-h-[500px] flex-col rounded-[16px] shadow-sm"
+            className="app-panel workspace-panel-b flex min-h-[520px] flex-col rounded-[18px]"
             data-generation-source={session?.generationMetadata.source ?? ""}
           >
-            <div className="panel-header flex items-center justify-between px-4 py-3">
-              <div>
-                <div className="panel-title accent-text text-[13px] font-[650]">Your {activeMode.label} rewrite</div>
-                <div className="muted-text text-[12px]">Edit directly, or select a highlighted word for local choices.</div>
-                <div className="mt-1 flex flex-wrap items-center gap-1.5" aria-live="polite">
+            <div className="panel-header flex items-start justify-between gap-3 px-4 py-3 sm:px-5">
+              <div className="min-w-0">
+                <div className="panel-title accent-text text-[13.5px] font-[650]">Your {activeMode.label} rewrite</div>
+                <div className="panel-sub mt-0.5 text-[12px] leading-relaxed">Edit directly, or select a highlighted word for local choices.</div>
+                <div className="mt-2 flex flex-wrap items-center gap-1.5" aria-live="polite">
                   <span className={cn("quality-chip", grammarReviewCount > 0 && "quality-chip-warning")}>
                     {harperStatus === "checking"
                       ? "Checking grammar locally…"
@@ -1256,7 +1262,7 @@ export default function App() {
                       : harperStatus === "unavailable" ? "Built-in grammar rules" : "Grammar checked"}
                   </span>
                   {grammarIssues.some((issue) => typeof issue.start === "number") && (
-                    <span className="muted-text text-[10px]">Underlined text has a review note.</span>
+                    <span className="muted-text text-[10.5px]">Underlined text has a review note.</span>
                   )}
                 </div>
                 {hasOutput && (
@@ -1267,21 +1273,22 @@ export default function App() {
                   </div>
                 )}
               </div>
-              <button type="button" onClick={() => void handleCopy()} disabled={!hasOutput} className="text-action rounded-full px-2.5 py-1 text-[12px] disabled:opacity-40">
+              <button type="button" onClick={() => void handleCopy()} disabled={!hasOutput} className="text-action flex-none rounded-full px-2.5 py-1 text-[12px] disabled:opacity-40">
                 {copied ? "Copied" : "Copy"}
               </button>
             </div>
 
-            <div className="flex-1 overflow-auto px-4 py-4">
+            <div className="flex-1 overflow-auto px-4 py-4 sm:px-5">
               {!hasOutput && !isParaphrasing && (
-                <div className="empty-editor rounded-[12px] px-4 py-5 text-[13px] leading-6">
-                  Your {activeMode.label} rewrite will appear here after you paraphrase.
+                <div className="empty-editor flex gap-3 rounded-[14px] px-4 py-5 text-[13px] leading-6">
+                  <span className="empty-icon" aria-hidden="true">✎</span>
+                  <span>Your {activeMode.label} rewrite will appear here after you paraphrase. Select any highlighted word to see local alternatives.</span>
                 </div>
               )}
               {isParaphrasing && (
-                <div className="space-y-3 pr-6" aria-live="polite">
+                <div className="space-y-3 pr-4" aria-live="polite">
                   {[...Array(6)].map((_, index) => (
-                    <div key={index} className="skeleton-line h-[14px] animate-pulse rounded-full" style={{ width: `${94 - index * 9}%` }} />
+                    <div key={index} className="skeleton-line h-[14px] rounded-full" style={{ width: `${94 - index * 9}%` }} />
                   ))}
                   <div className="muted-text pt-2 text-[12px]">Keeping the editor responsive while the local draft is prepared…</div>
                 </div>
@@ -1310,34 +1317,39 @@ export default function App() {
               )}
             </div>
 
-            <div className="panel-footer flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-              <div className="muted-text text-[12px]">{hasOutput ? `${outputWordCount} words · ${outputSentenceCount} sentences` : "No draft yet"}</div>
+            <div className="panel-footer flex flex-wrap items-center justify-between gap-2 px-4 py-3 sm:px-5">
+              <div className="muted-text count-num text-[12px]">{hasOutput ? `${outputWordCount} words · ${outputSentenceCount} sentences` : "No draft yet"}</div>
               <div className="flex items-center gap-2">
-                {session && <button type="button" onClick={handleRevertParagraph} disabled={!canRevertParagraph} className="secondary-button rounded-full px-3 py-[6px] text-[11px] disabled:cursor-not-allowed disabled:opacity-45">Revert edits</button>}
+                {session && <button type="button" onClick={handleRevertParagraph} disabled={!canRevertParagraph} className="secondary-button rounded-full px-3 py-[6px] text-[11.5px] disabled:cursor-not-allowed disabled:opacity-45">Revert edits</button>}
               </div>
             </div>
           </div>
         </section>
 
-        <section className="app-panel mt-4 rounded-[16px] px-4 py-3 shadow-sm">
+        <section className="app-panel approval-bar mt-4 rounded-[18px] px-4 py-3.5 sm:px-5" aria-label="Review and save">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2 text-[11px]">
-              <span className="status-badge">Learns from approved edits</span>
+              <span className="status-badge"><span className="status-dot" aria-hidden="true" />Learns from approved edits</span>
               {session && <span className="status-badge">Links, names, and numbers stay protected</span>}
             </div>
             {session && (
               <div className="flex items-center gap-2">
-                <button type="button" onClick={handleDiscard} className="secondary-button rounded-full px-3 py-[7px] text-[12px]">Discard</button>
-                <button type="button" onClick={() => void handleApprove()} disabled={isApproving} className="approve-button rounded-full px-4 py-[7px] text-[12px] font-[650] disabled:cursor-wait disabled:opacity-60">{isApproving ? "Saving & learning…" : "Save & learn"}</button>
+                <button type="button" onClick={handleDiscard} className="secondary-button rounded-full px-3.5 py-[7px] text-[12px]">Discard</button>
+                <button type="button" onClick={() => void handleApprove()} disabled={isApproving} className="approve-button rounded-full px-4 py-[7px] text-[12px] font-[650] disabled:cursor-wait disabled:opacity-60">{isApproving ? "Saving…" : "Save & learn"}</button>
               </div>
             )}
           </div>
           {(generationNotice || approvalMessage || approvalError || persistenceError) && (
-            <div className={cn("notice mt-2 rounded-[9px] border px-3 py-2 text-[12px]", approvalError || persistenceError ? "notice-error" : "notice-success")} aria-live="polite">
+            <div className={cn("notice mt-2.5 rounded-[12px] border px-3 py-2 text-[12.5px] leading-relaxed", approvalError || persistenceError ? "notice-error" : "notice-success")} aria-live="polite">
               {approvalError ?? persistenceError ?? approvalMessage ?? generationNotice}
             </div>
           )}
+          {!session && !generationNotice && !approvalMessage && (
+            <div className="muted-text mt-2 text-[12px]">Nothing is saved until you press Save & learn. Discard at any time.</div>
+          )}
         </section>
+
+        <p className="muted-text mt-4 pb-6 text-center text-[11.5px]">Pari runs fully on this Mac. Approved wording improves future rewrites on this device only.</p>
       </main>
 
       {activeToken && anchorRect && typeof document !== "undefined"

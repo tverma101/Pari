@@ -103,21 +103,22 @@ def build_instruction(request: dict[str, Any]) -> str:
     repair_pass = bool(request.get("repair_pass", False))
     custom_instructions = str(request.get("custom_instructions", "")).strip()
     style_tweaks = request.get("style_tweaks") if isinstance(request.get("style_tweaks"), dict) else {}
-    variation = (
-        "Make the wording noticeably warmer and more human. Replace robotic, cold, cynical, or needlessly harsh phrasing with considerate, natural English. Keep the writer's honest meaning, including real problems, limits, disagreement, and negative facts; do not add cheerleading, fake empathy, or praise. Prefer clear contractions and direct human phrasing when they fit."
-        if mode == "warmth"
-        else
-        "Make a noticeable but still conservative wording change."
-        if strength >= 70
-        else "Make a light, natural wording change and keep familiar phrasing where it is already good."
-        if strength < 42
-        else "Make a balanced wording change while keeping the original voice and detail."
-    )
+    if mode == "warmth":
+        variation = "Make the wording noticeably warmer and more human. Replace robotic, cold, cynical, or needlessly harsh phrasing with considerate, natural English. Keep the writer's honest meaning, including real problems, limits, disagreement, and negative facts; do not add cheerleading, fake empathy, or praise. Prefer clear contractions and direct human phrasing when they fit."
+    elif strength >= 75:
+        variation = "Make a substantial, natural wording change across the paragraph. Prefer fresh sentence framing and meaningful phrase changes over a pile of thesaurus substitutions."
+    elif strength >= 50:
+        variation = "Make a clearly noticeable wording change while keeping the original voice, detail, and factual emphasis. Use natural phrase alternatives where they fit."
+    elif strength >= 25:
+        variation = "Make a balanced wording change: refresh several useful phrases but preserve familiar sentence framing when it already reads well."
+    else:
+        variation = "Make a light, natural wording change and keep familiar phrasing where it is already good."
+
     structure_guidance = (
-        "At this high Rewrite amount, make a deep structural paraphrase: rebuild sentence openings, clause order, and grammatical framing across the paragraph instead of merely replacing isolated words. Recast at least one substantial clause in each intact sentence when natural, while keeping the same sentence count, every proposition, and every cause, contrast, condition, and time relationship explicit. Keep the result natural and readable; do not make it artificially formal."
+        "At this Deep Rewrite amount, make a deep structural paraphrase: vary sentence openings, clause order, and grammatical framing across the paragraph instead of merely replacing isolated words. Aim to reframe at least two intact sentences, and recast a substantial clause in more sentences when natural, while keeping the same sentence count, every proposition, and every cause, contrast, condition, and time relationship explicit. Keep the result natural and readable; do not make it artificially formal."
         if strength >= 82
         else
-        "At this Rewrite amount, vary sentence openings and clause framing across the paragraph when natural. Use more than isolated synonym substitutions while preserving the source sentence count, propositions, and relationships."
+        "At this Strong Rewrite amount, make one or more safe sentence-level structural changes when the paragraph allows them: vary a sentence opening or move a clear relationship clause instead of relying only on isolated synonym substitutions. Preserve the source sentence count, propositions, and relationships."
         if strength >= 69
         else ""
     )
@@ -1200,9 +1201,9 @@ def generate(request: dict[str, Any]) -> None:
     temperature = (
         max(0.0, min(float(requested_temperature), 1.0))
         if isinstance(requested_temperature, (int, float))
-        else 0.18 if strength < 42 else 0.24 if strength < 72 else 0.32
+        else 0.16 if strength < 25 else 0.22 if strength < 50 else 0.29 if strength < 75 else 0.36
     )
-    top_p = 0.86 if strength < 72 else 0.9
+    top_p = 0.86 if strength < 69 else 0.9
     max_tokens = max(96, min(int(request.get("max_tokens", 768)), 1536))
     # Best-of-N: extra candidates reuse the loaded model, so each additional
     # generation costs inference only (~1s on M4). The TypeScript layer ranks

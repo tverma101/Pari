@@ -56,9 +56,9 @@ export function loadSettings(): AppSettings {
     theme:
       raw.theme === "dark"
         ? "dark"
-        : raw.theme === "light"
-          ? "light"
-          : DEFAULT_SETTINGS.theme,
+        : raw.theme === "system"
+          ? "system"
+          : "light",
     mode: normalizeStoredRewriteMode(raw.mode),
     strength:
       typeof raw.strength === "number"

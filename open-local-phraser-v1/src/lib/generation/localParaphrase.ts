@@ -41,6 +41,7 @@ import {
   engineModeForStyle,
   type CustomStyle,
 } from "@/lib/styles/customStyles";
+import { maximumAutomaticRewrites } from "@/lib/phraseEngine/rules";
 
 export interface LocalParaphraseRequest {
   originalText: string;
@@ -385,16 +386,26 @@ function repairLocalCollocations(
 }
 
 function automaticRewriteBudget(strength: number): number {
-  // Two deliberate edits per sentence is enough to make a draft feel
-  // different while preventing the synonym bank from replacing every noun.
-  // Higher strength can add one more edit, but never turns into a word dump.
-  if (strength >= 82) return 3;
-  if (strength >= 42) return 2;
-  return 1;
+  return maximumAutomaticRewrites(strength);
 }
 
 const FRONTED_RELATION_CLAUSE = /^(?<lead>(?:because|although|even though|even if|when|while|if|unless|since|after|before|once|as long as|provided that)\b[^,;:.!?]+),\s+(?<main>.+?)(?<punct>[.!?]+)$/i;
 const FRONTED_CONTEXT_PHRASE = /^(?<lead>(?:in some situations|in certain situations|in certain contexts|in some cases|at times)\b),\s+(?<main>.+?)(?<punct>[.!?]+)$/i;
+const TRAILING_RELATION_CLAUSE = /^(?<main>.+?)\s+(?<relation>because|although|even though|even if|unless|since|after|before|when|while|once|as long as|provided that)\s+(?<tail>[^.!?]+)(?<punct>[.!?]+)$/i;
+const TRAILING_BY_METHOD = /^(?<main>.+?)\s+by\s+(?<method>[A-Za-z]+ing\b[^.!?]*)(?<punct>[.!?]+)$/i;
+
+function capitalizeSentenceStart(value: string): string {
+  return value.replace(/^(\s*)([a-z])/, (_match, whitespace: string, character: string) => `${whitespace}${character.toUpperCase()}`);
+}
+
+function lowercaseSentenceStart(value: string): string {
+  if (/^\s*I(?:\b|')/.test(value)) return value;
+  return value.replace(/^(\s*)([A-Z])/, (_match, whitespace: string, character: string) => `${whitespace}${character.toLowerCase()}`);
+}
+
+function hasEnoughWords(value: string, minimum: number): boolean {
+  return (value.match(/[A-Za-z]+(?:['-][A-Za-z]+)*/g) ?? []).length >= minimum;
+}
 
 function moveFrontedStructure(sentence: string): string {
   const match = sentence.trim().match(FRONTED_RELATION_CLAUSE) ?? sentence.trim().match(FRONTED_CONTEXT_PHRASE);
@@ -404,20 +415,85 @@ function moveFrontedStructure(sentence: string): string {
   const main = match.groups.main?.trim();
   const punctuation = match.groups.punct ?? ".";
   if (!lead || !main || /^(?:and|or|but|which|that|who)\b/i.test(main)) return sentence;
+  // Do not create cataphoric openings such as “They can … when students …”
+  // by moving a fronted clause whose main clause starts with a pronoun. The
+  // relationship is still grammatical in the source order, but the moved
+  // version makes the reader resolve the pronoun before its noun appears.
+  if (
+    /^(?:because|although|even though|even if|when|while|if|unless|since|after|before|once|as long as|provided that)\b/i.test(lead) &&
+    /^(?:it|they|he|she|we|you|this|that|these|those)\b/i.test(main)
+  ) return sentence;
   if ((main.match(/[A-Za-z]+(?:['-][A-Za-z]+)*/g) ?? []).length < 3) return sentence;
 
   // Keep the exact relation marker and clause words, but place the main
   // clause first. This is a bounded structural rewrite for the offline path:
   // it changes sentence framing without inventing a subject or weakening the
   // source's cause, contrast, condition, time, or context relationship.
-  const capitalizedMain = main.replace(/^[a-z]/, (character) => character.toUpperCase());
+  const capitalizedMain = capitalizeSentenceStart(main);
   return `${capitalizedMain} ${lead.toLowerCase()}${punctuation}`;
+}
+
+function moveTrailingRelationStructure(sentence: string): string {
+  const match = sentence.trim().match(TRAILING_RELATION_CLAUSE);
+  if (!match?.groups) return sentence;
+
+  const main = match.groups.main?.trim();
+  const relation = match.groups.relation?.trim();
+  const tail = match.groups.tail?.trim();
+  const punctuation = match.groups.punct ?? ".";
+  if (!main || !relation || !tail || !hasEnoughWords(main, 4) || !hasEnoughWords(tail, 2)) return sentence;
+  // “Since” can introduce an object of knowledge or memory rather than a
+  // sentence-level reason. Moving those complements would change the syntax.
+  if (/^(?:since)\b/i.test(relation) && /\b(?:know|knew|remember|recall|wonder|unclear|sure)\b/i.test(main)) {
+    return sentence;
+  }
+
+  return `${capitalizeSentenceStart(`${relation} ${tail}`)}, ${lowercaseSentenceStart(main)}${punctuation}`;
+}
+
+function moveTrailingByStructure(sentence: string): string {
+  const match = sentence.trim().match(TRAILING_BY_METHOD);
+  if (!match?.groups) return sentence;
+
+  const main = match.groups.main?.trim();
+  const method = match.groups.method?.trim();
+  const punctuation = match.groups.punct ?? ".";
+  if (!main || !method || !hasEnoughWords(main, 4) || !hasEnoughWords(method, 3)) return sentence;
+  // Restrict this move to a gerund method phrase. Passive “written by Maya”
+  // and agent phrases must keep their original attachment.
+  if (/^(?:was|were|is|are|be|been|being)\b/i.test(main.split(/\s+/).slice(-1)[0] ?? "")) return sentence;
+
+  return `${capitalizeSentenceStart(`By ${method}`)}, ${lowercaseSentenceStart(main)}${punctuation}`;
+}
+
+function recastBoredomSubject(sentence: string): string {
+  // Protected placeholders can temporarily mask “can”; preserve that token so
+  // the normal unmasking pass restores it after the subject recast.
+  const match = sentence.trim().match(
+    /^being\s+bored\s+(?<modal>can|\uE000[\s\S]\uE001)\s+help\s+(?<rest>people\b.+?)(?<punct>[.!?]+)$/i
+  );
+  if (!match?.groups?.rest || !match.groups.modal) return sentence;
+
+  const punctuation = match.groups.punct ?? ".";
+  return `${capitalizeSentenceStart(`boredom ${match.groups.modal} help ${match.groups.rest.trim()}`)}${punctuation}`;
+}
+
+function restructureSentence(sentence: string, deep = false): string {
+  const fronted = moveFrontedStructure(sentence);
+  if (fronted !== sentence) return deep ? recastBoredomSubject(fronted) : fronted;
+
+  const trailingRelation = moveTrailingRelationStructure(sentence);
+  if (trailingRelation !== sentence) return deep ? recastBoredomSubject(trailingRelation) : trailingRelation;
+
+  const trailingBy = moveTrailingByStructure(sentence);
+  return deep ? recastBoredomSubject(trailingBy) : trailingBy;
 }
 
 /**
  * Give the high Rewrite amount a structural effect even when the native
- * generator is unavailable. Only unambiguous fronted clauses/context phrases
- * are moved; all other sentences keep the deterministic lexical rewrite.
+ * generator is unavailable. Only unambiguous clause/context moves and a small
+ * safe subject recast are applied; all other sentences keep the deterministic
+ * lexical rewrite.
  */
 export function restructureHighStrength(
   text: string,
@@ -428,7 +504,7 @@ export function restructureHighStrength(
   const protectedValues = protectedValuesFor(text, protectedSpans);
   return withProtectedPlaceholders(text, protectedValues, (masked) =>
     splitSentences(masked)
-      .map((sentence) => moveFrontedStructure(sentence.text))
+      .map((sentence) => restructureSentence(sentence.text, strength >= 75))
       .join(" ")
       .trim()
   );
@@ -638,6 +714,7 @@ export async function generateLocalParaphrase(
             originalText,
             protectedSpans,
             mode,
+            strength,
             structuralRepair,
             finalizeDraft,
             warmthPolish,

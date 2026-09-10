@@ -104,13 +104,20 @@ const {
   generateAdvancedAlternatives,
   MAX_VISIBLE_SYNONYMS,
 } = loadTsModule(path.join(ROOT_DIR, "src/lib/rewriteStack/advancedParaphrase.ts"));
-const { validateRewriteQuality } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/rewriteQuality.ts"));
+const { repairContextualNaturalness, validateRewriteQuality } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/rewriteQuality.ts"));
 const { analyzeGrammar, grammarSafetyIssues } = loadTsModule(path.join(ROOT_DIR, "src/lib/nlp/grammar.ts"));
 const { analyzeSentenceFlow, repairSentenceFlow } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/sentenceFlow.ts"));
 const { repairDirectEnglish } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/directEnglishRepair.ts"));
 const { repairEnglishGrammar } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/englishGrammarRepair.ts"));
 const { meaningContractIssues } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/meaningContract.ts"));
 const { loadSettings, normalizeStoredRewriteMode } = loadTsModule(path.join(ROOT_DIR, "src/lib/settings/settingsStore.ts"));
+const {
+  maximumAutomaticRewrites,
+  minimumAutomaticRewrites,
+  percentToStrengthLevel,
+  strengthBand,
+  strengthLabel,
+} = loadTsModule(path.join(ROOT_DIR, "src/lib/phraseEngine/rules.ts"));
 const { needsStructuralRepair } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/rewriteQuality.ts"));
 const { countSentences, splitSentences } = loadTsModule(path.join(ROOT_DIR, "src/lib/nlp/sentenceSplit.ts"));
 const { normalizeCustomStyle, customModeForStyle, effectiveStyleStrength, engineModeForStyle } = loadTsModule(path.join(ROOT_DIR, "src/lib/styles/customStyles.ts"));
@@ -597,6 +604,14 @@ assert(concisionResult.safe, "Concision repair produced an unsafe result");
 assert(!/\bin order to\b|\bmake use of\b|\bat this point in time\b/i.test(concisionResult.text), `Concision repair left padded wording: ${concisionResult.text}`);
 
 const modeProbeText = "The team used simple tools to improve their writing and review difficult ideas.";
+assert(strengthBand(24) === "light" && strengthLabel(24) === "Light", "Light strength boundary drifted");
+assert(strengthBand(25) === "balanced" && strengthLabel(25) === "Balanced", "Balanced strength boundary drifted");
+assert(strengthBand(50) === "strong" && strengthLabel(50) === "Strong", "Strong strength boundary drifted");
+assert(strengthBand(75) === "deep" && strengthLabel(75) === "Deep", "Deep strength boundary drifted");
+assert(percentToStrengthLevel(74) === 3 && percentToStrengthLevel(75) === 4, "Strength level bands drifted from the slider");
+assert(minimumAutomaticRewrites(16) === 0, "Light strength unexpectedly requires a rewrite");
+assert(minimumAutomaticRewrites(60) === 1 && minimumAutomaticRewrites(90) === 2, "Higher strength minimum rewrite policy drifted");
+assert(maximumAutomaticRewrites(16) === 1 && maximumAutomaticRewrites(60) === 3 && maximumAutomaticRewrites(90) === 4, "Rewrite budgets do not scale with strength");
 const personalProbeResults = Object.fromEntries(
   [16, 40, 60, 90].map((strength, index) => [
     `level-${index + 1}`,
@@ -772,12 +787,25 @@ const qualityProbeSamples = [
   "The team worked with teachers and students to improve communication.",
   "I asked for more time after the deadline changed.",
 ];
+const qualityProbeForbiddenPatterns = [
+  /\b(?:grasp|comprehend|recognize|fathom)\s+(?:myself|yourself|himself|herself|ourselves|themselves|itself)\s+(?:better|clearer|clearly|more clearly)\b/i,
+  /\b(?:receive|get|accept|obtain)\s+a\s+break\s+from\b/i,
+  /\b(?:easy|uncomplicated)\s+(?:tools?|devices?)\b/i,
+  /\b(?:direct|plain|readable)\s+ideas?\b/i,
+  /\b(?:fast|faster|rapid|timely)\s+(?:advice|guidance|comments?)\b/i,
+  /\bit\s+(?:may|might|could|can)\s+(?:spend\s+time\s+learning|need\s+time\s+to\s+grasp)\b/i,
+  /\binvited\s+the\s+class\s+to\b/i,
+  /\b(?:improve|improves|improved|strengthen|strengthens|strengthened|enhance|enhances|enhanced)\s+(?:dialogue|interaction|exchange|conversation)\b/i,
+];
 const qualityProbeResults = [];
 for (const sample of qualityProbeSamples) {
   const result = await generateLocalParaphrase({ originalText: sample, examples: [], memory: learnedMemory, strength: 76 });
   assert(result.safe, `Quality probe was not safe: ${sample}`);
   assert(!/\b([A-Za-z]+)\s+\1\b/i.test(result.text), `Quality probe repeated a word: ${result.text}`);
   assert(!/\b(?:sought|requested|inquired)\s+for\b/i.test(result.text), `Quality probe created an invalid verb-preposition pair: ${result.text}`);
+  for (const pattern of qualityProbeForbiddenPatterns) {
+    assert(!pattern.test(result.text), `Quality probe contained ${pattern}: ${result.text}`);
+  }
   qualityProbeResults.push(`${sample} => ${result.text}`);
 }
 const adversarialSamples = [
@@ -946,10 +974,87 @@ const naturalnessQualityProbes = [
     candidate: "I sought questions when the instructions were unclear.",
     issue: "asked questions frame",
   },
+  {
+    original: "Boredom can help people understand themselves better and take a break from stimulation.",
+    candidate: "Boredom can help people grasp themselves clearer and receive a break from stimulation.",
+    issue: "reflexive understanding and break frames",
+  },
+  {
+    original: "The team used simple tools to improve their writing.",
+    candidate: "The crew used easy devices to improve their writing.",
+    issue: "writing-tool context",
+  },
+  {
+    original: "The editor gives writers clear suggestions.",
+    candidate: "The editor gives writers direct ideas.",
+    issue: "clear suggestions frame",
+  },
+  {
+    original: "People want faster feedback.",
+    candidate: "People want faster advice.",
+    issue: "feedback frame",
+  },
+  {
+    original: "Although the process is simple, it may take time to understand.",
+    candidate: "It may spend time learning even though the process is easy.",
+    issue: "modal take-time frame",
+  },
+  {
+    original: "The teacher asked the class to revise the paragraph.",
+    candidate: "The teacher invited the class to revise the paragraph.",
+    issue: "asked-class frame",
+  },
+  {
+    original: "The team worked to improve communication.",
+    candidate: "The team worked to strengthen dialogue.",
+    issue: "improve-communication frame",
+  },
 ];
 for (const probe of naturalnessQualityProbes) {
   const quality = validateRewriteQuality(probe.original, probe.candidate);
   assert(!quality.safe, `Quality gate accepted ${probe.issue}`);
+}
+
+const contextualRepairProbes = [
+  {
+    original: "Boredom can help people understand themselves better and take a break from stimulation.",
+    candidate: "Boredom can help people grasp themselves clearer and receive a break from stimulation.",
+    expected: "Boredom can help people understand themselves more clearly and take a break from stimulation.",
+  },
+  {
+    original: "The team used simple tools to improve their writing.",
+    candidate: "The crew used easy devices to improve their writing.",
+    expected: "The team used basic tools to improve their writing.",
+  },
+  {
+    original: "The editor gives writers clear suggestions.",
+    candidate: "The editor gives writers direct ideas.",
+    expected: "The editor gives writers clear suggestions.",
+  },
+  {
+    original: "People want faster feedback.",
+    candidate: "People want faster advice.",
+    expected: "People want faster feedback.",
+  },
+  {
+    original: "Although the process is simple, it may take time to understand.",
+    candidate: "It may spend time learning even though the process is easy.",
+    expected: "It may take time to understand even though the process is easy.",
+  },
+  {
+    original: "The teacher asked the class to revise the paragraph.",
+    candidate: "The teacher invited the class to revise the paragraph.",
+    expected: "The teacher asked the class to revise the paragraph.",
+  },
+  {
+    original: "The team worked to improve communication.",
+    candidate: "The team worked to strengthen dialogue.",
+    expected: "The team worked to strengthen communication.",
+  },
+];
+for (const probe of contextualRepairProbes) {
+  const repaired = repairContextualNaturalness(probe.original, probe.candidate);
+  assert(repaired === probe.expected, "Contextual repair mismatch: " + repaired);
 }
 
 const naturalnessParagraph =
@@ -1063,7 +1168,7 @@ assert((sentenceRewriteResult.text.match(/[.!?]/g) ?? []).length === 1, "Sentenc
 const highStructureInput = "Because the system is local, users can keep private drafts on the device. In some situations, being bored can help people think more creatively.";
 const highStructureOutput = restructureHighStrength(highStructureInput, 100);
 assert(
-  highStructureOutput === "Users can keep private drafts on the device because the system is local. Being bored can help people think more creatively in some situations.",
+  highStructureOutput === "Users can keep private drafts on the device because the system is local. Boredom can help people think more creatively in some situations.",
   `High Rewrite amount did not restructure safe fronted clauses: ${highStructureOutput}`,
 );
 assert(
@@ -1077,6 +1182,19 @@ const highNativeStructureOutput = restructureHighStrength(
 assert(
   highNativeStructureOutput === "Boredom is often perceived as a negative experience. It can foster creative thinking in certain contexts.",
   `High native candidate did not receive the bounded structural pass: ${highNativeStructureOutput}`,
+);
+const pronounOrderInput = "When students review their work, they can find clearer ways to explain difficult ideas.";
+assert(
+  restructureHighStrength(pronounOrderInput, 100) === pronounOrderInput,
+  "High Rewrite amount created a cataphoric pronoun opening",
+);
+const trailingStructureOutput = restructureHighStrength(
+  "Users can keep private drafts on the device because the system is local. Most people try to avoid boredom by watching videos, scrolling through social media, and playing games.",
+  100,
+);
+assert(
+  trailingStructureOutput === "Because the system is local, users can keep private drafts on the device. By watching videos, scrolling through social media, and playing games, most people try to avoid boredom.",
+  `High Rewrite amount did not move safe trailing clauses: ${trailingStructureOutput}`,
 );
 const restoredQuantityOutput = repairQuantityScope(
   "Most people avoid boredom.",

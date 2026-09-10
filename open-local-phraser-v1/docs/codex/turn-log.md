@@ -588,3 +588,87 @@
 - `next_action`: use the refreshed report for issue #11 review; if quality
   work continues, use human/blinded or new-corpus evidence rather than
   restarting CoEdIT-XL without an explicit memory-bounded plan.
+
+## 2026-09-09 — Current Pari status checkpoint
+
+- `scope`: canonical `/Users/tejas/Projects/Pari/open-local-phraser-v1`,
+  current source/benchmark state, and installed/live boundary.
+- `goal`: provide a current status report without restarting the
+  memory-intensive CoEdIT-XL run or changing the shipping model.
+- `inspected`: branch/remote/HEAD, working tree, current v2 report and model
+  manifest, `README.md`, `docs/remaining-work.md`, local build artifacts,
+  installed app paths, and Pari/native-worker process state.
+- `validation`: `npm run qa:paraphrase`, `npx tsc -p tsconfig.json --noEmit`,
+  `npm run benchmark:v2:validate`, and `npm run models:check:files` all passed.
+  Remote `origin/feat/quality-judge-holdout` resolves to `23cd13f`; the local
+  branch matches it.
+- `evidence_state`: source implemented=yes; automatic v2 benchmark/report
+  pushed=yes; required local model files verified=yes; current packaged-app
+  parity=no (the local `release/Pari.dmg` predates HEAD); installed=no
+  (`/Applications/Pari.app` and `~/Applications/Pari.app` absent); live=no
+  (no Pari/native worker process observed); human QuillBot comparison=no;
+  production model promotion=no.
+- `blocker`: issue #11 still needs blinded/human preference evidence and
+  target-Mac installed-runtime validation before Pari can claim release or
+  QuillBot-class readiness. The optional FreeLLMAPI route remains research
+  only and is not the shipping default.
+- `cleanup`: six generated Python `__pycache__` files remain untracked; no
+  source, model, or benchmark data was removed, and no new model benchmark
+  was started.
+- `learning_checkpoint`: promoted none; quarantined none; deprecated none;
+  skipped restarting CoEdIT-XL and skipped any model promotion.
+- `next_action`: if release proof is wanted, rebuild `Pari.dmg` from this
+  HEAD, run the installed connected/missing-model/custom checks, then perform
+  the same-input human comparison against QuillBot.
+
+## 2026-09-09 — Strengthened slider and paraphrase engine
+
+- `scope`: canonical Pari source checkout, deterministic rewrite engine,
+  native prompt contract, and automatic quality checks; no CoEdIT-XL work.
+- `project`: `tverma101/Pari`, branch `feat/quality-judge-holdout`; canonical
+  checkout is this directory.
+- `goal`: make the Rewrite amount control produce a more observable,
+  context-aware paraphrase while keeping protected content, meaning, and
+  grammar gates intact.
+- `changed_files`: `src/lib/phraseEngine/rules.ts`,
+  `src/lib/phraseEngine/rewriteText.ts`, `src/lib/phraseEngine/synonymBank.ts`,
+  `src/lib/generation/localParaphrase.ts`,
+  `src/lib/generation/rewriteQuality.ts`,
+  `src/lib/generation/nativeCandidateRanker.ts`,
+  `native-runtime/paraphrase_worker.py`, `scripts/qa-paraphrase.mjs`,
+  `README.md`, `docs/remaining-work.md`, and this log.
+- `implementation`: aligned Light/Balanced/Strong/Deep bands with minimum and
+  maximum automatic rewrite budgets; added phrase-aware, context-sensitive
+  synonym choices and final repairs; made Strong/Deep selection reach a safe
+  minimum while respecting the per-sentence cap; aligned native prompt and
+  candidate ranking to strength; and extended the offline high-strength path
+  with guarded fronted/trailing clause moves, gerund-method movement, and a
+  protected-placeholder-safe boredom-subject recast.
+- `validation`: `npm run qa:paraphrase`; `npm run qa:native:prompt`;
+  `npx tsc -p tsconfig.json --noEmit`; `npm run benchmark:quality`;
+  `npm run build`; `npm run build:desktop`; `npm run qa:installed`;
+  `npm run qa:installed:missing-model`; and
+  `codesign --verify --deep --strict release/Pari.app` all passed. The build
+  verified all 12 configured local model bundles. The packaged native smoke
+  reached `native-mlx`, the missing-model smoke reached `local-safe-engine`,
+  and the deterministic screenshot probe produces `Boredom can help ...` at
+  Deep strength while keeping the sentence safe.
+- `evidence_state`: source implemented=yes; focused automatic QA=yes;
+  quality benchmark=yes; TypeScript/build=yes; desktop package rebuilt=yes;
+  packaged headless native and fallback smokes=yes; current visible UI slider
+  confirmation=no; human QuillBot comparison=no; production model promotion=no.
+- `blocker`: no local implementation blocker for this pass. Target-Mac
+  installed-runtime/UI validation and the issue #11 human preference gate
+  remain open; the optional FreeLLMAPI route remains explicit research only.
+- `cleanup`: no model benchmark was started or resumed, and CoEdIT-XL remains
+  user-stopped. Existing unrelated untracked `benchmarks/llm-shootout/__pycache__/`
+  files were preserved. No commit, push, PR mutation, GitHub Actions, merge,
+  force-push, or default-branch change was performed.
+- `learning_checkpoint`: promoted the strength-policy alignment and
+  screenshot-derived contextual repair fixtures because they pass focused
+  regression and quality checks. Quarantined any claim of native-model or
+  QuillBot parity because those evidence states were not produced here.
+  Skipped all memory-intensive model benchmarking.
+- `next_action`: if release proof is requested, run the remaining custom-mode
+  smoke and verify the visible slider interaction on the target Mac before
+  publication.

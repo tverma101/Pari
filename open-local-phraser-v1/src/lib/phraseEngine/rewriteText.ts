@@ -9,7 +9,13 @@ import {
 
 import { assignTokenRanges, summarizeTokens } from "./diff";
 import { collectFrozenWordTokenIndices, parseFreezeEntries } from "./freezeWords";
-import { rewriteChance, seededFloat, strengthLabel } from "./rules";
+import {
+  maximumAutomaticRewrites,
+  minimumAutomaticRewrites,
+  rewriteChance,
+  seededFloat,
+  strengthLabel,
+} from "./rules";
 import { buildCandidateOptions, getSynonymEntry, PHRASE_KEYS } from "./synonymBank";
 import { isWarmthMode } from "@/lib/types";
 import type { ManualChoiceMap, RewriteResult, RewriteSettingsInput, RewriteToken } from "./types";
@@ -129,6 +135,120 @@ function automaticCandidateContextIssue(
   }
   if (article && article === "an" && !startsWithVowelSound(firstReplacementWord)) {
     return "The candidate changes the article from “an” to an incompatible consonant sound.";
+  }
+
+  // Automatic rewriting is sentence-aware only through this small local
+  // window, so protect the most common frames where a dictionary synonym is
+  // grammatical in isolation but wrong for the sentence around it.
+  if (
+    original === "however" &&
+    !before.trim() &&
+    /^(?:yet|though)\b/.test(replacement)
+  ) {
+    return "Keep a full contrast connector at the start of the sentence.";
+  }
+
+  if (
+    original === "because" &&
+    /^(?:seeing that|considering that)\b/.test(replacement)
+  ) {
+    return "Keep “because” or use a direct causal connector.";
+  }
+
+  if (
+    original === "simple" &&
+    /^(?:tools?|devices?|software|methods?|processes?|approaches?)$/.test(next ?? "") &&
+    /^(?:easy|uncomplicated)\b/.test(replacement)
+  ) {
+    return "Use “basic” or keep “simple” for a tool or process description.";
+  }
+
+  if (
+    original === "team" &&
+    /^(?:crew|unit|staff)\b/.test(replacement) &&
+    /\b(?:writing|drafts?|ideas?|students?|teachers?|editor|review)\b/i.test(sentence)
+  ) {
+    return "Keep “team” or use “group” in an academic or writing context.";
+  }
+
+  if (
+    /^(?:teacher|teachers)$/.test(original) &&
+    /^(?:tutor|tutors)\b/.test(replacement) &&
+    /\b(?:gave|asked|told|reminded|provide|provided|review|reviewed)\b/i.test(sentence)
+  ) {
+    return "Keep the classroom role “teacher” in this sentence.";
+  }
+
+  if (
+    /^(?:tool|tools)$/.test(original) &&
+    /^devices?\b/.test(replacement) &&
+    /\b(?:writing|drafts?|paragraphs?|text|software|app(?:lication)?s?|digital|local|online)\b/i.test(sentence)
+  ) {
+    return "Keep “tool” for software and writing-tool contexts.";
+  }
+
+  if (
+    original === "understand" &&
+    /^(?:myself|yourself|himself|herself|ourselves|themselves|itself)$/.test(next ?? "") &&
+    replacement !== "understand"
+  ) {
+    return "Keep “understand” in a reflexive self-understanding frame.";
+  }
+
+  if (
+    original === "take" &&
+    next === "a" &&
+    afterNext === "break" &&
+    /^(?:receive|accept|obtain|grab|seize|carry|choose)\b/.test(replacement)
+  ) {
+    return "Keep the natural phrase “take a break.”";
+  }
+
+  if (
+    original === "review" &&
+    following.some((word) => /^(?:ideas?|work|drafts?)$/.test(word)) &&
+    /^(?:characterize|depict|portray|illustrate)\b/.test(replacement)
+  ) {
+    return "Use “review” or “examine” for ideas, work, or a draft.";
+  }
+
+  if (
+    original === "asked the class to" &&
+    /^invited the class to\b/.test(replacement)
+  ) {
+    return "Keep “asked the class to” when the source gives an instruction.";
+  }
+
+  if (
+    original === "take time to understand" &&
+    /^(?:spend time learning|need time to grasp)\b/.test(replacement) &&
+    /(?:^|\s)(?:may|might|could|can)\s*$/i.test(before)
+  ) {
+    return "Keep the “may take time to understand” frame.";
+  }
+
+  if (
+    original === "feedback" &&
+    /^advice\b/.test(replacement) &&
+    /\b(?:fast|faster|rapid|timely|writing|draft|tool|suggestions?)\b/i.test(sentence)
+  ) {
+    return "Keep “feedback” when the source describes responses to writing or work.";
+  }
+
+  if (
+    original === "communication" &&
+    /^(?:dialogue|interaction|exchange|conversation)\b/.test(replacement) &&
+    /\b(?:improve|improves|improved|strengthen|strengthens|strengthened|effective|better|clear)\s+communication\b/i.test(sentence)
+  ) {
+    return "Keep broad “communication” wording in this improvement frame.";
+  }
+
+  if (
+    original === "clear" &&
+    next === "suggestions" &&
+    /^(?:direct|plain|readable)\b/.test(replacement)
+  ) {
+    return "Keep “clear suggestions” as the natural phrase.";
   }
 
   const unsafePairs: Record<string, string[]> = {
@@ -681,8 +801,18 @@ function automaticBudgetReached(
   sentenceRewriteCounts: Map<number, number>
 ): boolean {
   if (settings.automaticRewriteStrategy !== "conservative") return false;
-  const budget = settings.automaticRewriteBudget ?? 2;
+  const budget = settings.automaticRewriteBudget ?? maximumAutomaticRewrites(settings.strength);
   return (sentenceRewriteCounts.get(sentenceStart) ?? 0) >= Math.max(0, budget);
+}
+
+function automaticMinimumStillNeeded(
+  settings: RewriteSettingsInput,
+  sentenceStart: number,
+  sentenceRewriteCounts: Map<number, number>
+): boolean {
+  if (settings.automaticRewriteStrategy !== "conservative") return false;
+  const minimum = minimumAutomaticRewrites(settings.strength);
+  return (sentenceRewriteCounts.get(sentenceStart) ?? 0) < minimum;
 }
 
 function recordAutomaticRewrite(
@@ -814,7 +944,8 @@ export function rewriteText(
         selectedAlternativeId === null &&
         !automaticBudgetReached(settings, sentenceForAuto.start, sentenceRewriteCounts) &&
         modeRanked.length > 0 &&
-        (forcedModeCandidate(modeRanked, settings.mode, settings.strength) !== null ||
+        (automaticMinimumStillNeeded(settings, sentenceForAuto.start, sentenceRewriteCounts) ||
+          forcedModeCandidate(modeRanked, settings.mode, settings.strength) !== null ||
           seededFloat(`${seedBase}|${tokenId}|${originalText}`) <
             rewriteChance(settings.mode, settings.strength, originalText))
           ? forcedModeCandidate(modeRanked, settings.mode, settings.strength) ??
@@ -917,7 +1048,8 @@ export function rewriteText(
       selectedAlternativeId === null &&
       !automaticBudgetReached(settings, sentence.start, sentenceRewriteCounts) &&
       modeRanked.length > 0 &&
-      (forcedModeCandidate(modeRanked, settings.mode, settings.strength) !== null ||
+      (automaticMinimumStillNeeded(settings, sentence.start, sentenceRewriteCounts) ||
+        forcedModeCandidate(modeRanked, settings.mode, settings.strength) !== null ||
         seededFloat(`${seedBase}|${tokenId}|${originalText}`) <
           rewriteChance(settings.mode, settings.strength, originalText))
         ? forcedModeCandidate(modeRanked, settings.mode, settings.strength) ??
