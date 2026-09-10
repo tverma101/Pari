@@ -28,6 +28,10 @@ assert(
   "benchmark bridge missed degree/extent strengthening",
 );
 assert(
+  ids("I sometimes review the draft.", "I always review the draft.").has("frequency-drift"),
+  "benchmark bridge missed frequency strengthening",
+);
+assert(
   ids("At least 10 records remain.", "At most 10 records remain.").has("quantity-drift"),
   "benchmark bridge missed numeric bound reversal",
 );
