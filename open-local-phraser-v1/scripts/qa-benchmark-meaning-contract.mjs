@@ -32,6 +32,10 @@ assert(
   "benchmark bridge missed frequency strengthening",
 );
 assert(
+  ids("The new build is more reliable.", "The new build is less reliable.").has("comparative-direction-drift"),
+  "benchmark bridge missed direct comparative reversal",
+);
+assert(
   ids("At least 10 records remain.", "At most 10 records remain.").has("quantity-drift"),
   "benchmark bridge missed numeric bound reversal",
 );
