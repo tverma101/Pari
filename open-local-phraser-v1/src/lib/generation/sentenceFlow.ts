@@ -23,13 +23,18 @@ interface LeadingTransition {
 
 const LEADING_TRANSITIONS: Array<{ phrase: string; family: TransitionFamily }> = [
   { phrase: "on the other hand", family: "contrast" },
+  { phrase: "for unspecified reasons", family: "cause" },
+  { phrase: "as long as", family: "condition" },
+  { phrase: "provided that", family: "condition" },
   { phrase: "as a result", family: "result" },
   { phrase: "for example", family: "example" },
   { phrase: "in addition", family: "addition" },
   { phrase: "even though", family: "contrast" },
-  { phrase: "even if", family: "contrast" },
+  // “Even if” is a concessive condition, not a contrastive factual clause.
+  // Treating it as contrast caused harmless `if`/conditional structure to be
+  // compared against the wrong family and made repair choose the wrong link.
+  { phrase: "even if", family: "condition" },
   { phrase: "given that", family: "cause" },
-  { phrase: "for unspecified reasons", family: "cause" },
   { phrase: "moreover", family: "addition" },
   { phrase: "furthermore", family: "addition" },
   { phrase: "therefore", family: "result" },
@@ -37,10 +42,13 @@ const LEADING_TRANSITIONS: Array<{ phrase: string; family: TransitionFamily }> =
   { phrase: "because", family: "cause" },
   { phrase: "although", family: "contrast" },
   { phrase: "however", family: "contrast" },
+  { phrase: "whereas", family: "contrast" },
   { phrase: "though", family: "contrast" },
   { phrase: "while", family: "time" },
   { phrase: "when", family: "time" },
   { phrase: "once", family: "time" },
+  { phrase: "after", family: "time" },
+  { phrase: "before", family: "time" },
   { phrase: "unless", family: "condition" },
   { phrase: "also", family: "addition" },
   { phrase: "since", family: "cause" },
@@ -58,18 +66,26 @@ function escapeRegExp(value: string): string {
 }
 
 function embeddedTransition(sentence: string): LeadingTransition | null {
+  // Prefer the transition that appears first in the sentence. The previous
+  // loop returned the first phrase in the transition table that happened to
+  // match anywhere, so a later long phrase could hide an earlier relationship.
+  // Longer phrases still win ties at the same character position.
   const ordered = [...LEADING_TRANSITIONS].sort((left, right) => right.phrase.length - left.phrase.length);
+  let best: LeadingTransition | null = null;
   for (const transition of ordered) {
     const match = sentence.match(new RegExp(`\\b${escapeRegExp(transition.phrase).replace(/\s+/g, "\\s+")}\\b`, "i"));
     if (!match || match.index === undefined) continue;
-    return {
+    const candidate = {
       family: transition.family,
       text: match[0],
       start: match.index,
       end: match.index + match[0].length,
-    };
+    } satisfies LeadingTransition;
+    if (!best || candidate.start < best.start || (candidate.start === best.start && candidate.text.length > best.text.length)) {
+      best = candidate;
+    }
   }
-  return null;
+  return best;
 }
 
 function relationClause(sentence: string, relation: LeadingTransition): string {
@@ -106,14 +122,20 @@ function restoreDroppedEmbeddedRelation(
   );
   if (targetIndex < 0) return candidateSentence;
 
-  const leadingWhitespace = commaSegments[targetIndex].match(/^\s*/)?.[0] ?? "";
-  const leadingCoordinator = commaSegments[targetIndex]
-    .slice(leadingWhitespace.length)
-    .match(/^(?:and|or|but)\s+/i)?.[0] ?? "";
-  const relationPrefix = originalRelation.family === "time" && originalRelation.start > 0
-    ? "especially "
-    : "";
-  commaSegments[targetIndex] = `${leadingWhitespace}${leadingCoordinator}${relationPrefix}${sourceClause}`;
+  const segment = commaSegments[targetIndex];
+  const leadingWhitespace = segment.match(/^\s*/)?.[0] ?? "";
+  const body = segment.slice(leadingWhitespace.length);
+  const coordinatorMatch = body.match(/^(?:and|or|but)\s+/i);
+  const leadingCoordinator = coordinatorMatch?.[0] ?? "";
+  const remainder = body.slice(leadingCoordinator.length);
+  if (!remainder.trim()) return candidateSentence;
+
+  // Restore only the missing relationship marker. The previous implementation
+  // replaced the candidate segment with the source clause and, for embedded
+  // time clauses, invented the word “especially”. Prefixing the existing
+  // candidate clause preserves its wording/details and cannot add emphasis
+  // that was absent from the source.
+  commaSegments[targetIndex] = `${leadingWhitespace}${leadingCoordinator}${originalRelation.text} ${remainder.replace(/^\s+/, "")}`;
   return commaSegments.join(",");
 }
 
@@ -122,7 +144,8 @@ function leadingTransition(sentence: string): LeadingTransition | null {
   const body = sentence.slice(leadingWhitespace);
   const normalizedBody = body.toLowerCase();
 
-  for (const transition of LEADING_TRANSITIONS) {
+  const ordered = [...LEADING_TRANSITIONS].sort((left, right) => right.phrase.length - left.phrase.length);
+  for (const transition of ordered) {
     const phrase = transition.phrase;
     const boundary = normalizedBody[phrase.length];
     if (
