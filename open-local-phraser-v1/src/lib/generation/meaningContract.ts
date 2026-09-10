@@ -28,11 +28,14 @@ const MODALITY_RE = /\b(?:cannot|can['’]t|couldn['’]t|mightn['’]t|mustn['�
 // intentionally excluded: Cambridge distinguishes it from `certainly` because
 // it commonly seeks agreement rather than expressing no-doubt certainty.
 const CERTAINTY_RE = /\b(?:maybe|perhaps|possible|possibly|probable|probably|likely|unlikely|certainly|definitely)\b/gi;
+// `certain` is polysemous: “certain people” means particular/unspecified,
+// while “certain that/of/about/to …” expresses no-doubt certainty. Do not put
+// bare `certain` in either global regex; collect only high-confidence frames.
+const CERTAIN_EPISTEMIC_RE = /\bcertain(?=\s+(?:that|whether|if|how|why|what|when|where|who|to|of|about)\b|\s*[,.;:!?—-]|\s*$)/gi;
+const CERTAIN_SUBSET_RE = /\bcertain(?=\s+(?:people|persons|individuals|things|items|times|days|weeks|months|years|students?|users?|writers?|readers?|workers?|files?|records?|examples?|cases?|situations?|circumstances?|conditions?|types?|groups?|areas?|places?|words?|phrases?|sentences?|paragraphs?|tasks?|assignments?)\b)/gi;
 // “More” and “less” are excluded because they are frequently ordinary
 // comparatives (for example, “read more smoothly”), not quantity claims.
-// “Certain” commonly replaces “some” in a natural rewrite without changing
-// the open-ended subset being described. Keep it in the same contract class.
-const QUANTITY_RE = /\b(?:a\s+number\s+of|a\s+majority\s+of|the\s+majority\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|certain|any|enough)\b/gi;
+const QUANTITY_RE = /\b(?:a\s+number\s+of|a\s+majority\s+of|the\s+majority\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|any|enough)\b/gi;
 // Numeric bounds can reverse a factual claim while leaving the protected
 // numeral unchanged (`at least 10` -> `at most 10`). Collect these phrases
 // only when they directly modify a written number/currency amount, which keeps
@@ -97,7 +100,9 @@ function markerProfile(text: string): Marker[] {
     ...collectImplicitNegations(text),
     ...collect(text, "modality", MODALITY_RE),
     ...collect(text, "certainty", CERTAINTY_RE),
+    ...collect(text, "certainty", CERTAIN_EPISTEMIC_RE),
     ...collect(text, "quantity", QUANTITY_RE),
+    ...collect(text, "quantity", CERTAIN_SUBSET_RE),
     ...collect(text, "quantity", NUMERIC_QUANTITY_RE),
     ...collectRelations(text),
     ...collect(text, "person", PERSON_RE),
@@ -124,7 +129,7 @@ function certaintyClass(value: string): string {
   if (/^(?:maybe|perhaps|possible|possibly)$/.test(value)) return "possible-not-certain";
   if (/^(?:probable|probably|likely)$/.test(value)) return "probable-likely";
   if (/^unlikely$/.test(value)) return "unlikely";
-  if (/^(?:certainly|definitely)$/.test(value)) return "no-doubt-certain";
+  if (/^(?:certain|certainly|definitely)$/.test(value)) return "no-doubt-certain";
   return value;
 }
 
