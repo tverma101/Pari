@@ -35,6 +35,8 @@ interface CandidateSpan {
   priority: number;
 }
 
+const TIME_ZONE = "(?:ET|CT|MT|PT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|UTC|GMT)";
+
 const PROTECTED_PATTERNS: Array<{
   kind: ProtectedSpanKind;
   pattern: RegExp;
@@ -63,11 +65,23 @@ const PROTECTED_PATTERNS: Array<{
     pattern: /\b\d+(?:\.\d+){2,}(?:[-+][A-Za-z0-9.-]+)?\b/gi,
     priority: 74,
   },
-  // Keep the meridiem marker with its clock time during sentence-level
-  // repairs. Treating the periods in `p.m.`/`a.m.` as sentence punctuation
-  // can drop the beginning of a factual sentence when the shared splitter is
-  // used by a quantity or structural repair.
-  { kind: "time", pattern: /\b\d{1,2}:\d{2}(?:\s?[AP]M)?\b|\b[AP]\.M\.(?=\s|$|[),.;:!?])/gi, priority: 78 },
+  // Protect the whole clock expression, including meridiem and timezone when
+  // present. The older pattern handled `15:30` and `3:30 PM` but protected
+  // only the number in common pasted forms such as `6pm PST`, allowing a
+  // rewrite to silently lose or change PM/PST while still passing anchors.
+  {
+    kind: "time",
+    pattern: new RegExp(
+      `\\b(?:` +
+        `\\d{1,2}(?::\\d{2})?\\s?(?:A\\.?M\\.?|P\\.?M\\.?)(?:\\s*${TIME_ZONE})?` +
+        `|\\d{1,2}:\\d{2}(?:\\s*${TIME_ZONE})?` +
+        `|\\d{1,2}(?::\\d{2})?\\s+${TIME_ZONE}` +
+        `|(?:noon|midnight)(?:\\s+${TIME_ZONE})?` +
+      `)(?=\\s|$|[),.;:!?])`,
+      "gi",
+    ),
+    priority: 78,
+  },
   {
     kind: "number",
     pattern: /\b\d[\d,]*(?:\.\d+)?(?:\s?(?:kg|g|lb|lbs|km|mi|MB|GB|ms|s|hours?|minutes?|years?))?\b/gi,
@@ -76,7 +90,7 @@ const PROTECTED_PATTERNS: Array<{
   { kind: "list-marker", pattern: /^\s*(?:[-*•]|\d+[.)])(?=\s)/gm, priority: 70 },
   {
     kind: "negation",
-    pattern: /\b(?:not|never|no|without|cannot|can't|don't|doesn't|didn't|won't|wouldn't|shouldn't)\b/gi,
+    pattern: /\b(?:not|never|no|without|cannot|can['’]t|don['’]t|doesn['’]t|didn['’]t|won['’]t|wouldn['’]t|shouldn['’]t)\b/gi,
     priority: 65,
   },
   {
@@ -85,6 +99,12 @@ const PROTECTED_PATTERNS: Array<{
     priority: 64,
   },
 ];
+
+function isSentenceStart(text: string, index: number): boolean {
+  const before = text.slice(0, index).trimEnd();
+  if (!before) return true;
+  return /[.!?]$/.test(before);
+}
 
 function collectCandidates(text: string): CandidateSpan[] {
   const candidates: CandidateSpan[] = [];
@@ -119,10 +139,27 @@ function collectCandidates(text: string): CandidateSpan[] {
     });
   }
 
-  // A single capitalized word is ambiguous in headings and sentence-internal
-  // titles (for example, the word “Can” in a question-style heading). Keep
-  // it protected when an honorific makes the name context explicit, while
-  // leaving ordinary title words available to the rewriter.
+  // A sentence-internal capitalized word is a useful conservative signal for
+  // a single-token proper name, product, place, weekday, or titled entity
+  // (for example `Maya`, `Grammarly`, or `Monday`). Protecting it may reduce a
+  // little rewrite freedom, but losing one of these anchors is much costlier.
+  // Sentence-start capitalization stays unclassified to avoid treating every
+  // ordinary first word as a name.
+  const singleInternalNamePattern = /\b[A-Z][a-z]{2,}\b/g;
+  let singleInternalNameMatch: RegExpExecArray | null;
+  while ((singleInternalNameMatch = singleInternalNamePattern.exec(text)) !== null) {
+    if (isSentenceStart(text, singleInternalNameMatch.index)) continue;
+    candidates.push({
+      kind: "name",
+      text: singleInternalNameMatch[0],
+      start: singleInternalNameMatch.index,
+      end: singleInternalNameMatch.index + singleInternalNameMatch[0].length,
+      priority: 73,
+    });
+  }
+
+  // A single capitalized word is ambiguous at sentence start. Keep it
+  // protected when an honorific makes the name context explicit.
   const honorificNamePattern = /\b(?:Dr|Mr|Ms|Mrs|Prof|Professor)\.?\s+([A-Z][a-z]{2,})\b/g;
   let honorificNameMatch: RegExpExecArray | null;
   while ((honorificNameMatch = honorificNamePattern.exec(text)) !== null) {
