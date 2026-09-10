@@ -10,9 +10,15 @@ type TransitionFamily =
   | "cause"
   | "contrast"
   | "condition"
+  | "concessive-condition"
+  | "negative-condition"
   | "example"
   | "result"
-  | "time";
+  | "time-before"
+  | "time-after"
+  | "time-concurrent"
+  | "since"
+  | "while";
 
 interface LeadingTransition {
   family: TransitionFamily;
@@ -30,10 +36,7 @@ const LEADING_TRANSITIONS: Array<{ phrase: string; family: TransitionFamily }> =
   { phrase: "for example", family: "example" },
   { phrase: "in addition", family: "addition" },
   { phrase: "even though", family: "contrast" },
-  // “Even if” is a concessive condition, not a contrastive factual clause.
-  // Treating it as contrast caused harmless `if`/conditional structure to be
-  // compared against the wrong family and made repair choose the wrong link.
-  { phrase: "even if", family: "condition" },
+  { phrase: "even if", family: "concessive-condition" },
   { phrase: "given that", family: "cause" },
   { phrase: "moreover", family: "addition" },
   { phrase: "furthermore", family: "addition" },
@@ -44,14 +47,18 @@ const LEADING_TRANSITIONS: Array<{ phrase: string; family: TransitionFamily }> =
   { phrase: "however", family: "contrast" },
   { phrase: "whereas", family: "contrast" },
   { phrase: "though", family: "contrast" },
-  { phrase: "while", family: "time" },
-  { phrase: "when", family: "time" },
-  { phrase: "once", family: "time" },
-  { phrase: "after", family: "time" },
-  { phrase: "before", family: "time" },
-  { phrase: "unless", family: "condition" },
+  // `while` and `since` are lexically ambiguous: each can carry a temporal
+  // sense, while `while` can also contrast and `since` can give a reason.
+  // Preserve the exact marker instead of guessing its sense in a rule-only
+  // finalizer.
+  { phrase: "while", family: "while" },
+  { phrase: "since", family: "since" },
+  { phrase: "when", family: "time-concurrent" },
+  { phrase: "once", family: "time-after" },
+  { phrase: "after", family: "time-after" },
+  { phrase: "before", family: "time-before" },
+  { phrase: "unless", family: "negative-condition" },
   { phrase: "also", family: "addition" },
-  { phrase: "since", family: "cause" },
   { phrase: "thus", family: "result" },
   { phrase: "but", family: "contrast" },
   { phrase: "yet", family: "contrast" },
