@@ -58,7 +58,7 @@ function issues(original, candidate) {
 
 function expectSafe(original, candidate, label) {
   const found = issues(original, candidate);
-  assert.deepEqual(found, [], `${label}: equivalent certainty wording produced ${JSON.stringify(found)}`);
+  assert.deepEqual(found, [], `${label}: equivalent meaning produced ${JSON.stringify(found)}`);
 }
 
 function expectCertaintyDrift(original, candidate, label) {
@@ -66,6 +66,14 @@ function expectCertaintyDrift(original, candidate, label) {
   assert(
     found.some((issue) => issue.id === "certainty-drift"),
     `${label}: certainty change was accepted (${JSON.stringify(found)})`,
+  );
+}
+
+function expectQuantityDrift(original, candidate, label) {
+  const found = issues(original, candidate);
+  assert(
+    found.some((issue) => issue.id === "quantity-drift"),
+    `${label}: subset quantity change was accepted (${JSON.stringify(found)})`,
   );
 }
 
@@ -88,6 +96,16 @@ expectSafe(
   "The update will definitely work.",
   "The update will certainly work.",
   "definitely-certainly equivalence",
+);
+expectSafe(
+  "It is certain that the update works.",
+  "The update definitely works.",
+  "epistemic certain-definitely equivalence",
+);
+expectSafe(
+  "Certain users reported delays.",
+  "Some users reported delays.",
+  "subset certain-some equivalence",
 );
 
 expectCertaintyDrift(
@@ -119,6 +137,16 @@ expectCertaintyDrift(
   "The update will work.",
   "The update will probably work.",
   "unsupported probability inserted",
+);
+expectCertaintyDrift(
+  "It is certain that the update works.",
+  "It is possible that the update works.",
+  "epistemic certain weakened to possible",
+);
+expectQuantityDrift(
+  "Certain users reported delays.",
+  "Many users reported delays.",
+  "subset certain strengthened to many",
 );
 
 console.log("qa:meaning:certainty passed");
