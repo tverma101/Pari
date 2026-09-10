@@ -51,6 +51,7 @@ function loadTsModule(filePath) {
 const article = loadTsModule(path.join(ROOT_DIR, "src/lib/nlp/articleSound.ts"));
 const grammar = loadTsModule(path.join(ROOT_DIR, "src/lib/nlp/grammar.ts"));
 const englishRepair = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/englishGrammarRepair.ts"));
+const meaning = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/meaningContract.ts"));
 
 assert.equal(article.preferredIndefiniteArticle("hour"), "an");
 assert.equal(article.preferredIndefiniteArticle("honest answer"), "an");
@@ -63,6 +64,10 @@ assert.equal(article.preferredIndefiniteArticle("URL"), null);
 
 function hasArticleMismatch(text) {
   return grammar.grammarSafetyIssues(text).some((issue) => issue.id === "article-mismatch");
+}
+
+function meaningIds(original, candidate) {
+  return new Set(meaning.meaningContractIssues(original, candidate).map((issue) => issue.id));
 }
 
 assert.equal(hasArticleMismatch("It took a hour."), true, "high-confidence a/an error was missed");
@@ -86,6 +91,27 @@ assert.equal(
   englishRepair.repairEnglishGrammar("It is an herb."),
   "It is an herb.",
   "grammar repair forced one dialect for herb",
+);
+
+assert(
+  meaningIds("It is a herb.", "It is an herb.").has("ambiguous-article-drift"),
+  "shared contract accepted a dialect-sensitive herb article change",
+);
+assert(
+  meaningIds("It is an herb.", "It is a herb.").has("ambiguous-article-drift"),
+  "shared contract accepted reverse dialect-sensitive herb article change",
+);
+assert(
+  meaningIds("It uses a URL.", "It uses an URL.").has("ambiguous-article-drift"),
+  "shared contract accepted an ambiguous initialism article change",
+);
+assert(
+  !meaningIds("It took a hour.", "It took an hour.").has("ambiguous-article-drift"),
+  "high-confidence hour correction was blocked by ambiguous-article guard",
+);
+assert(
+  !meaningIds("It is an university program.", "It is a university program.").has("ambiguous-article-drift"),
+  "high-confidence university correction was blocked by ambiguous-article guard",
 );
 
 console.log("qa:article:sound passed");
