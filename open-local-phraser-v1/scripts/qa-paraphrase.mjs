@@ -581,7 +581,8 @@ const repairedDroppedEmbeddedTransition = repairSentenceFlow(
   "I stay focused when there are distractions, and I organize tasks.",
   "I stay focused over long periods, handle distractions, and organize tasks.",
 );
-assert(/focused over long periods, especially when there are distractions/i.test(repairedDroppedEmbeddedTransition), `Dropped sentence-flow repair failed: ${repairedDroppedEmbeddedTransition}`);
+assert(/focused over long periods when there are distractions/i.test(repairedDroppedEmbeddedTransition), `Dropped sentence-flow relation was not restored: ${repairedDroppedEmbeddedTransition}`);
+assert(!/\bwhen\s+handle\b/i.test(repairedDroppedEmbeddedTransition), `Dropped sentence-flow repair created a non-finite subordinate clause: ${repairedDroppedEmbeddedTransition}`);
 const repairedParallelSeries = repairSentenceFlow(
   "The team likes reading, writing, and revising.",
   "The team likes reading, writing, and revise."
