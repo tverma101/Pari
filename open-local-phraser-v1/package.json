@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "qa:paraphrase": "node scripts/qa-paraphrase.mjs && node scripts/qa-native-ranker.mjs && node scripts/qa-rule-nli.mjs && node scripts/qa-rule-ranker.mjs && node scripts/qa-meaning-audit.mjs && node scripts/qa-protected-units.mjs && node scripts/qa-article-sound.mjs && node scripts/qa-meaning-agreement.mjs",
+    "qa:paraphrase": "node scripts/qa-paraphrase.mjs && node scripts/qa-native-ranker.mjs && node scripts/qa-rule-nli.mjs && node scripts/qa-rule-ranker.mjs && node scripts/qa-meaning-audit.mjs && node scripts/qa-protected-units.mjs && node scripts/qa-article-sound.mjs && node scripts/qa-meaning-agreement.mjs && node scripts/qa-meaning-bounds.mjs",
     "qa:approval": "node scripts/qa-paraphrase.mjs",
     "qa:grammar:harper": "node scripts/qa-harper.mjs",
     "qa:native:model": "node scripts/qa-native-model.mjs",
@@ -15,6 +15,7 @@
     "qa:rule:ranker": "node scripts/qa-rule-ranker.mjs",
     "qa:meaning-audit": "node scripts/qa-meaning-audit.mjs",
     "qa:meaning-agreement": "node scripts/qa-meaning-agreement.mjs",
+    "qa:meaning:bounds": "node scripts/qa-meaning-bounds.mjs",
     "qa:protected:units": "node scripts/qa-protected-units.mjs",
     "qa:article:sound": "node scripts/qa-article-sound.mjs",
     "qa:agent:styles": "node scripts/qa-agent-style-backend.mjs",
