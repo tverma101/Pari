@@ -112,6 +112,16 @@ assert(
   "hour vowel sound did not prefer 'an hour'",
 );
 
+// Without a dialect or pronunciation setting, do not invent certainty. `herb`
+// differs between common UK and US pronunciations, and initialisms cannot be
+// classified from their first letter alone.
+const aHerb = score("It was a old ingredient.", "old", "herb");
+const anHerb = score("It was an old ingredient.", "old", "herb");
+assert(Math.abs(aHerb - anHerb) < 1e-9, "dialect-sensitive 'herb' forced one article");
+const aMri = score("It was a old scan.", "old", "MRI");
+const anMri = score("It was an old scan.", "old", "MRI");
+assert(Math.abs(aMri - anMri) < 1e-9, "initialism article was guessed from spelling");
+
 expectPreferred(
   "The result is the same as before.",
   "as",
