@@ -12,12 +12,12 @@ interface Marker {
   value: string;
 }
 
-const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no|without|cannot|can't|couldn't|don't|doesn't|didn't|won't|wouldn't|shouldn't|mustn't|mightn't|shan't|needn't|isn't|aren't|wasn't|weren't|hardly|rarely|seldom|invalid|unacceptable|impossible)\b/gi;
+const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|hardly|rarely|seldom|invalid|unacceptable|impossible)\b/gi;
 // Include negative contractions as modality markers as well as negation
 // markers. Otherwise a harmless contraction edit such as “couldn't” ->
 // “could not” looks like a modal was added because `could` is only visible in
 // the expanded form.
-const MODALITY_RE = /\b(?:cannot|can't|couldn't|mightn't|mustn't|shouldn't|shan't|won't|wouldn't|may|might|could|can|must|should|will|would|shall)\b/gi;
+const MODALITY_RE = /\b(?:cannot|can['’]t|couldn['’]t|mightn['’]t|mustn['’]t|shouldn['’]t|shan['’]t|won['’]t|wouldn['’]t|may|might|could|can|must|should|will|would|shall)\b/gi;
 // “More” and “less” are excluded because they are frequently ordinary
 // comparatives (for example, “read more smoothly”), not quantity claims.
 // “Certain” commonly replaces “some” in a natural rewrite without changing
@@ -38,7 +38,7 @@ function collect(text: string, family: MarkerFamily, pattern: RegExp): Marker[] 
   pattern.lastIndex = 0;
   return [...text.matchAll(pattern)].map((match) => ({
     family,
-    value: match[0].toLowerCase().replace(/\s+/g, " "),
+    value: match[0].toLowerCase().replace(/[’]/g, "'").replace(/\s+/g, " "),
   }));
 }
 
@@ -78,7 +78,7 @@ function modalityClass(value: string): string {
 }
 
 function quantityClass(value: string): string {
-  // Keep materially different scopes separate. The previous broad
+  // Keep materially different scopes separate. The old broad
   // “bounded-total” bucket treated `all`, `both`, and `only` as equivalent,
   // which can certify a real factual change without any model involvement.
   if (/^(?:a number of|many|several)$/.test(value)) return "large-unspecified";
@@ -97,13 +97,21 @@ function quantityClass(value: string): string {
 }
 
 function relationClass(value: string): string {
-  if (/^(?:due to the fact that|for unspecified reasons|given that|because|since|therefore|thus|so|consequently|as a result)$/.test(value)) return "cause-result";
+  // Keep cause-subordinators separate from result-connectors. Turning
+  // “X because Y” into “X; therefore Y” reverses causal direction even though
+  // both contain causal vocabulary.
+  if (/^(?:due to the fact that|for unspecified reasons|given that|because|since)$/.test(value)) return "cause";
+  if (/^(?:therefore|thus|so|consequently|as a result)$/.test(value)) return "result";
   if (/^(?:notwithstanding the fact that|although|though|even though|however|but|yet)$/.test(value)) return "contrast";
-  // “Even if” carries concessive force beyond a plain condition. Keep it
-  // distinct so an automatic rewrite cannot silently weaken that relationship.
+  // “Even if” carries concessive force beyond a plain condition.
   if (/^even if$/.test(value)) return "concessive-condition";
-  if (/^(?:in the event that|if|unless|provided that|as long as)$/.test(value)) return "condition";
-  if (/^(?:when|while|once|after|before)$/.test(value)) return "time";
+  if (/^(?:in the event that|if|provided that|as long as)$/.test(value)) return "positive-condition";
+  if (/^unless$/.test(value)) return "negative-condition";
+  // Temporal direction is semantic, not stylistic. In particular, `before`
+  // and `after` must never normalize to the same marker class.
+  if (/^before$/.test(value)) return "time-before";
+  if (/^(?:after|once)$/.test(value)) return "time-after";
+  if (/^(?:when|while)$/.test(value)) return "time-concurrent";
   return value;
 }
 
@@ -191,7 +199,7 @@ export function meaningContractIssues(
     {
       family: "relation",
       id: "discourse-relation-drift",
-      detail: "The rewrite changed a cause, contrast, condition, or time relationship.",
+      detail: "The rewrite changed a cause, result, contrast, condition, or time relationship.",
       normalize: relationClass,
     },
     {
