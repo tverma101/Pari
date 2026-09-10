@@ -38,9 +38,6 @@ interface CandidateSpan {
 const TIME_ZONE = "(?:ET|CT|MT|PT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|UTC|GMT|BST|CET|CEST|EET|EEST|IST|JST|KST|AEST|AEDT|ACST|ACDT|AWST)";
 const MONTH = "(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)";
 const WEEKDAY = "(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)";
-// Include the SI metre symbol `m` explicitly. The number pattern below keeps
-// the quantity and unit as one factual anchor, so `5 m` cannot silently turn
-// into another length such as `5 ft` while retaining the same numeral.
 const MEASUREMENT_UNIT = "(?:kg|mg|mcg|µg|g|oz|lb|lbs|mm|cm|m|km|mL|ml|L|mi|ft|yd|MB|GB|TB|KiB|MiB|GiB|ms|sec|secs|seconds?|min|mins|minutes?|hours?|days?|weeks?|months?|years?|°C|°F|Hz|kHz|MHz|GHz|Mbps|Gbps|tokens?|words?|pages?)";
 const NEGATIVE_AUXILIARY = "(?:can|could|do|does|did|have|has|had|is|are|was|were|will|would|should|must|might|shall|need)";
 
@@ -80,17 +77,11 @@ const PROTECTED_PATTERNS: Array<{
     ),
     priority: 78,
   },
-  // Treat semantic versions as one protected number. Protecting only each
-  // decimal component lets sentence repair split `2.4.1` at its periods.
   {
     kind: "number",
     pattern: /\b\d+(?:\.\d+){2,}(?:[-+][A-Za-z0-9.-]+)?\b/gi,
     priority: 74,
   },
-  // Protect the whole clock expression, including meridiem and timezone when
-  // present. The older pattern handled `15:30` and `3:30 PM` but protected
-  // only the number in common pasted forms such as `6pm PST`, allowing a
-  // rewrite to silently lose or change PM/PST while still passing anchors.
   {
     kind: "time",
     pattern: new RegExp(
@@ -112,8 +103,6 @@ const PROTECTED_PATTERNS: Array<{
   { kind: "list-marker", pattern: /^\s*(?:[-*•]|\d+[.)])(?=\s)/gm, priority: 70 },
   {
     kind: "negation",
-    // Consume expanded auxiliary+not as one semantic anchor so harmless
-    // contraction/expansion edits can be compared as equivalents.
     pattern: new RegExp(
       `\\b(?:failed\\s+to|fails\\s+to|${NEGATIVE_AUXILIARY}\\s+not|not|never|no|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|haven['’]t|hasn['’]t|hadn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|hardly|rarely|seldom|invalid|unacceptable|impossible)\\b`,
       "gi",
@@ -140,9 +129,6 @@ function collectCandidates(text: string): CandidateSpan[] {
     pattern.lastIndex = 0;
     let match: RegExpExecArray | null;
     while ((match = pattern.exec(text)) !== null) {
-      // Sentence punctuation is not part of a URL. Keeping a trailing period
-      // in the protected payload makes the validator reject an unchanged URL
-      // whenever it appears at the end of a sentence.
       const candidateText = kind === "url" ? match[0].replace(/[.,!?;:]+$/g, "") : match[0];
       candidates.push({
         kind,
@@ -166,8 +152,6 @@ function collectCandidates(text: string): CandidateSpan[] {
     });
   }
 
-  // Preserve high-signal technical/proper tokens regardless of sentence
-  // position: acronyms, mixed-case brands, and letter+digit model names.
   const technicalNamePattern = /\b(?:[A-Z]{2,}[A-Z0-9-]*|[A-Z][a-z]+[A-Z][A-Za-z0-9-]*|[A-Z][A-Za-z-]*\d[A-Za-z0-9-]*)\b/g;
   let technicalNameMatch: RegExpExecArray | null;
   while ((technicalNameMatch = technicalNamePattern.exec(text)) !== null) {
@@ -180,12 +164,6 @@ function collectCandidates(text: string): CandidateSpan[] {
     });
   }
 
-  // A sentence-internal capitalized word is a useful conservative signal for
-  // a single-token proper name, product, place, weekday, or titled entity
-  // (for example `Maya`, `Grammarly`, or `Monday`). Protecting it may reduce a
-  // little rewrite freedom, but losing one of these anchors is much costlier.
-  // Sentence-start capitalization stays unclassified to avoid treating every
-  // ordinary first word as a name.
   const singleInternalNamePattern = /\b[A-Z][a-z]{2,}\b/g;
   let singleInternalNameMatch: RegExpExecArray | null;
   while ((singleInternalNameMatch = singleInternalNamePattern.exec(text)) !== null) {
@@ -199,8 +177,6 @@ function collectCandidates(text: string): CandidateSpan[] {
     });
   }
 
-  // A single capitalized word is ambiguous at sentence start. Keep it
-  // protected when an honorific makes the name context explicit.
   const honorificNamePattern = /\b(?:Dr|Mr|Ms|Mrs|Prof|Professor)\.?\s+([A-Z][a-z]{2,})\b/g;
   let honorificNameMatch: RegExpExecArray | null;
   while ((honorificNameMatch = honorificNamePattern.exec(text)) !== null) {
@@ -228,14 +204,26 @@ export function extractProtectedSpans(text: string): ProtectedSpan[] {
     if (left.priority !== right.priority) return right.priority - left.priority;
     return right.end - left.end;
   })) {
-    // Negative modal contractions/expansions already preserve their modal
-    // carrier as part of the higher-priority negation span. Keeping an
-    // overlapping `can`/`could` span would make `can't` -> `cannot` fail exact
-    // matching even though the semantic anchor is unchanged.
     if (
       candidate.kind === "modality" &&
       selected.some((existing) =>
         existing.kind === "negation" &&
+        existing.start <= candidate.start &&
+        existing.end >= candidate.end
+      )
+    ) {
+      continue;
+    }
+
+    // AM/PM and timezone abbreviations belong to the clock expression when
+    // they occur inside a higher-priority protected time. Do not duplicate
+    // them as generic names: doing so would make a style-only `3 AM` ->
+    // `3 a.m.` edit look like a removed proper noun even though the time and
+    // timezone are unchanged.
+    if (
+      candidate.kind === "name" &&
+      selected.some((existing) =>
+        existing.kind === "time" &&
         existing.start <= candidate.start &&
         existing.end >= candidate.end
       )
@@ -352,13 +340,66 @@ function countEquivalentMeasurement(text: string, fragment: string): number {
   return [...text.matchAll(pattern)].length;
 }
 
+/**
+ * Canonical clock identity used only for protected-content comparison. Style
+ * variants such as `3am`, `3 AM`, `3 a.m.`, and `3:00 a.m.` represent the
+ * same clock value. A timezone remains part of the identity, so EST/PST or a
+ * present/missing zone can never be normalized away.
+ *
+ * Bare `3 PST` is kept in a separate class from `3 AM PST` because it does not
+ * state a meridiem. `noon`/`midnight` also remain lexical special values; NIST
+ * notes ambiguity around labeling 12 itself with a.m./p.m., so this rail does
+ * not infer that equivalence.
+ */
+function canonicalTimeKey(fragment: string): string | null {
+  const normalized = fragment.trim().replace(/\s+/g, " ");
+  const zonePattern = new RegExp(`\\s+(${TIME_ZONE})$`, "i");
+  const zoneMatch = normalized.match(zonePattern);
+  const zone = zoneMatch?.[1]?.toUpperCase() ?? "";
+  const clock = zoneMatch ? normalized.slice(0, zoneMatch.index).trim() : normalized;
+
+  if (/^noon$/i.test(clock)) return `special:noon|${zone}`;
+  if (/^midnight$/i.test(clock)) return `special:midnight|${zone}`;
+
+  const meridiem = clock.match(/^(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m\.?$/i);
+  if (meridiem) {
+    const hour = Number(meridiem[1]);
+    const minute = meridiem[2] === undefined ? 0 : Number(meridiem[2]);
+    if (hour < 1 || hour > 12 || minute < 0 || minute > 59) return null;
+    const hour24 = (hour % 12) + (meridiem[3].toLowerCase() === "p" ? 12 : 0);
+    return `absolute:${hour24 * 60 + minute}|${zone}`;
+  }
+
+  const colonClock = clock.match(/^(\d{1,2}):(\d{2})$/);
+  if (colonClock) {
+    const hour = Number(colonClock[1]);
+    const minute = Number(colonClock[2]);
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+    return `absolute:${hour * 60 + minute}|${zone}`;
+  }
+
+  const bareZoneClock = clock.match(/^(\d{1,2})$/);
+  if (bareZoneClock && zone) {
+    const hour = Number(bareZoneClock[1]);
+    if (hour < 0 || hour > 23) return null;
+    return `zone-clock:${hour * 60}|${zone}`;
+  }
+
+  return null;
+}
+
+function countEquivalentTime(text: string, fragment: string): number {
+  const sourceKey = canonicalTimeKey(fragment);
+  if (!sourceKey) return 0;
+  return extractProtectedSpans(text).filter(
+    (span) => span.kind === "time" && canonicalTimeKey(span.text) === sourceKey,
+  ).length;
+}
+
 function uniqueTexts(spans: ProtectedSpan[]): string[] {
   return [...new Set(spans.map((span) => span.text))];
 }
 
-// New anchors are inventions, not paraphrases. Names are handled separately
-// below because repeating an existing name can be a legitimate coreference
-// clarification; these exact anchor kinds should never appear from nowhere.
 const FACTUAL_ADDITION_KINDS = new Set<ProtectedSpanKind>([
   "url", "email", "quote", "citation",
   "date", "time", "number", "percentage", "currency",
@@ -368,6 +409,10 @@ function spanCountKey(span: Pick<ProtectedSpan, "kind" | "text">): string {
   if (span.kind === "number") {
     const measurement = measurementParts(span.text);
     if (measurement) return `${span.kind}\u0000${measurement.number}\u0000${measurement.unit}`;
+  }
+  if (span.kind === "time") {
+    const time = canonicalTimeKey(span.text);
+    if (time) return `${span.kind}\u0000${time}`;
   }
   return `${span.kind}\u0000${span.text}`;
 }
@@ -415,7 +460,9 @@ export function validateProtectedContent(
     const equivalentMeasurement = matchingSpans.every(
       (span) => span.kind === "number" && measurementParts(span.text) !== null,
     ) && countEquivalentMeasurement(candidateText, text) >= expected;
-    if (actual < expected && !equivalentNegation && !equivalentMeasurement) {
+    const equivalentTime = matchingSpans.every((span) => span.kind === "time") &&
+      countEquivalentTime(candidateText, text) >= expected;
+    if (actual < expected && !equivalentNegation && !equivalentMeasurement && !equivalentTime) {
       const missing = protectedSpans.find((span) => span.text === text);
       return {
         safe: false,
