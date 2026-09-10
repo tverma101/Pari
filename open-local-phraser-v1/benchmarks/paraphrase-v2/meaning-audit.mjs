@@ -141,39 +141,57 @@ function toCsv(items) {
   ].join("\n");
 }
 
-function parseCsvLine(line) {
-  const cells = [];
-  let current = "";
+function parseCsv(text) {
+  const records = [];
+  let record = [];
+  let field = "";
   let quoted = false;
-  for (let index = 0; index < line.length; index += 1) {
-    const char = line[index];
-    if (quoted && char === '"' && line[index + 1] === '"') {
-      current += '"';
-      index += 1;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    if (quoted) {
+      if (char === '"' && text[index + 1] === '"') {
+        field += '"';
+        index += 1;
+      } else if (char === '"') {
+        quoted = false;
+      } else {
+        field += char;
+      }
       continue;
     }
+
     if (char === '"') {
-      quoted = !quoted;
-      continue;
+      quoted = true;
+    } else if (char === ",") {
+      record.push(field);
+      field = "";
+    } else if (char === "\n" || char === "\r") {
+      if (char === "\r" && text[index + 1] === "\n") index += 1;
+      record.push(field);
+      field = "";
+      if (record.some((cell) => cell.length > 0)) records.push(record);
+      record = [];
+    } else {
+      field += char;
     }
-    if (char === "," && !quoted) {
-      cells.push(current);
-      current = "";
-      continue;
-    }
-    current += char;
   }
-  cells.push(current);
-  return cells;
+
+  if (field.length > 0 || record.length > 0) {
+    record.push(field);
+    if (record.some((cell) => cell.length > 0)) records.push(record);
+  }
+  if (quoted) throw new Error("Unterminated quoted field in ratings CSV");
+  if (!records.length) return [];
+
+  const headers = records[0];
+  return records.slice(1).map((cells) =>
+    Object.fromEntries(headers.map((header, index) => [header, cells[index] ?? ""])),
+  );
 }
 
 function loadCsv(filePath) {
-  const lines = fs.readFileSync(filePath, "utf8").split(/\r?\n/).filter(Boolean);
-  if (!lines.length) return [];
-  const headers = parseCsvLine(lines[0]);
-  return lines.slice(1).map((line) =>
-    Object.fromEntries(parseCsvLine(line).map((value, index) => [headers[index], value])),
-  );
+  return parseCsv(fs.readFileSync(filePath, "utf8"));
 }
 
 function normalizePreserved(value) {
