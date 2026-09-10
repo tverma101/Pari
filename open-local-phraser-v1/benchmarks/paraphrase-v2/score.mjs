@@ -2,6 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { scoreCase } from "../eval/metrics.mjs";
+import { meaningContractIssuesForBenchmark } from "./meaning-contract-bridge.mjs";
 import {
   DEFAULT_CORPUS_PATH,
   loadV2Corpus,
@@ -86,8 +87,20 @@ for (const item of corpus) {
     continue;
   }
   const scored = await scoreCase(item, output);
+  const meaningContractIssues = meaningContractIssuesForBenchmark(item.input, output);
+  const meaningContractSafe = meaningContractIssues.length === 0;
+  const failedChecks = meaningContractSafe
+    ? (scored.failedChecks ?? [])
+    : [...new Set([...(scored.failedChecks ?? []), "meaningContractSafe"])];
   results.push({
     ...scored,
+    passed: scored.passed && meaningContractSafe,
+    meaningSafe: scored.meaningSafe && meaningContractSafe,
+    failedChecks,
+    meaningContract: {
+      safe: meaningContractSafe,
+      issues: meaningContractIssues,
+    },
     output,
     ...(Number.isFinite(rawRow.seconds) ? { seconds: rawRow.seconds } : {}),
     ...(Number.isFinite(rawRow.totalSeconds) ? { totalSeconds: rawRow.totalSeconds } : {}),
@@ -133,6 +146,13 @@ function mean(rows, key) {
   const values = rows.map((row) => row.metrics?.[key]).filter((value) => Number.isFinite(value));
   if (!values.length) return null;
   return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(3));
+}
+
+function median(values) {
+  if (!values.length) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
 }
 
 function aggregate(rows) {
