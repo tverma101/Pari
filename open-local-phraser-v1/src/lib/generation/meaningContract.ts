@@ -12,6 +12,11 @@ interface Marker {
   value: string;
 }
 
+interface ComparativeCue {
+  direction: "higher" | "lower";
+  head: string;
+}
+
 // `no` normally carries negative force, but in numeric bound phrases such as
 // “no less than 10” / “no more than 10” that force is already represented by
 // the bound's quantity class. Counting it again as a free-standing negation
@@ -19,60 +24,21 @@ interface Marker {
 // 10”. Barely/hardly/scarcely also carry near-zero force, so keep all three
 // aligned here as well as in the degree/frequency contracts below.
 const NEGATION_RE = /\b(?:failed\s+to|fails\s+to|not|never|no(?!\s+(?:more|less)\s+than\s+(?:[$€£¥]\s*)?\d)|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|barely|hardly|scarcely|rarely|seldom|invalid|unacceptable|impossible)\b/gi;
-// Include negative contractions as modality markers as well as negation
-// markers. Otherwise a harmless contraction edit such as “couldn't” ->
-// “could not” looks like a modal was added because `could` is only visible in
-// the expanded form.
 const MODALITY_RE = /\b(?:cannot|can['’]t|couldn['’]t|mightn['’]t|mustn['’]t|shouldn['’]t|shan['’]t|won['’]t|wouldn['’]t|may|might|could|can|must|should|will|would|shall)\b/gi;
-// English also expresses epistemic force without modal verbs. Keep a narrow
-// high-confidence set whose probability strength is explicit. `surely` is
-// intentionally excluded: Cambridge distinguishes it from `certainly` because
-// it commonly seeks agreement rather than expressing no-doubt certainty.
 const CERTAINTY_RE = /\b(?:maybe|perhaps|possible|possibly|probable|probably|likely|unlikely|certainly|definitely)\b/gi;
-// `certain` is polysemous: “certain people” means particular/unspecified,
-// while “certain that/of/about/to …” expresses no-doubt certainty. Do not put
-// bare `certain` in either global regex; collect only high-confidence frames.
 const CERTAIN_EPISTEMIC_RE = /\bcertain(?=\s+(?:that|whether|if|how|why|what|when|where|who|to|of|about)\b|\s*[,.;:!?—-]|\s*$)/gi;
 const CERTAIN_SUBSET_RE = /\bcertain(?=\s+(?:people|persons|individuals|things|items|times|days|weeks|months|years|students?|users?|writers?|readers?|workers?|files?|records?|examples?|cases?|situations?|circumstances?|conditions?|types?|groups?|areas?|places?|words?|phrases?|sentences?|paragraphs?|tasks?|assignments?)\b)/gi;
-// Preserve explicit degree/extent when the wording is high-confidence. The
-// near-zero, small-degree, and large-degree families are semantically distinct:
-// “barely changed”, “slightly changed”, and “changed considerably” do not make
-// the same claim. `hardly ever` is a frequency expression, so keep that phrase
-// out of the degree family. `significantly` has a separate parenthetical
-// discourse sense ("Significantly, ..."), so collect it only when it is not
-// followed by a comma.
 const DEGREE_RE = /\b(?:(?:hardly(?!\s+ever)|barely|scarcely)|slightly|marginally|considerably|greatly)\b/gi;
 const SIGNIFICANT_DEGREE_RE = /\bsignificantly\b(?!\s*,)/gi;
-// Keep frequency strength separate from degree and negation. Cambridge groups
-// `hardly ever`, `rarely`, and `seldom` as frequency adverbs meaning not very
-// often, and explicitly treats `often` and `frequently` as synonyms. More
-// distant strengths stay separate so a rewrite cannot turn `sometimes` into
-// `always` without a semantic veto.
 const FREQUENCY_RE = /\b(?:not\s+ever|hardly\s+ever|never|rarely|seldom|occasionally|sometimes|frequently|often|usually|always)\b/gi;
-// “More” and “less” are excluded because they are frequently ordinary
-// comparatives (for example, “read more smoothly”), not quantity claims.
 const QUANTITY_RE = /\b(?:a\s+number\s+of|a\s+majority\s+of|the\s+majority\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|any|enough)\b/gi;
-// Numeric bounds can reverse a factual claim while leaving the protected
-// numeral unchanged (`at least 10` -> `at most 10`). Collect these phrases
-// only when they directly modify a written number/currency amount, which keeps
-// ambiguous ordinary uses of words such as “about” and “around” out of the
-// contract.
 const NUMERIC_QUANTITY_RE = /\b(?:at\s+least|no\s+less\s+than|at\s+most|no\s+more\s+than|more\s+than|less\s+than|fewer\s+than|up\s+to|approximately|roughly|about|around|nearly|almost|exactly|precisely)(?=\s+(?:[$€£¥]\s*)?\d)/gi;
-// Keep longest multiword relations first so one semantic marker is collected
-// for a construction such as “because of” instead of separately matching the
-// shorter “because”. These are high-confidence cause, contrast, condition,
-// and temporal relations; ambiguous words such as bare “as” remain excluded.
 const RELATION_RE = /\b(?:due\s+to\s+the\s+fact\s+that|notwithstanding\s+the\s+fact\s+that|in\s+spite\s+of\s+the\s+fact\s+that|despite\s+the\s+fact\s+that|in\s+the\s+event\s+that|for\s+unspecified\s+reasons|because\s+of|owing\s+to|due\s+to|in\s+spite\s+of|as\s+soon\s+as|as\s+long\s+as|provided\s+that|given\s+that|as\s+a\s+result|even\s+though|even\s+if|because|since|although|though|despite|whereas|if|unless|when|whilst|while|once|after|before|until|till|therefore|thus|consequently|however|but|yet)\b|(?:^|[^A-Za-z])['’]til\b/gi;
-// Bare “so” is intentionally excluded above. It is often an intensifier (“so
-// useful”, “so much”) rather than a cause/result marker. A separate collector
-// recognizes it only in punctuation-delimited coordinator positions.
 const SO_RELATION_RE = /(?:[,;]\s+so\b|(?:^|[.!?]\s+)so,\s+)/gi;
-// Expletive “it” is not a writer perspective marker. Keeping it out avoids
-// rejecting a direct repair such as “It is important to note that …” ->
-// “Several …”. Possessive and reflexive forms are included so a grammatical
-// recast does not look like a change of speaker or participant.
 const PERSON_RE = /\b(?:I|me|my|mine|myself|we|us|our|ourselves|you|your|yours|yourself|yourselves|he|him|his|himself|she|her|hers|herself|they|them|their|theirs|themselves)\b/gi;
 const UNLESS_RE = /\bunless\b/gi;
+const COMPARATIVE_DIRECTION_RE = /\b(more|less|fewer|higher|lower|greater|smaller)\s+([A-Za-z][A-Za-z'-]*)\b/gi;
+const COMPARATIVE_NON_HEADS = new Set(["and", "of", "or", "than"]);
 
 function collect(text: string, family: MarkerFamily, pattern: RegExp): Marker[] {
   pattern.lastIndex = 0;
@@ -96,12 +62,6 @@ function collectRelations(text: string): Marker[] {
   return markers;
 }
 
-/**
- * `unless P` is semantically equivalent to a negative condition such as
- * `if not P`. Represent that negative force explicitly in the contract so
- * safe unless↔if-not rewrites are accepted, while unless↔if still fails on
- * negation. This also composes correctly with `unless not P` (two negatives).
- */
 function collectImplicitNegations(text: string): Marker[] {
   UNLESS_RE.lastIndex = 0;
   return [...text.matchAll(UNLESS_RE)].map(() => ({
@@ -171,9 +131,6 @@ function frequencyClass(value: string): string {
 }
 
 function quantityClass(value: string): string {
-  // Numeric bounds need their own classes. Inclusive and exclusive bounds are
-  // kept separate because `at least 10` and `more than 10` differ at exactly
-  // 10 even though they point in the same direction.
   if (/^(?:at least|no less than)$/.test(value)) return "numeric-lower-inclusive";
   if (/^more than$/.test(value)) return "numeric-lower-exclusive";
   if (/^(?:at most|no more than|up to)$/.test(value)) return "numeric-upper-inclusive";
@@ -181,11 +138,6 @@ function quantityClass(value: string): string {
   if (/^(?:approximately|roughly|about|around)$/.test(value)) return "numeric-approximate";
   if (/^(?:nearly|almost)$/.test(value)) return "numeric-near-below";
   if (/^(?:exactly|precisely)$/.test(value)) return "numeric-exact";
-
-  // `a number of` is explicitly glossed as “several” by Cambridge, while
-  // `many` denotes a large number and `several` is described as fewer than
-  // many. Keep the supported a-number-of↔several paraphrase, but do not let a
-  // rule-only contract certify several↔many as a neutral strength change.
   if (/^(?:a number of|several)$/.test(value)) return "several-unspecified";
   if (/^many$/.test(value)) return "large-number";
   if (/^all$/.test(value)) return "universal-collective";
@@ -203,25 +155,13 @@ function quantityClass(value: string): string {
 }
 
 function relationClass(value: string): string {
-  // Keep cause-subordinators/prepositions separate from result-connectors.
-  // Turning “X because Y” into “X; therefore Y” reverses causal direction even
-  // though both contain causal vocabulary.
   if (/^(?:due to the fact that|for unspecified reasons|given that|because|because of|due to|owing to)$/.test(value)) return "cause";
   if (/^(?:therefore|thus|so|consequently|as a result)$/.test(value)) return "result";
   if (/^(?:notwithstanding the fact that|in spite of the fact that|despite the fact that|in spite of|despite|although|though|even though|whereas|however|but|yet)$/.test(value)) return "contrast";
-  // “Even if” carries concessive force beyond a plain condition.
   if (/^even if$/.test(value)) return "concessive-condition";
-  // `unless` joins the positive-condition surface class because its negative
-  // force is represented separately by collectImplicitNegations().
   if (/^(?:in the event that|if|unless|provided that|as long as)$/.test(value)) return "positive-condition";
-  // `since` and `while/whilst` are ambiguous without syntax/semantics. A
-  // rule-only contract should preserve the sense instead of assuming
-  // `since = because` or `while = when` and silently accepting the wrong use.
   if (/^since$/.test(value)) return "ambiguous-since";
   if (/^(?:while|whilst)$/.test(value)) return "ambiguous-while";
-  // Temporal direction/boundary is semantic, not stylistic. In particular,
-  // `before`, `after`, `until`, and the immediacy in `as soon as` remain
-  // distinct so a rewrite cannot weaken or reverse the timeline.
   if (/^before$/.test(value)) return "time-before";
   if (/^(?:after|once)$/.test(value)) return "time-after";
   if (/^as soon as$/.test(value)) return "time-immediate-after";
@@ -241,11 +181,33 @@ function personClass(value: string): string {
 }
 
 function negationClass(_value: string): string {
-  // “Failed to comply” and “didn't follow the instructions” are different
-  // words but the same negative proposition. Warmth uses this conversion
-  // deliberately, so the contract compares negative force rather than surface
-  // spelling.
   return "negative";
+}
+
+function comparativeCues(text: string): ComparativeCue[] {
+  COMPARATIVE_DIRECTION_RE.lastIndex = 0;
+  const cues: ComparativeCue[] = [];
+  for (const match of text.matchAll(COMPARATIVE_DIRECTION_RE)) {
+    const word = match[1].toLowerCase();
+    const head = match[2].toLowerCase();
+    // Exclude fixed/compositional frames whose semantic direction is already
+    // handled elsewhere or is not the literal comparative head: “more or
+    // less”, “more than 10”, “less of the work”, “more and more”.
+    if (COMPARATIVE_NON_HEADS.has(head)) continue;
+    cues.push({
+      direction: /^(?:more|higher|greater)$/.test(word) ? "higher" : "lower",
+      head,
+    });
+  }
+  return cues;
+}
+
+function hasDirectComparativeDirectionFlip(original: string, candidate: string): boolean {
+  const originalCues = comparativeCues(original);
+  const candidateCues = comparativeCues(candidate);
+  return originalCues.some((source) =>
+    candidateCues.some((rewrite) => source.head === rewrite.head && source.direction !== rewrite.direction)
+  );
 }
 
 function counts(values: string[]): Map<string, number> {
@@ -270,13 +232,11 @@ function hasSameFamilyShape(original: string[], candidate: string[], normalize: 
 }
 
 /**
- * A conservative semantic contract for automatic paraphrasing.
- *
- * It does not pretend to solve entailment. It catches high-cost drift that a
- * local text editor can detect reliably: negation, modal force, non-verbal
- * certainty, degree/extent, frequency, quantifier scope, discourse relation,
- * and writer perspective. More nuanced meaning is still protected by the model
- * prompt, protected-span gate, and native/local quality checks.
+ * A conservative semantic contract for automatic paraphrasing. It catches
+ * high-cost deterministic drift without pretending to solve open-ended
+ * entailment: negation, modal/certainty force, degree, frequency, quantifier
+ * scope, discourse relations, participant perspective, and direct comparative
+ * polarity reversals on the same lexical head.
  */
 export function meaningContractIssues(
   original: string,
@@ -293,67 +253,32 @@ export function meaningContractIssues(
     detail: string;
     normalize?: (value: string) => string;
   }> = [
-    {
-      family: "negation",
-      id: "negation-drift",
-      detail: "The rewrite changed the presence or number of negative markers.",
-      normalize: negationClass,
-    },
-    {
-      family: "modality",
-      id: "modality-drift",
-      detail: "The rewrite changed the presence or force of a modal verb.",
-      normalize: modalityClass,
-    },
-    {
-      family: "certainty",
-      id: "certainty-drift",
-      detail: "The rewrite changed the source's stated possibility, likelihood, or certainty.",
-      normalize: certaintyClass,
-    },
-    {
-      family: "degree",
-      id: "degree-drift",
-      detail: "The rewrite changed an explicit near-zero, small, or large degree/extent qualifier.",
-      normalize: degreeClass,
-    },
-    {
-      family: "frequency",
-      id: "frequency-drift",
-      detail: "The rewrite changed how often the source says an event happens.",
-      normalize: frequencyClass,
-    },
-    {
-      family: "quantity",
-      id: "quantity-drift",
-      detail: "The rewrite changed the scope or strength of a quantity word or numeric bound.",
-      normalize: quantityClass,
-    },
-    {
-      family: "relation",
-      id: "discourse-relation-drift",
-      detail: "The rewrite changed a cause, result, contrast, condition, or time relationship.",
-      normalize: relationClass,
-    },
-    {
-      family: "person",
-      id: "point-of-view-drift",
-      detail: "The rewrite changed the writer's point of view or participant roles.",
-      normalize: personClass,
-    },
+    { family: "negation", id: "negation-drift", detail: "The rewrite changed the presence or number of negative markers.", normalize: negationClass },
+    { family: "modality", id: "modality-drift", detail: "The rewrite changed the presence or force of a modal verb.", normalize: modalityClass },
+    { family: "certainty", id: "certainty-drift", detail: "The rewrite changed the source's stated possibility, likelihood, or certainty.", normalize: certaintyClass },
+    { family: "degree", id: "degree-drift", detail: "The rewrite changed an explicit near-zero, small, or large degree/extent qualifier.", normalize: degreeClass },
+    { family: "frequency", id: "frequency-drift", detail: "The rewrite changed how often the source says an event happens.", normalize: frequencyClass },
+    { family: "quantity", id: "quantity-drift", detail: "The rewrite changed the scope or strength of a quantity word or numeric bound.", normalize: quantityClass },
+    { family: "relation", id: "discourse-relation-drift", detail: "The rewrite changed a cause, result, contrast, condition, or time relationship.", normalize: relationClass },
+    { family: "person", id: "point-of-view-drift", detail: "The rewrite changed the writer's point of view or participant roles.", normalize: personClass },
   ];
 
   for (const contract of contracts) {
     const originalValues = familyValues(originalMarkers, contract.family);
     const candidateValues = familyValues(candidateMarkers, contract.family);
     const normalize = contract.normalize ?? ((value: string) => value);
-    const matches = hasSameFamilyShape(originalValues, candidateValues, normalize);
-    if (!matches) issues.push({ id: contract.id, detail: contract.detail });
+    if (!hasSameFamilyShape(originalValues, candidateValues, normalize)) {
+      issues.push({ id: contract.id, detail: contract.detail });
+    }
   }
 
-  // A personal rewrite may use contractions, but it must not invent a direct
-  // address to the reader. Check all second-person forms rather than only the
-  // standalone pronoun `you`.
+  if (hasDirectComparativeDirectionFlip(original, candidate)) {
+    issues.push({
+      id: "comparative-direction-drift",
+      detail: "The rewrite reversed a direct comparative direction on the same quality or quantity.",
+    });
+  }
+
   const secondPerson = /\b(?:you|your|yours|yourself|yourselves)\b/i;
   if (mode !== "warmth" && mode !== "warm" && secondPerson.test(candidate) && !secondPerson.test(original)) {
     issues.push({
