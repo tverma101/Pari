@@ -103,8 +103,8 @@ expectSafe(
   "existing email moved",
 );
 expectSafe(
-  "The label says \"ready\" today.",
-  "Today, the label says \"ready\".",
+  "The label says \"ready\" in the current draft.",
+  "In the current draft, the label says \"ready\".",
   "existing quotation moved",
 );
 expectSafe(
