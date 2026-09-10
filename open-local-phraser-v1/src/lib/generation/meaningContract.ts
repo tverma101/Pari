@@ -116,7 +116,7 @@ function relationClass(value: string): string {
   // Keep cause-subordinators separate from result-connectors. Turning
   // “X because Y” into “X; therefore Y” reverses causal direction even though
   // both contain causal vocabulary.
-  if (/^(?:due to the fact that|for unspecified reasons|given that|because|since)$/.test(value)) return "cause";
+  if (/^(?:due to the fact that|for unspecified reasons|given that|because)$/.test(value)) return "cause";
   if (/^(?:therefore|thus|so|consequently|as a result)$/.test(value)) return "result";
   if (/^(?:notwithstanding the fact that|although|though|even though|however|but|yet)$/.test(value)) return "contrast";
   // “Even if” carries concessive force beyond a plain condition.
@@ -124,11 +124,16 @@ function relationClass(value: string): string {
   // `unless` joins the positive-condition surface class because its negative
   // force is represented separately by collectImplicitNegations().
   if (/^(?:in the event that|if|unless|provided that|as long as)$/.test(value)) return "positive-condition";
+  // `since` and `while` are ambiguous without syntax/semantics. A rule-only
+  // contract should preserve them rather than assuming `since = because` or
+  // `while = when` and silently accepting the wrong sense.
+  if (/^since$/.test(value)) return "ambiguous-since";
+  if (/^while$/.test(value)) return "ambiguous-while";
   // Temporal direction is semantic, not stylistic. In particular, `before`
   // and `after` must never normalize to the same marker class.
   if (/^before$/.test(value)) return "time-before";
   if (/^(?:after|once)$/.test(value)) return "time-after";
-  if (/^(?:when|while)$/.test(value)) return "time-concurrent";
+  if (/^when$/.test(value)) return "time-concurrent";
   return value;
 }
 
