@@ -51,6 +51,7 @@ function loadTsModule(filePath) {
 const { createRuleNliJudge } = loadTsModule(path.join(ROOT_DIR, "src/lib/scoring/nliJudge.ts"));
 const { meaningContractIssues } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/meaningContract.ts"));
 const { repairSentenceFlow } = loadTsModule(path.join(ROOT_DIR, "src/lib/generation/sentenceFlow.ts"));
+const { extractProtectedSpans, validateProtectedContent } = loadTsModule(path.join(ROOT_DIR, "src/lib/safety/protectedContent.ts"));
 const judge = createRuleNliJudge();
 
 async function expectContradiction(premise, hypothesis, label) {
@@ -65,6 +66,16 @@ async function expectAllowed(premise, hypothesis, label) {
 
 function meaningIds(original, candidate) {
   return new Set(meaningContractIssues(original, candidate).map((issue) => issue.id));
+}
+
+function expectProtectedSafe(original, candidate, label) {
+  const result = validateProtectedContent(original, candidate, extractProtectedSpans(original));
+  assert.equal(result.safe, true, `${label}: false protected-content rejection ${JSON.stringify(result)}`);
+}
+
+function expectProtectedUnsafe(original, candidate, label) {
+  const result = validateProtectedContent(original, candidate, extractProtectedSpans(original));
+  assert.equal(result.safe, false, `${label}: protected-content drift was accepted`);
 }
 
 await expectContradiction(
@@ -169,6 +180,57 @@ assert(
     "I focus better, and the room is quiet.",
   ).includes("especially"),
   "relation repair invented emphasis",
+);
+
+expectProtectedSafe(
+  "We can't ship today.",
+  "We cannot ship today.",
+  "can't→cannot semantic anchor equivalence",
+);
+expectProtectedSafe(
+  "We could not ship tomorrow.",
+  "We couldn't ship tomorrow.",
+  "could-not→couldn't semantic anchor equivalence",
+);
+expectProtectedSafe(
+  "They aren’t ready.",
+  "They are not ready.",
+  "curly negative contraction expansion",
+);
+const negativeModalSpans = extractProtectedSpans("We can't ship.");
+assert(
+  !negativeModalSpans.some((span) => span.kind === "modality" && span.text.toLowerCase() === "can"),
+  "negative contraction retained a redundant nested modal anchor",
+);
+expectProtectedUnsafe(
+  "The dose is 50 mg.",
+  "The dose is 50 g.",
+  "measurement unit mutation",
+);
+expectProtectedUnsafe(
+  "Meet at 6pm PST.",
+  "Meet at 6pm EST.",
+  "timezone mutation",
+);
+expectProtectedUnsafe(
+  "The review is on 10 September 2026.",
+  "The review is on 10 October 2026.",
+  "day-month date mutation",
+);
+expectProtectedUnsafe(
+  "The draft is ready.",
+  "The draft is ready Monday.",
+  "invented weekday",
+);
+expectProtectedUnsafe(
+  "The report has 12 examples.",
+  "The report has 12 examples and 13 notes.",
+  "invented additional number",
+);
+const technicalSpans = extractProtectedSpans("GPT-6 can rewrite the draft.");
+assert(
+  technicalSpans.some((span) => span.kind === "name" && span.text === "GPT-6"),
+  "technical model name at sentence start was not protected",
 );
 
 console.log("qa:rule:nli passed");

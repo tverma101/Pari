@@ -35,7 +35,11 @@ interface CandidateSpan {
   priority: number;
 }
 
-const TIME_ZONE = "(?:ET|CT|MT|PT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|UTC|GMT)";
+const TIME_ZONE = "(?:ET|CT|MT|PT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|UTC|GMT|BST|CET|CEST|EET|EEST|IST|JST|KST|AEST|AEDT|ACST|ACDT|AWST)";
+const MONTH = "(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)";
+const WEEKDAY = "(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)";
+const MEASUREMENT_UNIT = "(?:kg|mg|mcg|µg|g|oz|lb|lbs|mm|cm|km|mL|ml|L|mi|ft|yd|MB|GB|TB|KiB|MiB|GiB|ms|sec|secs|seconds?|min|mins|minutes?|hours?|days?|weeks?|months?|years?|°C|°F|Hz|kHz|MHz|GHz|Mbps|Gbps|tokens?|words?|pages?)";
+const NEGATIVE_AUXILIARY = "(?:can|could|do|does|did|have|has|had|is|are|was|were|will|would|should|must|might|shall|need)";
 
 const PROTECTED_PATTERNS: Array<{
   kind: ProtectedSpanKind;
@@ -55,7 +59,22 @@ const PROTECTED_PATTERNS: Array<{
   { kind: "percentage", pattern: /\b\d+(?:\.\d+)?\s?%(?!\w)/g, priority: 80 },
   {
     kind: "date",
-    pattern: /\b(?:\d{1,4}[-/]\d{1,2}[-/]\d{1,4}|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:,\s*\d{4})?)\b/gi,
+    pattern: new RegExp(
+      `\\b(?:` +
+        `\\d{1,4}[-/]\\d{1,2}[-/]\\d{1,4}` +
+        `|${MONTH}\\s+\\d{1,2}(?:st|nd|rd|th)?(?:,?\\s*\\d{4})?` +
+        `|\\d{1,2}(?:st|nd|rd|th)?\\s+${MONTH}(?:\\s+\\d{4})?` +
+      `)\\b`,
+      "gi",
+    ),
+    priority: 78,
+  },
+  {
+    kind: "date",
+    pattern: new RegExp(
+      `\\b(?:today|tomorrow|yesterday|tonight|${WEEKDAY}|(?:this|next|last)\\s+(?:morning|afternoon|evening|night|week|month|year|${WEEKDAY}))\\b`,
+      "gi",
+    ),
     priority: 78,
   },
   // Treat semantic versions as one protected number. Protecting only each
@@ -84,13 +103,18 @@ const PROTECTED_PATTERNS: Array<{
   },
   {
     kind: "number",
-    pattern: /\b\d[\d,]*(?:\.\d+)?(?:\s?(?:kg|g|lb|lbs|km|mi|MB|GB|ms|s|hours?|minutes?|years?))?\b/gi,
+    pattern: new RegExp(`\\b\\d[\\d,]*(?:\\.\\d+)?(?:\\s?${MEASUREMENT_UNIT})?\\b`, "gi"),
     priority: 72,
   },
   { kind: "list-marker", pattern: /^\s*(?:[-*•]|\d+[.)])(?=\s)/gm, priority: 70 },
   {
     kind: "negation",
-    pattern: /\b(?:not|never|no|without|cannot|can['’]t|don['’]t|doesn['’]t|didn['’]t|won['’]t|wouldn['’]t|shouldn['’]t)\b/gi,
+    // Consume expanded auxiliary+not as one semantic anchor so harmless
+    // contraction/expansion edits can be compared as equivalents.
+    pattern: new RegExp(
+      `\\b(?:failed\\s+to|fails\\s+to|${NEGATIVE_AUXILIARY}\\s+not|not|never|no|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|haven['’]t|hasn['’]t|hadn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|hardly|rarely|seldom|invalid|unacceptable|impossible)\\b`,
+      "gi",
+    ),
     priority: 65,
   },
   {
@@ -136,6 +160,20 @@ function collectCandidates(text: string): CandidateSpan[] {
       start: nameMatch.index,
       end: nameMatch.index + nameMatch[0].length,
       priority: 75,
+    });
+  }
+
+  // Preserve high-signal technical/proper tokens regardless of sentence
+  // position: acronyms, mixed-case brands, and letter+digit model names.
+  const technicalNamePattern = /\b(?:[A-Z]{2,}[A-Z0-9-]*|[A-Z][a-z]+[A-Z][A-Za-z0-9-]*|[A-Z][A-Za-z-]*\d[A-Za-z0-9-]*)\b/g;
+  let technicalNameMatch: RegExpExecArray | null;
+  while ((technicalNameMatch = technicalNamePattern.exec(text)) !== null) {
+    candidates.push({
+      kind: "name",
+      text: technicalNameMatch[0],
+      start: technicalNameMatch.index,
+      end: technicalNameMatch.index + technicalNameMatch[0].length,
+      priority: 76,
     });
   }
 
@@ -187,6 +225,21 @@ export function extractProtectedSpans(text: string): ProtectedSpan[] {
     if (left.priority !== right.priority) return right.priority - left.priority;
     return right.end - left.end;
   })) {
+    // Negative modal contractions/expansions already preserve their modal
+    // carrier as part of the higher-priority negation span. Keeping an
+    // overlapping `can`/`could` span would make `can't` -> `cannot` fail exact
+    // matching even though the semantic anchor is unchanged.
+    if (
+      candidate.kind === "modality" &&
+      selected.some((existing) =>
+        existing.kind === "negation" &&
+        existing.start <= candidate.start &&
+        existing.end >= candidate.end
+      )
+    ) {
+      continue;
+    }
+
     const duplicate = selected.some(
       (existing) =>
         existing.kind === candidate.kind &&
@@ -226,11 +279,72 @@ function countCaseInsensitive(text: string, fragment: string): number {
   return [...text.matchAll(pattern)].length;
 }
 
+function canonicalNegationPattern(fragment: string): RegExp | null {
+  const normalized = fragment.toLowerCase().replace(/’/g, "'").replace(/\s+/g, " ").trim();
+  const forms: Record<string, string> = {
+    "cannot": "(?:cannot|can\\s+not|can['’]t)",
+    "can not": "(?:cannot|can\\s+not|can['’]t)",
+    "can't": "(?:cannot|can\\s+not|can['’]t)",
+    "could not": "(?:could\\s+not|couldn['’]t)",
+    "couldn't": "(?:could\\s+not|couldn['’]t)",
+    "do not": "(?:do\\s+not|don['’]t)",
+    "don't": "(?:do\\s+not|don['’]t)",
+    "does not": "(?:does\\s+not|doesn['’]t)",
+    "doesn't": "(?:does\\s+not|doesn['’]t)",
+    "did not": "(?:did\\s+not|didn['’]t)",
+    "didn't": "(?:did\\s+not|didn['’]t)",
+    "have not": "(?:have\\s+not|haven['’]t)",
+    "haven't": "(?:have\\s+not|haven['’]t)",
+    "has not": "(?:has\\s+not|hasn['’]t)",
+    "hasn't": "(?:has\\s+not|hasn['’]t)",
+    "had not": "(?:had\\s+not|hadn['’]t)",
+    "hadn't": "(?:had\\s+not|hadn['’]t)",
+    "is not": "(?:is\\s+not|isn['’]t)",
+    "isn't": "(?:is\\s+not|isn['’]t)",
+    "are not": "(?:are\\s+not|aren['’]t)",
+    "aren't": "(?:are\\s+not|aren['’]t)",
+    "was not": "(?:was\\s+not|wasn['’]t)",
+    "wasn't": "(?:was\\s+not|wasn['’]t)",
+    "were not": "(?:were\\s+not|weren['’]t)",
+    "weren't": "(?:were\\s+not|weren['’]t)",
+    "will not": "(?:will\\s+not|won['’]t)",
+    "won't": "(?:will\\s+not|won['’]t)",
+    "would not": "(?:would\\s+not|wouldn['’]t)",
+    "wouldn't": "(?:would\\s+not|wouldn['’]t)",
+    "should not": "(?:should\\s+not|shouldn['’]t)",
+    "shouldn't": "(?:should\\s+not|shouldn['’]t)",
+    "must not": "(?:must\\s+not|mustn['’]t)",
+    "mustn't": "(?:must\\s+not|mustn['’]t)",
+    "might not": "(?:might\\s+not|mightn['’]t)",
+    "mightn't": "(?:might\\s+not|mightn['’]t)",
+    "shall not": "(?:shall\\s+not|shan['’]t)",
+    "shan't": "(?:shall\\s+not|shan['’]t)",
+    "need not": "(?:need\\s+not|needn['’]t)",
+    "needn't": "(?:need\\s+not|needn['’]t)",
+  };
+  const source = forms[normalized];
+  return source ? new RegExp(`\\b${source}\\b`, "gi") : null;
+}
+
+function countEquivalentNegation(text: string, fragment: string): number {
+  const pattern = canonicalNegationPattern(fragment);
+  if (!pattern) return countCaseInsensitive(text, fragment);
+  return [...text.matchAll(pattern)].length;
+}
+
 function uniqueTexts(spans: ProtectedSpan[]): string[] {
   return [...new Set(spans.map((span) => span.text))];
 }
 
-function hasUnsupportedProtectedAddition(original: string, candidate: string): string | null {
+const FACTUAL_ADDITION_KINDS = new Set<ProtectedSpanKind>([
+  "date", "time", "number", "percentage", "currency",
+]);
+
+function spanCountKey(span: Pick<ProtectedSpan, "kind" | "text">): string {
+  return `${span.kind}\u0000${span.text}`;
+}
+
+function hasUnsupportedProtectedAddition(original: string, candidate: string): ProtectedSpan | null {
   const originalSpans = extractProtectedSpans(original);
   const candidateSpans = extractProtectedSpans(candidate);
   const originalNames = new Set(
@@ -240,7 +354,23 @@ function hasUnsupportedProtectedAddition(original: string, candidate: string): s
   const addedName = candidateSpans.find(
     (span) => span.kind === "name" && !originalNames.has(span.text)
   );
-  return addedName?.text ?? null;
+  if (addedName) return addedName;
+
+  const originalCounts = new Map<string, number>();
+  for (const span of originalSpans) {
+    if (!FACTUAL_ADDITION_KINDS.has(span.kind)) continue;
+    const key = spanCountKey(span);
+    originalCounts.set(key, (originalCounts.get(key) ?? 0) + 1);
+  }
+  const seenCandidateCounts = new Map<string, number>();
+  for (const span of candidateSpans) {
+    if (!FACTUAL_ADDITION_KINDS.has(span.kind)) continue;
+    const key = spanCountKey(span);
+    const next = (seenCandidateCounts.get(key) ?? 0) + 1;
+    seenCandidateCounts.set(key, next);
+    if (next > (originalCounts.get(key) ?? 0)) return span;
+  }
+  return null;
 }
 
 export function validateProtectedContent(
@@ -252,9 +382,9 @@ export function validateProtectedContent(
     const matchingSpans = protectedSpans.filter((span) => span.text === text);
     const expected = matchingSpans.length;
     const actual = countExact(candidateText, text);
-    const caseNormalizedNegation = matchingSpans.every((span) => span.kind === "negation") &&
-      countCaseInsensitive(candidateText, text) >= expected;
-    if (actual < expected && !caseNormalizedNegation) {
+    const equivalentNegation = matchingSpans.every((span) => span.kind === "negation") &&
+      countEquivalentNegation(candidateText, text) >= expected;
+    if (actual < expected && !equivalentNegation) {
       const missing = protectedSpans.find((span) => span.text === text);
       return {
         safe: false,
@@ -264,11 +394,13 @@ export function validateProtectedContent(
     }
   }
 
-  const unsupportedName = hasUnsupportedProtectedAddition(originalText, candidateText);
-  if (unsupportedName) {
+  const unsupported = hasUnsupportedProtectedAddition(originalText, candidateText);
+  if (unsupported) {
     return {
       safe: false,
-      reason: `The rewrite introduced an unsupported name: “${unsupportedName}”`,
+      reason: unsupported.kind === "name"
+        ? `The rewrite introduced an unsupported name: “${unsupported.text}”`
+        : `The rewrite introduced an unsupported ${unsupported.kind}: “${unsupported.text}”`,
     };
   }
 
