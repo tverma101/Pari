@@ -62,7 +62,11 @@ for (const [engineIndex, bundle] of bundles.entries()) {
 
   for (const item of corpus.cases) {
     const auditId = `audit-${hash(`${item.id}--${engine}`).slice(0, 12)}`;
-    key[auditId] = { engine, caseId: item.id };
+    key[auditId] = {
+      engine,
+      caseId: item.id,
+      expectedItems: item.mustPreserve.length,
+    };
     const candidateText = String(outputByCase.get(item.id) ?? "");
 
     for (const [itemIndex, mustPreserve] of item.mustPreserve.entries()) {
@@ -185,10 +189,25 @@ function normalizeBinary(value) {
 function summarizeRatings(ratings, auditKey, names) {
   const byEngine = Object.fromEntries(names.map((name) => [name, emptySummary()]));
   const caseItems = new Map();
+  const seenRows = new Set();
+  let ignoredRows = 0;
 
   for (const row of ratings) {
     const audit = auditKey[row.auditId];
-    if (!audit || !byEngine[audit.engine]) continue;
+    const itemIndex = Number(row.preserveItem);
+    const rowKey = `${row.auditId}:${row.preserveItem}`;
+    if (
+      !audit ||
+      !byEngine[audit.engine] ||
+      !Number.isInteger(itemIndex) ||
+      itemIndex < 1 ||
+      itemIndex > audit.expectedItems ||
+      seenRows.has(rowKey)
+    ) {
+      ignoredRows += 1;
+      continue;
+    }
+    seenRows.add(rowKey);
 
     const preserved = normalizePreserved(row.preserved);
     const contradicted = normalizeBinary(row.contradicted);
@@ -207,17 +226,26 @@ function summarizeRatings(ratings, auditKey, names) {
     }
 
     const caseKey = `${audit.engine}::${audit.caseId}`;
-    if (!caseItems.has(caseKey)) caseItems.set(caseKey, []);
-    caseItems.get(caseKey).push({ preserved, contradicted });
+    if (!caseItems.has(caseKey)) caseItems.set(caseKey, new Map());
+    caseItems.get(caseKey).set(itemIndex, { preserved, contradicted });
   }
 
   for (const [caseKey, items] of caseItems.entries()) {
-    const [engine] = caseKey.split("::");
+    const separator = caseKey.indexOf("::");
+    const engine = caseKey.slice(0, separator);
+    const caseId = caseKey.slice(separator + 2);
     const target = byEngine[engine];
-    const fullyRated = items.length > 0 && items.every((item) => item.preserved && item.contradicted);
+    const audit = Object.values(auditKey).find((entry) => entry.engine === engine && entry.caseId === caseId);
+    const expectedItems = audit?.expectedItems ?? 0;
+    const itemValues = [...items.values()];
+    const fullyRated =
+      expectedItems > 0 &&
+      items.size === expectedItems &&
+      itemValues.every((item) => item.preserved && item.contradicted);
     if (!fullyRated) continue;
+
     target.completeCases += 1;
-    if (items.every((item) => item.preserved === "Y" && item.contradicted === "N")) {
+    if (itemValues.every((item) => item.preserved === "Y" && item.contradicted === "N")) {
       target.fullPreservationCases += 1;
     }
   }
@@ -232,11 +260,13 @@ function summarizeRatings(ratings, auditKey, names) {
     schemaVersion: 1,
     benchmark: "pari-paraphrase-v2-human-meaning-audit",
     generatedAt: new Date().toISOString(),
+    ignoredRows,
     byEngine,
     interpretation: {
       preservationRate: "Share of rated mustPreserve items judged explicitly retained.",
       contradictionRate: "Share of rated items judged contradicted by the candidate.",
-      fullPreservationCaseRate: "Share of completely rated cases where every mustPreserve item was retained and none was contradicted.",
+      fullPreservationCaseRate: "Share of completely rated cases where every expected mustPreserve item was retained and none was contradicted.",
+      ignoredRows: "Rows ignored because the audit id/item index was invalid or duplicated.",
       promotionUse: "Diagnostic human evidence. Do not replace blinded pairwise preference, grammar/fluency review, or hard-safety gates with this score alone.",
     },
   };
@@ -269,6 +299,7 @@ function renderSummary(summary) {
     "# Pari v2 human meaning audit",
     "",
     `Generated: ${summary.generatedAt}`,
+    `Ignored malformed/duplicate rating rows: ${summary.ignoredRows}`,
     "",
     "| Engine | Preservation | Contradiction | Fully preserved cases | Rated items | Complete cases |",
     "|---|---:|---:|---:|---:|---:|",
