@@ -2,6 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { scoreCase } from "../eval/metrics.mjs";
+import { buildJudgeProvenance, sha256File } from "./judge-provenance.mjs";
 import { meaningContractIssuesForBenchmark } from "./meaning-contract-bridge.mjs";
 import { protectedContentValidationForBenchmark } from "./protected-content-bridge.mjs";
 import {
@@ -117,8 +118,9 @@ const byCategory = aggregateByCategory(results);
 const overall = aggregate(results);
 const hardSafetyFailures = results.filter((row) => !row.meaningSafe).length;
 const metadataPath = argValue("--metadata");
-const metadata = metadataPath && fs.existsSync(path.resolve(metadataPath))
-  ? JSON.parse(fs.readFileSync(path.resolve(metadataPath), "utf8"))
+const resolvedMetadataPath = metadataPath ? path.resolve(metadataPath) : null;
+const metadata = resolvedMetadataPath && fs.existsSync(resolvedMetadataPath)
+  ? JSON.parse(fs.readFileSync(resolvedMetadataPath, "utf8"))
   : {};
 const engine = {
   ...(metadata.engine ?? { name: path.basename(outputsPath, path.extname(outputsPath)), role: "unclassified" }),
@@ -126,14 +128,28 @@ const engine = {
 };
 const outPath = path.resolve(argValue("--out") ?? path.join(ROOT_DIR, "benchmarks/paraphrase-v2/results", `${path.basename(outputsPath, path.extname(outputsPath))}${productionPostprocess ? ".pari-postprocess" : ""}.scored.json`));
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
+const judge = buildJudgeProvenance();
 const payload = {
   schemaVersion: 1,
   benchmark: "pari-paraphrase-v2",
   generatedAt: new Date().toISOString(),
-  corpus: { path: corpusPath, version: corpusData.version, cases: corpus.length },
-  outputs: { path: outputsPath, productionPostprocess },
+  corpus: {
+    path: corpusPath,
+    version: corpusData.version,
+    cases: corpus.length,
+    sha256: sha256File(corpusPath),
+  },
+  outputs: {
+    path: outputsPath,
+    productionPostprocess,
+    sha256: sha256File(outputsPath),
+  },
   engine,
   metadata,
+  metadataSource: resolvedMetadataPath && fs.existsSync(resolvedMetadataPath)
+    ? { path: resolvedMetadataPath, sha256: sha256File(resolvedMetadataPath) }
+    : null,
+  judge,
   overall,
   byCategory,
   safety: { hardSafetyFailures, allCasesSafe: hardSafetyFailures === 0 },
@@ -144,6 +160,7 @@ fs.writeFileSync(outPath, JSON.stringify(payload, null, 2) + "\n");
 
 console.log(`[v2:score] ${payload.engine.name ?? "engine"} ${overall.passed}/${overall.total} full-gate cases`);
 console.log(`[v2:score] meaning-safe=${overall.meaningSafe}/${overall.total} english-quality=${overall.englishQuality}/${overall.total} hard-safety-failures=${hardSafetyFailures}`);
+console.log(`[v2:score] judge=${judge.fingerprint.slice(0, 12)} corpus=${payload.corpus.sha256.slice(0, 12)} outputs=${payload.outputs.sha256.slice(0, 12)}`);
 console.log(`[v2:score] automaticDiagnosticIndex=${overall.automaticDiagnosticIndex} -> ${outPath}`);
 if (args.includes("--fail-on-hard-safety") && hardSafetyFailures > 0) process.exitCode = 1;
 
