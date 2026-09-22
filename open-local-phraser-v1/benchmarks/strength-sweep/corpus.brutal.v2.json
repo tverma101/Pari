@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 2,
+  "name": "pari-strength-pressure-test",
+  "generated": "synthetic-hand-authored",
+  "purpose": "Stress-test every rewrite-slider value against dense meaning, uncertainty, relationships, and edit-discipline traps. These cases are intentionally harder than ordinary prose; they are not representative user text.",
+  "cases": [
+    {
+      "id": "quantifiers-01",
+      "category": "quantifier-negation",
+      "input": "The survey was open from May 3 through May 10. Of 43 invited staff, 31 submitted a response; 19 of those respondents supported the proposal and 12 opposed it. The results do not show what the 12 people who did not respond think, so they should not be described as a majority of all staff.",
+      "mustPreserve": ["survey dates May 3 through May 10", "43 invited, 31 responses", "19 respondents supported and 12 opposed", "the 12 nonrespondents' views are unknown", "no claim that a majority of all staff supports it"],
+      "doNotInfer": ["treat respondents as all invited staff", "turn 19 respondents into a majority of all staff", "say the nonrespondents oppose or support the proposal"],
+      "editIntent": "Paraphrase the dense counts naturally without blurring denominators or the final caution."
+    },
+    {
+      "id": "modal-scope-01",
+      "category": "modality-and-scope",
+      "input": "The early measurements suggest that the patch may reduce startup time on older laptops, but the test did not include machines with encrypted disks. We therefore cannot say that it will speed up every supported device, and the team has not decided whether to ship it by default.",
+      "mustPreserve": ["evidence is early and only suggests a possible reduction", "the tested group was older laptops", "encrypted-disk machines were not tested", "no guarantee for every supported device", "default shipping decision remains undecided"],
+      "doNotInfer": ["claim the patch definitely speeds up devices", "say encrypted disks caused a problem", "say the team decided to ship or reject it"],
+      "editIntent": "Keep the qualifications while giving the paragraph fresher sentence framing."
+    },
+    {
+      "id": "absence-01",
+      "category": "evidence-and-absence",
+      "input": "No complaints appeared in the support log during the first 48 hours. That is not evidence that nobody encountered the bug: the log records submitted tickets, not every failed attempt, and the monitoring job was offline for part of Tuesday.",
+      "mustPreserve": ["no complaints were logged in the first 48 hours", "the log only contains submitted tickets", "unreported failures remain possible", "monitoring was offline for part of Tuesday"],
+      "doNotInfer": ["claim nobody experienced the bug", "claim the outage caused any particular failure", "omit the monitoring gap"],
+      "editIntent": "Make the distinction between no recorded reports and no actual failures unmistakable."
+    },
+    {
+      "id": "condition-01",
+      "category": "conditional-logic",
+      "input": "If the archive is corrupt, restore the copy from Monday; if Monday's copy is also corrupt, stop and ask Priya before trying another source. Do not overwrite the current folder unless the restored copy has been checked against the manifest.",
+      "mustPreserve": ["Monday copy is the first restore option", "if that copy is corrupt, stop and ask Priya", "do not try another source before asking", "do not overwrite current folder before manifest check"],
+      "doNotInfer": ["make restoration unconditional", "reverse which copy is checked first", "remove the stop-and-ask exception"],
+      "editIntent": "Rewrite the instructions clearly while preserving branch order and the safety condition."
+    },
+    {
+      "id": "causality-01",
+      "category": "causality-and-correlation",
+      "input": "After the reminder was sent, late submissions fell from 14 to 9 in the next week. The sample was small, and two instructors also extended their deadlines, so the report says the reminder coincided with the decrease rather than caused it.",
+      "mustPreserve": ["late submissions changed from 14 to 9", "the period was the following week", "sample was small", "two instructors extended deadlines", "the report does not claim the reminder caused the decrease"],
+      "doNotInfer": ["attribute the entire decrease to the reminder", "omit the other deadline changes", "turn correlation into proof"],
+      "editIntent": "Improve flow without strengthening the causal claim."
+    },
+    {
+      "id": "chronology-01",
+      "category": "chronology-and-roles",
+      "input": "On Monday, Elena sent the draft to Marcus for review. Before Marcus replied, Elena replaced the chart and sent a second version on Tuesday; Marcus's Wednesday comments refer to the first version, not the replacement.",
+      "mustPreserve": ["Elena sent the first draft Monday", "Marcus had not replied before the replacement", "Elena replaced the chart and sent a second version Tuesday", "Marcus commented Wednesday on version one"],
+      "doNotInfer": ["say Marcus reviewed the replacement", "say the chart replacement came from Marcus", "collapse the two versions"],
+      "editIntent": "Make the sequence and version reference easier to follow."
+    },
+    {
+      "id": "attribution-01",
+      "category": "attribution-and-ambiguity",
+      "input": "Rae told Jo that the draft might be ready after the second review, but the notes do not say whether Rae or Jo would perform that review. A later message says only, 'I can look again Friday,' so the reviewer is still unclear.",
+      "mustPreserve": ["readiness is tentative and after a second review", "the notes do not identify who performs it", "the later quote is exactly 'I can look again Friday,'", "reviewer remains unclear"],
+      "doNotInfer": ["assign the review to Rae or Jo", "turn 'might be ready' into a promise", "identify the later speaker"],
+      "editIntent": "Improve the paragraph but deliberately leave unresolved details unresolved."
+    },
+    {
+      "id": "coreference-01",
+      "category": "coreference-and-reference",
+      "input": "Nina gave Omar the revised schedule after he asked for it, but she did not confirm whether the room had changed. The note says 'they will check before lunch'; it does not identify who 'they' refers to.",
+      "mustPreserve": ["Nina gave Omar the schedule", "Omar requested it", "Nina did not confirm a room change", "the note leaves 'they' unresolved", "the check is planned before lunch"],
+      "doNotInfer": ["assign the room check to Nina or Omar", "claim the room changed", "turn a planned check into a completed check"],
+      "editIntent": "Clarify the two sentences without resolving ambiguous pronouns by guesswork."
+    },
+    {
+      "id": "anchors-01",
+      "category": "numbers-and-units",
+      "input": "At 08:15 UTC on 2026-04-09, build 3.14.2 processed 1,204 records in 2.6 seconds; build 3.14.1 processed 1,240 in 2.9 seconds. The faster run used fewer records, so these figures alone do not establish a per-record speed improvement.",
+      "mustPreserve": ["time 08:15 UTC and date 2026-04-09", "versions 3.14.2 and 3.14.1", "1,204 records in 2.6 seconds", "1,240 records in 2.9 seconds", "the runs are not a fair per-record comparison"],
+      "doNotInfer": ["claim 3.14.2 is faster per record", "swap either record count or runtime", "drop the UTC designation"],
+      "editIntent": "Paraphrase technical reporting without changing any numeric relation."
+    },
+    {
+      "id": "anchors-02",
+      "category": "money-and-dates",
+      "input": "The invoice lists $1,280 for the annual plan and $96 for setup, before tax. The $96 setup fee is refundable only if cancellation occurs within 14 calendar days of payment; the annual charge is not refundable under that clause.",
+      "mustPreserve": ["annual plan costs $1,280", "setup costs $96 before tax", "only the setup fee may be refunded", "refund requires cancellation within 14 calendar days of payment", "the clause does not refund the annual charge"],
+      "doNotInfer": ["apply the refund condition to the annual charge", "change calendar days to business days", "say setup is always refundable"],
+      "editIntent": "Make the exception easy to understand without broadening refund eligibility."
+    },
+    {
+      "id": "quote-01",
+      "category": "quoted-text",
+      "input": "The email says, 'Do not publish the draft until Maya approves the figures.' Maya approved the figures on Thursday, but the editor still has not confirmed whether the draft itself is ready to publish.",
+      "mustPreserve": ["quoted instruction remains verbatim", "Maya approved figures on Thursday", "figure approval does not establish draft readiness", "editor has not confirmed publication readiness"],
+      "doNotInfer": ["say the draft was published", "change the quoted instruction", "treat figure approval as final publication approval"],
+      "editIntent": "Rewrite around the quotation while preserving the quoted language exactly."
+    },
+    {
+      "id": "technical-01",
+      "category": "technical-exception",
+      "input": "The client uses API v2.3.1 and retries a request only after a 503 response. It must not retry a 401, because the credential has to be refreshed first; the migration is still untested on iOS 17.6.",
+      "mustPreserve": ["API version v2.3.1", "retry only on 503", "do not retry on 401", "refresh credentials before retrying after 401", "iOS 17.6 migration is untested"],
+      "doNotInfer": ["treat 401 and 503 alike", "say the migration works on iOS 17.6", "change the version string"],
+      "editIntent": "Improve readability while retaining the exception logic and technical tokens."
+    },
+    {
+      "id": "instruction-01",
+      "category": "instruction-and-exception",
+      "input": "Before exporting, compare every label with the source table. If a value is missing, leave the cell blank; do not estimate it from neighboring rows. You may correct a spelling error in a label, but you may not change the underlying category.",
+      "mustPreserve": ["check every label against the source table before export", "missing values stay blank", "do not infer from neighboring rows", "spelling may be corrected", "category may not change"],
+      "doNotInfer": ["fill blank data", "remove the narrow permission to correct spelling", "broaden spelling correction into category editing"],
+      "editIntent": "Rephrase the procedure while preserving each permitted and prohibited action."
+    },
+    {
+      "id": "contrast-01",
+      "category": "contrast-and-rebuttal",
+      "input": "The first review found no reproducible crash, but it did find a delay when the cache was cold. That delay does not explain the blank screen reported by two users, and the second review has not reproduced either report.",
+      "mustPreserve": ["first review did not reproduce a crash", "it found cold-cache delay", "delay is not established as cause of blank screen", "two users reported blank screen", "second review reproduced neither report"],
+      "doNotInfer": ["say the cold cache caused the blank screen", "say no users saw a blank screen", "omit the disagreement between reports and reproduction"],
+      "editIntent": "Make contrasts clear without turning observations into an explanation."
+    },
+    {
+      "id": "counterfactual-01",
+      "category": "counterfactual-and-time",
+      "input": "If the export had finished before the maintenance window, the team would have reviewed it on Tuesday. It finished afterward, so the Tuesday review did not happen; the team has not yet chosen a new date.",
+      "mustPreserve": ["Tuesday review was conditional on export finishing before maintenance", "export finished afterward", "Tuesday review did not happen", "replacement date is undecided"],
+      "doNotInfer": ["say the Tuesday review happened", "say maintenance caused the late export", "invent a new date"],
+      "editIntent": "Retain the counterfactual and actual outcome as separate facts."
+    },
+    {
+      "id": "causal-chain-01",
+      "category": "multi-step-causality",
+      "input": "The vendor changed the certificate on Friday, and the importer began rejecting the feed that afternoon. Restarting the importer restored new records but did not backfill the 37 missing entries; support has not determined whether those entries can be recovered.",
+      "mustPreserve": ["vendor certificate changed Friday", "importer began rejecting feed that afternoon", "restart restored new records", "37 records remain missing and were not backfilled", "recoverability is undetermined"],
+      "doNotInfer": ["claim the certificate change is proven cause", "say all 37 records are permanently lost", "claim the restart recovered old entries"],
+      "editIntent": "Keep the chronology, partial recovery, and unresolved cause distinct."
+    },
+    {
+      "id": "quantifiers-02",
+      "category": "quantifier-scope",
+      "input": "Not every reviewer objected to the wording: two requested a change, one asked for more evidence, and the other three left no comment. The record does not say that the silent reviewers agreed.",
+      "mustPreserve": ["two requested wording changes", "one requested more evidence", "three left no comment", "silence is not evidence of agreement"],
+      "doNotInfer": ["say all reviewers objected", "say the three silent reviewers approved", "collapse requests for edits and evidence"],
+      "editIntent": "Preserve the distinction among objection, evidence request, and silence."
+    },
+    {
+      "id": "attribution-02",
+      "category": "reported-speech",
+      "input": "The incident note attributes 'the queue was empty' to the operator, while the dashboard captured a nonzero queue at 10:42. Neither record explains the mismatch, and the note does not say whether the operator was looking at the same region.",
+      "mustPreserve": ["quote is attributed to the operator", "dashboard showed a nonzero queue at 10:42", "records do not explain mismatch", "region comparability is unknown"],
+      "doNotInfer": ["accuse either source of being wrong", "assume both observed the same region", "remove the exact time"],
+      "editIntent": "Make the evidence conflict readable without adjudicating it."
+    },
+    {
+      "id": "safety-01",
+      "category": "safety-instructions",
+      "input": "Disconnect power before opening the enclosure. If the status light is still on, do not touch the board; wait 30 seconds and ask the lab lead to verify isolation. The manual says the light may remain on after disconnection, not that the board is safe to handle.",
+      "mustPreserve": ["disconnect power before opening", "if light remains on, do not touch the board", "wait 30 seconds and ask lab lead to verify isolation", "light may persist after disconnection", "light state does not certify safe handling"],
+      "doNotInfer": ["say the board is safe when the light is off", "remove the wait or verification", "reverse the order of operations"],
+      "editIntent": "Improve clarity but treat every instruction and safety qualification as critical."
+    },
+    {
+      "id": "policy-01",
+      "category": "policy-exception",
+      "input": "Guests may view the public schedule without signing in. Editing requires an account, except that the coordinator can make a one-time correction for a guest who cannot access email; that exception does not grant the guest continuing edit access.",
+      "mustPreserve": ["guests can view schedule without login", "editing normally requires an account", "coordinator may make one correction for guest unable to access email", "one-time correction does not grant continuing access"],
+      "doNotInfer": ["give all guests editing rights", "remove the narrow exception", "say coordinator exception is ongoing"],
+      "editIntent": "Keep the default rule and its tightly bounded exception distinct."
+    },
+    {
+      "id": "fragment-01",
+      "category": "fragment-repair",
+      "input": "Tuesday: not the full export, just the 8-row sample. Mina said the headers match; didn't check the totals. Ask Theo before sending outside the team, unless he is out, then leave it in drafts.",
+      "mustPreserve": ["Tuesday note concerns an 8-row sample, not full export", "Mina checked headers", "totals were not checked", "ask Theo before external sending", "if Theo is absent, leave draft unsent"],
+      "doNotInfer": ["claim the totals match", "send externally when Theo is absent", "turn the sample into the full export"],
+      "editIntent": "Repair fragments into clear prose without adding a sender or claiming unchecked work is complete."
+    },
+    {
+      "id": "runon-01",
+      "category": "run-on-and-actors",
+      "input": "The first file had the old address and I changed it before dispatch, but the copy in the shared folder still has the old address; Lena said not to overwrite it until she checks whether the signed version was already sent.",
+      "mustPreserve": ["first file had old address", "speaker changed first file before dispatch", "shared-folder copy still has old address", "Lena said not to overwrite yet", "signed version may already have been sent and needs checking"],
+      "doNotInfer": ["say shared copy was corrected", "say signed version was sent", "assign Lena's instruction to someone else"],
+      "editIntent": "Split the run-on into natural sentences while preserving which copy changed."
+    },
+    {
+      "id": "polished-01",
+      "category": "low-edit-control",
+      "input": "The room was quiet, the instructions were clear, and I finished the form before lunch. I would use the same process again.",
+      "mustPreserve": ["room was quiet", "instructions were clear", "form finished before lunch", "speaker would repeat the process"],
+      "doNotInfer": ["invent a reason for the quiet room", "add enthusiasm or criticism", "change the speaker's preference"],
+      "editIntent": "This is already natural. High strength may rephrase it, but should not inflate tone or add detail; low strength should be able to leave it nearly unchanged."
+    },
+    {
+      "id": "voice-01",
+      "category": "voice-and-register",
+      "input": "I know I missed the first message, and I am sorry about that. I still need the original receipt before I can approve the reimbursement; the screenshot is helpful, but it is not a substitute.",
+      "mustPreserve": ["first-person admission of missing message", "apology remains", "original receipt is required for approval", "screenshot is helpful but insufficient"],
+      "doNotInfer": ["remove the apology", "approve reimbursement", "make the request harsher or more deferential", "treat screenshot as equivalent"],
+      "editIntent": "Refresh wording while preserving the speaker's accountable but firm voice."
+    },
+    {
+      "id": "ambiguity-01",
+      "category": "underspecification",
+      "input": "The package arrived with one corner crushed. I have not opened it, so I cannot tell whether the device is damaged; the seller's message says only that a replacement may be available after inspection.",
+      "mustPreserve": ["one corner was crushed", "package is unopened", "device damage is unknown", "replacement is only a possibility after inspection"],
+      "doNotInfer": ["say device is damaged or undamaged", "say replacement is guaranteed", "claim inspection has occurred"],
+      "editIntent": "Make the uncertainty concise without answering the unresolved question."
+    },
+    {
+      "id": "data-01",
+      "category": "data-provenance",
+      "input": "The chart combines January figures from the billing export with February figures copied from an email. The email did not include refunds, while the export did; until the two sources use the same definition, the apparent month-to-month increase is not comparable.",
+      "mustPreserve": ["January came from billing export", "February came from email", "email omitted refunds", "export included refunds", "increase is not comparable until definitions align"],
+      "doNotInfer": ["claim the increase is real", "say both sources include refunds", "reverse which month came from which source"],
+      "editIntent": "Clarify provenance and comparability, not just substitute vocabulary."
+    },
+    {
+      "id": "long-01",
+      "category": "dense-multi-proposition",
+      "input": "The council approved a six-month trial of the evening route, not a permanent schedule change. Service will run on Thursdays only, except on holidays, and the stop at Pine Street remains unchanged. Staff will compare boarding counts with the same period last year, but because the route is new and the comparison uses a different fare system, the report will describe patterns rather than estimate how many riders switched from other routes.",
+      "mustPreserve": ["six-month trial, not permanent", "Thursdays only except holidays", "Pine Street stop unchanged", "compare boarding counts with same period last year", "different fare systems limit comparison", "report describes patterns and does not estimate rider switching"],
+      "doNotInfer": ["make route permanent", "add service on holidays", "claim exact rider transfers", "say the comparison is fully equivalent"],
+      "editIntent": "Reorganize this dense paragraph substantially if useful, without collapsing any exception or limitation."
+    },
+    {
+      "id": "long-02",
+      "category": "dense-cross-sentence-links",
+      "input": "The study found that participants who used the checklist made fewer formatting errors, but it did not assign participants randomly. People who chose the checklist also reported more prior experience, which could explain some of the difference. The authors recommend testing the checklist in a randomized study; they do not conclude that it improves comprehension or reduces factual mistakes.",
+      "mustPreserve": ["checklist users made fewer formatting errors", "participants were not randomized", "checklist users reported more prior experience", "experience may explain some difference", "authors recommend randomized test", "no conclusion about comprehension or factual mistakes"],
+      "doNotInfer": ["claim the checklist caused fewer errors", "claim comprehension improved", "claim factual mistakes declined"],
+      "editIntent": "Preserve the exact outcome measured and the study's causal limits."
+    },
+    {
+      "id": "long-03",
+      "category": "dense-conditional-chronology",
+      "input": "If the signed form reaches Finance by 3 p.m. on Friday, payment can be included in the Monday batch; forms received later move to the next batch, unless Finance requests a correction, in which case the processing date is reset after the corrected form arrives. The coordinator can confirm receipt but cannot promise the payment date.",
+      "mustPreserve": ["Friday 3 p.m. deadline", "on-time form may enter Monday batch", "later forms move to next batch", "correction resets processing date after corrected form arrives", "coordinator can confirm receipt but not promise payment date"],
+      "doNotInfer": ["guarantee Monday payment", "apply the correction rule before a correction is requested", "change when processing date resets"],
+      "editIntent": "Make the decision tree easier to read without changing its branches."
+    },
+    {
+      "id": "long-04",
+      "category": "dense-attribution-and-negation",
+      "input": "The release note says the migration 'preserves existing folder names.' In testing, 6 of 80 folders changed names when they contained a trailing space; the team has not established whether those names are valid inputs or whether the migration is at fault. The release note has not been updated, and support is asking users to keep a backup rather than promising that every folder is unaffected.",
+      "mustPreserve": ["quoted release claim", "6 of 80 folders changed names when trailing spaces were present", "validity of inputs and responsibility are unresolved", "release note unchanged", "support recommends backup and makes no universal promise"],
+      "doNotInfer": ["claim all names are preserved", "claim migration definitely caused issue", "say trailing-space names are invalid", "omit backup advice"],
+      "editIntent": "Retain the mismatch between broad release wording and qualified test evidence."
+    },
+    {
+      "id": "long-05",
+      "category": "dense-contrast-and-intent",
+      "input": "I asked for a shorter introduction so readers could reach the example sooner, not because the background was inaccurate. We removed one repeated explanation and moved the date to the first paragraph; the source note and the qualification 'in the two locations tested' stayed in place. The revision is intended to improve navigation, and it should not be presented as stronger evidence for the claim.",
+      "mustPreserve": ["shorter introduction was for navigation, not factual correction", "one repeated explanation removed", "date moved to first paragraph", "source note retained", "qualification 'in the two locations tested' retained", "revision is not stronger evidence"],
+      "doNotInfer": ["say background was inaccurate", "remove the scope qualification", "claim the evidence became stronger"],
+      "editIntent": "Preserve both the reason for editing and the limits on what the edit proves."
+    }
+  ]
+}

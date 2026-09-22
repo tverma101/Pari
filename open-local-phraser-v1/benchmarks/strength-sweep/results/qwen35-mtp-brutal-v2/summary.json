@@ -1,0 +1,143 @@
+{
+  "requestedRows": 217,
+  "completedRows": 217,
+  "remainingRows": 0,
+  "allStrengthsComplete": true,
+  "modeSummary": {
+    "mtp": {
+      "rows": 217,
+      "changedRate": 0.8203,
+      "meanLexicalChangeRate": 0.1186,
+      "hardGatePass": 179,
+      "hardGatePassRate": 0.8249,
+      "meanInferenceMs": 4202.8018,
+      "medianInferenceMs": 3793.0,
+      "meanDurationMs": 4204.659,
+      "medianGenerationTokensPerSecond": 29.22,
+      "perStrength": [
+        {
+          "strength": 0,
+          "promptRegime": "light",
+          "rows": 31,
+          "changedRate": 0.4516,
+          "meanLexicalChangeRate": 0.0117,
+          "hardGatePassRate": 1.0,
+          "medianInferenceMs": 3596.0,
+          "medianGenerationTokensPerSecond": 30.78
+        },
+        {
+          "strength": 25,
+          "promptRegime": "balanced",
+          "rows": 31,
+          "changedRate": 0.4839,
+          "meanLexicalChangeRate": 0.015,
+          "hardGatePassRate": 1.0,
+          "medianInferenceMs": 3531.0,
+          "medianGenerationTokensPerSecond": 30.53
+        },
+        {
+          "strength": 50,
+          "promptRegime": "strong-wording",
+          "rows": 31,
+          "changedRate": 0.871,
+          "meanLexicalChangeRate": 0.0832,
+          "hardGatePassRate": 0.9677,
+          "medianInferenceMs": 3639.0,
+          "medianGenerationTokensPerSecond": 29.68
+        },
+        {
+          "strength": 69,
+          "promptRegime": "strong-structure",
+          "rows": 31,
+          "changedRate": 0.9677,
+          "meanLexicalChangeRate": 0.1165,
+          "hardGatePassRate": 0.871,
+          "medianInferenceMs": 3788.0,
+          "medianGenerationTokensPerSecond": 30.8
+        },
+        {
+          "strength": 75,
+          "promptRegime": "deep-wording",
+          "rows": 31,
+          "changedRate": 0.9677,
+          "meanLexicalChangeRate": 0.1172,
+          "hardGatePassRate": 0.8387,
+          "medianInferenceMs": 3846.0,
+          "medianGenerationTokensPerSecond": 30.02
+        },
+        {
+          "strength": 82,
+          "promptRegime": "deep-structure",
+          "rows": 31,
+          "changedRate": 1.0,
+          "meanLexicalChangeRate": 0.2432,
+          "hardGatePassRate": 0.5484,
+          "medianInferenceMs": 4470.0,
+          "medianGenerationTokensPerSecond": 26.06
+        },
+        {
+          "strength": 100,
+          "promptRegime": "deep-structure",
+          "rows": 31,
+          "changedRate": 1.0,
+          "meanLexicalChangeRate": 0.2432,
+          "hardGatePassRate": 0.5484,
+          "medianInferenceMs": 4374.0,
+          "medianGenerationTokensPerSecond": 26.94
+        }
+      ]
+    }
+  },
+  "pairedSpeedComparison": {
+    "pairedRows": 0,
+    "mtpFasterRows": 0,
+    "mtpFasterRate": 0.0,
+    "medianSpeedup": 0.0,
+    "geometricMeanSpeedup": 0.0,
+    "medianInferenceMsSaved": 0.0,
+    "meanTargetOnlyInferenceMs": 0.0,
+    "meanMtpInferenceMs": 0.0,
+    "perStrength": [],
+    "note": "Paired same-prompt target-only/MTP timings; model load excluded, prompt tokenization and generation included."
+  },
+  "sliderRegimeMap": [
+    {
+      "from": 0,
+      "to": 24,
+      "representative": 0,
+      "regime": "light"
+    },
+    {
+      "from": 25,
+      "to": 49,
+      "representative": 25,
+      "regime": "balanced"
+    },
+    {
+      "from": 50,
+      "to": 68,
+      "representative": 50,
+      "regime": "strong-wording"
+    },
+    {
+      "from": 69,
+      "to": 74,
+      "representative": 69,
+      "regime": "strong-structure"
+    },
+    {
+      "from": 75,
+      "to": 81,
+      "representative": 75,
+      "regime": "deep-wording"
+    },
+    {
+      "from": 82,
+      "to": 100,
+      "representative": 82,
+      "regime": "deep-structure"
+    }
+  ],
+  "updatedAt": "2026-09-22T22:00:36.474820+00:00",
+  "outputDirectory": "benchmarks/strength-sweep/results/qwen35-mtp-brutal-v2"
+}
