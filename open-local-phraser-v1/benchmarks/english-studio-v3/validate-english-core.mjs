@@ -37,8 +37,11 @@ const seed = readJson("english-core-shadow.seed.json");
 const anchors = readJson("english-core-public-anchors.json");
 const resultSchema = readJson("english-core-result-schema.json");
 const metricContract = readJson("english-core-generative-metric-contract.json");
+const compatibilitySources = readJson("english-core-sources.json");
 
 if (config) {
+  if (Number(config.version) < 5) errors.push(`english-core-config.json version ${config.version} is older than required v5`);
+
   const weights = config.composite?.weights ?? {};
   const total = Object.values(weights).reduce((a, b) => a + Number(b), 0);
   if (total !== 100) errors.push(`composite weights sum to ${total}, expected 100`);
@@ -62,18 +65,30 @@ if (config) {
   for (const [label, name] of Object.entries(config.files ?? {})) checkFile(name, label);
 
   for (const requiredRule of [
+    "sourceRevisionPinning",
     "shadowAudit",
+    "forcedChoice",
+    "choiceOrderRobustness",
+    "choiceParser",
     "nativeProtocolSeparation",
+    "metricDirectionContract",
     "multiPrompt",
     "uncertainty",
     "pairedComparison",
     "distributionValidity",
+    "promotionValidation",
     "reproducibility"
   ]) {
     if (!config.evaluationProtocol?.[requiredRule]) errors.push(`evaluationProtocol missing required rule: ${requiredRule}`);
   }
 
-  for (const lane of ["publicNative", "publicPromptedFull", "publicPromptedFast", "freshShadow"]) {
+  for (const lane of [
+    "publicNative",
+    "publicPromptedFull",
+    "publicPromptedFast",
+    "freshShadow",
+    "robustnessDiagnostics"
+  ]) {
     if (!config.evidenceLanes?.[lane]) errors.push(`evidenceLanes missing ${lane}`);
   }
 }
@@ -119,8 +134,20 @@ if (seed && config) {
     if (!counts[dimension]) errors.push(`shadow seed has no cases for dimension ${dimension}`);
   }
 
+  // Do not invent a universal minimum sample-size threshold. Thin dimensions are
+  // surfaced as warnings and handled through uncertainty/claim-tier discipline.
   for (const [dimension, count] of Object.entries(counts)) {
     if (count < 6) warnings.push(`shadow dimension ${dimension} has only ${count} cases`);
+  }
+
+  const configuredGenerative = new Set(config.dimensions?.generative_expression?.metrics ?? []);
+  for (const row of seed.cases ?? []) {
+    if (row.dimension !== "generative_expression") continue;
+    for (const metric of row.scoring ?? []) {
+      if (!configuredGenerative.has(metric)) {
+        errors.push(`${row.id}: required metric ${metric} is used by seed but absent from config generative_expression.metrics`);
+      }
+    }
   }
 }
 
@@ -141,6 +168,15 @@ if (anchors && config) {
   }
 }
 
+if (compatibilitySources) {
+  if (compatibilitySources.canonicalRegistry !== "english-core-public-anchors.json") {
+    errors.push("english-core-sources.json must identify english-core-public-anchors.json as canonicalRegistry");
+  }
+  if (compatibilitySources.status !== "compatibility_registry") {
+    warnings.push("english-core-sources.json is not labeled compatibility_registry; avoid maintaining two competing canonical source registries");
+  }
+}
+
 if (resultSchema) {
   const provenance = resultSchema.properties?.outputs?.items?.properties?.metricProvenance;
   const provenanceKind = provenance?.properties?.kind?.enum ?? [];
@@ -150,12 +186,15 @@ if (resultSchema) {
   if (!provenanceRequired.has("protocol")) errors.push("result schema metricProvenance must require protocol/normalization description");
 
   const decoding = resultSchema.properties?.decoding?.properties ?? {};
-  if (!decoding.topP || !decoding.topK || !decoding.temperature || !decoding.seed) {
-    errors.push("result schema must preserve temperature/topP/topK/seed decoding provenance");
+  for (const field of ["temperature", "topP", "topK", "maxNewTokens", "forcedChoiceMaxNewTokens", "seed"]) {
+    if (!decoding[field]) errors.push(`result schema must preserve decoding.${field}`);
   }
+
+  if (!resultSchema.properties?.taskCount) errors.push("result schema must preserve taskCount");
+
   const modelProps = resultSchema.properties?.model?.properties ?? {};
-  if (!modelProps.tokenizerName || !modelProps.chatTemplateSha256) {
-    errors.push("result schema must preserve tokenizer identity and chat-template hash fields");
+  for (const field of ["artifactSha256", "tokenizerName", "chatTemplateSha256", "checkpointType", "quantization", "revision"]) {
+    if (!modelProps[field]) errors.push(`result schema model must preserve ${field}`);
   }
 }
 
@@ -178,18 +217,30 @@ for (const requiredImplementation of [
   "test_english_core_choice_parser.py",
   "english-core-generative-metric-contract.json",
   "run-english-core-mlx.py",
+  "validate-english-core-run.py",
+  "build-english-core.mjs",
   "score-english-core.mjs",
+  "build-english-core-prompt-robustness.mjs",
+  "score-english-core-prompt-robustness.mjs",
+  "build-english-core-choice-order-robustness.mjs",
+  "score-english-core-choice-order-robustness.mjs",
   "analyze-english-core-statistics.mjs",
   "compare-english-core-models.mjs",
-  "score-english-core-prompt-robustness.mjs",
+  "build-english-core-public-fast.py",
   "score-english-core-public-fast.py",
-  "score-english-core-public-full-classification.py"
+  "build-english-core-public-full-classification.py",
+  "score-english-core-public-full-classification.py",
+  "build-swords-english-core-prompts.py",
+  "convert-swords-english-core-output.py",
+  "build-jfleg-english-core-prompts.py",
+  "convert-jfleg-english-core-output.py",
+  "self-check-english-core.sh"
 ]) {
   if (!fs.existsSync(path.join(here, requiredImplementation))) errors.push(`missing required implementation file: ${requiredImplementation}`);
 }
 
 const report = {
-  version: 3,
+  version: 4,
   configVersion: config?.version ?? null,
   seedVersion: seed?.version ?? null,
   metricContractVersion: metricContract?.version ?? null,
@@ -205,7 +256,8 @@ const report = {
     "This validates benchmark package consistency, not linguistic validity.",
     "A passing package validator does not upgrade author-written shadow labels to independent human gold.",
     "Generative metric registration/direction checks prevent accidental inversion but do not validate the evaluator itself.",
-    "Choice-parser regression tests are separate executable checks and should be run before promotion-quality evaluation.",
+    "Choice-parser regression tests and task-builder leakage checks are separate executable checks run by self-check-english-core.sh.",
+    "Public data revision/fingerprint requirements are enforced at promotion-run/workflow level; package validation alone cannot prove that a future download used immutable source bytes.",
     "Run audit-english-core-shadow.mjs separately for item-level structural/distribution diagnostics.",
     "Research-level claims still require the claim-tier gates in ENGLISH_CORE_ROBUSTNESS.md."
   ]
