@@ -13,9 +13,19 @@ if (!resultPath) {
   process.exit(2);
 }
 
-const config = JSON.parse(fs.readFileSync(path.join(here, "english-core-config.json"), "utf8"));
-const seed = JSON.parse(fs.readFileSync(path.join(here, "english-core-shadow.seed.json"), "utf8"));
-const metricContract = JSON.parse(fs.readFileSync(path.join(here, "english-core-generative-metric-contract.json"), "utf8"));
+function readText(name) {
+  return fs.readFileSync(path.join(here, name), "utf8");
+}
+function sha256Text(text) {
+  return crypto.createHash("sha256").update(text).digest("hex");
+}
+
+const configText = readText("english-core-config.json");
+const seedText = readText("english-core-shadow.seed.json");
+const metricContractText = readText("english-core-generative-metric-contract.json");
+const config = JSON.parse(configText);
+const seed = JSON.parse(seedText);
+const metricContract = JSON.parse(metricContractText);
 const run = JSON.parse(fs.readFileSync(resultPath, "utf8"));
 const outputs = new Map((run.outputs ?? []).map((x) => [x.id, x]));
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -194,6 +204,7 @@ for (const dimension of Object.keys(config.dimensions)) {
     cases: rows.length,
     scored: scored.length,
     missing: rows.length - scored.length,
+    complete: scored.length === rows.length,
     score100: scored.length === rows.length ? mean(scored.map((x) => x.score)) * 100 : null,
     byPhenomenon: Object.fromEntries(Object.entries(byPhenomenon).map(([k, xs]) => [k, {
       cases: xs.length,
@@ -217,11 +228,22 @@ for (const [dimension, weight] of Object.entries(config.composite.weights)) {
 
 const equalWeightMean100 = complete && completeDimensionValues.length ? mean(completeDimensionValues) : null;
 const report = {
-  version: 6,
+  version: 7,
   runId: run.runId ?? null,
   model: run.model ?? null,
+  taskFile: run.taskFile ?? null,
+  taskFileSha256: run.taskFileSha256 ?? null,
+  promptModeRequested: run.promptModeRequested ?? null,
+  promptAdaptationModesObserved: run.promptAdaptationModesObserved ?? null,
+  promptAdaptationDetailsObserved: run.promptAdaptationDetailsObserved ?? null,
+  decoding: run.decoding ?? null,
   shadowCases: seed.cases.length,
   generativeMetricContractVersion: metricContract.version ?? null,
+  benchmarkInputs: {
+    configSha256: sha256Text(configText),
+    shadowSeedSha256: sha256Text(seedText),
+    generativeMetricContractSha256: sha256Text(metricContractText),
+  },
   dimensionScores,
   englishCoreShadow100: complete ? Number(englishCore100.toFixed(3)) : null,
   equalWeightDimensionMean100: typeof equalWeightMean100 === "number" ? Number(equalWeightMean100.toFixed(3)) : null,
@@ -237,6 +259,7 @@ const report = {
     "Generative metricScores are normalized observations in [0,1], not assumed utilities. Directionality comes from english-core-generative-metric-contract.json; lower-is-better criteria are inverted before aggregation.",
     "Generative cases require complete registered metricScores plus structured approved metricProvenance including the normalization/scoring protocol.",
     "General-purpose LLM judges are secondary diagnostics and cannot by themselves enter the official generative composite; validated specialist models require an explicit human-validation reference.",
+    "Benchmark input hashes are embedded so paired/statistical tooling can reject comparisons across different seed/config/metric-contract versions.",
     "The product-weighted composite is a Pari product prior, not a literature-derived psychometric scale; compare it with the equal-weight dimension mean and all seven subscores.",
     "Run analyze-english-core-statistics.mjs for uncertainty and compare-english-core-models.mjs for paired model comparison.",
     "Runtime, RAM and quantization do not affect English Core competence evidence."
