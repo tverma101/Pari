@@ -12,8 +12,9 @@ Examples:
     python run-english-core-mlx.py <model_dir> prompt-result.json \
         --tasks english-core-prompt-robustness.jsonl
 
-The runner records task hashes, environment metadata, decoding settings, and raw
-output hashes so promotion-quality comparisons can be reproduced.
+Use --prompt-mode plain for a base model that should not be wrapped in a chat
+template. `auto` uses the tokenizer chat template when available and otherwise
+falls back to the raw prompt.
 """
 
 import argparse
@@ -74,6 +75,27 @@ def chip_name() -> str:
     return platform.processor() or "unknown"
 
 
+def prompt_for_task(tokenizer, text: str, mode: str):
+    if mode == "plain":
+        return text, "plain"
+
+    messages = [{"role": "user", "content": text}]
+    try:
+        try:
+            encoded = tokenizer.apply_chat_template(
+                messages,
+                add_generation_prompt=True,
+                enable_thinking=False,
+            )
+        except TypeError:
+            encoded = tokenizer.apply_chat_template(messages, add_generation_prompt=True)
+        return encoded, "chat_template"
+    except Exception:
+        if mode == "chat":
+            raise
+        return text, "plain_fallback"
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("model_dir")
@@ -85,6 +107,7 @@ def main() -> None:
     ap.add_argument("--model-revision", default="unknown")
     ap.add_argument("--quantization", default="unknown")
     ap.add_argument("--checkpoint-type", choices=["base", "instruct", "chat", "specialized", "unknown"], default="unknown")
+    ap.add_argument("--prompt-mode", choices=["auto", "chat", "plain"], default="auto")
     ap.add_argument("--chat-template-label", default="tokenizer.apply_chat_template")
     ap.add_argument("--benchmark-revision", default="unknown", help="Git commit/revision containing the benchmark files")
     args = ap.parse_args()
@@ -111,24 +134,18 @@ def main() -> None:
 
     sampler = make_sampler(temp=args.temperature)
     outputs = []
+    adaptation_modes = set()
 
     for i, task in enumerate(tasks, 1):
-        messages = [{"role": "user", "content": task["prompt"]}]
-        try:
-            prompt_ids = tokenizer.apply_chat_template(
-                messages,
-                add_generation_prompt=True,
-                enable_thinking=False,
-            )
-        except TypeError:
-            prompt_ids = tokenizer.apply_chat_template(messages, add_generation_prompt=True)
+        prompt, adaptation_mode = prompt_for_task(tokenizer, task["prompt"], args.prompt_mode)
+        adaptation_modes.add(adaptation_mode)
 
         max_tokens = args.max_tokens if task.get("generative") else 8
         t1 = time.time()
         output = generate(
             model,
             tokenizer,
-            prompt=prompt_ids,
+            prompt=prompt,
             max_tokens=max_tokens,
             sampler=sampler,
         )
@@ -138,6 +155,7 @@ def main() -> None:
             "id": task["id"],
             "output": text,
             "latencySeconds": round(latency, 4),
+            "promptAdaptation": adaptation_mode,
         })
         print(f"[{i:04d}/{len(tasks):04d}] {task['id']} {latency:.2f}s  {text[:100]}", flush=True)
 
@@ -153,7 +171,7 @@ def main() -> None:
             "checkpointType": args.checkpoint_type,
             "runtime": "mlx-lm",
             "runtimeVersion": package_version("mlx-lm"),
-            "chatTemplate": args.chat_template_label,
+            "chatTemplate": args.chat_template_label if "chat_template" in adaptation_modes else "none/plain",
         },
         "hardware": {
             "machine": platform.machine(),
@@ -163,6 +181,8 @@ def main() -> None:
         },
         "taskFile": str(task_path),
         "taskFileSha256": sha256_bytes(task_bytes),
+        "promptModeRequested": args.prompt_mode,
+        "promptAdaptationModesObserved": sorted(adaptation_modes),
         "decoding": {
             "temperature": args.temperature,
             "maxNewTokens": args.max_tokens,
@@ -177,7 +197,8 @@ def main() -> None:
             "rawOutputSha256": sha256_bytes(outputs_bytes),
             "notes": [
                 "Model artifact hash is not inferred from a directory path; supply/record it separately when promotion-quality reproducibility requires it.",
-                "Checkpoint type and quantization are caller-supplied metadata and should be verified against the actual model artifact."
+                "Checkpoint type and quantization are caller-supplied metadata and should be verified against the actual model artifact.",
+                "Base models should generally be run with --prompt-mode plain; instruct/chat checkpoints should use their official tokenizer chat template when available."
             ],
         },
     }
