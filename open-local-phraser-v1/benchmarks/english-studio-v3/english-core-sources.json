@@ -1,6 +1,13 @@
 {
-  "version": 1,
-  "policy": "All public benchmark evaluation splits are frozen evaluation-only. Do not train or prompt-tune against them. Report public-anchor and Pari-shadow results separately.",
+  "version": 2,
+  "status": "compatibility_registry",
+  "canonicalRegistry": "english-core-public-anchors.json",
+  "policy": "All public benchmark evaluation splits are evaluation-only. Do not train or prompt-tune against them. Report public-native, public-prompted, public-fast, and Pari-shadow evidence separately. Promotion runs must pin source revisions/hashes where the source tooling supports it.",
+  "notes": [
+    "This file is retained as a compact compatibility/source-status view. english-core-public-anchors.json is the canonical protocol-aware registry.",
+    "A prompted adapter being ready does not mean the benchmark's official/native protocol has been reproduced.",
+    "WritingBench and creative-writing leaderboards remain secondary evidence for Pari editing-model selection."
+  ],
   "sources": [
     {
       "id": "swords",
@@ -8,7 +15,7 @@
       "dimension": "lexical_context",
       "reference": "https://aclanthology.org/2021.naacl-main.345/",
       "role": "primary contextual lexical-substitution anchor",
-      "status": "adapter_required"
+      "status": "prompt_adapter_ready_official_evaluator_external"
     },
     {
       "id": "wic",
@@ -16,7 +23,15 @@
       "dimension": "lexical_context",
       "reference": "https://aclanthology.org/N19-1128/",
       "role": "context-sensitive word-sense discrimination",
-      "status": "adapter_required"
+      "status": "public_fast_and_full_distribution_prompted_ready"
+    },
+    {
+      "id": "coinco_ls07",
+      "name": "CoInCo / SemEval lexical substitution",
+      "dimension": "lexical_context",
+      "reference": "https://aclanthology.org/W13-2407/",
+      "role": "contextual lexical substitution/ranking",
+      "status": "native_adapter_pending_source_license_review"
     },
     {
       "id": "lexical_collocations_eacl2021",
@@ -24,7 +39,7 @@
       "dimension": "collocation_naturalness",
       "reference": "https://aclanthology.org/2021.eacl-main.120/",
       "role": "collocation and context-sensitive lexical-combination anchor",
-      "status": "adapter_required"
+      "status": "native_adapter_pending_source_package_review"
     },
     {
       "id": "blimp",
@@ -32,7 +47,7 @@
       "dimension": "grammar_syntax",
       "reference": "https://aclanthology.org/2020.tacl-1.25/",
       "role": "linguistic minimal-pair grammar/syntax anchor",
-      "status": "adapter_required"
+      "status": "public_fast_ready_native_mlx_lm_eval_ready"
     },
     {
       "id": "cola",
@@ -40,23 +55,23 @@
       "dimension": "grammar_syntax",
       "reference": "https://aclanthology.org/Q19-1040/",
       "role": "real linguistics-literature acceptability anchor",
-      "status": "adapter_required"
+      "status": "public_fast_and_full_distribution_prompted_ready_mcc_reported"
     },
     {
       "id": "paws",
       "name": "PAWS",
       "dimension": "paraphrase_semantics",
-      "reference": "https://github.com/google-research-datasets/paws",
+      "reference": "https://aclanthology.org/N19-1131/",
       "role": "high-overlap adversarial semantic-equivalence anchor",
-      "status": "existing_dataset_ledger_entry_adapter_required"
+      "status": "public_fast_and_full_distribution_prompted_ready"
     },
     {
       "id": "jfleg",
       "name": "JFLEG",
       "dimension": "fluency_register",
-      "reference": "https://github.com/keisks/jfleg",
+      "reference": "https://aclanthology.org/E17-2037/",
       "role": "human fluency-correction anchor",
-      "status": "existing_dataset_ledger_entry_adapter_required"
+      "status": "prompt_adapter_ready_official_gleu_external"
     },
     {
       "id": "gyafc",
@@ -64,15 +79,31 @@
       "dimension": "fluency_register",
       "reference": "https://aclanthology.org/N18-1012/",
       "role": "formality/register distinction anchor",
-      "status": "adapter_required_license_review"
+      "status": "adapter_pending_license_and_protocol_review"
+    },
+    {
+      "id": "editeval",
+      "name": "EditEval relevant editing tasks",
+      "dimension": "generative_expression",
+      "reference": "https://aclanthology.org/2024.conll-1.7/",
+      "role": "primary modular text-editing anchor",
+      "status": "native_task_adapter_pending"
+    },
+    {
+      "id": "iterater_holdout",
+      "name": "IteraTeR held-out revisions",
+      "dimension": "generative_expression",
+      "reference": "https://aclanthology.org/2022.acl-long.250/",
+      "role": "human iterative revision anchor",
+      "status": "heldout_adapter_pending"
     },
     {
       "id": "writingbench_selected",
       "name": "WritingBench selected style/language subsets",
       "dimension": "generative_expression",
-      "reference": "https://github.com/X-PLUG/WritingBench",
+      "reference": "https://arxiv.org/abs/2503.05244",
       "role": "secondary broad writing diagnostic only",
-      "status": "existing_dataset_ledger_entry_subset_adapter_required"
+      "status": "secondary_only_subset_adapter_pending"
     },
     {
       "id": "bediscover_english",
@@ -80,7 +111,7 @@
       "dimension": "discourse",
       "reference": "https://aclanthology.org/2026.eacl-long.207/",
       "role": "discourse relation/temporal/sentence-order anchor",
-      "status": "adapter_required_task_level_license_review"
+      "status": "task_adapter_pending_license_review"
     }
   ]
 }
