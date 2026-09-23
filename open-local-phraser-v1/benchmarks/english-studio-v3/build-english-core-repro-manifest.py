@@ -42,6 +42,15 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def canonical_outputs_sha256(outputs: list[dict]) -> str:
+    payload = json.dumps(outputs, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    return sha256_bytes(payload)
+
+
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text())
 
@@ -124,6 +133,77 @@ def unique_metric_provenance(score: dict | None) -> list[dict]:
     return result
 
 
+def inspect_run_integrity(run: dict) -> tuple[list[str], dict]:
+    blockers: list[str] = []
+    outputs = run.get("outputs")
+    if not isinstance(outputs, list) or not outputs:
+        blockers.append("run_has_no_outputs")
+        outputs = []
+
+    declared_count = run.get("taskCount")
+    if not isinstance(declared_count, int) or isinstance(declared_count, bool) or declared_count < 1:
+        blockers.append("missing_or_invalid_task_count")
+    elif declared_count != len(outputs):
+        blockers.append("task_count_output_count_mismatch")
+
+    declared_raw_hash = (run.get("reproducibility") or {}).get("rawOutputSha256")
+    actual_raw_hash = canonical_outputs_sha256(outputs) if outputs else None
+    if not is_sha256(declared_raw_hash):
+        blockers.append("missing_raw_output_hash")
+    elif actual_raw_hash != str(declared_raw_hash).lower():
+        blockers.append("raw_output_hash_mismatch")
+
+    output_ids = [row.get("id") for row in outputs if isinstance(row, dict)]
+    if len(output_ids) != len(outputs):
+        blockers.append("non_object_output_row")
+    elif any(not str(value or "").strip() for value in output_ids):
+        blockers.append("missing_output_id")
+    elif len(output_ids) != len(set(output_ids)):
+        blockers.append("duplicate_output_ids")
+
+    task_path = Path(str(run.get("taskFile") or ""))
+    task_file_resolved = task_path.is_file()
+    task_hash_verified = False
+    task_ids_verified = False
+    resolved_task_count = None
+    if task_file_resolved:
+        task_bytes = task_path.read_bytes()
+        actual_task_hash = sha256_bytes(task_bytes)
+        task_hash_verified = actual_task_hash == run.get("taskFileSha256")
+        if not task_hash_verified:
+            blockers.append("task_file_hash_mismatch")
+        try:
+            tasks = [json.loads(line) for line in task_bytes.decode("utf-8").splitlines() if line.strip()]
+            task_ids = [row.get("id") for row in tasks]
+            resolved_task_count = len(task_ids)
+            if len(task_ids) != len(set(task_ids)):
+                blockers.append("duplicate_task_ids")
+            if declared_count != resolved_task_count:
+                blockers.append("task_count_task_file_mismatch")
+            if set(task_ids) != set(output_ids):
+                blockers.append("task_output_id_set_mismatch")
+            else:
+                task_ids_verified = True
+        except Exception:
+            blockers.append("task_file_parse_failed")
+    else:
+        # The task hash still identifies the model-visible bytes, but the manifest
+        # cannot independently recheck those bytes if the original task path is
+        # unavailable. Treat that as a promotion blocker rather than assuming the
+        # run is self-authenticating.
+        blockers.append("task_file_not_locally_resolvable_for_integrity_check")
+
+    return blockers, {
+        "declaredTaskCount": declared_count,
+        "outputCount": len(outputs),
+        "resolvedTaskCount": resolved_task_count,
+        "rawOutputHashVerified": bool(outputs and is_sha256(declared_raw_hash) and actual_raw_hash == str(declared_raw_hash).lower()),
+        "taskFileLocallyResolved": task_file_resolved,
+        "taskFileHashVerified": task_hash_verified,
+        "taskOutputIdsVerified": task_ids_verified,
+    }
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", required=True, type=Path)
@@ -185,8 +265,8 @@ def main() -> None:
             raise SystemExit(f"Duplicate artifact label: {label}")
         used_labels.add(label)
         data = load_json(path)
-        blockers = public_manifest_blockers(label, data)
-        public_blockers.extend(blockers)
+        blockers_for_source = public_manifest_blockers(label, data)
+        public_blockers.extend(blockers_for_source)
         public_manifests.append({
             "label": label,
             "path": str(path),
@@ -194,7 +274,7 @@ def main() -> None:
             "datasetsLibraryVersion": data.get("datasetsLibraryVersion"),
             "sources": data.get("sources"),
             "resolvedDatasetFingerprints": data.get("resolvedDatasetFingerprints"),
-            "promotionBlockers": blockers,
+            "promotionBlockers": blockers_for_source,
         })
         artifacts.append({"label": label, "path": str(path), "sha256": sha256_file(path), "bytes": path.stat().st_size})
 
@@ -238,15 +318,15 @@ def main() -> None:
 
     if not is_sha256(run.get("taskFileSha256")):
         blockers.append("missing_task_file_hash")
-    if not isinstance(run.get("taskCount"), int) or run.get("taskCount") < 1:
-        blockers.append("missing_task_count")
     for key in ("temperature", "topP", "topK", "maxNewTokens", "forcedChoiceMaxNewTokens", "seed"):
         if key not in decoding:
             blockers.append(f"missing_decoding_{key}")
-    if not is_sha256(reproducibility.get("rawOutputSha256")):
-        blockers.append("missing_raw_output_hash")
     if not known(declared_benchmark_revision):
         blockers.append("missing_benchmark_revision")
+
+    integrity_blockers, integrity = inspect_run_integrity(run)
+    blockers.extend(integrity_blockers)
+
     if not current_commit:
         blockers.append("unable_to_resolve_current_git_commit")
     elif known(declared_benchmark_revision) and declared_benchmark_revision != current_commit:
@@ -271,11 +351,12 @@ def main() -> None:
     blockers = list(dict.fromkeys(blockers))
 
     manifest = {
-        "version": 3,
+        "version": 4,
         "generatedAtUtc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "purpose": "Frozen provenance manifest for English Core evidence; not a quality metric.",
         "promotionReady": not blockers,
         "promotionBlockers": blockers,
+        "runIntegrity": integrity,
         "model": {**model, "artifactSha256": model_hash},
         "hardware": run.get("hardware"),
         "decoding": decoding,
@@ -299,6 +380,8 @@ def main() -> None:
         "artifacts": artifacts,
         "rules": [
             "All supplied evidence files are hashed byte-for-byte.",
+            "The run's raw-output hash, task count, task-file hash, and task/output ID set are independently rechecked when the task file is locally resolvable.",
+            "A task file that cannot be locally resolved blocks promotion-manifest integrity verification instead of being silently trusted from metadata alone.",
             "Promotion readiness is a provenance gate only; it does not imply model quality or benchmark validity.",
             "Promotion requires an explicit prompt adaptation mode and one observed adaptation path; auto/mixed adaptation is exploratory only.",
             "A dirty benchmark checkout or declared/current revision mismatch blocks promotion because the evaluator state would not be independently reproducible.",
