@@ -8,7 +8,10 @@
     "runId": {"type": "string"},
     "timestamp": {"type": "string"},
     "taskFile": {"type": "string"},
-    "taskFileSha256": {"type": "string"},
+    "taskFileSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+    "promptModeRequested": {"type": "string", "enum": ["auto", "chat", "plain"]},
+    "promptAdaptationModesObserved": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "promptAdaptationDetailsObserved": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "model": {
       "type": "object",
       "required": ["name"],
@@ -16,12 +19,14 @@
         "name": {"type": "string"},
         "repoOrName": {"type": "string"},
         "revision": {"type": "string"},
-        "artifactSha256": {"type": "string"},
+        "artifactSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
         "quantization": {"type": "string"},
         "checkpointType": {"type": "string", "enum": ["base", "instruct", "chat", "specialized", "unknown"]},
         "runtime": {"type": "string"},
         "runtimeVersion": {"type": "string"},
-        "chatTemplate": {"type": "string"}
+        "tokenizerName": {"type": "string"},
+        "chatTemplate": {"type": "string"},
+        "chatTemplateSha256": {"type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$"}
       }
     },
     "hardware": {
@@ -38,9 +43,10 @@
       "type": "object",
       "properties": {
         "temperature": {"type": "number"},
-        "topP": {"type": "number"},
-        "topK": {"type": "integer"},
-        "maxNewTokens": {"type": "integer"},
+        "topP": {"type": "number", "minimum": 0, "maximum": 1},
+        "topK": {"type": "integer", "minimum": 0},
+        "maxNewTokens": {"type": "integer", "minimum": 1},
+        "forcedChoiceMaxNewTokens": {"type": "integer", "minimum": 1},
         "seed": {"type": ["integer", "null"]}
       }
     },
@@ -52,7 +58,9 @@
         "properties": {
           "id": {"type": "string"},
           "output": {"type": "string"},
-          "latencySeconds": {"type": "number"},
+          "latencySeconds": {"type": "number", "minimum": 0},
+          "promptAdaptation": {"type": "string"},
+          "promptAdaptationDetail": {"type": "string"},
           "probabilities": {
             "type": "object",
             "description": "Optional diagnostic probabilities/logits. Text-output scoring remains the cross-runtime primary prompted measure.",
@@ -105,7 +113,7 @@
       "properties": {
         "benchmarkRevision": {"type": "string"},
         "scorerRevision": {"type": "string"},
-        "rawOutputSha256": {"type": "string"},
+        "rawOutputSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
         "notes": {"type": "array", "items": {"type": "string"}}
       }
     }
