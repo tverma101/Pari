@@ -1,322 +1,298 @@
-# Pari English Studio Benchmark v3
+# Pari English Studio v3 benchmark
 
-This directory is the **evaluation layer** for Pari's rewriting studio. The model/training/compute decision tree lives in [`PROJECT_PLAN.md`](./PROJECT_PLAN.md).
+This directory is Pari's evaluation layer.
 
-The benchmark's job is simple:
+The product/model decision tree lives in [`PROJECT_PLAN.md`](./PROJECT_PLAN.md). The concrete V1 model/runtime experiment lives in [`V1_SHOOTOUT.md`](./V1_SHOOTOUT.md). Model-to-benchmark routing lives in [`BENCHMARK_MODEL_MAP.md`](./BENCHMARK_MODEL_MAP.md). Dataset provenance lives in [`dataset-ledger.json`](./dataset-ledger.json).
 
-> determine whether a model or pipeline produces correct, natural, controllable English edits without requiring the project owner to be an expert English judge.
+The benchmark has one job:
 
-No single score decides the winner.
+> measure whether a model or pipeline is useful for a human-controlled rewriting studio without requiring the project owner to be an expert English judge.
 
----
-
-# 1. Benchmark layers
-
-## Layer A — Pari regression and safety
-
-These existing suites remain unchanged and first-class:
-
-| Suite | Role |
-| --- | --- |
-| `../eval/corpus.json` | adversarial grammar/meaning/safety regression |
-| `../quillbot/corpus.frozen.json` | 320-case broken-English / hard-tail comparison corpus |
-| `../paraphrase-v2/corpus.json` | 72 standards-traced paragraph editing cases |
-
-They test product-specific failure modes and prevent old fixes from regressing.
-
-They are **not** independent public gold standards and must never be described as proof of human-quality English by themselves.
-
-## Layer B — independent human-reference suites
-
-These are the main objective quality anchors.
-
-### JFLEG — fluency / grammatical correction
-
-Source: https://github.com/keisks/jfleg
-
-- 754 dev + 747 test sources;
-- four human corrections per source;
-- official GLEU evaluator;
-- CC BY-NC-SA 4.0: benchmark/evaluation use unless licensing permits more.
-
-Report:
-
-- GLEU dev/test;
-- protected-content failures if any;
-- semantic/negation/modality violations;
-- unchanged-rate on already-acceptable material where measurable.
-
-### ASSET — simplification / multi-operation rewriting
-
-Source: https://github.com/facebookresearch/asset
-
-- 2,000 validation + 359 test source sentences;
-- ten human simplifications each;
-- includes lexical paraphrasing, compression, reordering and splitting;
-- CC BY-NC 4.0: evaluation/reference use.
-
-Report:
-
-- SARI;
-- add/delete/keep sub-scores where available;
-- meaning/safety vetoes;
-- sentence-split/join behavior.
-
-Do not interpret SARI alone as complete human quality; the ASSET paper explicitly motivates richer evaluation for multi-operation rewriting.
-
-### Microsoft Smart Word Suggestions — contextual word/phrase alternatives
-
-Source: https://github.com/microsoft/SmartWordSuggestions
-
-- human test set of 1,000 learner-written sentences;
-- over 16,000 substitution suggestions annotated by 10 native speakers;
-- MIT repository;
-- large distantly-supervised training set is **not** part of the gold test.
-
-This is one of the closest public benchmarks to Pari's click-a-word/click-a-phrase UX.
-
-Use the repository's official evaluation framework and preserve its human test split.
-
-### TSAR lexical simplification — ranked alternatives
-
-Source: https://aclanthology.org/2022.tsar-1.31/
-
-Use the English test set and official ranking metrics:
-
-- MAP@3 / 5 / 10;
-- Potential@3 / 5 / 10;
-- Accuracy@k@top1;
-- optional precision/recall@k diagnostics.
-
-The shared-task evaluation data is CC BY-NC-SA 4.0; keep it evaluation-only.
-
-### PAWS — paraphrase / word-order meaning traps
-
-Source: https://github.com/google-research-datasets/paws
-
-Use the human-labeled final splits as an independent adversarial meaning test.
-
-The purpose is not to train Pari to classify PAWS. It is to make sure Pari's semantic gate catches cases where almost the same words express a different relationship because subject/object or word order changed.
-
-### IteraTeR held-out revisions
-
-Source: https://github.com/vipulraheja/iterater
-
-If IteraTeR train is used for adaptation, keep official dev/test completely frozen.
-
-Because revision is one-to-many, report several diagnostics rather than treating one target string as the only correct answer:
-
-- semantic preservation;
-- reference overlap/edit similarity;
-- grammar/fluency;
-- edit amount;
-- safety failures.
-
-## Optional GEC suite
-
-Add BEA/ERRANT or CoNLL-style M2/ERRANT evaluation only after data-access and license handling are documented. Do not block the first v3 benchmark on this.
+No single benchmark and no single scalar score decides the winner.
 
 ---
 
-# 2. Pari interactive studio suite
+# 1. Two-speed benchmark design
 
-Public benchmarks do not cover the entire product interaction model, so `interactive.seed.json` remains a custom product suite.
+## V1 fast acceptance suite
 
-It covers:
+Use a compact ~200-unique-source suite for frequent local model/runtime iteration.
+
+Target mix:
+
+| Route | Unique cases | Priority |
+| --- | ---: | --- |
+| word/phrase alternatives | ~60 | highest |
+| sentence alternatives | ~35 | high |
+| paragraph first draft | ~35 | medium |
+| semantic/safety traps | ~30 | mandatory gate |
+| rewrite-strength/register | ~25 | mandatory UX |
+| protected/edit-containment | ~15 | mandatory control |
+
+Cases can participate in more than one operation, but always report unique-source count separately from task-instance count.
+
+The fast suite exists to answer practical V1 questions such as:
+
+- Is a 2B model already good enough for interactive suggestions?
+- Does 4B materially improve the options?
+- Is a ternary 27B worth the latency/runtime complexity?
+- Does a lower quantization visibly damage word/sentence suggestions?
+- Does MTP/speculation reduce end-to-end suggestion latency?
+
+## Release/research validation
+
+Before changing Pari's default route, run the broader relevant suites.
+
+### Existing Pari suites
+
+- `../eval/corpus.json` — adversarial grammar/meaning/safety regression;
+- `../quillbot/corpus.frozen.json` — 320-case broken-English/hard-tail suite;
+- `../paraphrase-v2/corpus.json` — 72 standards-traced paragraph cases;
+- English Studio interactive cases.
+
+These are important regression tests but are not independent proof of human-quality English.
+
+### Independent human/reference suites
+
+Use by route, not indiscriminately:
+
+- **Smart Word Suggestions** — contextual word/phrase suggestion;
+- **TSAR** — lexical alternative ranking;
+- **JFLEG** — grammar/fluency;
+- **IteraTeR held-out revisions** — real human revision behavior;
+- **EditEval** — modular editing capabilities;
+- **PAWS** — adversarial semantic/order traps;
+- **ASSET** — simplification/compression/split-join where relevant.
+
+WritingBench/Arena/creative-writing leaderboards are model-screening signals only. They do not decide Pari because writing from scratch is different from editing one selected span while keeping everything else stable.
+
+---
+
+# 2. Route-based evaluation
+
+Models get capability profiles rather than one global rank.
+
+## Route A — word/phrase alternatives
+
+This is V1's most important route.
+
+Measure:
+
+- top-3/top-5/top-10 useful coverage where references exist;
+- grammaticality after replacement in the full sentence;
+- meaning preservation;
+- duplicate rate;
+- materially different usable candidate count;
+- replacement-length distribution (shorter / same / longer);
+- time to first 3 and first 10 suggestions;
+- peak memory.
+
+A model can win this route while being mediocre at paragraph writing.
+
+## Route B — sentence alternatives
+
+Measure:
+
+- meaning preservation;
+- grammar/naturalness;
+- register drift;
+- structural diversity;
+- unnecessary length inflation;
+- latency to the first useful batch.
+
+## Route C — paragraph first draft
+
+Measure:
+
+- factual/semantic safety;
+- coherence;
+- vocabulary/formality inflation;
+- rewrite-strength response;
+- unnecessary edit rate;
+- latency.
+
+For V1 the paragraph draft only needs to be a useful starting point. The interactive editor is the main product.
+
+## Route D — grammar/repair specialist
+
+Measure mainly with JFLEG and existing Pari regression tests.
+
+A grammar specialist does not need to be a good creative writer.
+
+## Route E — simplification/compression/expansion
+
+Measure with ASSET, TSAR and the custom phrase-length cases.
+
+## Route F — post-V1 personalization
+
+Not part of V1 model selection.
+
+When enough user interaction data exists, evaluate whether a ranker predicts the user's choices among candidates that already passed objective quality gates.
+
+---
+
+# 3. Interactive-edit contract
+
+The custom suite must test operations that public benchmarks usually miss:
 
 - word -> word;
 - word -> multi-word phrase;
 - phrase -> word;
-- phrase -> phrase;
-- clause rewrite;
-- full-sentence rewrite;
-- split/join;
+- phrase -> different-length phrase;
+- clause -> clause;
+- sentence -> sentence;
+- sentence split/join;
 - local edit containment;
-- protected content next to the selected span;
+- protected facts next to the edit;
+- low/high rewrite-strength behavior;
 - register/vocabulary ceiling;
-- candidate diversity;
-- rewrite-strength calibration.
+- candidate diversity.
 
-## Expansion policy
+Selected-span generation must use surrounding context for meaning/grammar, but replacing a span must not silently rewrite unrelated text.
 
-Do not create hundreds of near-duplicate templates.
-
-Expand from:
-
-1. hand-authored adversarial cases;
-2. localized human edits automatically extracted from IteraTeR revisions;
-3. failure cases discovered during real Pari use, after removing personal content.
-
-Track **unique source examples** separately from **task instances**.
-
-The composite builder may apply several distinct operations to one source, but those operations are correlated and must not be counted as independent prose examples.
+Candidate length is free. A good replacement may turn one word into five or five words into one.
 
 ---
 
-# 3. Rewrite-strength benchmark
+# 4. Rewrite-strength contract
 
-Strength controls **surface-change budget**, not intelligence or formality.
+Strength is a **surface-change budget**, not a vocabulary-sophistication slider.
 
 | Strength | Expected behavior |
 | --- | --- |
-| 15 | grammar cleanup + tiny wording changes |
-| 40 | phrase substitution + light reshaping |
-| 60 | substantial phrase/clause rewrite |
-| 90 | large surface/syntax change while preserving meaning/register |
+| ~15 | grammar cleanup + tiny wording changes |
+| ~40 | phrase substitutions + light reshaping |
+| ~60 | substantial phrase/clause changes |
+| ~90 | large surface/syntax change while preserving meaning/register |
 
-For each source measure:
+Measure edit distance/structural change against:
 
-- token/character edit distance;
-- syntactic/structural change proxy;
 - semantic preservation;
-- vocabulary-frequency/readability drift;
+- readability/vocabulary drift;
 - register drift;
 - safety failures.
 
-Pass condition:
+Required behavior:
 
-- change amount should rise with strength;
-- meaning/safety should remain stable;
-- vocabulary sophistication must not automatically rise with strength.
-
-Human revision data can also be binned by observed edit distance to create non-synthetic examples of different rewrite amounts.
+- change amount rises with strength;
+- meaning remains stable;
+- formality and rare-word use do **not** automatically rise with strength.
 
 ---
 
-# 4. Alternative-set evaluation
+# 5. Human-sounding operational definition
 
-Pari is unusual because it intentionally wants a deep candidate toolbox rather than one machine-selected rewrite.
+Do not optimize for an AI-detector score.
 
-For each selected span report:
+For Pari, "human sounding" means:
 
-- top-1 validity;
-- top-3 / top-5 / top-10 gold coverage where the public suite supports it;
-- top-10 precision;
-- top-40 safety/grammar pass rate;
-- duplicate / near-duplicate rate;
-- semantic diversity among surviving candidates;
-- local-edit containment failures;
-- time to first 5 / 10 / 40 usable candidates.
+- common/natural English rather than gratuitous thesaurus substitutions;
+- grammar that fits the surrounding sentence;
+- approximate source register preserved unless explicitly changed;
+- useful contractions/informal structures kept when appropriate;
+- no repetitive stock transition/filler patterns;
+- no unnecessary sentence-length or abstraction inflation;
+- multiple plausible ways to express the same meaning.
 
-For lexical simplification, use TSAR-style MAP/Potential/Accuracy metrics rather than inventing a new ranking metric.
-
-For SWS, use its official evaluator.
-
-For custom phrase/clause cases without exhaustive gold alternatives, objective gates determine validity and the suite records diversity/containment rather than pretending there is one exact correct string.
+The user then chooses, mixes or manually edits those options.
 
 ---
 
-# 5. Safety vetoes
+# 6. Hard semantic/safety vetoes
 
-Regardless of reference score, a candidate is ineligible when it causes a hard semantic failure:
+Regardless of any reference metric, reject a candidate that causes:
 
 - contradiction;
 - negation flip;
 - modality/certainty change;
 - quantity/name/date/currency/link/quote corruption;
 - actor/patient reversal;
-- invented facts/reasons/outcomes/evidence;
+- invented facts/reasons/evidence/outcomes;
 - lost cause/contrast/condition relation;
-- protected-span corruption.
+- protected-span corruption;
+- unrelated-text mutation outside the selected edit unit.
 
-Use the existing Pari protected-content, grammar, semantic and NLI stack as independent vetoes.
-
-A high reference metric cannot erase a hard safety failure.
+Use the existing Pari protected-content, grammar, semantic and NLI stack as independent gates.
 
 ---
 
-# 6. Compression benchmark
+# 7. Quantization/runtime evaluation
 
-Every candidate model is evaluated first at its best practical reference precision/format, then at deployable quantizations.
+A compressed model is compared against the same model's strongest practical reference build.
 
-For each quantization report **delta from the same model's reference**, not only raw score:
+Report quality **delta** plus runtime:
 
-- JFLEG GLEU delta;
-- ASSET SARI delta;
-- SWS/TSAR ranking delta;
-- PAWS/semantic-safety delta;
-- internal hard-failure delta;
+- lexical suggestion metric delta;
+- sentence/paragraph quality delta;
+- semantic/safety delta;
 - candidate-diversity delta;
-- peak memory;
-- first-result latency;
+- peak unified memory;
+- model size;
+- cold load;
+- prefill;
+- decode;
+- time to first useful option;
+- top-10 suggestion latency;
+- paragraph latency.
+
+Generic benchmark-retention percentages do not prove that writing/editing quality survived compression.
+
+---
+
+# 8. MTP/speculative evaluation
+
+MTP/speculation is a runtime lane, not a V1 quality requirement.
+
+For compatible models compare:
+
+- plain decode vs speculative/MTP;
+- end-to-end top-10 suggestion latency;
 - paragraph latency;
-- candidates/sec.
+- extra memory;
+- runtime stability;
+- exact/distribution-preserving behavior where the implementation supports validation.
 
-The purpose is to identify the smallest representation that retains the editing ability Pari cares about.
+If the end-user latency improvement is small, omit it even if raw tokens/sec rises.
 
-Generic benchmark-retention claims are not substitutes for this test.
-
----
-
-# 7. Personalization benchmark
-
-Personalization runs **after objective filtering**.
-
-The user is never asked to decide whether bad grammar is acceptable. The model first produces a set of objectively safe/grammatical alternatives; personalization only learns which valid expression the user prefers.
-
-Hold out a portion of real interaction events and report:
-
-- chosen-vs-rejected pair accuracy;
-- MRR/NDCG of the actually selected candidate;
-- revert rate;
-- change in objective safety/English scores (must not materially regress).
-
-Do not train and test on the same interaction event.
+Do not train a new MTP head for V1 unless normal decoding is proven to be the blocking bottleneck.
 
 ---
 
-# 8. Leakage rules
+# 9. External reference handling / leakage
 
-Maintain a machine-readable dataset ledger with exact revisions/hashes.
-
-For every dataset classify it as one of:
-
-- `shipping_train`
-- `research_train`
-- `eval_only`
-- `blocked_pending_review`
+The machine-readable source policy is in `dataset-ledger.json`.
 
 Rules:
 
-- no external test/reference split enters training;
-- no teacher-generated text becomes an external benchmark reference;
-- if CoEdIT is used for training, its own validation material is not an independent promotion metric;
-- IteraTeR official dev/test remain frozen when IteraTeR train is used;
-- NC/NC-SA datasets remain eval-only unless licensing is explicitly resolved.
+- V1 does not train the paraphrase generator;
+- public test/reference splits never enter training;
+- teacher/model-generated text never becomes an independent gold benchmark;
+- if post-V1 adaptation uses IteraTeR train, official dev/test remain frozen;
+- NC/NC-SA datasets stay evaluation-only unless licensing is explicitly resolved;
+- synthetic data is post-V1 augmentation only, never the sole quality authority.
 
 ---
 
-# 9. Reporting
+# 10. Reporting format
 
-Never collapse v3 to one leaderboard number.
+Do not publish one `Pari score`.
 
-Every model report must contain:
+For every candidate produce:
 
-1. **hard safety table**;
-2. **grammar/fluency table** (JFLEG + optional ERRANT/M2);
-3. **simplification/rewrite table** (ASSET);
-4. **word/phrase suggestion table** (SWS + TSAR);
-5. **meaning-adversarial table** (PAWS + Pari invariants);
-6. **paragraph/internal table** (existing Pari suites);
-7. **interactive candidate-set table**;
-8. **rewrite-strength calibration table**;
-9. **runtime/RAM table**;
-10. **personalization table** when enough interaction data exists.
+1. word/phrase alternatives table;
+2. sentence alternatives table;
+3. paragraph first-draft table;
+4. hard safety table;
+5. strength/register table;
+6. latency/RAM table;
+7. quantization delta table where applicable;
+8. MTP/speculative delta table where applicable.
 
-Then produce Pareto views rather than one winner score:
+Then show Pareto views:
 
+- suggestion quality vs latency;
 - quality vs memory;
-- quality vs latency;
-- candidate quality vs candidate depth;
-- reference model vs each quantization;
-- cold-start vs personalized ranking.
+- candidate diversity vs latency;
+- paragraph quality vs runtime cost.
 
----
-
-# 10. Relationship to the old benchmark work
-
-Nothing here deletes the old work.
-
-The old suites remain valuable regression tests. V3 adds independent gold/reference suites and a product-specific interactive layer so the project no longer mistakes an internal automatic score for proof of English quality.
-
-The training/model strategy is documented separately in [`PROJECT_PLAN.md`](./PROJECT_PLAN.md).
+The output of V1 benchmarking is a **routing decision**, not a universal model ranking.
