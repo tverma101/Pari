@@ -56,6 +56,12 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def sha256_text(text: str | None) -> str | None:
+    if not text:
+        return None
+    return sha256_bytes(text.encode("utf-8"))
+
+
 def package_version(name: str) -> str:
     try:
         return importlib.metadata.version(name)
@@ -77,7 +83,7 @@ def chip_name() -> str:
 
 def prompt_for_task(tokenizer, text: str, mode: str):
     if mode == "plain":
-        return text, "plain"
+        return text, "plain", "none"
 
     messages = [{"role": "user", "content": text}]
     try:
@@ -87,13 +93,14 @@ def prompt_for_task(tokenizer, text: str, mode: str):
                 add_generation_prompt=True,
                 enable_thinking=False,
             )
+            return encoded, "chat_template", "enable_thinking=false"
         except TypeError:
             encoded = tokenizer.apply_chat_template(messages, add_generation_prompt=True)
-        return encoded, "chat_template"
+            return encoded, "chat_template", "template_default_no_enable_thinking_arg"
     except Exception:
         if mode == "chat":
             raise
-        return text, "plain_fallback"
+        return text, "plain_fallback", "chat_template_failed"
 
 
 def main() -> None:
@@ -103,6 +110,8 @@ def main() -> None:
     ap.add_argument("--tasks", default=None, help="Task JSONL path; defaults to english-core-shadow.jsonl")
     ap.add_argument("--max-tokens", type=int, default=220)
     ap.add_argument("--temperature", type=float, default=0.0)
+    ap.add_argument("--top-p", type=float, default=1.0)
+    ap.add_argument("--top-k", type=int, default=0)
     ap.add_argument("--seed", type=int, default=0, help="Generation RNG seed; default 0 for reproducibility")
     ap.add_argument("--model-revision", default="unknown")
     ap.add_argument("--quantization", default="unknown")
@@ -111,6 +120,11 @@ def main() -> None:
     ap.add_argument("--chat-template-label", default="tokenizer.apply_chat_template")
     ap.add_argument("--benchmark-revision", default="unknown", help="Git commit/revision containing the benchmark files")
     args = ap.parse_args()
+
+    if not 0.0 <= args.top_p <= 1.0:
+        raise SystemExit("--top-p must be in [0,1]")
+    if args.top_k < 0:
+        raise SystemExit("--top-k must be >= 0")
 
     task_path = resolve_path(args.tasks)
     if not task_path.exists():
@@ -132,13 +146,15 @@ def main() -> None:
     load_seconds = time.time() - t0
     print(f"loaded in {load_seconds:.2f}s", flush=True)
 
-    sampler = make_sampler(temp=args.temperature)
+    sampler = make_sampler(temp=args.temperature, top_p=args.top_p, top_k=args.top_k)
     outputs = []
     adaptation_modes = set()
+    adaptation_details = set()
 
     for i, task in enumerate(tasks, 1):
-        prompt, adaptation_mode = prompt_for_task(tokenizer, task["prompt"], args.prompt_mode)
+        prompt, adaptation_mode, adaptation_detail = prompt_for_task(tokenizer, task["prompt"], args.prompt_mode)
         adaptation_modes.add(adaptation_mode)
+        adaptation_details.add(adaptation_detail)
 
         max_tokens = args.max_tokens if task.get("generative") else 8
         t1 = time.time()
@@ -156,10 +172,13 @@ def main() -> None:
             "output": text,
             "latencySeconds": round(latency, 4),
             "promptAdaptation": adaptation_mode,
+            "promptAdaptationDetail": adaptation_detail,
         })
         print(f"[{i:04d}/{len(tasks):04d}] {task['id']} {latency:.2f}s  {text[:100]}", flush=True)
 
     outputs_bytes = json.dumps(outputs, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    chat_template = getattr(tokenizer, "chat_template", None)
+    tokenizer_name = getattr(tokenizer, "name_or_path", None) or getattr(tokenizer, "name", None) or "unknown"
     result = {
         "runId": f"english-core-{int(time.time())}",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -171,7 +190,9 @@ def main() -> None:
             "checkpointType": args.checkpoint_type,
             "runtime": "mlx-lm",
             "runtimeVersion": package_version("mlx-lm"),
+            "tokenizerName": str(tokenizer_name),
             "chatTemplate": args.chat_template_label if "chat_template" in adaptation_modes else "none/plain",
+            "chatTemplateSha256": sha256_text(chat_template if isinstance(chat_template, str) else None),
         },
         "hardware": {
             "machine": platform.machine(),
@@ -183,9 +204,13 @@ def main() -> None:
         "taskFileSha256": sha256_bytes(task_bytes),
         "promptModeRequested": args.prompt_mode,
         "promptAdaptationModesObserved": sorted(adaptation_modes),
+        "promptAdaptationDetailsObserved": sorted(adaptation_details),
         "decoding": {
             "temperature": args.temperature,
+            "topP": args.top_p,
+            "topK": args.top_k,
             "maxNewTokens": args.max_tokens,
+            "forcedChoiceMaxNewTokens": 8,
             "seed": args.seed,
         },
         "runtime": {
@@ -198,7 +223,8 @@ def main() -> None:
             "notes": [
                 "Model artifact hash is not inferred from a directory path; supply/record it separately when promotion-quality reproducibility requires it.",
                 "Checkpoint type and quantization are caller-supplied metadata and should be verified against the actual model artifact.",
-                "Base models should generally be run with --prompt-mode plain; instruct/chat checkpoints should use their official tokenizer chat template when available."
+                "Base models should generally be run with --prompt-mode plain; instruct/chat checkpoints should use their official tokenizer chat template when available.",
+                "The tokenizer chat-template hash is recorded when the tokenizer exposes a string template; adaptation details record whether enable_thinking=false was accepted or the tokenizer default path was used."
             ],
         },
     }
