@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseChoiceLetter } from "./english-core-choice-parser.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const resultPath = process.argv[2];
@@ -62,22 +63,6 @@ function expectedLetter(row) {
   const order = permutation(choiceCount, row.id);
   const permutedIndex = order.indexOf(baseIndex);
   return permutedIndex >= 0 ? letters[permutedIndex] : null;
-}
-
-function parseLetter(text) {
-  const s = String(text ?? "").trim().toUpperCase();
-  if (!s) return null;
-  const patterns = [
-    /^([A-Z])$/,
-    /^([A-Z])(?:[.)\]:-])(?:\s|$)/,
-    /^ANSWER\s*[:=-]\s*([A-Z])(?:\b|[.)\]:-])/,
-    /^OPTION\s+([A-Z])(?:\b|[.)\]:-])/,
-  ];
-  for (const pattern of patterns) {
-    const match = s.match(pattern);
-    if (match) return match[1];
-  }
-  return null;
 }
 
 function mean(values) {
@@ -182,7 +167,7 @@ for (const row of seed.cases) {
 
   const expected = expectedLetter(row);
   if (!expected) throw new Error(`Cannot derive permuted gold answer for ${row.id}`);
-  const predicted = parseLetter(got.output);
+  const predicted = parseChoiceLetter(got.output);
   detail.push({
     id: row.id,
     dimension: row.dimension,
@@ -232,7 +217,7 @@ for (const [dimension, weight] of Object.entries(config.composite.weights)) {
 
 const equalWeightMean100 = complete && completeDimensionValues.length ? mean(completeDimensionValues) : null;
 const report = {
-  version: 5,
+  version: 6,
   runId: run.runId ?? null,
   model: run.model ?? null,
   shadowCases: seed.cases.length,
@@ -247,6 +232,7 @@ const report = {
   notes: [
     "This scorer covers the fresh Pari shadow set only; public-anchor benchmark results must be reported separately.",
     "Forced-choice option positions are deterministically permuted per case ID to reduce answer-position artifacts.",
+    "The shared choice parser accepts only unambiguous forms such as A, A., Answer: A, The answer is A, or Option A; free-form prose and inferred choices remain invalid.",
     "Forced-choice cases are deterministically scored from the private seed answer key.",
     "Generative metricScores are normalized observations in [0,1], not assumed utilities. Directionality comes from english-core-generative-metric-contract.json; lower-is-better criteria are inverted before aggregation.",
     "Generative cases require complete registered metricScores plus structured approved metricProvenance including the normalization/scoring protocol.",
