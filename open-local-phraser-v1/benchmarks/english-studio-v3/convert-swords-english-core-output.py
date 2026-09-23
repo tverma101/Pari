@@ -190,7 +190,7 @@ def main() -> None:
         "substitutesLemmatized": bool(args.lemmatized),
         "promotionProvenanceErrors": provenance_errors,
         "promotionProvenanceReady": not provenance_errors,
-        "officialEvaluatorRequired": true,
+        "officialEvaluatorRequired": True,
         "officialRepository": "https://github.com/p-lambda/swords",
         "researchReference": "https://aclanthology.org/2021.naacl-main.345/",
         "notes": [
