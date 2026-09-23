@@ -16,35 +16,61 @@ No single benchmark and no single scalar score decides the shipping winner.
 
 Before comparing RAM, latency or product routing, plausible base LLMs can be screened with **Pari English Core**. English Core asks a narrower question:
 
-> which model shows the strongest underlying English competence for Pari's editing workload?
+> which model shows the strongest evidence for Pari-relevant English capabilities under the current evaluation protocol?
 
-It deliberately separates lexical sense, contextual substitution, collocation, grammar, semantic equivalence, register/fluency, controlled generation and discourse from coding/math/general-agent ability.
+That wording is deliberate. English Core is a **multi-lane evidence profile**, not a universal English-IQ test.
+
+It separates lexical sense, contextual substitution, collocation, grammar, semantic equivalence, register/fluency, controlled generation/editing, and discourse from coding/math/general-agent ability.
 
 Canonical English Core files:
 
 - [`ENGLISH_CORE.md`](./ENGLISH_CORE.md) — construct/dimension overview;
 - [`ENGLISH_CORE_RUN.md`](./ENGLISH_CORE_RUN.md) — required execution sequence;
 - [`ENGLISH_CORE_RESEARCH_BASIS.md`](./ENGLISH_CORE_RESEARCH_BASIS.md) — primary research evidence and validity notes;
-- [`ENGLISH_CORE_ROBUSTNESS.md`](./ENGLISH_CORE_ROBUSTNESS.md) — prompt sensitivity, statistics, distribution and claim tiers;
+- [`ENGLISH_CORE_ROBUSTNESS.md`](./ENGLISH_CORE_ROBUSTNESS.md) — prompt/order/statistical/distribution rules and claim tiers;
+- [`ENGLISH_CORE_NATIVE_PROTOCOLS.md`](./ENGLISH_CORE_NATIVE_PROTOCOLS.md) — native/official versus common prompted adaptations;
 - [`ENGLISH_CORE_HUMAN_EVAL.md`](./ENGLISH_CORE_HUMAN_EVAL.md) — independent gold-label and generative human-evaluation protocols;
 - [`RESEARCH_GROUNDING_POLICY.md`](./RESEARCH_GROUNDING_POLICY.md) — standing evidence rules for benchmark changes;
 - `english-core-config.json` — machine-readable construct/weight/protocol contract;
-- `english-core-shadow.seed.json` — fresh Pari shadow probes, explicitly author-labeled/unvalidated until independent annotation;
-- `english-core-public-anchors.json` — established external benchmark registry.
+- `english-core-shadow.seed.json` — current **68-case** fresh Pari shadow set, explicitly `author_labeled_unvalidated` until independent annotation;
+- `english-core-public-anchors.json` — established external benchmark/protocol registry;
+- `english-core-generative-metric-contract.json` — direction/normalization contract for generative criteria;
+- `validate-english-core-run.py` and `build-english-core-repro-manifest.py` — promotion/reproducibility gates.
 
-Important distinction:
+English Core evidence is intentionally separated into lanes:
+
+1. **public native/official** — benchmark-native protocols and metrics where reproducible;
+2. **public prompted full-distribution** — common zero-shot interface on locally scoreable native validation distributions;
+3. **public prompted fast** — balanced/subsampled triage only;
+4. **fresh shadow** — Pari-authored fresh-surface probes;
+5. **robustness diagnostics** — prompt paraphrases, counterbalanced option order, uncertainty/dependence sensitivity, paired comparison, and protocol sensitivity.
+
+Important distinctions:
 
 - **English Core may use a product-weighted composite for candidate selection**, but the exact weights are Pari engineering priorities rather than literature-derived psychometric constants.
-- **The normal V1 benchmark still makes the shipping/routing decision.** A model with stronger English competence can still lose a product route because of safety, latency, RAM or specialist performance.
+- The equal-weight seven-dimension mean and every individual dimension remain visible beside the product-weighted composite.
+- **The normal V1 benchmark still makes the shipping/routing decision.** A model with stronger English evidence can still lose a product route because of safety, latency, RAM or specialist performance.
+- Public prompted scores are never relabeled as official/native benchmark results.
+- The fresh shadow set is not independent human gold until the human-validation protocol is completed.
 
-Research-grounding rule:
+Research-grounding rules:
 
-- established constructs use primary/official benchmark evidence where available;
+- established constructs use primary literature and official benchmark evidence where available;
 - common prompted screens are labeled as screens, not official benchmark scores;
-- public anchors and fresh shadow tests are reported separately;
-- close contenders require prompt-robustness and paired/statistical analysis rather than winner-by-raw-mean;
+- public anchors and fresh shadow tests are reported separately because contamination and benchmark overfitting are real threats;
+- close contenders require multi-prompt robustness, **counterbalanced choice-order robustness**, complete aligned paired comparison, and uncertainty analysis rather than winner-by-raw-mean;
+- uncertainty reports both item bootstrap and a disclosed **phenomenon/item hierarchical-bootstrap sensitivity**; neither is presented as a universal-English confidence interval;
 - general-purpose LLM judges cannot by themselves define official generative scores;
-- strong English claims require official anchors, reproducibility, independent shadow validation and protocol/weight robustness.
+- promotion-quality public sources are pinned to immutable revisions/fingerprints where the tooling supports it;
+- strong English claims require native/official anchors, reproducibility, independent shadow validation, and protocol/weight robustness.
+
+Before using English Core, run:
+
+```bash
+./self-check-english-core.sh
+```
+
+Then follow `ENGLISH_CORE_RUN.md` rather than inventing a shorter evaluation path.
 
 ---
 
