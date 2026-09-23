@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "purpose": "Registry of established public benchmarks used to validate the fresh Pari English Core shadow suite. Public-anchor results are reported separately from shadow results.",
+  "policy": {
+    "usage": "evaluation_only",
+    "training": "forbidden for V1 selection",
+    "reportSeparately": true,
+    "licenseRule": "Verify the current dataset/repository license and official evaluation split before downloading or redistributing benchmark data. This registry intentionally does not copy benchmark data into Pari."
+  },
+  "anchors": [
+    {
+      "id": "swords",
+      "name": "SWORDS",
+      "dimension": "lexical_context",
+      "reference": "https://aclanthology.org/2021.naacl-main.345/",
+      "role": "high-coverage contextual lexical substitution and candidate acceptability",
+      "preferredMetrics": ["precision", "recall", "F-score", "human-reference candidate coverage"]
+    },
+    {
+      "id": "wic",
+      "name": "WiC",
+      "dimension": "lexical_context",
+      "reference": "https://aclanthology.org/N19-1128/",
+      "role": "word-sense discrimination in context",
+      "preferredMetrics": ["accuracy"]
+    },
+    {
+      "id": "coinco_ls07",
+      "name": "CoInCo / SemEval lexical substitution",
+      "dimension": "lexical_context",
+      "reference": "https://aclanthology.org/W13-2407/",
+      "role": "contextual lexical substitution and ranking",
+      "preferredMetrics": ["best", "oot", "ranking metrics"]
+    },
+    {
+      "id": "lexical_collocations_eacl2021",
+      "name": "Lexical collocation retrieval/categorization benchmark",
+      "dimension": "collocation_naturalness",
+      "reference": "https://aclanthology.org/2021.eacl-main.120/",
+      "role": "natural English collocation knowledge",
+      "preferredMetrics": ["accuracy", "retrieval/ranking metrics"]
+    },
+    {
+      "id": "blimp",
+      "name": "BLiMP",
+      "dimension": "grammar_syntax",
+      "reference": "https://aclanthology.org/2020.tacl-1.25/",
+      "role": "minimal-pair grammatical knowledge across many linguistic phenomena",
+      "preferredMetrics": ["accuracy", "per-phenomenon accuracy"]
+    },
+    {
+      "id": "cola",
+      "name": "CoLA",
+      "dimension": "grammar_syntax",
+      "reference": "https://aclanthology.org/Q19-1040/",
+      "role": "grammatical acceptability from linguistics literature",
+      "preferredMetrics": ["Matthews correlation", "accuracy diagnostic"]
+    },
+    {
+      "id": "paws",
+      "name": "PAWS",
+      "dimension": "paraphrase_semantics",
+      "reference": "https://aclanthology.org/N19-1131/",
+      "role": "high lexical-overlap paraphrase traps including role/order changes",
+      "preferredMetrics": ["accuracy", "F1"]
+    },
+    {
+      "id": "jfleg",
+      "name": "JFLEG",
+      "dimension": "fluency_register",
+      "reference": "https://aclanthology.org/E17-2037/",
+      "role": "human fluency correction",
+      "preferredMetrics": ["GLEU"]
+    },
+    {
+      "id": "gyafc",
+      "name": "GYAFC",
+      "dimension": "fluency_register",
+      "reference": "https://aclanthology.org/N18-1012/",
+      "role": "formality/register distinctions",
+      "preferredMetrics": ["human/register evaluation", "task-specific automatic metrics"]
+    },
+    {
+      "id": "writingbench_subset",
+      "name": "WritingBench selected style/language subset",
+      "dimension": "generative_expression",
+      "reference": "https://github.com/X-PLUG/WritingBench",
+      "role": "secondary open-ended writing diagnostic only",
+      "preferredMetrics": ["criteria-level scores"],
+      "secondaryOnly": true
+    },
+    {
+      "id": "eqbench_creative_writing",
+      "name": "EQ-Bench Creative Writing",
+      "dimension": "generative_expression",
+      "reference": "https://eqbench.com/creative_writing.html",
+      "role": "secondary natural-writing/slop diagnostic only",
+      "preferredMetrics": ["creative-writing score", "repetition/slop diagnostics"],
+      "secondaryOnly": true
+    },
+    {
+      "id": "bediscover_focused",
+      "name": "BeDiscovER focused English subset",
+      "dimension": "discourse",
+      "reference": "https://aclanthology.org/2026.eacl-long.207/",
+      "role": "discourse relations, sentence ordering, temporal and rhetorical dependencies",
+      "preferredMetrics": ["task-level accuracy/F1"]
+    }
+  ]
+}
