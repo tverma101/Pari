@@ -4,7 +4,7 @@ This document defines the robustness checks required before English Core results
 
 The central rule is simple:
 
-> a one-prompt, one-sample, one-number result is not sufficient evidence for a close model-selection decision.
+> a one-prompt, one-order, one-sample, one-number result is not sufficient evidence for a close model-selection decision.
 
 ## 1. Multi-prompt robustness
 
@@ -28,18 +28,30 @@ English Core implementation:
 
 A model with high canonical accuracy but poor worst-prompt performance or low answer consistency is marked prompt-sensitive.
 
-## 2. Benchmark perturbation sensitivity
+## 2. Answer-order and selection-bias robustness
 
-Alzahrani et al. (ACL 2024) show that seemingly minor benchmark choices, including answer ordering and answer-selection method, can move popular LLM leaderboard rankings by as many as eight positions in their experiments.
+Alzahrani et al. (ACL 2024) show that benchmark perturbations including answer ordering and answer-selection method can materially change model rankings. Wei et al. (Findings ACL 2024) directly study option-order/token selection bias and show that ordered-choice presentation can affect LLM decisions.
 
-Reference: https://aclanthology.org/2024.acl-long.744/
+References:
 
-English Core therefore:
+- https://aclanthology.org/2024.acl-long.744/
+- https://aclanthology.org/2024.findings-acl.333/
 
-- deterministically permutes forced-choice option positions;
-- balances binary labels in the public-fast screening subsets where sampling permits;
-- accepts harmless output forms such as `A` and `Answer: A` rather than conflating English competence with one formatting convention;
-- keeps prompted-screen results distinct from benchmark-native/official protocols.
+English Core therefore uses two controls:
+
+1. every normal forced-choice item is deterministically permuted instead of placing hand-authored gold answers in a fixed position;
+2. close contenders must also run `build-english-core-choice-order-robustness.mjs` and `score-english-core-choice-order-robustness.mjs`, which present each forced-choice shadow item in two different option orders.
+
+Report at least:
+
+- average presentation accuracy;
+- `bothOrdersCorrectRate`;
+- `semanticAnswerConsistencyRate` (underlying option identity, not displayed letter);
+- `oneCorrectOneWrongRate`.
+
+The order-robustness lane is a **diagnostic gate**, not another weighted English Core component. A material order effect weakens a single-order prompted result and must be reported rather than averaged away.
+
+The shared parsers `english-core-choice-parser.mjs` and `english_core_choice_parser.py` accept only narrowly defined unambiguous answer wrappers such as `A`, `A.`, `Answer: A`, or `The answer is A`. They reject free-form/multi-answer outputs so format tolerance does not become answer inference.
 
 ## 3. Statistical uncertainty
 
@@ -51,13 +63,23 @@ Reference: https://aclanthology.org/2022.acl-demo.12/
 
 English Core implementation:
 
-- `analyze-english-core-statistics.mjs` performs deterministic stratified item bootstrap resampling;
-- it reports 95% intervals for each English dimension and for both product-weighted and equal-weight composites;
-- intervals are labeled as **conditional on the current shadow item set**.
+- `analyze-english-core-statistics.mjs` reports deterministic item-bootstrap intervals for each English dimension and both product/equal-weight composites;
+- it additionally reports **phenomenon-cluster bootstrap sensitivity** for each dimension because several author-written items share linguistic phenomena/templates;
+- item intervals are labeled as conditional on the current shadow item set;
+- cluster sensitivity is explicitly exploratory when the number of phenomenon clusters is small.
+
+Why both views:
+
+Language-evaluation observations can be nested or clustered. Treating dependent rows as fully independent can understate uncertainty. Hierarchical/cluster resampling is therefore useful as a sensitivity analysis, but with only a small number of clusters it is itself unstable and must not be oversold.
+
+Relevant methodology:
+
+- Burchill & Jaeger, Journal of Memory and Language 2024, hierarchical bootstrap in language data;
+- Anglin 2026 preprint, uncertainty estimation for LLM/classifier performance with nested data.
 
 Important limitation:
 
-These intervals quantify item-resampling uncertainty under the current benchmark construction. They do **not** imply that Pari's handcrafted items are an i.i.d. random sample from a universal population of English usage.
+Neither interval implies that Pari's handcrafted items are an i.i.d. random sample from a universal population of English usage. Material disagreement between item-level and cluster-sensitive intervals is evidence against a fine-grained winner claim.
 
 ## 4. Paired model comparison
 
@@ -71,10 +93,10 @@ Additional evidence:
 
 English Core implementation:
 
-- `compare-english-core-models.mjs` aligns the exact same scored items for Model A and Model B;
-- reports wins/ties/losses;
-- computes paired bootstrap intervals for each dimension;
-- performs stratified paired bootstrap comparison for product-weighted and equal-weight composites;
+- `compare-english-core-models.mjs` verifies matching benchmark input hashes and matching model-visible task-file hashes;
+- it requires complete aligned scoring instead of silently comparing only the overlap between incomplete runs;
+- reports wins/ties/losses and paired bootstrap intervals per dimension;
+- performs paired bootstrap comparison for product-weighted and equal-weight composites;
 - if the interval contains zero, the result is reported as **inconclusive**, not a forced winner.
 
 Do not infer pairwise significance merely because two separately calculated confidence intervals do or do not overlap.
@@ -93,14 +115,28 @@ English Core therefore does not claim its shadow mix estimates a universal Engli
 
 Target interpretation:
 
-- public anchors estimate performance on their published task distributions;
+- public-native anchors estimate performance under their published/native task protocols;
+- full-distribution prompted public runs estimate zero-shot instruction behavior on the public validation distribution;
+- balanced public-fast runs are engineering screens only;
 - the shadow suite probes transfer to fresh Pari-relevant linguistic phenomena;
 - Pari product weights encode the application distribution we care about;
-- per-dimension and, where possible, per-phenomenon results remain visible.
+- per-dimension and per-phenomenon results remain visible.
 
 A universal-English claim requires broader independent evidence than the Pari shadow distribution.
 
-## 6. Contamination
+## 6. Native protocol versus prompted adaptation
+
+A common prompted A/B task is useful for comparing chat/instruct models under one interface, but it must not silently replace a benchmark's native scoring protocol.
+
+Examples:
+
+- BLiMP's grammar evidence should include its native sentence-likelihood/minimal-pair protocol; the chat-style BLiMP subset remains a prompted robustness screen.
+- CoLA headline reporting uses Matthews correlation coefficient on its native distribution where supported; balanced-screen accuracy is not called the official CoLA metric.
+- SWORDS and JFLEG use their official evaluators rather than Pari redefinitions.
+
+See `ENGLISH_CORE_NATIVE_PROTOCOLS.md` and `english-core-public-anchors.json`.
+
+## 7. Contamination
 
 PaCoST and other contamination research show that public benchmark exposure can distort apparent model performance.
 
@@ -113,7 +149,7 @@ English Core response:
 - repeated optimization against one frozen shadow file eventually contaminates it too, so cases must rotate;
 - unexpectedly large public-anchor versus shadow gaps are investigated rather than averaged away.
 
-## 7. Metric-model uncertainty
+## 8. Metric-model uncertainty
 
 Hu, Goyal, and Gupta (EMNLP 2023) show that when a learned metric model is used for evaluation, ignoring metric-model error can change significance conclusions.
 
@@ -122,11 +158,12 @@ Reference: https://aclanthology.org/2023.emnlp-main.464/
 Consequences for English Core:
 
 - gold/human-reference/deterministic scores are preferred;
-- scores from learned judges must preserve judge identity, version, validation evidence, and raw sub-scores;
+- scores from learned judges must preserve judge identity, version, validation evidence, protocol, and raw sub-scores;
 - a judge-based metric is not treated as noise-free ground truth;
-- general LLM judges remain secondary unless specifically validated against humans for the exact criterion.
+- general LLM judges remain secondary unless specifically validated against humans for the exact criterion;
+- generative metric directionality is declared in `english-core-generative-metric-contract.json` so failure rates such as `stock_phrase_rate` and `length_inflation` are not accidentally rewarded.
 
-## 8. Claim tiers
+## 9. Claim tiers
 
 These tiers are Pari governance categories, not literature-derived universal thresholds.
 
@@ -151,7 +188,8 @@ Minimum evidence:
 - complete English Core shadow profile;
 - public-fast anchors;
 - multi-prompt forced-choice robustness;
-- uncertainty reporting;
+- choice-order robustness for close contenders;
+- uncertainty reporting including cluster sensitivity;
 - paired comparison for close contenders;
 - weight sensitivity shown.
 
@@ -164,10 +202,11 @@ Allowed claim:
 Add:
 
 - primary official lexical anchors such as SWORDS;
+- native BLiMP grammar evaluation where applicable;
+- full-distribution prompted WiC/CoLA/PAWS lane;
 - official JFLEG/EditEval or other relevant native protocols;
-- full public-anchor runs where practical;
 - quantization delta and product V1 route testing;
-- reproducibility manifest.
+- reproducibility manifest and promotion-run validation.
 
 Allowed claim:
 
@@ -182,11 +221,11 @@ Add:
 - protocol sensitivity analysis;
 - independent replication where practical;
 - statistically supported paired differences;
-- no material ranking flip under reasonable weighting schemes.
+- no material ranking flip under reasonable weighting/protocol choices.
 
 Even here, prefer scoped claims over `objectively best English model`.
 
-## 9. Reproducibility
+## 10. Reproducibility and promotion-run metadata
 
 Every promotion-quality result should record:
 
@@ -194,13 +233,16 @@ Every promotion-quality result should record:
 - model artifact hash where available;
 - quantization;
 - runtime and version/commit;
-- chat template/adaptation mode;
+- checkpoint type and explicit prompt adaptation mode;
+- tokenizer identity and chat-template hash where available;
 - hardware and OS;
 - benchmark source/config/split/revision;
-- prompt-suite version/hash;
-- decoding parameters and seed;
-- scorer version/commit;
+- model-visible task-file hash;
+- decoding parameters (`temperature`, `top_p`, `top_k`, token limits) and seed;
+- scorer/metric-contract revision;
 - metric/judge provenance;
-- raw-output location/hash.
+- raw-output hash.
+
+`--prompt-mode auto`, unknown model revision, or unknown quantization may be acceptable for exploration, but they are not sufficient metadata for a promotion-quality comparison. Promotion validation should fail or downgrade such runs rather than treating them as equivalent to fully specified runs.
 
 Without enough metadata to reproduce a result, treat it as exploratory evidence rather than a promotion result.
