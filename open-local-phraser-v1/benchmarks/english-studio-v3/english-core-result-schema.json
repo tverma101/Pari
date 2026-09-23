@@ -5,11 +5,11 @@
   "type": "object",
   "required": ["runId", "model", "outputs"],
   "properties": {
-    "runId": {"type": "string"},
+    "runId": {"type": "string", "minLength": 1},
     "timestamp": {"type": "string"},
     "taskFile": {"type": "string"},
     "taskFileSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
-    "taskCount": {"type": "integer", "minimum": 0},
+    "taskCount": {"type": "integer", "minimum": 1},
     "promptModeRequested": {"type": "string", "enum": ["auto", "chat", "plain"]},
     "promptAdaptationModesObserved": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "promptAdaptationDetailsObserved": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
@@ -17,7 +17,7 @@
       "type": "object",
       "required": ["name"],
       "properties": {
-        "name": {"type": "string"},
+        "name": {"type": "string", "minLength": 1},
         "repoOrName": {"type": "string"},
         "revision": {"type": "string"},
         "artifactSha256": {"type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$"},
@@ -35,7 +35,7 @@
       "properties": {
         "machine": {"type": "string"},
         "chip": {"type": "string"},
-        "memoryGB": {"type": ["number", "null"]},
+        "memoryGB": {"type": ["number", "null"], "minimum": 0},
         "os": {"type": "string"},
         "python": {"type": "string"}
       }
@@ -43,7 +43,7 @@
     "decoding": {
       "type": "object",
       "properties": {
-        "temperature": {"type": "number"},
+        "temperature": {"type": "number", "minimum": 0},
         "topP": {"type": "number", "minimum": 0, "maximum": 1},
         "topK": {"type": "integer", "minimum": 0},
         "maxNewTokens": {"type": "integer", "minimum": 1},
@@ -53,11 +53,12 @@
     },
     "outputs": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "object",
         "required": ["id", "output"],
         "properties": {
-          "id": {"type": "string"},
+          "id": {"type": "string", "minLength": 1},
           "output": {"type": "string"},
           "latencySeconds": {"type": "number", "minimum": 0},
           "promptAdaptation": {"type": "string"},
