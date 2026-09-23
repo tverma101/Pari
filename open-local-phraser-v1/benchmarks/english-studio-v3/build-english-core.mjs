@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,6 +24,27 @@ for (const row of seed.cases) {
 
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+// LLM multiple-choice scores can change substantially when answer choices move.
+// Deterministically permute every forced-choice item's options so the handcrafted
+// seed cannot leak a "correct answer is usually first" shortcut. The scorer uses
+// the same ID-derived permutation to recover the gold position without exposing it
+// in the model-visible task file.
+function permutation(length, id) {
+  const order = Array.from({ length }, (_, i) => i);
+  for (let i = length - 1; i > 0; i -= 1) {
+    const digest = crypto.createHash("sha256").update(`${id}:option:${i}`).digest();
+    const value = digest.readUInt32BE(0);
+    const j = value % (i + 1);
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}
+
+function shuffledChoices(row, choices) {
+  const order = permutation(choices.length, row.id);
+  return order.map((i) => choices[i]);
+}
+
 function choicePrompt(prefix, choices) {
   return `${prefix}\n${choices.map((choice, i) => `${letters[i]}. ${choice}`).join("\n")}\nAnswer only with the letter.`;
 }
@@ -32,41 +54,47 @@ function render(row) {
     case "same_sense":
       return choicePrompt(
         `Target word: ${row.target}\nSentence 1: ${row.sentenceA}\nSentence 2: ${row.sentenceB}\nDoes the target have the same meaning in both sentences?`,
-        ["same", "different"],
+        shuffledChoices(row, ["same", "different"]),
       );
     case "best_substitute":
       return choicePrompt(
         `Sentence: ${row.sentence}\nTarget text: ${row.target}\nWhich replacement best preserves the target meaning and sounds natural in this exact sentence?`,
-        row.choices,
+        shuffledChoices(row, row.choices),
       );
     case "minimal_pair":
-      return choicePrompt(`Choose the word that makes the most natural standard-English expression.\nSentence: ${row.sentence}`, row.choices);
+      return choicePrompt(
+        `Choose the word that makes the most natural standard-English expression.\nSentence: ${row.sentence}`,
+        shuffledChoices(row, row.choices),
+      );
     case "acceptability_pair":
-      return choicePrompt("Which sentence is more acceptable in standard written English?", [row.sentenceA, row.sentenceB]);
+      return choicePrompt(
+        "Which sentence is more acceptable in standard written English?",
+        shuffledChoices(row, [row.sentenceA, row.sentenceB]),
+      );
     case "same_meaning":
       return choicePrompt(
         `Sentence 1: ${row.sentenceA}\nSentence 2: ${row.sentenceB}\nDo these sentences preserve the same meaning?`,
-        ["same", "different"],
+        shuffledChoices(row, ["same", "different"]),
       );
     case "closer_register":
     case "closer_meaning_and_register":
       return choicePrompt(
         `Source: ${row.source}\nWhich option best preserves the source meaning, intensity, and register?`,
-        row.choices,
+        shuffledChoices(row, row.choices),
       );
     case "more_natural":
-      return choicePrompt("Which option is more natural standard English?", row.choices);
+      return choicePrompt("Which option is more natural standard English?", shuffledChoices(row, row.choices));
     case "relation_preservation":
       return choicePrompt(
         `Source: ${row.source}\nCandidate: ${row.candidate}\nDoes the candidate preserve the source relation/meaning?`,
-        ["preserved", "changed"],
+        shuffledChoices(row, ["preserved", "changed"]),
       );
     case "relation_label":
-      return choicePrompt(`Sentence: ${row.sentence}\nWhich discourse relation is expressed?`, row.choices);
+      return choicePrompt(`Sentence: ${row.sentence}\nWhich discourse relation is expressed?`, shuffledChoices(row, row.choices));
     case "sentence_order":
       return choicePrompt(
         `Sentences:\n${row.sentences.map((s, i) => `${i + 1}. ${s}`).join("\n")}\nWhich ordering is most coherent?`,
-        row.choices.map((x) => x.map((n) => n + 1).join("-")),
+        shuffledChoices(row, row.choices.map((x) => x.map((n) => n + 1).join("-"))),
       );
     case "generate_span_alternatives":
       return `Sentence: ${row.sentence}\nSelected text: ${row.selection}\nGive ${row.count} materially useful replacements for the selected text that fit this exact sentence. Candidate length may change. Requirements: ${row.requirements.join("; ")}. Return only the candidates, one per line.`;
@@ -97,11 +125,12 @@ fs.writeFileSync(path.join(here, "english-core-shadow.jsonl"), tasks.map((x) => 
 fs.writeFileSync(
   path.join(here, "english-core-shadow.manifest.json"),
   JSON.stringify({
-    version: 1,
+    version: 2,
     source: "english-core-shadow.seed.json",
     cases: tasks.length,
     countsByDimension,
-    answerLeakageRule: "Generated task JSONL contains prompts but never gold answers. Scoring reads gold only from the seed file.",
+    optionOrder: "deterministic SHA-256 permutation per case ID for every forced-choice task",
+    answerLeakageRule: "Generated task JSONL contains prompts but never gold answers. Scoring reads gold only from the seed file and reconstructs the same option permutation.",
     compositeRule: config.composite.rule,
   }, null, 2) + "\n",
 );
