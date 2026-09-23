@@ -1,607 +1,402 @@
 # Pari English Studio v3 — canonical project plan
 
-**Status:** canonical plan for the `bench/english-studio-v3` branch.
+## V1 decision
 
-This document replaces the earlier vague assumption that Pari should automatically use a large teacher, generate synthetic data, distill it, and then quantize. That is only one possible branch. The project must first prove which branch is actually necessary.
+**V1 is a zero-training product.**
 
-## 0. Product goal
+Do not fine-tune the paraphraser for V1. Do not distill a teacher for V1. Do not build a large synthetic training corpus for V1.
 
-Pari is a local English rewriting studio, not a chatbot and not an automatic "make this sound smarter" button.
+The only training-like experiments allowed before V1 are narrowly scoped runtime experiments such as an MTP/speculative drafter **if** they measurably improve latency on the target Mac. Quantization experiments are allowed because they directly affect whether a good model can run locally.
 
-Core loop:
+The reason is simple: Pari V1 is not trying to autonomously write the perfect paragraph. It is a **human-controlled rewriting tool**. The model only needs to be good enough to generate sensible, diverse options quickly while the user decides the final wording.
+
+---
+
+# 1. V1 product contract
 
 ```text
 paste paragraph
   -> choose rewrite strength
-  -> get one natural editable draft
-  -> select a word / phrase / clause / sentence
-  -> get many context-valid alternatives
-  -> choose / type / revert / undo
-  -> approve final text
-  -> learn stylistic preference from those choices
+  -> receive one decent editable draft
+  -> click/select word / phrase / clause / sentence
+  -> receive fast context-aware alternatives
+  -> choose / mix / type / undo / revert
+  -> continue until the wording feels right
 ```
 
-The objective is **correct, natural English + human control + eventual personal preference learning**.
+Required V1 behavior:
 
-The user is not expected to be an expert English evaluator. Objective English quality must therefore come from verified human-edited corpora, reference-backed benchmarks, and independent safety/grammar/semantic checks. User actions provide *style preference* data only after candidates pass objective quality gates.
+- preserve meaning and protected facts;
+- avoid automatically making the prose more academic or formal;
+- allow low/high rewrite-strength modes;
+- allow 1 word -> many words;
+- allow many words -> 1 word;
+- allow phrase -> phrase, clause -> clause, sentence -> sentence;
+- allow sentence shortening, expansion, split and join;
+- provide many alternatives, not one machine-selected answer;
+- keep unrelated surrounding text stable;
+- make word/phrase suggestions quickly enough to feel interactive;
+- let the user remain the final stylistic authority.
+
+The initial whole-paragraph rewrite only needs to be **decent**. The interactive toolbox is the actual product.
 
 ---
 
-# 1. What data actually exists
+# 2. V1 architecture
 
-Pari does not need to manufacture its foundational training corpus with an LLM.
-
-## 1.1 Primary human-revision training candidates
-
-### IteraTeR / IteraTeR v2
-
-Official repository: https://github.com/vipulraheja/iterater
-
-Evidence:
-
-- repository is Apache-2.0;
-- IteraTeR-FULL contains 157,579 sentence-level training revisions and 29,848 document-level training revisions;
-- IteraTeR v2 reports 292,929 train revisions, 34,029 dev and 39,511 test;
-- the corpus comes from revision histories and was designed specifically for iterative text revision.
-
-**Role:** primary human-revision source after a provenance/duplication audit.
-
-**Important:** preserve the official dev/test splits. Do not leak them into training.
-
-### CoEdIT public dataset
-
-Dataset: https://huggingface.co/datasets/grammarly/coedit
-
-Evidence:
-
-- public dataset card marks Apache-2.0;
-- about 69.1k train rows;
-- tasks include grammatical correction and other text-editing instructions;
-- public release is smaller than the paper's 82k corpus because restricted source data was removed.
-
-**Role:** curated task-instruction editing data after lineage/license audit.
-
-**Do not confuse dataset and model licenses.** The released `coedit-large/xl/xxl` checkpoints are CC-BY-NC-4.0 and are therefore research/reference models, not the default shipping base.
-
-## 1.2 Human-backed span/word data
-
-### Microsoft Smart Word Suggestions (SWS)
-
-Repo: https://github.com/microsoft/SmartWordSuggestions
-
-Evidence:
-
-- MIT repository;
-- human test set: 1,000 English-learner sentences;
-- more than 16,000 substitution suggestions annotated by 10 native speakers;
-- also provides a large distantly-supervised training set (3.7M sentences / 12.7M suggestions).
-
-**Role:** the human test set is a core benchmark for Pari's click-a-word / click-a-phrase UX. The distantly-supervised portion is auxiliary training only, never gold truth.
-
-### Extracting local span edits from human revisions
-
-IteraTeR revisions can be aligned with word-level diff / edit-distance tooling to turn document/sentence revisions into:
+Do not require one model to do everything.
 
 ```text
-full context
-selected old span
-human replacement span
-edit type
+cheap lexical/contextual candidates -----------\
+phrase/span generator --------------------------+\
+sentence/paragraph generator -------------------+--> safety + grammar + meaning filters
+retrieved human-edit patterns ------------------+/             |
+                                                             dedupe/diversity
+                                                                   |
+                                                             ranking + UI
 ```
 
-This is important because it creates phrase-length-changing training data from **human revisions**, rather than asking a teacher model to invent it.
+For trivial word substitutions, the existing contextual synonym stack remains useful.
 
-Required pilot before relying on this source:
+For phrase/clause/sentence alternatives, use a small/medium local generative model.
 
-1. sample 10k IteraTeR revision pairs;
-2. align source -> revision;
-3. keep localized substitutions where surrounding context is stable;
-4. reject giant deletions, unresolved referents, formatting-only changes and ambiguous multi-edit examples;
-5. report clean-yield percentage and edit-length distribution.
+For the paragraph rewrite, use the same model unless a larger low-bit model is clearly better and still fast enough.
 
-**Gate:** if clean local-span yield is poor, do not pretend this solves span training; use it only where the extraction is reliable.
+The general model does not need to generate all 40 displayed options by itself. Candidate pools can combine:
 
-## 1.3 Evaluation-only human reference sets
-
-These are valuable precisely because they are not generated by Pari's teacher. Some have non-commercial licenses, so they remain evaluation/reference material unless licensing permits otherwise.
-
-- **JFLEG** — 754 dev + 747 test sentences, four human corrections each; CC BY-NC-SA 4.0. Use official GLEU evaluation for fluency/GEC.
-  - https://github.com/keisks/jfleg
-- **ASSET** — 2,000 validation + 359 test source sentences, ten human simplifications each; CC BY-NC 4.0. Use SARI plus safety checks.
-  - https://github.com/facebookresearch/asset
-- **TSAR lexical simplification** — human lexical alternatives; official metrics include MAP@k, Potential@k and Accuracy@k@top1. Evaluation data is CC BY-NC-SA 4.0.
-  - https://aclanthology.org/2022.tsar-1.31/
-- **PAWS** — 49,401 human-labeled training pairs + 8k/8k dev/test in the final labeled split; useful for adversarial meaning/word-order traps. Repository license permits broad use.
-  - https://github.com/google-research-datasets/paws
-
-## 1.4 Synthetic / automatically aligned data policy
-
-Synthetic data is allowed only as **augmentation**, never as the foundation or final judge.
-
-Allowed uses:
-
-- generate extra candidate alternatives for difficult coverage gaps;
-- mine hard negatives;
-- fill rare edit operations after human data is exhausted;
-- teacher-student distillation *only when a measured teacher gap exists*.
-
-Every synthetic example must retain:
-
-- provenance (`teacher`, checkpoint, quantization, prompt, seed);
-- validation results;
-- which human/reference source motivated the example;
-- whether it was used for SFT, preference/ranking, or only evaluation.
-
-Synthetic examples never enter objective test sets.
+- masked-LM/contextual lexical suggestions;
+- phrase banks / human-edit retrieval;
+- generative candidates;
+- deterministic transformations;
+- later, personalized ranking.
 
 ---
 
-# 2. Model strategy: decision tree, not one assumed path
+# 3. V1 model selection: speed + decent English + local fit
 
-## Path A — direct large-model compression first
+V1 should choose the model by the actual studio workload, not by general intelligence benchmarks.
 
-Before training anything, test whether a strong large model already solves the problem at an acceptable local footprint.
+## Candidate class A — very small / fast
 
-### Qwen3.8-27B reference
+Examples:
 
-- Apache-2.0;
-- 27B dense model;
-- native MTP training;
-- Q4_K_M GGUF is around 19 GB, so ordinary 4-bit does **not** meet the 16-GB whole-studio goal;
-- use as a Kaggle/reference quality ceiling and as the full-precision/base comparison for compression experiments.
+- MiniCPM5-2B 4-bit MLX (~1.4 GB);
+- other current 2–4B local instruction models with stable MLX/GGUF support.
 
-References:
+Role:
 
-- https://huggingface.co/Qwen/Qwen3.8-27B
-- https://huggingface.co/ggml-org/Qwen3.8-27B-GGUF
+- fast phrase/sentence alternatives;
+- potentially paragraph rewrite if quality is acceptable;
+- excellent baseline because latency and memory are cheap.
 
-### Bonsai 2 27B direct low-bit candidate
+## Candidate class B — 4–9B local models
 
-- based on Qwen3.8-27B;
-- ternary 1.75-bpw format reported at ~5.9 GB, with a ~7.2 GB faster format;
-- custom PrismML runtime/fork required for current formats;
-- Apache-2.0 release.
+Role:
 
-Reference:
+- likely quality/speed sweet spot if 2B alternatives are too weak;
+- benchmark 4-bit and, where useful, 3-bit builds;
+- keep only if the improvement is noticeable on Pari tasks.
 
-- https://prismml.com/news/bonsai-2-27b
-- https://github.com/PrismML-Eng/Bonsai-demo
+## Candidate class C — Bonsai / aggressive low-bit large models
 
-**Why test it first:** if Bonsai 2 preserves Pari's English-writing quality and is fast on the target Mac, it can eliminate the need to distill a large model merely to fit memory.
+Bonsai 2 27B is especially interesting because it compresses Qwen3.8-27B to roughly 5.9 GB in its ternary representation while retaining most generic benchmark capability.
 
-**Caution:** benchmark-retention claims on generic reasoning/coding tasks do not prove retention on rewriting, candidate diversity or register control. Pari must test those directly.
+For V1 this is a **direct inference experiment**, not a training target.
 
-### Ordinary quantization ladder
+Question:
 
-For any strong base that has runtime support:
+> Does Bonsai 2 produce materially better phrase/sentence/paragraph alternatives than the 2–9B candidates while still being interactive on the Mac?
+
+If yes, use it for the harder generation route. If no, the smaller model wins.
+
+Do not infer writing quality from Bonsai's math/coding/reasoning benchmark retention. Test writing directly.
+
+---
+
+# 4. MTP / speculative decoding decision
+
+MTP is optional acceleration, not a V1 requirement.
+
+Current evidence:
+
+- Qwen3.8-27B has native MTP support in its original architecture/runtime ecosystem;
+- Bonsai 2's published ternary pack does not simply expose that original MTP block in the same way;
+- community work has grafted the Qwen3.8 MTP head back onto Bonsai 2 for lossless speculative decoding;
+- PrismML's own documentation says speculative decoding helps much more on CUDA and can be a net slowdown for ordinary chat/reasoning on Apple Silicon.
+
+Therefore:
+
+1. benchmark normal decode first;
+2. benchmark any existing MTP/speculative path second;
+3. **do not train a new MTP head unless normal decode fails the latency target and the experiment has a plausible Mac payoff**;
+4. if MTP adds complexity without clear Mac speedup, drop it for V1.
+
+The V1 optimization priority is:
 
 ```text
-reference precision -> Q8 -> Q6 -> Q4 -> Q3
+better base model / quantization
+    > candidate routing
+    > caching / streaming
+    > speculative/MTP training
 ```
 
-Go below Q3 only if an actual implementation exists and passes Pari's suite.
-
-Do not assume a generic Qwen checkpoint can simply be converted to Bonsai/BitNet quality at 1.5 bits. Native BitNet uses architecture/training-aware ternary weights, and Bonsai uses specialized transforms/formats. Treat sub-3-bit compression as a separate research branch, not a routine export button.
-
-## Path B — train a small specialist on verified human edits
-
-If direct low-bit large models are too slow, too brittle, or fail the task, specialize a smaller model.
-
-### First training target: Qwen3.5-4B
-
-Reasoning:
-
-- Apache-2.0 base;
-- strong current general model;
-- Unsloth reports ~10 GB for 16-bit LoRA-class fine-tuning, making a brief adapter run realistic on a T4-class 16-GB GPU;
-- exports cleanly to GGUF/local runtimes;
-- small enough that multiple experimental runs are practical for a one-person project.
-
-Do **not** start with full fine-tuning.
-
-Initial experiment:
-
-1. text-only LoRA/adapters;
-2. human-revision data only;
-3. start with 10k–20k high-confidence examples as a smoke run;
-4. if objective suites improve with no safety regression, scale toward 50k–100k curated examples;
-5. use early stopping / held-out IteraTeR dev rather than blindly running many epochs;
-6. merge/export only after benchmark success.
-
-The objective is not to teach English from scratch. The pretrained model already knows English; the adapter teaches **editing behavior**.
-
-### Second trainable target: 9B class
-
-A 9B model is a follow-up only if 4B specialization leaves a meaningful gap.
-
-Unsloth reports roughly 22 GB for Qwen3.5-9B 16-bit LoRA, so this is not a simple one-T4 job. Use:
-
-- multi-GPU only if the runtime is stable; or
-- Modal/Colab burst compute with enough VRAM.
-
-Do not consume the project budget training 9B until 4B has established a baseline.
-
-### 27B training is not the default
-
-Unsloth reports roughly 56 GB for Qwen3.5-27B LoRA. That is outside the normal 2xT4 budget and is not justified for this project unless later evidence changes the economics.
-
-A 27B model is a teacher/reference/inference candidate first, not a training target.
-
-## Path C — teacher/student distillation only if there is a proven gap
-
-Trigger distillation only when all of the following are true:
-
-1. a larger teacher beats the best human-data-trained 4B/9B student on multiple objective task families;
-2. the advantage survives direct quantization of both models;
-3. the advantage matters to the actual studio UX (not generic benchmarks);
-4. the larger model cannot meet local latency/RAM goals directly.
-
-Then distill only the missing capabilities.
-
-Recommended recipe:
-
-- keep verified human-edit data as the majority of training batches;
-- generate teacher alternatives only for task categories where the student loses;
-- retain multiple teacher candidates rather than one canonical "AI style" rewrite;
-- reject candidates that fail meaning, protected-span, grammar or reference checks;
-- train the student on accepted candidates plus original human revisions;
-- never evaluate on teacher-generated references.
-
-The teacher is not automatically "truth". It is a candidate generator whose outputs must pass independent tests.
-
 ---
 
-# 3. Why training is justified at all
+# 5. Quantization policy
 
-The strongest evidence is CoEdIT: task-specific editing instruction tuning allowed a ~0.8B editing model to be competitive with, and on several editing benchmarks outperform, much larger general instruction models. That demonstrates the relevant principle for Pari: **narrow editing specialization can close a large parameter-count gap**.
+Quantization is a V1 priority because it can directly unlock a stronger model locally.
 
-Pari therefore tests specialization before assuming parameter count is the answer.
-
-The intended training question is:
-
-> Can a 2–4B pretrained model, briefly adapted on high-quality human revisions, match the editing behavior of a much larger general model closely enough that local inference becomes easy?
-
-This is a falsifiable experiment, not a belief.
-
----
-
-# 4. Objective benchmark stack (user does not need to be an English expert)
-
-Do not rely on one aggregate score and do not require thousands of manual judgments.
-
-## Layer A — existing Pari regression/safety suites
-
-Keep all existing work:
-
-- `benchmarks/eval/corpus.json` — adversarial meaning/safety regression;
-- `benchmarks/quillbot/corpus.frozen.json` — 320 hard broken-English cases;
-- `benchmarks/paraphrase-v2/corpus.json` — 72 standards-traced paragraph cases.
-
-These are internal product tests. They are not independent public gold standards.
-
-## Layer B — independent reference-backed English suites
-
-### Grammar / fluency
-
-**JFLEG**
-
-- four independent human corrections per source;
-- official sentence-level GLEU evaluator;
-- catches fluency edits beyond minimal grammar correction.
-
-Optional additional GEC benchmark if its data license/access is acceptable:
-
-- BEA/ERRANT or CoNLL-style M2 / ERRANT F0.5 evaluation.
-
-### Simplification / rephrasing
-
-**ASSET**
-
-- ten human simplifications per source;
-- SARI measures add/delete/keep behavior against source and references;
-- pair with meaning checks because ASSET authors themselves note limitations of automatic metrics for multi-operation rewriting.
-
-### Word / phrase suggestion
-
-**Microsoft Smart Word Suggestions**
-
-- 1,000 human-labeled learner sentences;
-- >16k native-speaker substitution annotations;
-- use official evaluator for end-to-end suggestion quality.
-
-**TSAR lexical simplification**
-
-- use MAP@3/5/10, Potential@3/5/10 and Accuracy@k@top1;
-- directly measures whether useful alternatives appear near the top of the suggestion list.
-
-### Meaning preservation / adversarial structure
-
-**PAWS**
-
-- use as an adversarial paraphrase/meaning detector test;
-- especially useful for subject/object and word-order changes that embedding cosine can miss.
-
-### Human revision holdout
-
-**IteraTeR v2 dev/test**
-
-- never train on official dev/test;
-- use as a held-out real-revision check;
-- score with multiple signals (semantic preservation, edit overlap/reference metrics, grammar) because valid revisions are non-unique.
-
-## Layer C — Pari interactive studio suite
-
-The custom `interactive.seed.json` remains necessary because public benchmarks do not fully cover:
-
-- 1 word -> many words;
-- many words -> 1 word;
-- arbitrary phrase/clause selection;
-- edit containment;
-- 40-option diversity;
-- rewrite-strength calibration;
-- protected spans next to an edit;
-- undo/revert behavior.
-
-Expand this suite using two sources:
-
-1. hand-written adversarial cases;
-2. automatically extracted localized human edits from IteraTeR.
-
-Do **not** inflate the benchmark by cloning templates. Track unique source count separately from task-instance count.
-
-## Layer D — compression parity
-
-For every quantized model compare against its own higher-precision/reference output on the same suites.
-
-Report:
-
-- delta in JFLEG/GLEU;
-- delta in ASSET/SARI;
-- delta in SWS/TSAR candidate metrics;
-- safety-veto delta;
-- meaning-preservation delta;
-- candidate-diversity delta;
-- latency / memory.
-
-The smallest model that keeps objective quality within the agreed tolerance is the deployment candidate.
-
-## Layer E — personalization
-
-Personalization evaluation is not "is the user's English objectively correct?"
-
-All options first pass objective quality gates. Then measure whether the personalized ranker predicts the user's choices among *already-valid* alternatives.
-
-Metrics:
-
-- held-out chosen-vs-rejected pair accuracy;
-- MRR/NDCG of the actually chosen option;
-- revert rate after personalized suggestions;
-- objective-quality regression = must remain zero or negligible.
-
----
-
-# 5. Automatic quality gates
-
-The user should not have to grade English quality manually.
-
-Every generated edit/candidate should pass a layered filter:
-
-1. protected-span equality checks;
-2. negation/modality/quantity/role rules;
-3. grammar diagnostics (Harper + existing Pari rules; add ERRANT-compatible diagnostics where useful);
-4. semantic/NLI contradiction veto;
-5. full-sentence context check after inserting the replacement;
-6. duplicate / near-duplicate removal;
-7. register/vocabulary-inflation heuristics;
-8. task-specific benchmark scoring when a gold reference exists.
-
-Use a stronger LLM judge only as a **secondary diagnostic** if needed. Do not make one teacher model the final evaluator of its own outputs.
-
----
-
-# 6. Personalization plan
-
-The user's English skill does not need to be the objective quality authority.
-
-The user only answers a simpler question:
-
-> Among choices that are already grammatical and meaning-safe, which wording do I prefer?
-
-Store:
+For ordinary models test:
 
 ```text
-source paragraph
-current paragraph
+reference -> Q8 -> Q6 -> Q4 -> Q3
+```
+
+For specialized low-bit releases such as Bonsai, test the provided native format directly.
+
+Do not assume an arbitrary model can be turned into a Bonsai-quality 1.5-bit model by ordinary post-training quantization.
+
+Measure for each build:
+
+- meaning failures;
+- grammar/naturalness;
+- word/phrase suggestion quality;
+- candidate diversity;
+- paragraph quality;
+- time to first suggestion;
+- time to top-10 suggestions;
+- memory;
+- app stability.
+
+Choose the smallest format that keeps V1 quality acceptable.
+
+---
+
+# 6. V1 benchmark philosophy
+
+V1 does **not** need a giant academic benchmark leaderboard. It needs a compact but versatile acceptance suite that reflects the actual UI.
+
+Models receive capability profiles instead of one rank.
+
+Core V1 routes:
+
+1. **word/phrase alternatives** — highest priority;
+2. **sentence alternatives** — high priority;
+3. **paragraph first draft** — medium priority;
+4. **grammar/meaning safety** — mandatory gate;
+5. **rewrite-strength control** — mandatory UX behavior;
+6. **runtime/latency** — mandatory local gate.
+
+A model that is weak at an unrelated benchmark is not eliminated if it is excellent at its assigned route.
+
+Detailed benchmark mapping lives in `BENCHMARK_MODEL_MAP.md`.
+
+---
+
+# 7. V1 acceptance suite
+
+Use a **small, representative subset** for fast iteration, plus the larger suites for release validation.
+
+## Fast development set
+
+Target roughly 150–250 unique cases total:
+
+- 40–60 word/phrase alternative cases;
+- 30–40 sentence rewrite cases;
+- 30–40 paragraph rewrite cases;
+- 20–30 hard meaning/safety traps;
+- 20–30 rewrite-strength/register cases.
+
+Each case can produce several candidate/ranking measurements, but unique-source count is reported separately.
+
+## Release validation
+
+Run the relevant independent and existing suites:
+
+- Smart Word Suggestions;
+- TSAR lexical simplification;
+- JFLEG;
+- IteraTeR held-out subset;
+- EditEval relevant tasks;
+- PAWS semantic traps;
+- existing Pari adversarial / QuillBot / paraphrase-v2 suites.
+
+ASSET is useful for compression/simplification but is not a pass/fail gate for every model route.
+
+WritingBench/Arena writing categories are only teacher/model-screening signals, not production gates.
+
+---
+
+# 8. V1 scoring
+
+## Word/phrase route
+
+Measure:
+
+- top-3 / top-5 / top-10 useful alternative coverage where references exist;
+- top-10 validity;
+- duplicate rate;
+- grammar after replacement;
+- meaning preservation;
+- replacement-length variety;
+- time to first 5 / 10 suggestions.
+
+This is the most important V1 score family.
+
+## Sentence route
+
+Measure:
+
+- meaning preservation;
+- naturalness/grammar;
+- register drift;
+- structural diversity;
+- local containment;
+- latency.
+
+## Paragraph route
+
+Measure:
+
+- meaning/factual safety;
+- coherence;
+- vocabulary/formality inflation;
+- rewrite-strength responsiveness;
+- latency.
+
+The paragraph generator does not need to beat every proprietary writing model. It needs to provide a useful starting point for the interactive editor.
+
+---
+
+# 9. Human-sounding definition for V1
+
+Do not use AI-detector probability as the target.
+
+For V1, "human sounding" means:
+
+- normal/common English rather than unnecessary thesaurus words;
+- grammar that fits the surrounding sentence;
+- source register roughly preserved;
+- no repeated generic transition/filler patterns;
+- multiple plausible ways to express the same meaning;
+- sentence structures that are not needlessly inflated;
+- no automatic professor/corporate tone unless requested.
+
+The user can then manually choose or mix options.
+
+---
+
+# 10. No-training rule for V1
+
+Do not spend Kaggle/Modal/Colab time training the paraphrase model for V1.
+
+Use compute for:
+
+- model shootouts;
+- quantization experiments;
+- candidate-generation stress tests;
+- MTP/speculative benchmark experiments;
+- runtime profiling;
+- large batch benchmark runs.
+
+Training data research remains documented for post-V1, but it is not on the V1 critical path.
+
+---
+
+# 11. Post-V1 personalization
+
+After V1 is genuinely useful, begin collecting interaction data:
+
+```text
+source context
 selected span
 candidate set shown
-candidate selected
-candidates ignored/reverted
-manual edit after selection
+candidate chosen
+candidate reverted/ignored
+manual replacement
 final approved paragraph
 rewrite strength
-operation type
 ```
 
-Learning ladder:
+The first personalization system should be a **small ranking layer**, not generator fine-tuning.
 
-1. preference-memory reorder rules;
-2. small pairwise candidate ranker;
-3. ranker fine-tuning after enough choices exist;
-4. generator LoRA only after the ranker proves the preference signal is real;
-5. optional student distillation that incorporates the learned preference distribution.
+It learns:
 
-Safety/grammar filters always run before personal preference ranking.
+- words the user frequently changes;
+- words the user usually keeps;
+- preferred expansions/compressions;
+- sentence-length preferences;
+- formality;
+- contractions;
+- favored phrases;
+- disliked suggestions.
 
----
+Only later, if ranking is insufficient and enough private data exists, consider LoRA/fine-tuning on the user's own behavior.
 
-# 7. Compute budget — justified uses
-
-## Kaggle: 2x T4, ~30 hours/week
-
-Best uses:
-
-- run independent model baselines in parallel;
-- Qwen3.8-27B low-bit teacher/reference inference across both GPUs when needed;
-- generate large candidate sets for benchmark cases;
-- train Qwen3.5-4B LoRA on one T4 while the second GPU evaluates another run;
-- quantization A/B evaluation;
-- dataset preprocessing and span extraction.
-
-Do not burn Kaggle time regenerating outputs when only the ranker/evaluator changed. Cache every raw candidate set.
-
-## Modal: ~$30 monthly credits
-
-Reserve for experiments that genuinely need a larger/faster GPU:
-
-- 9B 16-bit LoRA;
-- short 24–48GB-VRAM experiments;
-- conversion jobs that are awkward on Kaggle;
-- one-off teacher generation if 2xT4 throughput is too poor.
-
-Do not use Modal for routine benchmark scoring that Kaggle can do for free.
-
-## Colab overflow
-
-Use for:
-
-- overflow training/evaluation;
-- long jobs when Kaggle sessions are unavailable;
-- reproducing an experiment on a second environment.
-
-Do not design a critical path that assumes a particular Colab GPU is always available.
-
-## Mac
-
-The Mac is the final deployment laboratory:
-
-- MLX/GGUF compatibility;
-- peak unified memory of the *whole studio*;
-- cold/warm latency;
-- top-10/top-40 suggestion latency;
-- thermals/energy;
-- packaged-app reliability.
-
-Do not waste Mac time doing large training sweeps.
+That is the point where training becomes justified because it optimizes for the actual user's preference rather than generic synthetic style.
 
 ---
 
-# 8. Concrete experiment order
+# 12. V1 experiment order
 
-## Phase 0 — freeze data provenance and benchmark adapters
+## P0 — benchmark current local models
 
-Deliverables:
+Benchmark at least:
 
-- machine-readable dataset ledger;
-- license/use classification: `shipping_train`, `research_train`, `eval_only`, `blocked`;
-- adapters for JFLEG, ASSET, SWS, TSAR, PAWS, IteraTeR holdout;
-- exact dataset revisions/hashes;
-- no benchmark leakage into training.
+- MiniCPM5-2B 4-bit MLX;
+- current Pari Qwen path;
+- a strong current 4B candidate;
+- a 7–9B candidate if it fits comfortably;
+- Bonsai 2 27B native low-bit path;
+- existing lexical/contextual synonym route.
 
-## Phase 1 — untrained model/quantization baseline
+Output a route-by-route Pareto table: quality, memory, latency.
 
-Run the same studio tasks on:
+## P1 — build the actual interactive editor
 
-- Qwen3.8-27B reference/teacher path;
-- Bonsai 2 27B ternary local candidate;
-- Qwen3.5-9B local quant;
-- Qwen3.5-4B;
-- MiniCPM5-2B;
-- Ling-3.0-tiny;
-- CoEdIT-large/XL as research references only;
-- current Pari production model and deterministic fallback.
+- arbitrary span selection;
+- word/phrase/clause/sentence actions;
+- 1->many and many->1 replacement support;
+- top suggestions + deeper alternatives;
+- undo/revert;
+- local edit containment;
+- progressive candidate streaming.
 
-Outcome: establish the real quality-vs-RAM Pareto frontier before training.
+## P2 — choose V1 model/router
 
-## Phase 2 — human-data specialist pilot
+Pick the simplest route that is good enough:
 
-Train Qwen3.5-4B adapters on a small, clean subset of IteraTeR + audited CoEdIT.
+- small model only;
+- small model + lexical specialist;
+- small model + Bonsai for difficult cases;
+- Bonsai as general generator + cheap lexical route.
 
-Compare against the Phase-1 4B baseline.
+## P3 — quantization/runtime polish
 
-Proceed only if objective English/editing scores improve without safety regression.
+- test lower-bit builds;
+- benchmark caching and batched candidate generation;
+- test speculative/MTP only if normal decode misses latency target;
+- validate packaged Mac app.
 
-## Phase 3 — scale human-data specialization
+## P4 — ship V1
 
-If Phase 2 succeeds:
+No personalization training required.
 
-- expand toward 50k–100k high-confidence human edits;
-- add extracted local-span examples;
-- derive rewrite-strength buckets from actual human edit distance;
-- early-stop on held-out IteraTeR + external benchmarks.
+## P5 — collect preference data
 
-## Phase 4 — quantize the trained specialist
-
-Export and test Q8/Q6/Q4/Q3 where supported.
-
-If Q4/Q3 preserves quality and delivers good local latency, stop. There is no reason to distill merely because distillation is fashionable.
-
-## Phase 5 — only if needed, train the next class
-
-If 4B remains materially behind:
-
-- train/test 9B adapters using Modal/multi-GPU;
-- compare direct 9B quantization against 4B specialist and Bonsai 2.
-
-## Phase 6 — conditional teacher/student distillation
-
-Only if a large teacher still owns important task families and cannot ship directly:
-
-- generate teacher candidates for those failing categories;
-- filter against independent gates/references;
-- mix with majority human-edit data;
-- distill into 4B/2B student;
-- re-run every external and internal suite.
-
-## Phase 7 — personalization
-
-Once the objective system is reliable:
-
-- learn from click/revert/approval data;
-- start with a small ranker;
-- keep objective quality filters ahead of personalization;
-- only fine-tune the generator when interaction volume justifies it.
+After real use, add local preference ranking and only then revisit training.
 
 ---
 
-# 9. Stop rules
+# 13. V1 success condition
 
-A one-person project needs explicit reasons to stop spending compute.
+Pari V1 is ready when:
 
-Stop a model branch when:
-
-- it loses clearly on two or more core external suites with no runtime advantage;
-- quantization causes repeated safety/meaning failures;
-- a specialist route dominates it in both latency and quality;
-- training improvement plateaus across two checkpoints;
-- its runtime/toolchain is too fragile for the installed Mac app.
-
-Stop teacher-data generation when:
-
-- human-data-only training closes the measured gap;
-- new teacher candidates mostly duplicate existing human patterns;
-- synthetic augmentation stops improving held-out human-reference suites.
-
-Stop deeper quantization when:
-
-- the next step crosses the agreed objective-quality/safety tolerance;
-- the saved memory does not materially improve whole-app deployment.
-
----
-
-# 10. What success looks like
-
-The project succeeds when either of these happens:
-
-### Outcome A — big low-bit model wins
-
-A Bonsai-class 27B local model fits and is fast enough, so Pari keeps the large generator and only trains a tiny preference ranker.
-
-### Outcome B — small specialist wins
-
-A 2–4B human-data-adapted model reaches near-teacher English editing quality, then Q4/Q3 fits comfortably alongside the rest of the studio.
-
-### Outcome C — hybrid wins
-
-A compact local model handles normal rewriting; lexical/grammar specialists handle cheap operations; a larger local low-bit model is invoked only for difficult sentence/paragraph cases.
-
-All three are acceptable. The benchmark decides.
+- a pasted paragraph gets a decent, meaning-safe rewrite;
+- selecting a word or phrase quickly produces several sensible alternatives;
+- replacements can freely change length;
+- sentence alternatives are usable and reasonably fast;
+- the user can mix/edit/revert everything;
+- the model does not systematically inflate vocabulary/formality;
+- the whole system fits and behaves acceptably on the target 16-GB Mac;
+- no model training was required to reach this baseline.
