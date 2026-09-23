@@ -1,117 +1,132 @@
-# Pari English Core — base-LLM selection benchmark
+# Pari English Core — base-LLM English selection
 
-This benchmark answers a narrower question than the normal Pari acceptance suite:
+English Core is a **model-selection benchmark for Pari's editing workload**, not a universal test of intelligence and not a claim to measure one latent quantity called “English ability.”
 
-> Which candidate model has the strongest underlying English competence for Pari's rewriting/editing workload?
+Its narrower question is:
 
-It deliberately excludes coding, math, tool use, factual knowledge, agent performance and most generic reasoning. Those capabilities can make a modern LLM look strong while telling us very little about whether it understands word sense, collocation, natural phrasing or register.
+> Which candidate model provides the strongest evidence, across several research-backed English-language capabilities, for Pari's rewriting/editing workload?
 
-The machine-readable definition is `english-core-config.json`. Fresh Pari-authored shadow cases are in `english-core-shadow.seed.json`.
+The benchmark deliberately excludes coding, mathematics, factual breadth, tool use and agent performance. Those capabilities can improve general LLM leaderboards while saying little about contextual lexical choice, collocation, natural phrasing or register.
 
----
+Read together:
 
-## 1. English Core score
+- `english-core-config.json` — machine-readable construct/weight/protocol contract;
+- `ENGLISH_CORE_RESEARCH_BASIS.md` — primary research evidence and limitations;
+- `RESEARCH_GROUNDING_POLICY.md` — standing evidence rules;
+- `ENGLISH_CORE_ROBUSTNESS.md` — prompt/statistical/distribution/claim-tier protocol;
+- `ENGLISH_CORE_HUMAN_EVAL.md` — independent shadow-label and generative human-evaluation protocol;
+- `ENGLISH_CORE_RUN.md` — execution order.
 
-For **base-LLM selection only**, one weighted composite is allowed:
-
-| Dimension | Weight |
-| --- | ---: |
-| contextual lexical meaning / word association | 25 |
-| collocation and natural lexical choice | 20 |
-| grammar / syntax | 15 |
-| paraphrase semantics | 15 |
-| fluency / register | 10 |
-| generative expression | 10 |
-| discourse relations | 5 |
-| **Total** | **100** |
-
-Always publish the seven subscores next to the composite. The composite is never allowed to replace the route-specific Pari product benchmark.
-
-A model can therefore be the strongest English base model and still lose the final product decision because it is too slow, too large, unsafe after quantization, or worse than a specialist on a particular route.
+The current fresh shadow seed contains **68 Pari-authored cases** and is explicitly `author_labeled_unvalidated`. It is useful as a contamination-resistant internal diagnostic, but it is not an independently validated public benchmark until issue #16's annotation/adjudication gate is completed.
 
 ---
 
-## 2. Dimension A — contextual lexical meaning / word association (25%)
+## 1. What is research-backed and what is Pari-specific
 
-This is the most important dimension for Pari.
+### Research-backed constructs
 
-Public anchors:
+English Core separates capabilities that have established NLP/linguistic evaluation traditions:
 
-- **SWORDS** — contextual lexical substitution with high-coverage human judgments: https://aclanthology.org/2021.naacl-main.345/
-- **WiC** — tests whether a word has the same sense in two contexts: https://aclanthology.org/N19-1128/
-- **CoInCo / SemEval lexical substitution** where a clean evaluation package is available.
+1. contextual lexical meaning / lexical substitution;
+2. collocation and natural lexical choice;
+3. grammar / syntactic acceptability;
+4. paraphrase semantics;
+5. fluency / register;
+6. controlled editing and generative expression;
+7. discourse relations and coherence.
 
-Measure:
+The public anchors for those constructs come from peer-reviewed benchmarks such as SWORDS, WiC, BLiMP, CoLA, PAWS, JFLEG, GYAFC, EditEval and discourse-focused evaluations.
+
+### Pari-specific engineering choices
+
+The following are **not** literature-derived constants:
+
+- the exact weights `25/20/15/15/10/10/5`;
+- the number and wording of shadow cases;
+- the public-fast sampling budgets;
+- the decision to emphasize lexical/contextual editing more heavily than open-ended writing.
+
+Those choices encode Pari's product workload. Always report the seven dimensions, the product-weighted composite, and the equal-weight dimension mean. If candidate rankings change materially under reasonable weighting schemes, describe a capability tradeoff rather than a universal winner.
+
+---
+
+## 2. English Core dimensions
+
+| Dimension | Pari weight | Primary research role |
+| --- | ---: | --- |
+| contextual lexical meaning / word association | 25 | sense-in-context + lexical substitution |
+| collocation / natural lexical choice | 20 | idiomatic lexical compatibility |
+| grammar / syntax | 15 | acceptability and targeted grammatical phenomena |
+| paraphrase semantics | 15 | meaning preservation under structural/surface similarity |
+| fluency / register | 10 | native-like fluency + register/formality control |
+| controlled editing / generative expression | 10 | revision, paraphrasing, restructuring |
+| discourse relations | 5 | condition, cause, concession, temporal/coherence relations |
+
+The weighted composite is allowed **only as a Pari candidate-selection aid**. It does not replace the product route benchmark and is not a psychometric scale of universal English competence.
+
+---
+
+## 3. Contextual lexical meaning / word association — 25%
+
+This is Pari's highest-priority linguistic dimension because the core interaction is selecting a word or phrase and asking for context-valid alternatives.
+
+Primary anchors:
+
+- **SWORDS** — high-coverage contextual lexical substitution with human appropriateness judgments: https://aclanthology.org/2021.naacl-main.345/
+- **WiC** — same/different word sense in context: https://aclanthology.org/N19-1128/
+- CoInCo / SemEval lexical substitution as complementary historical anchors where reproducible.
+
+SWORDS is especially construct-aligned with Pari: its paper explicitly motivates lexical substitution for writing assistance and argues that human judgment of proposed substitutes can provide better coverage than relying only on human recall.
+
+Measure separately:
 
 - word-sense discrimination;
 - context-valid substitution;
-- target meaning preservation;
-- human-reference recall at 10 and 40 candidates;
-- usable-candidate rate at 10 and 40;
-- candidate ranking quality.
+- target-meaning preservation;
+- human-reference/candidate coverage;
+- ranking quality;
+- usable alternatives deep into the candidate list.
 
-Example:
-
-`Sales showed a sharp decline in August.`
-
-Target: `sharp`
-
-Correct contextual replacement: `steep`
-
-Wrong senses such as `pointed`, `loud` or `sweet` should not receive credit simply because they are valid meanings of the word elsewhere.
+A model does not receive credit merely because a replacement is a dictionary synonym under some other sense.
 
 ---
 
-## 3. Dimension B — collocation and natural lexical choice (20%)
+## 4. Collocation / natural lexical choice — 20%
 
-A model must know not only that words are semantically related, but which combinations English speakers actually use.
+Semantic relatedness is insufficient for natural rewriting. English allows combinations such as `heavy rain`, `make a decision`, `deeply concerned` and `draw a conclusion`, while semantically related alternatives can sound unnatural.
 
-Public anchor:
+Primary anchor:
 
-- **Evaluating language models for the retrieval and categorization of lexical collocations** (EACL 2021): https://aclanthology.org/2021.eacl-main.120/
+- EACL 2021 lexical-collocation retrieval/categorization benchmark: https://aclanthology.org/2021.eacl-main.120/
 
-Fresh Pari shadow cases cover adjective+noun, verb+noun, adverb+adjective and preposition compatibility.
+Pari shadow coverage includes adjective+noun, verb+noun, adverb+adjective and preposition compatibility.
 
-Examples:
-
-- `heavy rain` > `strong rain`
-- `make a decision` > `perform a decision`
-- `deeply concerned` > `heavily concerned`
-- `draw a conclusion` > `pull a conclusion`
-
-This dimension is intentionally large because thesaurus-like systems often know that two words are related while still producing English that sounds wrong.
+This remains separate from generic embedding similarity because a system can preserve topic/meaning while choosing a non-native collocation.
 
 ---
 
-## 4. Dimension C — grammar / syntax (15%)
+## 5. Grammar / syntax — 15%
 
-Public anchors:
+Primary anchors:
 
-- **BLiMP** — 67 linguistic phenomena with 1,000 minimal pairs each: https://aclanthology.org/2020.tacl-1.25/
-- **CoLA** — 10,657 acceptability examples from linguistics literature: https://aclanthology.org/Q19-1040/
+- **BLiMP** — controlled minimal pairs over 67 linguistic phenomena: https://aclanthology.org/2020.tacl-1.25/
+- **CoLA** — acceptability judgments drawn from linguistics literature: https://aclanthology.org/Q19-1040/
 
-Measure direct acceptability preference without asking the model to explain itself.
+The common Pari prompt lane uses direct forced choice for cross-runtime comparability. That is **not identical to every benchmark's native scoring protocol**, so native/official scores must be reported separately when making research-level claims.
 
-Example:
+The shadow set includes agreement, argument structure, determiner/word-order phenomena, negative-polarity licensing, binding agreement, morphology and do-support.
 
-A. `The collection of old photographs was damaged.`
-
-B. `The collection of old photographs were damaged.`
-
-Expected answer: A.
-
-Where local runtimes expose reliable logits, record the probability margin in addition to forced-choice accuracy.
+Do not ask for explanations or chain-of-thought; the diagnostic is the linguistic choice itself.
 
 ---
 
-## 5. Dimension D — paraphrase semantics (15%)
+## 6. Paraphrase semantics — 15%
 
-Public anchors:
+Primary anchor:
 
-- **PAWS** for high-overlap adversarial paraphrase pairs;
-- existing Pari semantic-adversarial cases.
+- **PAWS** — adversarial sentence pairs with high lexical overlap but potentially different meaning: https://aclanthology.org/N19-1131/
 
-Fresh shadow cases test:
+Pari cares about errors that surface-overlap or embedding metrics can miss:
 
 - actor/patient reversal;
 - causal reversal;
@@ -122,151 +137,131 @@ Fresh shadow cases test:
 - comparison;
 - focus/scope.
 
-Example:
-
-A. `Jordan sent Alex the document.`
-
-B. `Alex sent Jordan the document.`
-
-The lexical overlap is almost perfect, but the meaning is different. A good English model must notice the role reversal.
+Meaning preservation is therefore evaluated independently from naturalness.
 
 ---
 
-## 6. Dimension E — fluency / register (10%)
+## 7. Fluency / register — 10%
 
-Public anchors:
+Primary anchors:
 
-- **JFLEG** for human fluency correction;
-- **GYAFC** for formality/style distinctions: https://aclanthology.org/N18-1012/
-- Pari register and vocabulary-ceiling cases.
+- **JFLEG** — human fluency corrections, evaluated with the official multi-reference GLEU workflow: https://aclanthology.org/E17-2037/
+- **GYAFC** — formality/style transfer and register distinctions: https://aclanthology.org/N18-1012/
 
-The goal is not to reward formality. It is to test whether the model understands the source register and can preserve it.
+The goal is not to reward formality. Pari should preserve ordinary/casual wording when that is what the source uses.
 
-Example source:
-
-`Honestly, the new layout is kind of annoying.`
-
-Preferred:
-
-`Honestly, the new layout is a little annoying.`
-
-Do not reward:
-
-`The revised interface produces considerable user dissatisfaction.`
-
-Both are grammatical, but only the first preserves the original voice and intensity.
+A grammatical rewrite can still be wrong for Pari if it gratuitously becomes academic, corporate, abstract, intense, or verbose.
 
 ---
 
-## 7. Dimension F — generative English expression (10%)
+## 8. Controlled editing / generative expression — 10%
 
-This is intentionally a minority of the English Core score.
+This dimension is intentionally smaller than lexical/contextual competence.
 
-Use:
+Primary anchors should emphasize **editing**, not blank-page essay writing:
 
-- selected WritingBench style/language tasks as a secondary anchor;
-- EQ-Bench Creative Writing diagnostics only as secondary evidence;
-- fresh Pari span/sentence/paragraph generation cases as the primary product-shaped diagnostic.
+- **EditEval** — modular text improvement/editing: https://aclanthology.org/2024.conll-1.7/
+- **IteraTeR** — human iterative revision histories: https://aclanthology.org/2022.acl-long.250/
+- fresh Pari span/sentence/paragraph editing cases, scored only with approved independent provenance.
 
-Measure:
+Secondary diagnostics only:
 
-- semantic preservation;
-- naturalness;
-- structural diversity;
-- register fit;
-- stock-LLM phrase rate;
-- unnecessary length inflation.
+- WritingBench selected style/language tasks;
+- EQ-Bench creative-writing/slop diagnostics.
 
-A model that writes impressive essays but performs poorly on lexical sense, collocation or register should not win English Core.
+Open-ended writing benchmarks mix English competence with planning, knowledge, instruction following and judge preferences, so they must not dominate Pari model selection.
+
+Generative shadow cases preserve raw outputs and require structured `metricProvenance`. A candidate model cannot grade its own official score, and an unvalidated general LLM judge cannot by itself populate the official composite.
 
 ---
 
-## 8. Dimension G — discourse relations (5%)
+## 9. Discourse relations — 5%
 
-Public anchor:
+Primary external direction:
 
-- **BeDiscovER**, using a focused English subset only: https://aclanthology.org/2026.eacl-long.207/
+- BeDiscovER focused English tasks: https://aclanthology.org/2026.eacl-long.207/
 
-The benchmark covers discourse markers, temporal reasoning, discourse relations, sentence ordering and dialogue discourse parsing. Pari only needs the subset relevant to editing existing prose.
-
-Fresh shadow examples test:
+Pari-specific discourse probes target relations that rewrites often damage even when individual sentences remain fluent:
 
 - `if` versus `when`;
 - cause versus contrast;
 - concession;
 - purpose;
 - temporal order;
-- sentence ordering.
+- sentence ordering/coherence.
 
 ---
 
-## 9. Public anchors versus fresh shadow cases
+## 10. Three evidence lanes must stay separate
 
-Every dimension should report two result groups:
+Do not collapse these into one opaque number:
 
-1. **public-anchor score** — established benchmark data;
-2. **Pari shadow score** — newly authored cases testing the same linguistic abilities.
+### A. Public/native anchors
 
-Do not merge the two until both are visible separately.
+Established benchmark data and official/native metrics where available. Examples: official SWORDS evaluation and JFLEG GLEU.
 
-Why:
+### B. Common prompted public screen
 
-- public benchmarks may have appeared in modern pretraining corpora;
-- a model may memorize benchmark surface patterns without possessing equally strong underlying language competence;
-- fresh shadow cases let us test the same phenomenon with different wording.
+The deterministic BLiMP/WiC/CoLA/PAWS screen provides apples-to-apples prompted triage across chat/instruct models. It is useful, but it is not an official benchmark score and intentionally changes some source distributions through balanced sampling.
 
-Shadow cases are evaluation-only. Never train on them or tune prompts specifically against them. Rotate/add cases once repeated experimentation starts overfitting the file.
+### C. Fresh Pari shadow set
 
----
+Fresh surface forms test whether public-benchmark strength transfers to Pari-relevant examples. The current labels are author-written and remain internal evidence until independent annotation/adjudication is complete.
 
-## 10. Prompting protocol
-
-For forced-choice tasks, prefer the smallest possible instruction.
-
-Example:
-
-```text
-Which sentence is more natural English?
-A. She made a decision.
-B. She performed a decision.
-Answer only A or B.
-```
-
-Do **not** ask for explanations or chain-of-thought. We are measuring English competence, not verbosity or reasoning-style compliance.
-
-For lexical generation:
-
-```text
-Sentence: The examples clarified the rule for me.
-Selected text: clarified
-Give up to 20 replacements that fit this exact sentence and preserve the intended meaning.
-```
-
-Preserve raw outputs and fixed decoding settings for every candidate model.
+Public and shadow results are always reported separately because modern public benchmarks may be present in model pretraining corpora.
 
 ---
 
-## 11. Interpreting results
+## 11. Robustness is part of the benchmark, not optional polish
 
-Example profile:
+Research on LLM evaluation shows that prompt wording, answer ordering, data distribution and aggregation choices can alter absolute scores and relative rankings.
 
-| Model | Lexical | Collocation | Grammar | Semantics | Register | Generation | Discourse | Core |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A | 94 | 91 | 92 | 88 | 86 | 79 | 84 | 89.2 |
-| B | 84 | 83 | 96 | 94 | 82 | 93 | 91 | 88.4 |
-| C | 96 | 95 | 90 | 91 | 91 | 70 | 79 | 90.2 |
+Before a close candidate-selection claim:
 
-In this hypothetical result, C is the strongest underlying English model even though B is the better open-ended writer.
+- run multiple intent-preserving prompt variants;
+- report answer consistency and worst-prompt performance;
+- report uncertainty conditional on the current item set;
+- compare models on the same items with paired analysis;
+- inspect product-weighted and equal-weight views;
+- preserve per-source, per-dimension and per-phenomenon results;
+- record exact model/runtime/task/scorer provenance.
 
-That distinction is exactly why English Core exists.
+See `ENGLISH_CORE_ROBUSTNESS.md` for the required protocol and claim tiers.
 
 ---
 
-## 12. Final selection flow
+## 12. Interpretation language
 
-1. Run English Core on all plausible base LLMs.
-2. Keep the per-dimension profile and English Core composite.
-3. Reject/flag models whose public-anchor strength does not reproduce on fresh shadow cases.
-4. Only then compare quantizations, RAM, latency and MTP/speculation.
-5. Run the existing Pari V1 route-specific benchmark on the surviving models.
-6. Choose the shipping route/model based on the product Pareto frontier, not English Core alone.
+Preferred claims are scoped to the evidence.
+
+Good:
+
+- `Model A scored higher on the Pari product-weighted English Core under this protocol.`
+- `Model A showed stronger lexical-substitution evidence on official SWORDS and the fresh Pari lexical probes.`
+- `A and B are statistically inconclusive on the current shadow set.`
+- `Model A's lead is weight-sensitive.`
+
+Avoid:
+
+- `Model A objectively has the best English.`
+- `Model A is better because its raw average is 0.8 points higher.`
+- treating the prompted public-fast screen as an official BLiMP/CoLA/SWORDS/JFLEG score.
+
+The evidence standard increases with claim strength. Tier-3-style claims additionally require independently validated shadow labels, official primary anchors, protocol robustness, reproducibility and paired/statistical support.
+
+---
+
+## 13. Selection flow
+
+1. Audit the shadow dataset (`audit-english-core-shadow.mjs`).
+2. Build/run/score the canonical shadow profile.
+3. Quantify uncertainty.
+4. Run multi-prompt robustness.
+5. Run the public-fast prompted screen.
+6. Run primary official/native anchors, especially SWORDS for Pari's lexical role and JFLEG/EditEval where applicable.
+7. Use paired comparisons for close contenders.
+8. Inspect weight/protocol sensitivity and reproducibility metadata.
+9. Only then compare quantization, RAM, latency and runtime stability.
+10. Run the separate Pari V1 route/product acceptance suite.
+
+English Core narrows the candidate field. The final shipping decision remains a product Pareto decision across linguistic quality, semantic safety, latency, memory and specialist routing.
