@@ -4,6 +4,8 @@ This document records the evidence behind the English Core benchmark design. It 
 
 The benchmark follows the spirit of Evidence-Centered Benchmark Design (ECBD): define the capability of interest, specify what model behavior counts as evidence for that capability, and document assumptions and threats to validity. It also follows HELM's multi-dimensional reporting principle: no single metric should hide important trade-offs.
 
+The standing change-control rule is in [`RESEARCH_GROUNDING_POLICY.md`](./RESEARCH_GROUNDING_POLICY.md). Future benchmark changes must satisfy that policy before being treated as part of English Core.
+
 ## 1. Benchmark-design evidence
 
 ### Evidence-Centered Benchmark Design (ACL 2024)
@@ -280,3 +282,18 @@ To expose dependence on the weights, the scorer reports both:
 - every individual dimension score.
 
 If two models exchange rank under reasonable weighting schemes, report them as **weight-sensitive / capability-tradeoff candidates** rather than claiming a universal English winner.
+
+## 14. Standing research-grounding gate
+
+English Core is not allowed to drift into a collection of plausible-looking tests. Before a substantive benchmark change is treated as valid, it must pass the checklist in `RESEARCH_GROUNDING_POLICY.md`.
+
+At minimum:
+
+- the intended construct must have primary-source support or be labeled explicitly as a Pari-specific product heuristic;
+- the benchmark's official protocol and metric must be checked before creating a local approximation;
+- local approximations must be labeled as screens rather than official scores;
+- threats to validity, contamination, answer-position effects, and judge dependence must be documented;
+- model-selection claims must be no broader than the evidence supports;
+- a benchmark should not be added or weighted simply because it favors a preferred candidate model.
+
+When new research conflicts with the present design, the literature should trigger a benchmark review rather than being ignored to preserve historical scores.
