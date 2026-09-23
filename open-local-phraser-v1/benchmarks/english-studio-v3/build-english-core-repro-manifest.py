@@ -9,12 +9,16 @@ Example:
       --score shadow-score.json \
       --artifact shadow-stats=shadow-stats.json \
       --artifact prompt-score=prompt-score.json \
-      --model-artifact-sha256 <64-hex> \
+      --artifact order-score=order-score.json \
+      --public-manifest public-fast=english-core-public-fast.manifest.json \
+      --public-manifest public-full=english-core-public-full-classification.manifest.json \
       --output repro-manifest.json \
       --require-promotion-ready
 
-Use repeated --artifact LABEL=PATH for public/native benchmark outputs, official
+Use repeated --artifact LABEL=PATH for native/public benchmark outputs, official
 SWORDS/JFLEG evaluator files, human-eval exports, or other frozen evidence.
+Use repeated --public-manifest LABEL=PATH for Hugging Face-derived builder
+manifests whose revisions/fingerprints must be immutable for promotion use.
 """
 
 from __future__ import annotations
@@ -27,6 +31,7 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+MUTABLE_REVISIONS = {"", "unknown", "mutable_default_not_pinned", "main", "master", "latest", "default"}
 
 
 def sha256_file(path: Path) -> str:
@@ -50,16 +55,16 @@ def git_value(args: list[str]) -> str | None:
         return None
 
 
-def parse_artifact(value: str) -> tuple[str, Path]:
+def parse_labeled_file(value: str) -> tuple[str, Path]:
     if "=" not in value:
-        raise argparse.ArgumentTypeError("artifact must be LABEL=PATH")
+        raise argparse.ArgumentTypeError("value must be LABEL=PATH")
     label, raw_path = value.split("=", 1)
     label = label.strip()
     if not label:
-        raise argparse.ArgumentTypeError("artifact label cannot be empty")
+        raise argparse.ArgumentTypeError("label cannot be empty")
     path = Path(raw_path).expanduser().resolve()
     if not path.is_file():
-        raise argparse.ArgumentTypeError(f"artifact is not a file: {path}")
+        raise argparse.ArgumentTypeError(f"not a file: {path}")
     return label, path
 
 
@@ -71,6 +76,35 @@ def is_sha256(value: str | None) -> bool:
         return True
     except ValueError:
         return False
+
+
+def known(value) -> bool:
+    return str(value or "").strip().lower() not in MUTABLE_REVISIONS
+
+
+def fingerprint_complete(value) -> bool:
+    if isinstance(value, str):
+        return bool(value.strip())
+    if isinstance(value, dict):
+        return bool(value) and all(fingerprint_complete(v) for v in value.values())
+    return False
+
+
+def public_manifest_blockers(label: str, data: dict) -> list[str]:
+    blockers: list[str] = []
+    if not data.get("datasetsLibraryVersion"):
+        blockers.append(f"{label}:missing_datasets_library_version")
+    sources = data.get("sources") or {}
+    if not sources:
+        blockers.append(f"{label}:missing_sources")
+    fingerprints = data.get("resolvedDatasetFingerprints") or {}
+    for source_name, source in sorted(sources.items()):
+        revision = source.get("requestedRevision")
+        if not known(revision):
+            blockers.append(f"{label}:{source_name}:unpinned_source_revision")
+        if not fingerprint_complete(fingerprints.get(source_name)):
+            blockers.append(f"{label}:{source_name}:missing_dataset_fingerprint")
+    return blockers
 
 
 def unique_metric_provenance(score: dict | None) -> list[dict]:
@@ -94,8 +128,9 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", required=True, type=Path)
     ap.add_argument("--score", type=Path)
-    ap.add_argument("--artifact", action="append", default=[], type=parse_artifact)
-    ap.add_argument("--model-artifact-sha256")
+    ap.add_argument("--artifact", action="append", default=[], type=parse_labeled_file)
+    ap.add_argument("--public-manifest", action="append", default=[], type=parse_labeled_file)
+    ap.add_argument("--model-artifact-sha256", help="override/supply exact model artifact hash")
     ap.add_argument("--output", required=True, type=Path)
     ap.add_argument(
         "--require-promotion-ready",
@@ -135,19 +170,33 @@ def main() -> None:
                 "bytes": score_path.stat().st_size,
             }
         )
+
     used_labels = {row["label"] for row in artifacts}
     for label, path in args.artifact:
         if label in used_labels:
             raise SystemExit(f"Duplicate artifact label: {label}")
         used_labels.add(label)
-        artifacts.append(
-            {
-                "label": label,
-                "path": str(path),
-                "sha256": sha256_file(path),
-                "bytes": path.stat().st_size,
-            }
-        )
+        artifacts.append({"label": label, "path": str(path), "sha256": sha256_file(path), "bytes": path.stat().st_size})
+
+    public_manifests = []
+    public_blockers = []
+    for label, path in args.public_manifest:
+        if label in used_labels:
+            raise SystemExit(f"Duplicate artifact label: {label}")
+        used_labels.add(label)
+        data = load_json(path)
+        blockers = public_manifest_blockers(label, data)
+        public_blockers.extend(blockers)
+        public_manifests.append({
+            "label": label,
+            "path": str(path),
+            "sha256": sha256_file(path),
+            "datasetsLibraryVersion": data.get("datasetsLibraryVersion"),
+            "sources": data.get("sources"),
+            "resolvedDatasetFingerprints": data.get("resolvedDatasetFingerprints"),
+            "promotionBlockers": blockers,
+        })
+        artifacts.append({"label": label, "path": str(path), "sha256": sha256_file(path), "bytes": path.stat().st_size})
 
     model = run.get("model") or {}
     decoding = run.get("decoding") or {}
@@ -158,40 +207,57 @@ def main() -> None:
     blockers = []
     if not is_sha256(model_hash):
         blockers.append("missing_or_invalid_model_artifact_sha256")
-    if not model.get("revision") or model.get("revision") == "unknown":
+    if not known(model.get("revision")):
         blockers.append("missing_exact_model_revision")
-    if not model.get("quantization") or model.get("quantization") == "unknown":
+    if not known(model.get("quantization")):
         blockers.append("missing_quantization_identity")
-    if not model.get("runtimeVersion") or model.get("runtimeVersion") == "unknown":
+    if model.get("checkpointType") in (None, "unknown"):
+        blockers.append("missing_checkpoint_type")
+    if not known(model.get("runtimeVersion")):
         blockers.append("missing_runtime_version")
-    if not run.get("taskFileSha256"):
+    if not known(model.get("tokenizerName")):
+        blockers.append("missing_tokenizer_identity")
+    if run.get("promptModeRequested") == "auto":
+        blockers.append("auto_prompt_adaptation_not_promotion_safe")
+    if run.get("promptModeRequested") not in {"plain", "chat"}:
+        blockers.append("missing_explicit_prompt_adaptation")
+
+    adaptation_modes = set(run.get("promptAdaptationModesObserved") or [])
+    if len(adaptation_modes) != 1:
+        blockers.append("mixed_or_missing_prompt_adaptation_modes")
+    if run.get("promptModeRequested") == "plain" and adaptation_modes != {"plain"}:
+        blockers.append("plain_prompt_mode_adaptation_mismatch")
+    if run.get("promptModeRequested") == "chat" and adaptation_modes != {"chat_template"}:
+        blockers.append("chat_prompt_mode_adaptation_mismatch")
+    if model.get("checkpointType") == "base" and run.get("promptModeRequested") == "chat":
+        blockers.append("base_checkpoint_chat_adaptation_requires_separate_justification")
+    if model.get("checkpointType") in {"chat", "instruct"} and run.get("promptModeRequested") == "plain":
+        blockers.append("chat_or_instruct_checkpoint_plain_adaptation_requires_separate_justification")
+    if "chat_template" in adaptation_modes and not is_sha256(model.get("chatTemplateSha256")):
+        blockers.append("missing_chat_template_hash_for_chat_run")
+
+    if not is_sha256(run.get("taskFileSha256")):
         blockers.append("missing_task_file_hash")
-    for key in ("temperature", "topP", "topK", "seed"):
+    if not isinstance(run.get("taskCount"), int) or run.get("taskCount") < 1:
+        blockers.append("missing_task_count")
+    for key in ("temperature", "topP", "topK", "maxNewTokens", "forcedChoiceMaxNewTokens", "seed"):
         if key not in decoding:
             blockers.append(f"missing_decoding_{key}")
-    if not reproducibility.get("rawOutputSha256"):
+    if not is_sha256(reproducibility.get("rawOutputSha256")):
         blockers.append("missing_raw_output_hash")
-    if not declared_benchmark_revision or declared_benchmark_revision == "unknown":
+    if not known(declared_benchmark_revision):
         blockers.append("missing_benchmark_revision")
     if not current_commit:
         blockers.append("unable_to_resolve_current_git_commit")
-    elif declared_benchmark_revision and declared_benchmark_revision != "unknown" and declared_benchmark_revision != current_commit:
+    elif known(declared_benchmark_revision) and declared_benchmark_revision != current_commit:
         blockers.append("declared_benchmark_revision_mismatch_current_checkout")
     if dirty:
         blockers.append("benchmark_worktree_is_dirty")
 
-    adaptation_modes = set(run.get("promptAdaptationModesObserved") or [])
-    if "chat_template" in adaptation_modes and not is_sha256(model.get("chatTemplateSha256")):
-        blockers.append("missing_chat_template_hash_for_chat_run")
-
     if score is None:
         blockers.append("missing_shadow_score_artifact")
     else:
-        required_hashes = (
-            "configSha256",
-            "shadowSeedSha256",
-            "generativeMetricContractSha256",
-        )
+        required_hashes = ("configSha256", "shadowSeedSha256", "generativeMetricContractSha256")
         benchmark_inputs = score.get("benchmarkInputs") or {}
         for key in required_hashes:
             if not is_sha256(benchmark_inputs.get(key)):
@@ -201,17 +267,16 @@ def main() -> None:
         if score.get("complete") is not True:
             blockers.append("incomplete_shadow_score")
 
+    blockers.extend(public_blockers)
     blockers = list(dict.fromkeys(blockers))
+
     manifest = {
-        "version": 2,
+        "version": 3,
         "generatedAtUtc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "purpose": "Frozen provenance manifest for English Core evidence; not a quality metric.",
         "promotionReady": not blockers,
         "promotionBlockers": blockers,
-        "model": {
-            **model,
-            "artifactSha256": model_hash,
-        },
+        "model": {**model, "artifactSha256": model_hash},
         "hardware": run.get("hardware"),
         "decoding": decoding,
         "promptModeRequested": run.get("promptModeRequested"),
@@ -219,6 +284,7 @@ def main() -> None:
         "promptAdaptationDetailsObserved": run.get("promptAdaptationDetailsObserved"),
         "taskFile": run.get("taskFile"),
         "taskFileSha256": run.get("taskFileSha256"),
+        "taskCount": run.get("taskCount"),
         "runReproducibility": reproducibility,
         "scoreBenchmarkInputs": score.get("benchmarkInputs") if score else None,
         "scoreComplete": score.get("complete") if score else None,
@@ -229,14 +295,18 @@ def main() -> None:
             "declaredBenchmarkRevision": declared_benchmark_revision,
             "declaredMatchesCurrent": bool(current_commit and declared_benchmark_revision == current_commit),
         },
+        "publicSourceManifests": public_manifests,
         "artifacts": artifacts,
         "rules": [
             "All supplied evidence files are hashed byte-for-byte.",
             "Promotion readiness is a provenance gate only; it does not imply model quality or benchmark validity.",
-            "A dirty benchmark checkout or a declared/current revision mismatch blocks promotion readiness because the evaluator state would not be independently reproducible.",
-            "A complete shadow score is required for promotion readiness; missing generative judgments cannot be hidden by a provenance-complete manifest.",
+            "Promotion requires an explicit prompt adaptation mode and one observed adaptation path; auto/mixed adaptation is exploratory only.",
+            "A dirty benchmark checkout or declared/current revision mismatch blocks promotion because the evaluator state would not be independently reproducible.",
+            "A complete shadow score is required; missing generative judgments cannot be hidden by a provenance-complete manifest.",
             "Chat-template runs require a recorded tokenizer chat-template hash.",
-            "External/native evaluator outputs should be attached with --artifact and their evaluator revisions recorded in the artifact itself or accompanying notes.",
+            "Supplied Hugging Face public-source manifests require immutable requested revisions and resolved fingerprints for every represented source.",
+            "Public-fast reproducibility does not convert that lane into an official/native benchmark result.",
+            "External/native evaluator outputs should be attached with --artifact and evaluator/source revisions preserved in accompanying artifacts/notes."
         ],
     }
 
