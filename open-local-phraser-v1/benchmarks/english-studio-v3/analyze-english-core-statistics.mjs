@@ -18,8 +18,6 @@ const config = JSON.parse(fs.readFileSync(path.join(here, "english-core-config.j
 const seed = JSON.parse(fs.readFileSync(path.join(here, "english-core-shadow.seed.json"), "utf8"));
 const metadata = new Map(seed.cases.map((x) => [x.id, x]));
 
-// Deterministic PRNG so reports are reproducible. This is only for bootstrap
-// resampling, not for generation.
 let state = 0x45c0a11d;
 function random() {
   state ^= state << 13;
@@ -55,8 +53,11 @@ const byDimension = Object.fromEntries(dimensions.map((d) => [d, scored.filter((
 const dimensionReport = {};
 for (const dimension of dimensions) {
   const rows = byDimension[dimension];
+  const declared = score.dimensionScores?.[dimension] ?? {};
+  const expectedCases = Number(declared.cases ?? metadata.size);
+  const complete = declared.complete === true && rows.length === expectedCases;
   const boot = [];
-  if (rows.length) {
+  if (complete) {
     for (let b = 0; b < iterations; b += 1) boot.push(mean(sampleWithReplacement(rows).map((x) => x.score)) * 100);
   }
   const phenomena = {};
@@ -66,20 +67,24 @@ for (const dimension of dimensions) {
     phenomena[phenomenon].push(row.score);
   }
   dimensionReport[dimension] = {
-    cases: rows.length,
-    score100: rows.length ? Number((mean(rows.map((x) => x.score)) * 100).toFixed(3)) : null,
-    bootstrap95: ci95(boot),
+    expectedCases,
+    scoredCases: rows.length,
+    coverage: expectedCases ? Number((rows.length / expectedCases).toFixed(6)) : null,
+    complete,
+    score100: complete ? Number((mean(rows.map((x) => x.score)) * 100).toFixed(3)) : null,
+    bootstrap95: complete ? ci95(boot) : null,
+    incompleteReason: complete ? null : "Uncertainty withheld because the dimension is not completely scored; partial-item intervals would overstate comparability.",
     phenomena: Object.fromEntries(Object.entries(phenomena).map(([k, xs]) => [k, {
       cases: xs.length,
-      score100: Number((mean(xs) * 100).toFixed(3))
+      score100Exploratory: Number((mean(xs) * 100).toFixed(3))
     }]))
   };
 }
 
-const allDimensionsPresent = dimensions.every((d) => byDimension[d].length > 0);
+const allDimensionsComplete = score.complete === true && dimensions.every((d) => dimensionReport[d].complete);
 const weightedBoot = [];
 const equalBoot = [];
-if (allDimensionsPresent) {
+if (allDimensionsComplete) {
   for (let b = 0; b < iterations; b += 1) {
     const dimMeans = {};
     for (const d of dimensions) dimMeans[d] = mean(sampleWithReplacement(byDimension[d]).map((x) => x.score)) * 100;
@@ -89,22 +94,28 @@ if (allDimensionsPresent) {
 }
 
 const report = {
-  version: 1,
+  version: 2,
   runId: score.runId ?? null,
   model: score.model ?? null,
+  benchmarkInputs: score.benchmarkInputs ?? null,
+  taskFileSha256: score.taskFileSha256 ?? null,
   bootstrapIterations: iterations,
   bootstrapSeed: "0x45c0a11d",
   dimensions: dimensionReport,
-  compositeUncertainty: allDimensionsPresent ? {
+  compositeComplete: allDimensionsComplete,
+  compositeUncertainty: allDimensionsComplete ? {
     productWeighted95: ci95(weightedBoot),
     equalWeight95: ci95(equalBoot)
   } : null,
+  compositeWithheldReason: allDimensionsComplete ? null : "Composite uncertainty is withheld until every English Core dimension is completely scored.",
   interpretationRules: [
     "These are nonparametric item-resampling intervals conditional on the current English Core shadow set.",
     "They do not imply that the handcrafted shadow set is a random sample from a universal distribution of English.",
-    "Very wide intervals are expected for dimensions with only a handful of shadow items and are evidence against making fine-grained winner claims.",
-    "Per-phenomenon results remain visible because correlated/similar items can make naive item-level precision look stronger than it is.",
-    "Use paired comparison on the same items when comparing two models; do not infer a model-vs-model significance result merely from overlap or non-overlap of two separate confidence intervals."
+    "A dimension must be fully scored before its bootstrap interval is reported; missing generative judgments are not silently ignored.",
+    "Composite uncertainty is reported only when the score report itself is complete and all seven dimensions have full item coverage.",
+    "Very wide intervals are evidence against making fine-grained winner claims.",
+    "Per-phenomenon descriptive values remain visible, but they are labeled exploratory because many phenomena contain very few items.",
+    "Use paired comparison on the same items when comparing two models; do not infer a model-vs-model significance result from separate confidence-interval overlap."
   ],
   researchBasis: [
     "Fornaciari et al., ACL 2022, BooStSa: bootstrap sampling for NLP model evaluation",
