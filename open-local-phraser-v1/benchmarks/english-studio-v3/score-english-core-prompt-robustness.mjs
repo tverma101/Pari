@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseChoiceLetter } from "./english-core-choice-parser.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const resultPath = process.argv[2];
@@ -63,20 +64,6 @@ function expectedLetter(row) {
   return idx >= 0 ? letters[idx] : null;
 }
 
-function parseLetter(text) {
-  const s = String(text ?? "").trim().toUpperCase();
-  for (const pattern of [
-    /^([A-Z])$/,
-    /^([A-Z])(?:[.)\]:-])(?:\s|$)/,
-    /^ANSWER\s*[:=-]\s*([A-Z])(?:\b|[.)\]:-])/,
-    /^OPTION\s+([A-Z])(?:\b|[.)\]:-])/
-  ]) {
-    const m = s.match(pattern);
-    if (m) return m[1];
-  }
-  return null;
-}
-
 function mean(xs) { return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null; }
 
 const forced = tasks.filter((x) => !x.generative);
@@ -85,7 +72,7 @@ for (const task of forced) {
   const row = byBase.get(task.baseId);
   const expected = expectedLetter(row);
   const got = outputs.get(task.id);
-  const predicted = got ? parseLetter(got.output) : null;
+  const predicted = got ? parseChoiceLetter(got.output) : null;
   detail.push({
     id: task.id,
     baseId: task.baseId,
@@ -146,7 +133,7 @@ for (const dim of [...new Set(detail.map((x) => x.dimension))]) {
 }
 
 const report = {
-  version: 1,
+  version: 2,
   model: run.model ?? null,
   runId: run.runId ?? null,
   forcedChoice: summarize(detail),
@@ -155,6 +142,7 @@ const report = {
   generativeNote: "Generative prompt sensitivity must be analyzed with the same independently validated metric/human protocol across variants; this scorer intentionally does not invent an automatic generative quality score.",
   interpretation: {
     primary: ["meanPromptAccuracy", "worstPromptAccuracy", "allPromptsCorrectRate", "answerConsistencyRate"],
+    parserPolicy: "Only unambiguous choice forms are accepted; formatting wrappers such as 'The answer is A' are recovered, while free-form/inferred choices remain invalid.",
     rule: "Do not pick the best prompt after observing model results. Large promptAccuracySpread or low answerConsistencyRate is a robustness warning even when canonical accuracy is high."
   },
   researchBasis: [
