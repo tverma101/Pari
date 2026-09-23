@@ -15,7 +15,6 @@ const config = JSON.parse(fs.readFileSync(path.join(here, "english-core-config.j
 const seed = JSON.parse(fs.readFileSync(path.join(here, "english-core-shadow.seed.json"), "utf8"));
 const run = JSON.parse(fs.readFileSync(resultPath, "utf8"));
 
-const byId = new Map(seed.cases.map((x) => [x.id, x]));
 const outputs = new Map((run.outputs ?? []).map((x) => [x.id, x]));
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -45,10 +44,21 @@ function choiceIndex(row) {
 
 function parseLetter(text) {
   const s = String(text ?? "").trim().toUpperCase();
-  const direct = s.match(/^([A-Z])(?:\b|[.)\]:-])/);
-  if (direct) return direct[1];
-  const lone = s.match(/^([A-Z])$/);
-  return lone ? lone[1] : null;
+  if (!s) return null;
+
+  // Do not turn this benchmark into an instruction-format test. Accept common
+  // harmless wrappers while still refusing to mine a long explanation for a guess.
+  const patterns = [
+    /^([A-Z])$/,
+    /^([A-Z])(?:[.)\]:-])(?:\s|$)/,
+    /^ANSWER\s*[:=-]\s*([A-Z])(?:\b|[.)\]:-])/,
+    /^OPTION\s+([A-Z])(?:\b|[.)\]:-])/,
+  ];
+  for (const pattern of patterns) {
+    const match = s.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
 }
 
 function mean(values) {
@@ -134,6 +144,7 @@ const report = {
     "This scorer covers the fresh Pari shadow set only; public-anchor benchmark results must be reported separately.",
     "Forced-choice cases are deterministically scored from the private seed answer key.",
     "Generative cases require normalized external metricScores and a metricSource; candidate-model self-grading is not accepted.",
+    "Harmless answer wrappers such as `Answer: A` are accepted so formatting compliance is not confused with English competence.",
     "Runtime, RAM and quantization do not affect English Core competence scores.",
   ],
   detail,
