@@ -51,6 +51,35 @@ function sampleWithReplacement(rows) {
   for (let i = 0; i < rows.length; i += 1) out.push(rows[Math.floor(random() * rows.length)]);
   return out;
 }
+function groupByPhenomenon(rows) {
+  const groups = new Map();
+  for (const row of rows) {
+    const phenomenon = metadata.get(row.id)?.phenomenon ?? "unspecified";
+    if (!groups.has(phenomenon)) groups.set(phenomenon, []);
+    groups.get(phenomenon).push(row);
+  }
+  return groups;
+}
+function phenomenonClusterBootstrap(rows) {
+  const groups = [...groupByPhenomenon(rows).values()];
+  if (groups.length < 2) return { clusterCount: groups.length, bootstrap95: null, note: "Too few phenomenon clusters." };
+  const boot = [];
+  for (let b = 0; b < iterations; b += 1) {
+    const sampledRows = [];
+    for (let i = 0; i < groups.length; i += 1) {
+      const picked = groups[Math.floor(random() * groups.length)];
+      sampledRows.push(...picked);
+    }
+    boot.push(mean(sampledRows.map((x) => x.score)) * 100);
+  }
+  return {
+    clusterCount: groups.length,
+    bootstrap95: ci95(boot),
+    note: groups.length < 20
+      ? "Exploratory sensitivity only: the number of phenomenon clusters is small, so cluster-bootstrap uncertainty itself is unstable."
+      : "Phenomenon-cluster sensitivity interval."
+  };
+}
 
 const scored = (score.detail ?? []).filter((x) => typeof x.score === "number");
 const dimensions = Object.keys(config.composite.weights);
@@ -78,7 +107,8 @@ for (const dimension of dimensions) {
     coverage: expectedCases ? Number((rows.length / expectedCases).toFixed(6)) : null,
     complete,
     score100: complete ? Number((mean(rows.map((x) => x.score)) * 100).toFixed(3)) : null,
-    bootstrap95: complete ? ci95(boot) : null,
+    itemBootstrap95: complete ? ci95(boot) : null,
+    phenomenonClusterSensitivity: complete ? phenomenonClusterBootstrap(rows) : null,
     incompleteReason: complete ? null : "Uncertainty withheld because the dimension is not completely scored; partial-item intervals would overstate comparability.",
     phenomena: Object.fromEntries(Object.entries(phenomena).map(([k, xs]) => [k, {
       cases: xs.length,
@@ -100,7 +130,7 @@ if (allDimensionsComplete) {
 }
 
 const report = {
-  version: 3,
+  version: 4,
   runId: score.runId ?? null,
   model: score.model ?? null,
   benchmarkInputs: score.benchmarkInputs ?? null,
@@ -110,17 +140,19 @@ const report = {
   dimensions: dimensionReport,
   compositeComplete: allDimensionsComplete,
   compositeUncertainty: allDimensionsComplete ? {
-    productWeighted95: ci95(weightedBoot),
-    equalWeight95: ci95(equalBoot)
+    productWeightedItemBootstrap95: ci95(weightedBoot),
+    equalWeightItemBootstrap95: ci95(equalBoot)
   } : null,
   compositeWithheldReason: allDimensionsComplete ? null : "Composite uncertainty is withheld until every English Core dimension is completely scored.",
   interpretationRules: [
-    "These are nonparametric item-resampling intervals conditional on the current English Core shadow set.",
-    "They do not imply that the handcrafted shadow set is a random sample from a universal distribution of English.",
-    "A dimension must be fully scored before its bootstrap interval is reported; missing generative judgments are not silently ignored.",
-    "Expected per-dimension case counts come from the scored report when present, otherwise from the current seed's true per-dimension counts; the full 68-case seed size is never used as a dimension fallback.",
+    "Item-bootstrap intervals are nonparametric resampling intervals conditional on the current English Core shadow items.",
+    "Items that share a linguistic phenomenon or template family may not be statistically independent; each dimension therefore also reports a phenomenon-cluster bootstrap sensitivity interval.",
+    "Phenomenon-cluster intervals are explicitly exploratory when there are few clusters and must not be treated as precise inferential bounds.",
+    "Neither interval implies that the handcrafted shadow set is a random sample from a universal distribution of English.",
+    "A dimension must be fully scored before uncertainty is reported; missing generative judgments are not silently ignored.",
+    "Expected per-dimension case counts come from the scored report when present, otherwise from the current seed's true per-dimension counts; the full seed size is never used as a dimension fallback.",
     "Composite uncertainty is reported only when the score report itself is complete and all seven dimensions have full item coverage.",
-    "Very wide intervals are evidence against making fine-grained winner claims.",
+    "Very wide or materially different item-vs-cluster intervals are evidence against fine-grained winner claims.",
     "Per-phenomenon descriptive values remain visible, but they are labeled exploratory because many phenomena contain very few items.",
     "Use paired comparison on the same items when comparing two models; do not infer a model-vs-model significance result from separate confidence-interval overlap."
   ],
@@ -128,7 +160,9 @@ const report = {
     "Fornaciari et al., ACL 2022, BooStSa: bootstrap sampling for NLP model evaluation",
     "Peyrard et al., ACL 2021, Better than Average: Paired Evaluation of NLP systems",
     "Siska et al., ACL 2024, robustness to benchmark distributional assumptions",
-    "Kovatchev and Lease, NAACL 2024, Benchmark Transparency"
+    "Kovatchev and Lease, NAACL 2024, Benchmark Transparency",
+    "Burchill and Jaeger, Journal of Memory and Language 2024, hierarchical bootstrap and dependency in language data",
+    "Anglin, 2026 preprint, uncertainty for LLM/classifier performance with nested data"
   ]
 };
 
