@@ -153,6 +153,7 @@ def main() -> None:
     decoding = run.get("decoding") or {}
     reproducibility = run.get("reproducibility") or {}
     model_hash = args.model_artifact_sha256 or model.get("artifactSha256")
+    declared_benchmark_revision = reproducibility.get("benchmarkRevision")
 
     blockers = []
     if not is_sha256(model_hash):
@@ -170,12 +171,19 @@ def main() -> None:
             blockers.append(f"missing_decoding_{key}")
     if not reproducibility.get("rawOutputSha256"):
         blockers.append("missing_raw_output_hash")
-    if not reproducibility.get("benchmarkRevision") or reproducibility.get("benchmarkRevision") == "unknown":
+    if not declared_benchmark_revision or declared_benchmark_revision == "unknown":
         blockers.append("missing_benchmark_revision")
     if not current_commit:
         blockers.append("unable_to_resolve_current_git_commit")
+    elif declared_benchmark_revision and declared_benchmark_revision != "unknown" and declared_benchmark_revision != current_commit:
+        blockers.append("declared_benchmark_revision_mismatch_current_checkout")
     if dirty:
         blockers.append("benchmark_worktree_is_dirty")
+
+    adaptation_modes = set(run.get("promptAdaptationModesObserved") or [])
+    if "chat_template" in adaptation_modes and not is_sha256(model.get("chatTemplateSha256")):
+        blockers.append("missing_chat_template_hash_for_chat_run")
+
     if score is None:
         blockers.append("missing_shadow_score_artifact")
     else:
@@ -190,9 +198,12 @@ def main() -> None:
                 blockers.append(f"missing_score_benchmark_hash_{key}")
         if score.get("taskFileSha256") != run.get("taskFileSha256"):
             blockers.append("score_run_task_hash_mismatch")
+        if score.get("complete") is not True:
+            blockers.append("incomplete_shadow_score")
 
+    blockers = list(dict.fromkeys(blockers))
     manifest = {
-        "version": 1,
+        "version": 2,
         "generatedAtUtc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "purpose": "Frozen provenance manifest for English Core evidence; not a quality metric.",
         "promotionReady": not blockers,
@@ -215,19 +226,23 @@ def main() -> None:
         "benchmarkCheckout": {
             "currentGitCommit": current_commit,
             "worktreeDirty": dirty,
-            "declaredBenchmarkRevision": reproducibility.get("benchmarkRevision"),
+            "declaredBenchmarkRevision": declared_benchmark_revision,
+            "declaredMatchesCurrent": bool(current_commit and declared_benchmark_revision == current_commit),
         },
         "artifacts": artifacts,
         "rules": [
             "All supplied evidence files are hashed byte-for-byte.",
             "Promotion readiness is a provenance gate only; it does not imply model quality or benchmark validity.",
-            "A dirty benchmark checkout blocks promotion readiness because uncommitted evaluator changes are not independently reproducible.",
+            "A dirty benchmark checkout or a declared/current revision mismatch blocks promotion readiness because the evaluator state would not be independently reproducible.",
+            "A complete shadow score is required for promotion readiness; missing generative judgments cannot be hidden by a provenance-complete manifest.",
+            "Chat-template runs require a recorded tokenizer chat-template hash.",
             "External/native evaluator outputs should be attached with --artifact and their evaluator revisions recorded in the artifact itself or accompanying notes.",
         ],
     }
 
-    args.output.expanduser().resolve().write_text(json.dumps(manifest, indent=2) + "\n")
-    print(json.dumps({"output": str(args.output), "promotionReady": not blockers, "blockers": blockers}, indent=2))
+    output_path = args.output.expanduser().resolve()
+    output_path.write_text(json.dumps(manifest, indent=2) + "\n")
+    print(json.dumps({"output": str(output_path), "promotionReady": not blockers, "blockers": blockers}, indent=2))
     if args.require_promotion_ready and blockers:
         raise SystemExit(1)
 
