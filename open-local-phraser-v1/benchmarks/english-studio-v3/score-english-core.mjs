@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,7 +19,18 @@ const run = JSON.parse(fs.readFileSync(resultPath, "utf8"));
 const outputs = new Map((run.outputs ?? []).map((x) => [x.id, x]));
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-function choiceIndex(row) {
+function permutation(length, id) {
+  const order = Array.from({ length }, (_, i) => i);
+  for (let i = length - 1; i > 0; i -= 1) {
+    const digest = crypto.createHash("sha256").update(`${id}:option:${i}`).digest();
+    const value = digest.readUInt32BE(0);
+    const j = value % (i + 1);
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}
+
+function baseChoiceIndex(row) {
   switch (row.task) {
     case "same_sense":
     case "same_meaning":
@@ -42,12 +54,29 @@ function choiceIndex(row) {
   }
 }
 
+function expectedLetter(row) {
+  const baseIndex = baseChoiceIndex(row);
+  if (baseIndex < 0) return null;
+  let choiceCount;
+  switch (row.task) {
+    case "same_sense":
+    case "same_meaning":
+    case "relation_preservation":
+    case "acceptability_pair":
+      choiceCount = 2;
+      break;
+    default:
+      choiceCount = row.choices?.length ?? -1;
+  }
+  if (choiceCount < 1) return null;
+  const order = permutation(choiceCount, row.id);
+  const permutedIndex = order.indexOf(baseIndex);
+  return permutedIndex >= 0 ? letters[permutedIndex] : null;
+}
+
 function parseLetter(text) {
   const s = String(text ?? "").trim().toUpperCase();
   if (!s) return null;
-
-  // Do not turn this benchmark into an instruction-format test. Accept common
-  // harmless wrappers while still refusing to mine a long explanation for a guess.
   const patterns = [
     /^([A-Z])$/,
     /^([A-Z])(?:[.)\]:-])(?:\s|$)/,
@@ -94,9 +123,8 @@ for (const row of seed.cases) {
     continue;
   }
 
-  const expectedIndex = choiceIndex(row);
-  if (expectedIndex < 0) throw new Error(`Cannot derive gold answer for ${row.id}`);
-  const expected = letters[expectedIndex];
+  const expected = expectedLetter(row);
+  if (!expected) throw new Error(`Cannot derive permuted gold answer for ${row.id}`);
   const predicted = parseLetter(got.output);
   detail.push({
     id: row.id,
@@ -133,7 +161,7 @@ for (const [dimension, weight] of Object.entries(config.composite.weights)) {
 }
 
 const report = {
-  version: 1,
+  version: 2,
   runId: run.runId ?? null,
   model: run.model ?? null,
   shadowCases: seed.cases.length,
@@ -142,9 +170,9 @@ const report = {
   complete,
   notes: [
     "This scorer covers the fresh Pari shadow set only; public-anchor benchmark results must be reported separately.",
+    "Forced-choice option positions are deterministically permuted per case ID to reduce answer-position artifacts.",
     "Forced-choice cases are deterministically scored from the private seed answer key.",
     "Generative cases require normalized external metricScores and a metricSource; candidate-model self-grading is not accepted.",
-    "Harmless answer wrappers such as `Answer: A` are accepted so formatting compliance is not confused with English competence.",
     "Runtime, RAM and quantization do not affect English Core competence scores.",
   ],
   detail,
