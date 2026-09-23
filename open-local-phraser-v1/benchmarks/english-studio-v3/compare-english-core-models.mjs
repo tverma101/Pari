@@ -18,6 +18,23 @@ const A = JSON.parse(fs.readFileSync(aPath, "utf8"));
 const B = JSON.parse(fs.readFileSync(bPath, "utf8"));
 const config = JSON.parse(fs.readFileSync(path.join(here, "english-core-config.json"), "utf8"));
 
+function requireSameBenchmarkInputs(a, b) {
+  const keys = ["configSha256", "shadowSeedSha256", "generativeMetricContractSha256"];
+  if (!a?.benchmarkInputs || !b?.benchmarkInputs) {
+    throw new Error("Both score files must include benchmarkInputs hashes from score-english-core.mjs v7+");
+  }
+  for (const key of keys) {
+    if (!a.benchmarkInputs[key] || !b.benchmarkInputs[key]) throw new Error(`Missing benchmark input hash: ${key}`);
+    if (a.benchmarkInputs[key] !== b.benchmarkInputs[key]) {
+      throw new Error(`Cannot pair runs from different benchmark inputs: ${key} differs`);
+    }
+  }
+  if (!a.taskFileSha256 || !b.taskFileSha256) throw new Error("Both score files must include taskFileSha256");
+  if (a.taskFileSha256 !== b.taskFileSha256) throw new Error("Cannot pair runs with different model-visible task files");
+}
+
+requireSameBenchmarkInputs(A, B);
+
 const mapA = new Map((A.detail ?? []).filter((x) => typeof x.score === "number").map((x) => [x.id, x]));
 const mapB = new Map((B.detail ?? []).filter((x) => typeof x.score === "number").map((x) => [x.id, x]));
 const ids = [...mapA.keys()].filter((id) => mapB.has(id));
@@ -77,14 +94,30 @@ function summarize(rows) {
 
 const dimensions = Object.keys(config.composite.weights);
 const byDimension = {};
+let everyDimensionComplete = true;
 for (const d of dimensions) {
   const rows = pairs.filter((x) => x.dimension === d);
-  byDimension[d] = rows.length ? summarize(rows) : null;
+  const aMeta = A.dimensionScores?.[d] ?? {};
+  const bMeta = B.dimensionScores?.[d] ?? {};
+  const sameExpectedCount = Number(aMeta.cases) === Number(bMeta.cases);
+  const complete = aMeta.complete === true && bMeta.complete === true && sameExpectedCount && rows.length === Number(aMeta.cases);
+  if (!complete) everyDimensionComplete = false;
+  byDimension[d] = {
+    complete,
+    expectedCasesA: aMeta.cases ?? null,
+    expectedCasesB: bMeta.cases ?? null,
+    alignedScoredCases: rows.length,
+    comparison: complete ? summarize(rows) : null,
+    incompleteReason: complete ? null : "Paired interval withheld because one or both models lack full aligned coverage for this dimension."
+  };
 }
 
-// Stratified paired bootstrap for the product-weighted and equal-weight composites.
-const availableDimensions = dimensions.filter((d) => pairs.some((x) => x.dimension === d));
-const complete = availableDimensions.length === dimensions.length;
+const expectedShadowCases = Number(A.shadowCases);
+const fullAlignment = Number.isFinite(expectedShadowCases)
+  && expectedShadowCases === Number(B.shadowCases)
+  && pairs.length === expectedShadowCases;
+const complete = A.complete === true && B.complete === true && everyDimensionComplete && fullAlignment;
+
 const weightedBoot = [];
 const equalBoot = [];
 if (complete) {
@@ -100,10 +133,10 @@ if (complete) {
 }
 
 function observedComposite(weighted) {
+  if (!complete) return null;
   const vals = {};
   for (const d of dimensions) {
     const rows = pairs.filter((x) => x.dimension === d);
-    if (!rows.length) return null;
     vals[d] = mean(rows.map((x) => x.diff)) * 100;
   }
   return weighted
@@ -121,11 +154,20 @@ function conclusionFrom(ci) {
 const weightedCI = complete ? ci95(weightedBoot) : null;
 const equalCI = complete ? ci95(equalBoot) : null;
 const report = {
-  version: 1,
+  version: 2,
   modelA: A.model ?? null,
   modelB: B.model ?? null,
-  alignedCases: pairs.length,
-  overallPairedItemComparison: summarize(pairs),
+  benchmarkInputs: A.benchmarkInputs,
+  taskFileSha256: A.taskFileSha256,
+  alignedScoredCases: pairs.length,
+  expectedShadowCases: expectedShadowCases || null,
+  fullAlignment,
+  completeForHeadlineComparison: complete,
+  overallPairedItemComparison: complete ? summarize(pairs) : null,
+  exploratoryAlignedItemSummary: complete ? null : {
+    alignedCases: pairs.length,
+    note: "No inferential winner is reported from this partial intersection. Complete aligned scoring is required."
+  },
   byDimension,
   compositeComparison: complete ? {
     productWeightedDeltaAminusB100: Number(observedComposite(true).toFixed(3)),
@@ -135,10 +177,13 @@ const report = {
     equalWeightPairedBootstrap95: equalCI,
     equalWeightConclusion: conclusionFrom(equalCI)
   } : null,
+  compositeWithheldReason: complete ? null : "Headline/composite paired conclusions require identical benchmark hashes, identical task file, complete scoring for both models, and full item alignment across all dimensions.",
   interpretationRules: [
-    "Comparisons are paired because both models are evaluated on the same items.",
-    "If the paired interval includes zero, report the comparison as inconclusive rather than forcing a winner.",
-    "A significant difference on this shadow set is not automatically a universal-English claim; public anchors, prompt robustness, distribution validity, and external replication still matter.",
+    "Comparisons are paired because both models are evaluated on the exact same items.",
+    "Benchmark seed/config/metric-contract hashes and model-visible task-file hashes must match before comparison.",
+    "Missing or externally unscored items are never silently reduced to the intersection for a headline winner claim.",
+    "If a complete paired interval includes zero, report the comparison as inconclusive rather than forcing a winner.",
+    "A difference on this shadow set is not automatically a universal-English claim; public anchors, prompt robustness, distribution validity, and external replication still matter.",
     "Do not use independent-model confidence-interval overlap as a substitute for this paired comparison."
   ],
   bootstrapIterations: iterations,
