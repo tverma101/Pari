@@ -30,7 +30,7 @@ HERE = Path(__file__).resolve().parent
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-def permute_choices(task_id: str, choices: list[str], correct_index: int) -> tuple[list[str], str]:
+def permute_choices(task_id: str, choices: list[str], correct_index: int) -> tuple[list[str], str, list[int]]:
     """Deterministically permute choices to reduce answer-position artifacts."""
     order = list(range(len(choices)))
     for i in range(len(order) - 1, 0, -1):
@@ -38,7 +38,7 @@ def permute_choices(task_id: str, choices: list[str], correct_index: int) -> tup
         j = int.from_bytes(digest[:4], "big") % (i + 1)
         order[i], order[j] = order[j], order[i]
     shuffled = [choices[i] for i in order]
-    return shuffled, LETTERS[order.index(correct_index)]
+    return shuffled, LETTERS[order.index(correct_index)], order
 
 
 def choice_prompt(prefix: str, choices: list[str]) -> str:
@@ -58,11 +58,18 @@ def add(
     dimension: str,
     prefix: str,
     choices: list[str],
+    choice_labels: list[int],
     correct_index: int,
     gold_label: int,
     phenomenon: str,
 ) -> None:
-    shuffled, letter = permute_choices(task_id, choices, correct_index)
+    if len(choices) != len(choice_labels):
+        raise ValueError(f"{task_id}: choices and choice_labels length mismatch")
+    shuffled, letter, order = permute_choices(task_id, choices, correct_index)
+    label_by_letter = {
+        LETTERS[new_index]: int(choice_labels[original_index])
+        for new_index, original_index in enumerate(order)
+    }
     tasks.append(
         {
             "id": task_id,
@@ -76,10 +83,14 @@ def add(
     answers[task_id] = {
         "letter": letter,
         "goldLabel": int(gold_label),
+        "labelByLetter": label_by_letter,
     }
     counts[source] += 1
     label_counts.setdefault(source, Counter())[int(gold_label)] += 1
 
+
+# In all three binary tasks, original choice 0 expresses class 1 and choice 1 class 0.
+BINARY_CHOICE_LABELS = [1, 0]
 
 # WiC / SuperGLUE validation: label 1=same sense, 0=different sense.
 for i, row in enumerate(load_dataset("aps/super_glue", "wic", split="validation")):
@@ -96,6 +107,7 @@ for i, row in enumerate(load_dataset("aps/super_glue", "wic", split="validation"
             "Does the target have the same meaning in both sentences?"
         ),
         ["same", "different"],
+        BINARY_CHOICE_LABELS,
         0 if label == 1 else 1,
         label,
         "word_sense_discrimination",
@@ -112,6 +124,7 @@ for i, row in enumerate(load_dataset("nyu-mll/glue", "cola", split="validation")
         "grammar_syntax",
         f"Sentence: {row['sentence']}\nIs this sentence acceptable in standard written English?",
         ["acceptable", "unacceptable"],
+        BINARY_CHOICE_LABELS,
         0 if label == 1 else 1,
         label,
         "acceptability",
@@ -132,6 +145,7 @@ for i, row in enumerate(load_dataset("paws", "labeled_final", split="validation"
             "Do these sentences preserve the same meaning?"
         ),
         ["same", "different"],
+        BINARY_CHOICE_LABELS,
         0 if label == 1 else 1,
         label,
         "high_overlap_paraphrase",
@@ -142,17 +156,17 @@ for i, row in enumerate(load_dataset("paws", "labeled_final", split="validation"
     "\n".join(json.dumps(row, ensure_ascii=False) for row in tasks) + "\n"
 )
 (HERE / "english-core-public-full-classification.answers.json").write_text(
-    json.dumps({"version": 1, "answers": answers}, indent=2) + "\n"
+    json.dumps({"version": 2, "answers": answers}, indent=2) + "\n"
 )
 (HERE / "english-core-public-full-classification.manifest.json").write_text(
     json.dumps(
         {
-            "version": 1,
+            "version": 2,
             "purpose": "full-distribution prompted classification lane; distinct from balanced fast screen and benchmark-native protocols",
             "cases": len(tasks),
             "countsBySource": dict(counts),
             "labelCountsBySource": {k: dict(v) for k, v in label_counts.items()},
-            "optionOrder": "deterministic SHA-256 permutation per item",
+            "optionOrder": "deterministic SHA-256 permutation per item; answer file preserves displayed-letter-to-class mapping",
             "distributionPolicy": "no Pari label balancing or subsampling; preserve each locally scoreable validation distribution",
             "adaptation": "zero-shot prompted classification; not identical to supervised benchmark-native model adaptation",
             "sources": {
