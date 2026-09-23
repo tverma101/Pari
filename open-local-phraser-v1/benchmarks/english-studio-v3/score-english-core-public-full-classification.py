@@ -14,31 +14,15 @@ from __future__ import annotations
 
 import json
 import math
-import re
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from english_core_choice_parser import parse_choice_letter
+
 HERE = Path(__file__).resolve().parent
 TASKS = HERE / "english-core-public-full-classification.jsonl"
 ANSWERS = HERE / "english-core-public-full-classification.answers.json"
-
-
-def parse_letter(text: str) -> str | None:
-    s = str(text or "").strip().upper()
-    if not s:
-        return None
-    patterns = [
-        r"^([A-Z])$",
-        r"^([A-Z])(?:[.)\]:-])(?:\s|$)",
-        r"^ANSWER\s*[:=-]\s*([A-Z])(?:\b|[.)\]:-])",
-        r"^OPTION\s+([A-Z])(?:\b|[.)\]:-])",
-    ]
-    for pattern in patterns:
-        match = re.match(pattern, s)
-        if match:
-            return match.group(1)
-    return None
 
 
 def safe_div(a: float, b: float) -> float | None:
@@ -109,7 +93,7 @@ def main() -> None:
     for task in tasks:
         meta = answer_data[task["id"]]
         got = outputs.get(task["id"])
-        predicted_letter = parse_letter(got.get("output", "")) if got else None
+        predicted_letter = parse_choice_letter(got.get("output", "")) if got else None
         predicted_label = None
         if predicted_letter is not None:
             predicted_label = meta["labelByLetter"].get(predicted_letter)
@@ -159,7 +143,7 @@ def main() -> None:
     }
 
     report = {
-        "version": 1,
+        "version": 2,
         "runId": run.get("runId"),
         "model": run.get("model"),
         "adaptation": "zero-shot prompted classification on full locally scoreable validation distributions",
@@ -167,6 +151,7 @@ def main() -> None:
         "bySource": source_reports,
         "notes": [
             "This lane preserves the public validation distribution; it is separate from Pari's balanced public-fast screen.",
+            "The shared choice parser accepts only unambiguous letter forms such as A, A., Answer: A, The answer is A, or Option A; free-form prose remains invalid.",
             "Prompted zero-shot classification is not identical to the supervised model adaptation used in the original benchmark literature.",
             "CoLA headline reporting uses MCC when all predictions are valid; balanced-screen accuracy must not be called an official CoLA score.",
             "Invalid/missing outputs are never silently dropped from headline classification metrics.",
