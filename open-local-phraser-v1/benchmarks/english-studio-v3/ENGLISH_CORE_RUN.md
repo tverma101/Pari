@@ -111,11 +111,13 @@ node analyze-english-core-statistics.mjs shadow-score.json > shadow-stats.json
 Inspect both:
 
 - **item-bootstrap 95% intervals** — conditional on the current shadow items;
-- **phenomenon-cluster sensitivity intervals** — a dependence sensitivity check for cases sharing linguistic phenomena/templates.
+- **phenomenon hierarchical-bootstrap sensitivity** — resamples phenomenon groups and then items within the selected groups to probe dependence among cases sharing linguistic phenomena/templates.
 
-The cluster interval is explicitly exploratory when there are few phenomenon clusters. Neither interval turns the hand-authored shadow set into an i.i.d. sample of universal English.
+The hierarchical lane is a **sensitivity analysis**, not a population-confidence claim. Pari's phenomena were deliberately designed rather than randomly sampled from all English usage, and the benchmark does not invent a universal minimum number of phenomenon groups.
 
-Wide intervals or a large item-vs-cluster discrepancy weaken fine-grained model claims.
+Neither uncertainty lane turns the hand-authored shadow set into an i.i.d. sample of universal English. Wide intervals or a large item-vs-hierarchical discrepancy weaken fine-grained model claims.
+
+Research context for this treatment is recorded in the analyzer itself, including bootstrap NLP evaluation work and hierarchical/nested-data uncertainty literature. The exact choice to group by Pari `phenomenon` tags remains an application-specific engineering decision and is disclosed as such.
 
 ---
 
@@ -186,7 +188,7 @@ Primary diagnostics:
 - `oneCorrectOneWrongRate`;
 - per-presentation accuracy.
 
-This is a **robustness gate**, not an eighth weighted English dimension.
+This is a **robustness gate**, not an eighth weighted English dimension. The rationale is grounded in published evidence that LLM multiple-choice decisions and leaderboard rankings can change under option-order perturbations.
 
 ---
 
@@ -434,7 +436,7 @@ Patterns to investigate rather than average away:
 - strong canonical + weak multi-prompt — prompt-sensitive;
 - strong single-order + weak both-orders-correct — option-position sensitive;
 - small mean lead + paired CI crossing zero — inconclusive;
-- materially different item-vs-cluster intervals — dependence/coverage warning;
+- materially different item-vs-hierarchical intervals — dependence/coverage warning;
 - ranking flip under product/equal weights — product-prior sensitive;
 - native/prompted ranking flip — adaptation/protocol sensitive.
 
@@ -446,7 +448,7 @@ For serious base-model selection:
 
 1. Package/self-check.
 2. Canonical shadow profile.
-3. Shadow item + cluster-sensitive uncertainty.
+3. Shadow item-bootstrap + phenomenon hierarchical-bootstrap sensitivity.
 4. Multi-prompt robustness.
 5. Counterbalanced option-order robustness.
 6. Public-fast screen.
