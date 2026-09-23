@@ -36,6 +36,7 @@ const config = readJson("english-core-config.json");
 const seed = readJson("english-core-shadow.seed.json");
 const anchors = readJson("english-core-public-anchors.json");
 const resultSchema = readJson("english-core-result-schema.json");
+const metricContract = readJson("english-core-generative-metric-contract.json");
 
 if (config) {
   const weights = config.composite?.weights ?? {};
@@ -48,18 +49,10 @@ if (config) {
   for (const dimension of dimensions) {
     const dimWeight = config.dimensions[dimension]?.weight;
     const compositeWeight = weights[dimension];
-    if (typeof compositeWeight !== "number") {
-      errors.push(`dimension ${dimension} missing from composite weights`);
-    }
-    if (dimWeight !== compositeWeight) {
-      errors.push(`weight mismatch for ${dimension}: dimension=${dimWeight}, composite=${compositeWeight}`);
-    }
-    if (!config.dimensions[dimension]?.researchConstruct) {
-      errors.push(`dimension ${dimension} missing researchConstruct`);
-    }
-    if (!(config.dimensions[dimension]?.publicAnchors?.length > 0)) {
-      warnings.push(`dimension ${dimension} has no publicAnchors`);
-    }
+    if (typeof compositeWeight !== "number") errors.push(`dimension ${dimension} missing from composite weights`);
+    if (dimWeight !== compositeWeight) errors.push(`weight mismatch for ${dimension}: dimension=${dimWeight}, composite=${compositeWeight}`);
+    if (!config.dimensions[dimension]?.researchConstruct) errors.push(`dimension ${dimension} missing researchConstruct`);
+    if (!(config.dimensions[dimension]?.publicAnchors?.length > 0)) warnings.push(`dimension ${dimension} has no publicAnchors`);
   }
 
   for (const dimension of Object.keys(weights)) {
@@ -77,14 +70,21 @@ if (config) {
     "distributionValidity",
     "reproducibility"
   ]) {
-    if (!config.evaluationProtocol?.[requiredRule]) {
-      errors.push(`evaluationProtocol missing required rule: ${requiredRule}`);
-    }
+    if (!config.evaluationProtocol?.[requiredRule]) errors.push(`evaluationProtocol missing required rule: ${requiredRule}`);
   }
 
-  if (!config.evidenceLanes?.publicNative || !config.evidenceLanes?.freshShadow) {
-    errors.push("evidenceLanes must distinguish publicNative and freshShadow");
+  for (const lane of ["publicNative", "publicPromptedFull", "publicPromptedFast", "freshShadow"]) {
+    if (!config.evidenceLanes?.[lane]) errors.push(`evidenceLanes missing ${lane}`);
   }
+}
+
+if (metricContract) {
+  const directions = new Set(["higher_is_better", "lower_is_better"]);
+  for (const [name, definition] of Object.entries(metricContract.metrics ?? {})) {
+    if (!directions.has(definition.direction)) errors.push(`metric ${name} has invalid direction ${definition.direction}`);
+    if (!definition.construct) errors.push(`metric ${name} missing construct definition`);
+  }
+  if (!Object.keys(metricContract.metrics ?? {}).length) errors.push("generative metric contract has no metrics");
 }
 
 if (seed && config) {
@@ -103,6 +103,16 @@ if (seed && config) {
 
     if (!config.dimensions?.[row.dimension]) errors.push(`${row.id}: unknown dimension ${row.dimension}`);
     counts[row.dimension] = (counts[row.dimension] ?? 0) + 1;
+
+    if (row.dimension === "generative_expression") {
+      if (!Array.isArray(row.scoring) || row.scoring.length === 0) {
+        errors.push(`${row.id}: generative case missing scoring metrics`);
+      } else if (metricContract) {
+        for (const metric of row.scoring) {
+          if (!metricContract.metrics?.[metric]) errors.push(`${row.id}: unregistered generative metric ${metric}`);
+        }
+      }
+    }
   }
 
   for (const dimension of Object.keys(config.dimensions ?? {})) {
@@ -127,18 +137,20 @@ if (anchors && config) {
     if (!config.dimensions?.[anchor.dimension]) errors.push(`${anchor.id}: unknown anchor dimension ${anchor.dimension}`);
     if (!anchor.reference) errors.push(`${anchor.id}: missing research reference`);
     if (!anchor.role) errors.push(`${anchor.id}: missing role/construct explanation`);
+    if (!anchor.evidencePriority) warnings.push(`${anchor.id}: missing evidencePriority`);
+    if (!anchor.implementationStatus) warnings.push(`${anchor.id}: missing implementationStatus`);
     if (!(anchor.preferredMetrics?.length > 0)) warnings.push(`${anchor.id}: missing preferredMetrics`);
+    if (!anchor.nativeProtocol && anchor.evidencePriority !== "secondary") warnings.push(`${anchor.id}: primary/supporting anchor lacks nativeProtocol description`);
   }
 }
 
 if (resultSchema) {
-  const provenanceKind = resultSchema.properties?.outputs?.items?.properties?.metricProvenance?.properties?.kind?.enum ?? [];
-  if (!provenanceKind.includes("official_benchmark_metric")) {
-    errors.push("result schema metricProvenance must support official_benchmark_metric");
-  }
-  if (!provenanceKind.includes("blinded_human")) {
-    errors.push("result schema metricProvenance must support blinded_human");
-  }
+  const provenance = resultSchema.properties?.outputs?.items?.properties?.metricProvenance;
+  const provenanceKind = provenance?.properties?.kind?.enum ?? [];
+  const provenanceRequired = new Set(provenance?.required ?? []);
+  if (!provenanceKind.includes("official_benchmark_metric")) errors.push("result schema metricProvenance must support official_benchmark_metric");
+  if (!provenanceKind.includes("blinded_human")) errors.push("result schema metricProvenance must support blinded_human");
+  if (!provenanceRequired.has("protocol")) errors.push("result schema metricProvenance must require protocol/normalization description");
 }
 
 for (const requiredDoc of [
@@ -154,19 +166,22 @@ for (const requiredDoc of [
 }
 
 const report = {
-  version: 1,
+  version: 2,
   configVersion: config?.version ?? null,
   seedVersion: seed?.version ?? null,
+  metricContractVersion: metricContract?.version ?? null,
   shadowValidationStatus: seed?.validationStatus ?? null,
   shadowCases: seed?.cases?.length ?? null,
   dimensions: Object.keys(config?.dimensions ?? {}),
   publicAnchors: anchors?.anchors?.length ?? null,
+  registeredGenerativeMetrics: Object.keys(metricContract?.metrics ?? {}).length,
   errors,
   warnings,
   status: errors.length ? "fail" : warnings.length ? "pass_with_warnings" : "pass",
   interpretation: [
     "This validates benchmark package consistency, not linguistic validity.",
     "A passing package validator does not upgrade author-written shadow labels to independent human gold.",
+    "Generative metric registration/direction checks prevent accidental inversion but do not validate the evaluator itself.",
     "Run audit-english-core-shadow.mjs separately for item-level structural/distribution diagnostics.",
     "Research-level claims still require the claim-tier gates in ENGLISH_CORE_ROBUSTNESS.md."
   ]
