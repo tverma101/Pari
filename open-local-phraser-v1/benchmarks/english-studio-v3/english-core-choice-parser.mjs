@@ -12,7 +12,9 @@ export function parseChoiceLetter(text) {
   const patterns = [
     /^([A-Z])$/,
     /^([A-Z])[.)\]:-]$/,
-    /^(?:THE\s+)?ANSWER\s*(?::|=|-|IS)?\s*([A-Z])[.)\]:-]?$/,
+    /^(?:THE\s+)?ANSWER\s+IS\s+([A-Z])[.)\]:-]?$/,
+    /^(?:THE\s+)?ANSWER\s*[:=-]\s*([A-Z])[.)\]:-]?$/,
+    /^(?:THE\s+)?ANSWER\s+([A-Z])[.)\]:-]?$/,
     /^OPTION\s+([A-Z])[.)\]:-]?$/,
   ];
 
