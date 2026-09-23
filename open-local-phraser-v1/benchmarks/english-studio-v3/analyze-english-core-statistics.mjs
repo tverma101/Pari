@@ -17,6 +17,12 @@ const score = JSON.parse(fs.readFileSync(scorePath, "utf8"));
 const config = JSON.parse(fs.readFileSync(path.join(here, "english-core-config.json"), "utf8"));
 const seed = JSON.parse(fs.readFileSync(path.join(here, "english-core-shadow.seed.json"), "utf8"));
 const metadata = new Map(seed.cases.map((x) => [x.id, x]));
+const seedCountByDimension = Object.fromEntries(
+  Object.keys(config.composite.weights).map((dimension) => [
+    dimension,
+    seed.cases.filter((row) => row.dimension === dimension).length,
+  ]),
+);
 
 let state = 0x45c0a11d;
 function random() {
@@ -54,8 +60,8 @@ const dimensionReport = {};
 for (const dimension of dimensions) {
   const rows = byDimension[dimension];
   const declared = score.dimensionScores?.[dimension] ?? {};
-  const expectedCases = Number(declared.cases ?? metadata.size);
-  const complete = declared.complete === true && rows.length === expectedCases;
+  const expectedCases = Number(declared.cases ?? seedCountByDimension[dimension] ?? 0);
+  const complete = declared.complete === true && rows.length === expectedCases && expectedCases > 0;
   const boot = [];
   if (complete) {
     for (let b = 0; b < iterations; b += 1) boot.push(mean(sampleWithReplacement(rows).map((x) => x.score)) * 100);
@@ -94,7 +100,7 @@ if (allDimensionsComplete) {
 }
 
 const report = {
-  version: 2,
+  version: 3,
   runId: score.runId ?? null,
   model: score.model ?? null,
   benchmarkInputs: score.benchmarkInputs ?? null,
@@ -112,6 +118,7 @@ const report = {
     "These are nonparametric item-resampling intervals conditional on the current English Core shadow set.",
     "They do not imply that the handcrafted shadow set is a random sample from a universal distribution of English.",
     "A dimension must be fully scored before its bootstrap interval is reported; missing generative judgments are not silently ignored.",
+    "Expected per-dimension case counts come from the scored report when present, otherwise from the current seed's true per-dimension counts; the full 68-case seed size is never used as a dimension fallback.",
     "Composite uncertainty is reported only when the score report itself is complete and all seven dimensions have full item coverage.",
     "Very wide intervals are evidence against making fine-grained winner claims.",
     "Per-phenomenon descriptive values remain visible, but they are labeled exploratory because many phenomena contain very few items.",
