@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pari.local/schemas/v1-result-schema.json",
+  "title": "Pari V1 benchmark run result",
+  "type": "object",
+  "required": ["runId", "candidateId", "model", "runtime", "hardware", "generation", "routes"],
+  "properties": {
+    "runId": {"type": "string"},
+    "candidateId": {"type": "string"},
+    "timestamp": {"type": "string"},
+    "gitCommit": {"type": "string"},
+    "model": {
+      "type": "object",
+      "required": ["repoOrName", "revision", "quantization"],
+      "properties": {
+        "repoOrName": {"type": "string"},
+        "revision": {"type": "string"},
+        "artifactSha256": {"type": "string"},
+        "quantization": {"type": "string"},
+        "bytesOnDisk": {"type": "integer"}
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "string"},
+        "commit": {"type": "string"},
+        "mtpOrSpeculative": {"type": "boolean"},
+        "draftModelOrHead": {"type": ["string", "null"]}
+      }
+    },
+    "hardware": {
+      "type": "object",
+      "required": ["machine", "memoryGB", "os"],
+      "properties": {
+        "machine": {"type": "string"},
+        "chip": {"type": "string"},
+        "memoryGB": {"type": "number"},
+        "os": {"type": "string"}
+      }
+    },
+    "generation": {
+      "type": "object",
+      "required": ["promptContractVersion", "temperature", "maxNewTokens"],
+      "properties": {
+        "promptContractVersion": {"type": "string"},
+        "temperature": {"type": "number"},
+        "topP": {"type": "number"},
+        "topK": {"type": "integer"},
+        "seed": {"type": ["integer", "null"]},
+        "maxNewTokens": {"type": "integer"},
+        "candidateBudget": {"type": "integer"}
+      }
+    },
+    "runtimeMetrics": {
+      "type": "object",
+      "properties": {
+        "coldLoadSeconds": {"type": "number"},
+        "peakUnifiedMemoryBytes": {"type": "integer"},
+        "prefillTokensPerSecond": {"type": "number"},
+        "decodeTokensPerSecond": {"type": "number"},
+        "latencyFirstUsefulOptionSeconds": {"type": "number"},
+        "latencyTop3Seconds": {"type": "number"},
+        "latencyTop10Seconds": {"type": "number"},
+        "paragraphLatencySeconds": {"type": "number"},
+        "crashesOrFatalErrors": {"type": "integer"}
+      }
+    },
+    "routes": {
+      "type": "object",
+      "properties": {
+        "wordPhrase": {"$ref": "#/$defs/routeResult"},
+        "sentence": {"$ref": "#/$defs/routeResult"},
+        "paragraph": {"$ref": "#/$defs/routeResult"},
+        "safety": {"$ref": "#/$defs/routeResult"},
+        "strengthRegister": {"$ref": "#/$defs/routeResult"},
+        "containment": {"$ref": "#/$defs/routeResult"}
+      }
+    },
+    "rawOutputPath": {"type": "string"},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "routeResult": {
+      "type": "object",
+      "required": ["cases", "metrics", "hardFailures"],
+      "properties": {
+        "cases": {"type": "integer"},
+        "metrics": {"type": "object", "additionalProperties": {"type": ["number", "integer", "string", "boolean", "null"]}},
+        "hardFailures": {
+          "type": "object",
+          "properties": {
+            "contradiction": {"type": "integer"},
+            "negationFlip": {"type": "integer"},
+            "modalityChange": {"type": "integer"},
+            "quantityOrAnchorCorruption": {"type": "integer"},
+            "roleReversal": {"type": "integer"},
+            "invention": {"type": "integer"},
+            "protectedSpanCorruption": {"type": "integer"},
+            "outsideSelectionMutation": {"type": "integer"}
+          },
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}
