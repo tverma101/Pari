@@ -46,7 +46,7 @@
     {"id":"ec-gra-09","dimension":"grammar_syntax","task":"acceptability_pair","sentenceA":"No student has ever submitted that form.","sentenceB":"Some student has ever submitted that form.","answer":"A","phenomenon":"negative_polarity_item"},
     {"id":"ec-gra-10","dimension":"grammar_syntax","task":"acceptability_pair","sentenceA":"Maria blamed herself for the mistake.","sentenceB":"Maria blamed himself for the mistake.","answer":"A","phenomenon":"anaphor_binding_agreement"},
     {"id":"ec-gra-11","dimension":"grammar_syntax","task":"acceptability_pair","sentenceA":"The child has gone home already.","sentenceB":"The child has went home already.","answer":"A","phenomenon":"irregular_participle"},
-    {"id":"ec-gra-12","dimension":"grammar_syntax","task":"acceptability_pair","sentenceA":"Neither of the answers is correct.","sentenceB":"Neither of the answers are correct.","answer":"A","phenomenon":"quantifier_agreement_standard_written"},
+    {"id":"ec-gra-12","dimension":"grammar_syntax","task":"acceptability_pair","sentenceA":"She does not know the answer.","sentenceB":"She does not knows the answer.","answer":"A","phenomenon":"do_support_agreement"},
 
     {"id":"ec-sem-01","dimension":"paraphrase_semantics","task":"same_meaning","sentenceA":"Jordan sent Alex the document.","sentenceB":"Alex sent Jordan the document.","answer":"different","phenomenon":"actor_patient"},
     {"id":"ec-sem-02","dimension":"paraphrase_semantics","task":"same_meaning","sentenceA":"The update failed because the server restarted.","sentenceB":"The server restarted because the update failed.","answer":"different","phenomenon":"causal_direction"},
