@@ -12,7 +12,9 @@ import re
 _PATTERNS = [
     re.compile(r"^([A-Z])$"),
     re.compile(r"^([A-Z])[.)\]:-]$"),
-    re.compile(r"^(?:THE\s+)?ANSWER\s*(?::|=|-|IS)?\s*([A-Z])[.)\]:-]?$") ,
+    re.compile(r"^(?:THE\s+)?ANSWER\s+IS\s+([A-Z])[.)\]:-]?$") ,
+    re.compile(r"^(?:THE\s+)?ANSWER\s*[:=-]\s*([A-Z])[.)\]:-]?$") ,
+    re.compile(r"^(?:THE\s+)?ANSWER\s+([A-Z])[.)\]:-]?$") ,
     re.compile(r"^OPTION\s+([A-Z])[.)\]:-]?$") ,
 ]
 
