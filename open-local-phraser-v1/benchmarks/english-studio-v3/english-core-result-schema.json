@@ -59,14 +59,14 @@
             "additionalProperties": {"type": "number"}
           },
           "metricScores": {
-            "description": "For generative-expression cases only. Each value must be normalized to 0..1 and produced by an approved independent evaluation source, never by the candidate model grading itself.",
+            "description": "For generative-expression cases only. Values are normalized observations in [0,1] under the recorded protocol, not automatically assumed to be higher-is-better utilities. Directionality is defined by english-core-generative-metric-contract.json and converted by score-english-core.mjs.",
             "type": "object",
             "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
           },
           "metricProvenance": {
-            "description": "Structured provenance for generative metricScores. A free-form source name alone is insufficient for official English Core scoring.",
+            "description": "Structured provenance for generative metricScores. The protocol field must define the scoring/normalization procedure. A free-form source name alone is insufficient for official English Core scoring.",
             "type": "object",
-            "required": ["kind", "name", "candidateSelfGrade"],
+            "required": ["kind", "name", "protocol", "candidateSelfGrade"],
             "properties": {
               "kind": {
                 "type": "string",
@@ -79,10 +79,14 @@
                   "general_llm_diagnostic"
                 ]
               },
-              "name": {"type": "string"},
+              "name": {"type": "string", "minLength": 1},
               "version": {"type": "string"},
               "reference": {"type": "string"},
-              "protocol": {"type": "string"},
+              "protocol": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Predeclared procedure that maps raw evaluator judgments/measurements into the normalized 0..1 observations in metricScores."
+              },
               "validatedAgainstHumans": {"type": "boolean"},
               "validationReference": {"type": "string"},
               "candidateSelfGrade": {"const": false},
