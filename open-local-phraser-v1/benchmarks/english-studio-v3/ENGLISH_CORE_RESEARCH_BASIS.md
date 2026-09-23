@@ -1,6 +1,6 @@
 # Pari English Core — research basis and validity notes
 
-This document records the evidence behind the English Core benchmark design. It distinguishes **published evidence for the capability being measured** from **Pari-specific engineering choices** such as weights, sample budgets, and shadow-case wording.
+This document records the evidence behind the English Core benchmark design. It distinguishes **published evidence for the capability being measured** from **Pari-specific engineering choices** such as weights, sample budgets, shadow-case wording, grouping decisions, and promotion gates.
 
 The benchmark follows the spirit of Evidence-Centered Benchmark Design (ECBD): define the capability of interest, specify what model behavior counts as evidence for that capability, and document assumptions and threats to validity. It also follows HELM's multi-dimensional reporting principle: no single metric should hide important trade-offs.
 
@@ -8,7 +8,7 @@ The standing change-control rule is in [`RESEARCH_GROUNDING_POLICY.md`](./RESEAR
 
 ## 1. Benchmark-design evidence
 
-### Evidence-Centered Benchmark Design (ACL 2024)
+### Evidence-Centered Benchmark Design — ACL 2024
 
 Liu et al. argue that benchmark validity depends on explicitly connecting intended capabilities, tasks, response evidence, and scoring decisions rather than relying on implicit assumptions.
 
@@ -18,7 +18,7 @@ English Core therefore records, for every dimension:
 
 - the intended linguistic capability;
 - public benchmark anchors;
-- fresh Pari shadow families testing the same construct;
+- fresh Pari shadow families probing related constructs;
 - the metric used to turn responses into evidence;
 - known threats to validity.
 
@@ -42,7 +42,7 @@ Why it supports Pari:
 
 - Pari needs contextual alternatives rather than context-free thesaurus synonyms;
 - high-coverage candidate judgments are closer to a 10–40 suggestion UI than one-reference paraphrase scoring;
-- human appropriateness judgments provide a stronger lexical gold signal than an LLM judge.
+- human appropriateness judgments provide a stronger lexical gold signal than a general LLM judge.
 
 ### WiC — NAACL 2019
 
@@ -56,11 +56,11 @@ A system should not suggest replacements for one sense of a word merely because 
 
 ### LS07 / CoInCo
 
-Older lexical-substitution benchmarks remain useful as complementary lexical tests. SWORDS is preferred when possible because it was designed to improve substitute coverage and contextual appropriateness.
+Older lexical-substitution benchmarks remain useful complementary lexical tests. SWORDS is preferred when possible because it was designed to improve substitute coverage and contextual appropriateness.
 
 ## 3. Collocation and natural lexical choice
 
-Espinosa Anke, Codina-Filba, and Wanner (EACL 2021) evaluate language models on lexical collocations such as `heavy rain` and `take a step`, including retrieval and contextual categorization across 17 semantic categories. They show that models can still struggle with fine-grained collocational restrictions.
+Espinosa Anke, Codina-Filba, and Wanner (EACL 2021) evaluate language models on lexical collocations such as `heavy rain` and `take a step`, including retrieval and contextual categorization across 17 semantic categories.
 
 Reference: https://aclanthology.org/2021.eacl-main.120/
 
@@ -80,7 +80,7 @@ Why it supports Pari:
 
 Minimal pairs reduce topical and lexical confounds and test whether a model distinguishes grammatical from minimally altered ungrammatical forms.
 
-### CoLA — TACL 2019
+### CoLA — linguistic acceptability
 
 CoLA contains 10,657 English acceptability judgments drawn from linguistics literature and was designed to evaluate whether neural models acquire grammatical concepts used in linguistic analysis.
 
@@ -90,17 +90,17 @@ Caveat:
 
 Acceptability is not identical to all of "English quality". CoLA and BLiMP are therefore one dimension, not the full benchmark.
 
-### Forced-choice protocol
+### Forced-choice acceptability evidence — ACL SRW 2026
 
-A 2026 ACL study of linguistically informed forced-choice acceptability judgments found that LLM performance varied by linguistic phenomenon but generally approximated human judgments, with prompt strategies having relatively small effects in that study.
+Liu & Reiter evaluate LLMs on 150 linguistically categorized minimal sentence pairs in a forced-choice acceptability paradigm and report variation by model and linguistic phenomenon, with models generally approximating human judgments.
 
 Reference: https://aclanthology.org/2026.acl-srw.103/
 
-This supports using minimal forced-choice prompts as a practical diagnostic, while retaining the caveat that prompted chat-model behavior is not identical to the original probability-based BLiMP protocol.
+This supports forced-choice acceptability as a useful diagnostic while retaining the caveat that prompted chat-model behavior is not identical to BLiMP's probability/likelihood protocol.
 
 ## 5. Paraphrase semantics
 
-PAWS was constructed specifically to challenge models with sentence pairs that have high lexical overlap but differ in meaning because of word order and structural relations. The original paper shows that models lacking non-local contextual understanding fail badly on this setting.
+PAWS was constructed specifically to challenge models with sentence pairs that have high lexical overlap but differ in meaning because of word order and structural relations.
 
 Reference: https://aclanthology.org/N19-1131/
 
@@ -108,15 +108,7 @@ Why it supports Pari:
 
 Paraphrasing can preserve almost every word while reversing roles, causality, or temporal order. PAWS therefore complements embedding similarity and surface-overlap metrics.
 
-Pari shadow cases extend this construct to product-specific failure modes:
-
-- actor/patient reversal;
-- causal reversal;
-- negation;
-- modality;
-- quantity;
-- temporal order;
-- comparison and scope.
+Pari shadow cases extend this construct to product-specific failure modes including actor/patient reversal, causal reversal, negation, modality, quantity, temporal order, focus/scope, and syntactic-equivalence traps.
 
 ## 6. Fluency and register
 
@@ -152,7 +144,7 @@ EditEval argues that writing is iterative and incremental and evaluates modular 
 
 Reference: https://aclanthology.org/2024.conll-1.7/
 
-This strongly supports keeping generative editing separate from lexical/grammar tests and avoiding one automatic metric as the sole quality signal.
+This supports keeping generative editing separate from lexical/grammar tests and avoiding one automatic metric as the sole quality signal.
 
 ### IteraTeR — ACL 2022
 
@@ -164,15 +156,13 @@ Why it supports Pari:
 
 Pari is an interactive revision tool rather than a blank-page content generator. Human revision histories are therefore more construct-valid than purely open-ended creative-writing prompts.
 
-### WritingBench — 2025
+### WritingBench — secondary only
 
 WritingBench covers broad generative writing across six domains and 100 subdomains.
 
 Reference: https://arxiv.org/abs/2503.05244
 
-Use in English Core:
-
-secondary evidence only. Open-ended writing mixes English competence with planning, instruction following, domain knowledge, and judge preferences.
+Use in English Core: secondary evidence only. Open-ended writing mixes English competence with planning, instruction following, domain knowledge, and judge preferences.
 
 ## 8. Discourse relations
 
@@ -184,38 +174,56 @@ Why it supports Pari:
 
 A locally fluent rewrite can still break `if` versus `when`, cause versus contrast, concession, purpose, or temporal order. Those relations therefore receive an explicit discourse diagnostic.
 
-## 9. Contamination and fresh shadow cases
+## 9. Public-benchmark contamination and fresh shadow cases
 
-Public static benchmarks can be present in modern pretraining corpora. Deng et al. (NAACL 2024) provide evidence that benchmark contamination can inflate apparent performance, and a 2025 EMNLP survey describes the field's move from purely static toward dynamic evaluation in response to contamination risk.
+Public static benchmarks can be present in modern pretraining corpora. Deng et al. (NAACL 2024) investigate contamination in modern LLM benchmarks; PaCoST (Findings EMNLP 2024) proposes paired confidence testing for contamination detection.
 
 References:
 
 - https://aclanthology.org/2024.naacl-long.482/
-- https://aclanthology.org/2025.emnlp-main.511/
+- https://aclanthology.org/2024.findings-emnlp.97/
+- broader dynamic-evaluation survey: https://aclanthology.org/2025.emnlp-main.511/
 
 English Core therefore reports public-anchor and Pari shadow performance separately.
 
-The shadow set is **not** claimed to be an independently validated public benchmark. Its role is contamination-resistant transfer testing: reproduce the same linguistic phenomena with new surface forms. Repeated optimization against the shadow file itself would eventually contaminate it, so cases must be rotated over time.
+The shadow set is **not** claimed to be an independently validated public benchmark. Its role is fresh-surface transfer testing: reproduce relevant linguistic phenomena using newly authored surface forms. Repeated optimization against the shadow file itself would eventually compromise that freshness, so cases must rotate over time.
 
-## 10. Option-order and multiple-choice artifacts
+The current seed contains **68 author-labeled cases** and remains `author_labeled_unvalidated` until the independent procedure in `ENGLISH_CORE_HUMAN_EVAL.md` is completed.
 
-Pezeshkpour and Hruschka (Findings of NAACL 2024) found large performance changes when LLM answer choices were reordered. Other 2024 work likewise shows that leaderboard rankings can change under small multiple-choice evaluation perturbations.
+Freshness does not equal validity.
 
-References:
+## 10. Prompt sensitivity
 
-- https://aclanthology.org/2024.findings-naacl.130/
-- https://aclanthology.org/2024.acl-long.744/
+Mizrahi et al. (TACL 2024) evaluate 20 LLMs over 39 tasks and 6.5M instances using instruction paraphrases and show that different prompt templates can materially change both absolute scores and relative model rankings.
+
+Reference: https://aclanthology.org/2024.tacl-1.52/
 
 English Core mitigation:
 
-- every forced-choice shadow item is deterministically option-permuted;
-- the public fast screen also permutes choices;
+- canonical prompts remain fixed for the main run;
+- close contenders receive three intent-preserving prompt variants;
+- report mean, worst-prompt, spread, all-prompts-correct, and answer-consistency diagnostics;
+- never choose the best prompt after observing model results and report only that prompt.
+
+## 11. Option-order and multiple-choice artifacts
+
+2024 work shows that LLM choices and leaderboard ordering can change under option-order and answer-selection perturbations.
+
+References:
+
+- Wei et al., order/token selection bias: https://aclanthology.org/2024.findings-acl.333/
+- Pezeshkpour & Hruschka, option-order sensitivity: https://aclanthology.org/2024.findings-naacl.130/
+- Alzahrani et al., leaderboard perturbation sensitivity: https://aclanthology.org/2024.acl-long.744/
+
+English Core mitigation:
+
+- every canonical forced-choice shadow item is deterministically option-permuted;
+- public prompted screens also permute choices;
 - WiC, CoLA, and PAWS fast-screen subsets are label-balanced;
-- public-fast results are explicitly screening results, not official benchmark scores.
+- close contenders receive a second counterbalanced presentation of each forced-choice shadow item;
+- order robustness is reported separately rather than folded into the English score.
 
-For official research reporting, use each benchmark's standard protocol in addition to the common prompted screen.
-
-## 11. Text answers versus first-token logits
+## 12. Text answers versus first-token logits
 
 Wang et al. (Findings of ACL 2024) show that first-token multiple-choice probabilities can disagree substantially with the text answer produced by instruction-tuned LLMs.
 
@@ -223,34 +231,86 @@ Reference: https://aclanthology.org/2024.findings-acl.441/
 
 English Core policy:
 
-- text-answer accuracy is the common cross-runtime measure;
+- text-answer accuracy is the common cross-runtime prompted measure;
 - token/logit margins may be recorded as an additional diagnostic when the runtime exposes them reliably;
 - logit scoring must not silently replace actual text-output behavior.
 
-## 12. LLM-as-a-judge limitations
+For benchmark-native likelihood tasks such as BLiMP, native likelihood scoring remains a separate evidence lane rather than being relabeled as prompted text accuracy.
 
-Multiple studies report biases and vulnerabilities in LLM judges, including position bias and disagreement with human judgments.
+## 13. LLM-as-a-judge and learned-metric limitations
+
+LLM judges can exhibit position/format bias and disagreement with humans, and learned metric models introduce their own error into significance estimates.
 
 References:
 
-- https://aclanthology.org/2024.emnlp-main.474/
-- https://aclanthology.org/2025.ijcnlp-long.18/
-- https://aclanthology.org/2025.gem-1.33/
+- LLM judge limitations: https://aclanthology.org/2024.emnlp-main.474/
+- model-based metric uncertainty: https://aclanthology.org/2023.emnlp-main.464/
 
-English Core therefore prefers, in order:
+English Core therefore:
 
-1. gold labels;
-2. human reference sets;
-3. deterministic linguistic/semantic checks;
-4. independently validated specialist classifiers/rankers;
-5. blinded human evaluation;
-6. general LLM judges only as secondary diagnostics.
+- prefers gold labels, human references, official deterministic metrics, and blinded human evaluation;
+- requires explicit identity/version/protocol/validation evidence for specialist learned evaluators;
+- treats general LLM judges as secondary diagnostics;
+- never allows a candidate model to grade its own generative output for the official score;
+- preserves metric direction through `english-core-generative-metric-contract.json` so failure rates are not accidentally rewarded.
 
-A candidate model is never allowed to grade its own generative output for the official score.
+## 14. Distributional validity
 
-## 13. What is research-backed versus Pari-specific
+Siska et al. (ACL 2024) show that benchmark test prompts need not behave like independent random draws from a single use-case distribution; accounting for prompt correlations can change rankings. Kovatchev & Lease (NAACL 2024) show that benchmark data distributions can materially affect absolute and relative performance.
 
-### Research-backed constructs
+References:
+
+- https://aclanthology.org/2024.acl-long.560/
+- https://aclanthology.org/2024.naacl-long.86/
+
+English Core therefore reports public-native, public-prompted, shadow, and application-weighted evidence separately. It does not claim that the 68 shadow cases estimate a universal English population.
+
+## 15. Statistical uncertainty and paired comparison
+
+Bootstrap and paired-evaluation research supports reporting uncertainty and respecting the fact that competing models are tested on the same items.
+
+References:
+
+- BooStSa: https://aclanthology.org/2022.acl-demo.12/
+- Better than Average / paired NLP evaluation: https://aclanthology.org/2021.acl-long.179/
+
+English Core therefore:
+
+- reports item-bootstrap uncertainty only for completely scored dimensions;
+- adds a **phenomenon/item hierarchical-bootstrap sensitivity analysis** because author-written cases sharing a phenomenon/template may be dependent;
+- treats the hierarchical lane as exploratory rather than a population-confidence interval;
+- performs aligned paired model comparison on identical items and identical benchmark/task hashes;
+- withholds headline paired conclusions when coverage is incomplete;
+- reports close differences as inconclusive when paired intervals cross zero.
+
+Nested-data methodology motivating the sensitivity lane:
+
+- Burchill & Jaeger 2024: https://doi.org/10.1016/j.jml.2023.104494
+- Anglin 2026 preprint: https://arxiv.org/abs/2606.26422
+
+Critical caveat: no cited paper validates Pari's `phenomenon` tags as a randomly sampled statistical hierarchy. Using those tags for hierarchical resampling is a disclosed engineering sensitivity analysis.
+
+## 16. Native versus prompted protocols
+
+A common prompted interface is useful for model comparison, but benchmark-native evidence remains separate.
+
+Examples:
+
+- BLiMP: native sentence/minimal-pair likelihood is primary grammar evidence; chat A/B is a prompted screen.
+- CoLA: full-distribution MCC is reported separately from balanced fast-screen accuracy.
+- SWORDS and JFLEG: use official evaluators rather than inventing Pari replacements.
+
+See `ENGLISH_CORE_NATIVE_PROTOCOLS.md` and `english-core-public-anchors.json`.
+
+## 17. Source pinning and reproducibility
+
+Promotion-quality public runs pin immutable source revisions where supported and record resolved dataset fingerprints and library versions. Model runs record exact checkpoint revision/build hash, quantization, runtime, tokenizer/chat-template identity, task hash/count, decoding, hardware, and raw-output hash.
+
+`validate-english-core-run.py --promotion` and `build-english-core-repro-manifest.py --require-promotion-ready` turn these into reproducibility gates rather than optional notes.
+
+## 18. What is research-backed versus Pari-specific
+
+### Research-backed constructs / validity concerns
 
 - contextual word sense;
 - lexical substitution;
@@ -261,19 +321,26 @@ A candidate model is never allowed to grade its own generative output for the of
 - formality/register distinction;
 - iterative text editing/revision;
 - discourse relations;
-- contamination controls;
-- option-order controls;
-- multidimensional reporting.
+- public-benchmark contamination risk;
+- prompt sensitivity;
+- option-order sensitivity;
+- multidimensional reporting;
+- data-distribution effects;
+- paired evaluation and uncertainty reporting;
+- learned-metric uncertainty.
 
 ### Pari-specific engineering choices
 
 - the exact weights `25/20/15/15/10/10/5`;
-- the 50-case shadow-set size;
+- the current **68-case** shadow-set size and exact case wording;
 - the 1,570-case public-fast budget;
-- the exact wording of shadow items;
-- which dimensions receive the most product emphasis.
+- three prompt variants for the robustness lane;
+- two option-order presentations for the order lane;
+- grouping shadow items by Pari `phenomenon` tags for hierarchical sensitivity;
+- which dimensions receive the most product emphasis;
+- claim-tier governance thresholds/workflow.
 
-These choices are justified by Pari's use case, not presented as scientific constants.
+These choices are justified by Pari's use case or operational needs, not presented as scientific constants.
 
 To expose dependence on the weights, the scorer reports both:
 
@@ -281,19 +348,18 @@ To expose dependence on the weights, the scorer reports both:
 - an equal-weight mean across all seven dimensions;
 - every individual dimension score.
 
-If two models exchange rank under reasonable weighting schemes, report them as **weight-sensitive / capability-tradeoff candidates** rather than claiming a universal English winner.
+If two models exchange rank under reasonable weighting or protocol choices, report them as **weight/protocol-sensitive capability tradeoffs** rather than claiming a universal English winner.
 
-## 14. Standing research-grounding gate
+## 19. Standing research-grounding gate
 
-English Core is not allowed to drift into a collection of plausible-looking tests. Before a substantive benchmark change is treated as valid, it must pass the checklist in `RESEARCH_GROUNDING_POLICY.md`.
+English Core is not allowed to drift into a collection of plausible-looking tests. Before a substantive benchmark change is treated as valid, it must pass `RESEARCH_GROUNDING_POLICY.md`.
 
 At minimum:
 
 - the intended construct must have primary-source support or be labeled explicitly as a Pari-specific product heuristic;
 - the benchmark's official protocol and metric must be checked before creating a local approximation;
 - local approximations must be labeled as screens rather than official scores;
-- threats to validity, contamination, answer-position effects, and judge dependence must be documented;
+- threats to validity, contamination, prompt/answer-position effects, dependence, and judge error must be documented;
 - model-selection claims must be no broader than the evidence supports;
-- a benchmark should not be added or weighted simply because it favors a preferred candidate model.
-
-When new research conflicts with the present design, the literature should trigger a benchmark review rather than being ignored to preserve historical scores.
+- a benchmark should not be added or weighted simply because it favors a preferred candidate model;
+- new research that conflicts with the present design triggers benchmark review rather than being ignored to preserve historical scores.
