@@ -1,12 +1,13 @@
 {
-  "version": 2,
-  "purpose": "Registry of established public benchmarks used to validate the fresh Pari English Core shadow suite. Public-anchor results are reported separately from shadow results.",
+  "version": 3,
+  "purpose": "Registry of established public benchmarks used as external evidence for Pari English Core. Native/official, full-distribution prompted, fast prompted, and secondary diagnostic results are never silently conflated.",
   "policy": {
     "usage": "evaluation_only",
     "training": "forbidden for V1 selection",
     "reportSeparately": true,
+    "protocolSeparation": true,
     "licenseRule": "Verify the current dataset/repository license and official evaluation split before downloading or redistributing benchmark data. This registry intentionally does not copy benchmark data into Pari.",
-    "researchBasis": "See ENGLISH_CORE_RESEARCH_BASIS.md for construct validity, caveats, and citations."
+    "researchBasis": "See ENGLISH_CORE_RESEARCH_BASIS.md, ENGLISH_CORE_NATIVE_PROTOCOLS.md, and RESEARCH_GROUNDING_POLICY.md for construct validity, adaptation caveats, and claim rules."
   },
   "anchors": [
     {
@@ -15,7 +16,11 @@
       "dimension": "lexical_context",
       "reference": "https://aclanthology.org/2021.naacl-main.345/",
       "role": "high-coverage contextual lexical substitution and candidate acceptability for writing assistance",
-      "preferredMetrics": ["official lexical-substitution metrics", "human-reference candidate coverage", "usable candidate rate"]
+      "evidencePriority": "primary",
+      "nativeProtocol": "Use the official SWORDS benchmark/result format and official evaluator; Pari adapters only prepare prompts and convert outputs.",
+      "implementationStatus": "adapter_ready_official_evaluator_external",
+      "pariFiles": ["build-swords-english-core-prompts.py", "convert-swords-english-core-output.py"],
+      "preferredMetrics": ["official SWORDS lexical-substitution metrics", "human-reference candidate coverage", "usable candidate analysis"]
     },
     {
       "id": "wic",
@@ -23,6 +28,10 @@
       "dimension": "lexical_context",
       "reference": "https://aclanthology.org/N19-1128/",
       "role": "word-sense discrimination in context",
+      "evidencePriority": "primary_supporting",
+      "nativeProtocol": "Classification accuracy on the published task distribution; model adaptation must be stated explicitly.",
+      "pariProtocol": "Full validation-distribution zero-shot prompted classification plus a separate balanced fast screen.",
+      "implementationStatus": "full_prompted_and_fast_ready",
       "preferredMetrics": ["accuracy"]
     },
     {
@@ -30,7 +39,10 @@
       "name": "CoInCo / SemEval lexical substitution",
       "dimension": "lexical_context",
       "reference": "https://aclanthology.org/W13-2407/",
-      "role": "contextual lexical substitution and ranking",
+      "role": "complementary contextual lexical substitution and ranking",
+      "evidencePriority": "primary_supporting",
+      "nativeProtocol": "Use the benchmark-native lexical-substitution evaluator/metrics when a reproducible package is established.",
+      "implementationStatus": "pending_reproducible_adapter",
       "preferredMetrics": ["best", "oot", "ranking metrics"]
     },
     {
@@ -39,6 +51,9 @@
       "dimension": "collocation_naturalness",
       "reference": "https://aclanthology.org/2021.eacl-main.120/",
       "role": "natural English collocation knowledge",
+      "evidencePriority": "primary",
+      "nativeProtocol": "Reproduce the paper's retrieval/categorization tasks and metrics if the official data/code package can be verified.",
+      "implementationStatus": "pending_reproducibility_audit",
       "preferredMetrics": ["accuracy", "retrieval/ranking metrics"]
     },
     {
@@ -47,7 +62,11 @@
       "dimension": "grammar_syntax",
       "reference": "https://aclanthology.org/2020.tacl-1.25/",
       "role": "minimal-pair grammatical knowledge across 67 linguistic phenomena",
-      "preferredMetrics": ["accuracy", "per-phenomenon accuracy"]
+      "evidencePriority": "primary",
+      "nativeProtocol": "Prefer the acceptable sentence when comparing language-model sentence likelihood/probability; report per-phenomenon and aggregate accuracy.",
+      "pariProtocol": "Use current MLX-LM + lm-evaluation-harness BLiMP group with chat template disabled for the native likelihood lane; keep Pari prompted BLiMP as a separate screen.",
+      "implementationStatus": "native_runtime_path_documented_and_fast_ready",
+      "preferredMetrics": ["native likelihood accuracy", "per-phenomenon accuracy", "prompted-screen accuracy as secondary protocol evidence"]
     },
     {
       "id": "cola",
@@ -55,7 +74,11 @@
       "dimension": "grammar_syntax",
       "reference": "https://aclanthology.org/Q19-1040/",
       "role": "grammatical acceptability from linguistics literature",
-      "preferredMetrics": ["Matthews correlation under official protocol", "accuracy diagnostic"]
+      "evidencePriority": "primary_supporting",
+      "nativeProtocol": "Report Matthews correlation coefficient on the native task distribution; state model adaptation separately from metric choice.",
+      "pariProtocol": "Full validation-distribution zero-shot prompted classification reports MCC; balanced 300-item accuracy remains a fast screen only.",
+      "implementationStatus": "full_prompted_and_fast_ready",
+      "preferredMetrics": ["Matthews correlation coefficient", "accuracy diagnostic"]
     },
     {
       "id": "paws",
@@ -63,7 +86,11 @@
       "dimension": "paraphrase_semantics",
       "reference": "https://aclanthology.org/N19-1131/",
       "role": "high lexical-overlap paraphrase traps including role/order changes",
-      "preferredMetrics": ["accuracy", "F1"]
+      "evidencePriority": "primary",
+      "nativeProtocol": "Classification on the published task distribution; preserve the selected split and metric provenance.",
+      "pariProtocol": "Full PAWS-Wiki validation-distribution zero-shot prompted classification plus a separate balanced fast screen.",
+      "implementationStatus": "full_prompted_and_fast_ready",
+      "preferredMetrics": ["accuracy", "F1 where protocol/reporting calls for it"]
     },
     {
       "id": "jfleg",
@@ -71,7 +98,11 @@
       "dimension": "fluency_register",
       "reference": "https://aclanthology.org/E17-2037/",
       "role": "human fluency correction beyond minimal grammar repair",
-      "preferredMetrics": ["official GLEU", "human/reference analysis"]
+      "evidencePriority": "primary",
+      "nativeProtocol": "Generate one hypothesis per source sentence and use the official four-reference GLEU evaluation workflow.",
+      "implementationStatus": "adapter_ready_official_evaluator_external",
+      "pariFiles": ["build-jfleg-english-core-prompts.py", "convert-jfleg-english-core-output.py"],
+      "preferredMetrics": ["official GLEU", "official evaluator uncertainty output", "human/reference analysis"]
     },
     {
       "id": "gyafc",
@@ -79,6 +110,9 @@
       "dimension": "fluency_register",
       "reference": "https://aclanthology.org/N18-1012/",
       "role": "formality/register distinctions",
+      "evidencePriority": "supporting",
+      "nativeProtocol": "Use the established formality-transfer data/protocol with task-appropriate automatic and/or human evaluation; document the exact subset and adaptation.",
+      "implementationStatus": "pending_adapter",
       "preferredMetrics": ["human/register evaluation", "task-specific automatic metrics"]
     },
     {
@@ -86,9 +120,11 @@
       "name": "EditEval relevant editing tasks",
       "dimension": "generative_expression",
       "reference": "https://aclanthology.org/2024.conll-1.7/",
-      "role": "primary external anchor for iterative text improvement, paraphrasing and cohesion",
-      "preferredMetrics": ["task-level official metrics", "per-task results"],
-      "primaryForEditing": true
+      "role": "primary external anchor for modular text improvement, paraphrasing and cohesion",
+      "evidencePriority": "primary",
+      "nativeProtocol": "Use relevant EditEval tasks with their documented task-level evaluation rather than collapsing all editing behaviors into one score.",
+      "implementationStatus": "pending_adapter",
+      "preferredMetrics": ["task-level official/documented metrics", "per-task results"]
     },
     {
       "id": "iterater_holdout",
@@ -96,15 +132,19 @@
       "dimension": "generative_expression",
       "reference": "https://aclanthology.org/2022.acl-long.250/",
       "role": "human iterative revision across domains, intentions and granularities",
-      "preferredMetrics": ["held-out revision metrics", "edit-intention breakdown"],
-      "primaryForEditing": true
+      "evidencePriority": "primary_supporting",
+      "nativeProtocol": "Use held-out human revisions and preserve edit-intention/granularity breakdowns; do not train V1 on the held-out evaluation portion.",
+      "implementationStatus": "pending_adapter",
+      "preferredMetrics": ["held-out revision metrics", "edit-intention breakdown"]
     },
     {
       "id": "writingbench_subset",
       "name": "WritingBench selected style/language subset",
       "dimension": "generative_expression",
       "reference": "https://arxiv.org/abs/2503.05244",
-      "role": "secondary open-ended writing diagnostic only",
+      "role": "secondary open-ended writing diagnostic only; mixes English competence with planning/domain/instruction-following factors",
+      "evidencePriority": "secondary",
+      "implementationStatus": "optional_secondary",
       "preferredMetrics": ["criteria-level scores"],
       "secondaryOnly": true
     },
@@ -114,6 +154,8 @@
       "dimension": "generative_expression",
       "reference": "https://eqbench.com/creative_writing.html",
       "role": "secondary natural-writing/slop diagnostic only",
+      "evidencePriority": "secondary",
+      "implementationStatus": "optional_secondary",
       "preferredMetrics": ["creative-writing score", "repetition/slop diagnostics"],
       "secondaryOnly": true
     },
@@ -123,6 +165,9 @@
       "dimension": "discourse",
       "reference": "https://aclanthology.org/2026.eacl-long.207/",
       "role": "discourse relations, sentence ordering, temporal and rhetorical dependencies",
+      "evidencePriority": "primary_supporting",
+      "nativeProtocol": "Use only the discourse subtasks relevant to prose editing and preserve task-level metrics rather than inventing one Pari discourse score.",
+      "implementationStatus": "pending_adapter",
       "preferredMetrics": ["task-level accuracy/F1"]
     }
   ]
