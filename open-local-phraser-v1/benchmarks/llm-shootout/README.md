@@ -1,139 +1,146 @@
-# Pari local-model shootout
+# Pari local-model shootout harness
 
-This directory is for **generator and editing-model research**, not production model promotion.
+This directory contains **research runners** for comparing local generation backends. It does not promote a production model by itself.
 
-The product target is narrow:
+The current V1 product contract is defined in:
 
-> Repair broken, vague, awkward English into clear, natural, maximally grammatical English while preserving every recoverable fact and inventing nothing.
+- `../english-studio-v3/PROJECT_PLAN.md`
+- `../english-studio-v3/V1_SHOOTOUT.md`
+- `../english-studio-v3/v1-candidates.json`
+- `../english-studio-v3/v1-prompt-contracts.json`
 
-A model does not become Pari's default because it wins a generic reasoning benchmark. It must beat the current controls on Pari's frozen English-repair benchmark and survive the production safety gates.
+## V1 target
 
-Pari should not assume that one general LLM must do every editing task. The shootout includes both general rewrite models and compact grammatical-error-correction specialists. The useful question is whether a specialist + general rewrite cascade beats either model alone on quality, safety, memory, and latency.
-
-Current execution priority is tracked in [`docs/remaining-work.md`](../../docs/remaining-work.md).
-
-## Existing direct MLX runner
-
-Use `run_model.py` for checkpoints that load directly with the pinned `mlx-lm` stack:
-
-```bash
-python benchmarks/llm-shootout/run_model.py \
-  /path/to/model \
-  benchmarks/llm-shootout/model-output.jsonl
-
-node benchmarks/eval/run-eval.mjs \
-  --outputs benchmarks/llm-shootout/model-output.jsonl
-```
-
-## OpenAI-compatible local runner
-
-Use `run_openai_compatible.py` for local runtimes that expose `/v1/chat/completions` but are not yet supported by Pari's direct `mlx-lm` path.
-
-This keeps the benchmark model-agnostic and lets new Apple-Silicon runtimes compete without first wiring them into production.
-
-## MiniCPM5-2B candidate
-
-Tracking issue: [#10](https://github.com/tverma101/Pari/issues/10)
-
-Primary model card:
-
-- https://huggingface.co/openbmb/MiniCPM5-2B
-
-Why it is a high-priority test:
-
-- ~2.6B dense parameters;
-- Apache-2.0;
-- 131k advertised context;
-- intended for on-device / edge use;
-- Artificial Analysis Intelligence Index v4.2 score of 15, versus an estimated 14 for Qwen3.5-4B Reasoning in the same comparison;
-- substantially smaller weight footprint than the 4B benchmark control.
-
-Those generic results do **not** establish that MiniCPM is the better Pari paraphraser. The exact test is MiniCPM5-2B vs Qwen3.5-4B vs the production Qwen3-4B backend on the frozen Pari corpus, with reasoning/thinking disabled for the normal rewrite path unless separately justified.
-
-Save raw outputs/candidates before changing the production backend. Promotion requires zero new hard safety regressions, comparable-or-better coherence/meaning preservation, and either a product-quality win or a meaningful memory/latency win at comparable quality.
-
-## Grammar-specialist candidates
-
-Initial research targets:
-
-| Candidate | Approx. size | Primary use |
-| --- | ---: | --- |
-| GECToR | ~355M | high-precision minimal grammar edits |
-| DeCoGLM | ~335M | detect suspicious spans, then locally correct |
-| BART-family GEC | ~400M | compact seq2seq grammatical correction |
-| CoEdIT-large | ~770M | grammar, coherence, paraphrase, formality |
-
-These are research targets, not pinned production dependencies. Verify checkpoint license, runtime support, and actual Pari benchmark quality before downloading or bundling anything. In particular, released CoEdIT checkpoints should be treated as research/non-commercial references unless a distributable alternative is selected.
-
-The preferred experiment is not only `specialist vs Qwen`. Also test the cascade:
+Pari is a human-controlled rewriting studio:
 
 ```text
-input
-  -> grammar specialist candidate
-  -> conservative general rewrite candidate
-  -> stronger general rewrite candidate
-  -> original/deterministic fallback
-  -> Pari safety + grammar + semantic scorer
-  -> winner
+paragraph -> useful starting draft
+selected word/phrase/sentence -> fast context-aware alternatives
+human chooses / mixes / types / reverts
 ```
 
-A specialist should be rewarded for **precision**, not edit count. Unnecessary corrections and meaning drift are failures.
+The highest-priority benchmark is therefore **interactive alternatives**, not only top-1 paragraph repair.
 
-## Ling-3.0-tiny candidate
-
-Tracking issue: #6
-
-Primary model card:
-
-- https://huggingface.co/inclusionAI/Ling-3.0-tiny
-
-Current Apple 4-bit conversion/runtime documentation:
-
-- https://huggingface.co/rapid-mlx/Ling-3.0-tiny-MLX-4bit
-
-Why it is being tested:
-
-- 7.9B total parameters
-- 1.3B active parameters per token
-- sparse MoE architecture
-- official Apple-Silicon validation
-- InclusionAI reports roughly 86-90 tokens/s on an M4 Pro MacBook with FP8 at 8K context
-- the current 4-bit Apple conversion is about 4.2 GB
-
-The architecture is newer than the current production incumbent and is **not yet a drop-in `mlx-lm` production replacement**. The current 4-bit Apple path documents `rapid-mlx` as the serving runtime while upstream `mlx-lm` support for `bailing_hybrid` catches up.
-
-### Smoke-test Ling through the generic runner
-
-Install/start the runtime according to the conversion's current model card, then run:
+## Build the internal V1 core
 
 ```bash
-rapid-mlx serve ling-3.0-tiny-4bit
-
-python benchmarks/llm-shootout/run_openai_compatible.py \
-  --base-url http://127.0.0.1:8000/v1 \
-  --model ling-3.0-tiny-4bit \
-  --out benchmarks/llm-shootout/ling3-tiny-4bit.jsonl \
-  --chat-template-kwargs '{"enable_thinking": false}'
-
-node benchmarks/eval/run-eval.mjs \
-  --outputs benchmarks/llm-shootout/ling3-tiny-4bit.jsonl
+node benchmarks/english-studio-v3/build-v1-core.mjs
 ```
 
-If the runtime exposes a different model ID, pass that exact ID to `--model`; the benchmark adapter intentionally does not hard-code Ling.
+This writes:
 
-## Promotion rules
+- `benchmarks/english-studio-v3/v1-core.internal.jsonl`
+- `benchmarks/english-studio-v3/v1-core.manifest.json`
 
-Do not replace the production backend or add a second model based only on the current automatic score.
+The builder deliberately does not fabricate selected spans from paragraph corpora. External human-reference suites such as Smart Word Suggestions and TSAR remain separate evaluation modules.
 
-A candidate or cascade must eventually be judged on:
+## Direct MLX V1 runner
 
-1. grammatical correctness and syntactic well-formedness;
-2. natural English / collocations;
-3. clarity and reconstruction of broken prose;
-4. meaning preservation and unsupported-invention rate;
-5. protected-span / negation / modality / quantity safety;
-6. unnecessary-edit / overcorrection rate;
-7. latency and peak memory on the target Mac;
-8. installed-app/native-runtime reliability.
+Use for checkpoints that load directly with `mlx-lm`:
 
-Qwen3.5-4B remains the **general-model benchmark control pending issue #10**. The shipped backend may differ; benchmark control and production backend are deliberately separate concepts.
+```bash
+python benchmarks/llm-shootout/run_v1_mlx.py \
+  /path/to/model \
+  benchmarks/llm-shootout/results/model-v1.jsonl \
+  --model-id exact/model-id-or-revision
+```
+
+Smoke-test one route:
+
+```bash
+python benchmarks/llm-shootout/run_v1_mlx.py \
+  /path/to/model \
+  /tmp/pari-v1-word.jsonl \
+  --route word_phrase_alternatives \
+  --limit 10
+```
+
+## OpenAI-compatible V1 runner
+
+Use for llama.cpp, Bonsai-compatible servers, rapid-mlx, or any other local runtime exposing `/v1/chat/completions`:
+
+```bash
+python benchmarks/llm-shootout/run_v1_openai_compatible.py \
+  --base-url http://127.0.0.1:8000/v1 \
+  --model exact-runtime-model-id \
+  --out benchmarks/llm-shootout/results/model-v1.jsonl
+```
+
+Runtime-specific request fields can be passed without changing the benchmark contract:
+
+```bash
+--chat-template-kwargs '{"enable_thinking": false}'
+--extra-body '{"seed": 1234}'
+```
+
+## Shared task semantics
+
+`v1_runner_common.py` owns:
+
+- paragraph/span/sentence prompt rendering;
+- rewrite-strength behavior;
+- correlated strength-job expansion;
+- candidate-list parsing;
+- exact duplicate removal.
+
+This keeps transport changes from silently changing the requested English behavior.
+
+## Legacy paragraph runners
+
+The following remain for old regression compatibility:
+
+- `run_model.py`
+- `run_openai_compatible.py`
+
+They use the old paragraph-repair prompt and should **not** be used as the main V1 product shootout.
+
+## Pinned first sweep
+
+See `../english-studio-v3/v1-candidates.json`.
+
+Required initial classes:
+
+1. current Pari incumbent;
+2. MiniCPM5-2B MLX 4-bit;
+3. Qwen3.5-4B MLX 4-bit;
+4. Ministral 3 8B Q4_K_M non-Qwen control;
+5. Ternary Bonsai 2 27B aggressive-low-bit experiment.
+
+Ling-3.0-tiny remains optional after the core sweep.
+
+## Quantization
+
+When practical, compare the same model's stronger/reference format with its deployable quantizations.
+
+Do not treat a vendor's generic benchmark-retention percentage as proof that Pari editing quality survived compression.
+
+Measure changes in:
+
+- word/phrase suggestion quality;
+- sentence alternatives;
+- paragraph draft quality;
+- semantic safety;
+- candidate diversity;
+- register/vocabulary drift;
+- latency;
+- memory.
+
+## MTP / speculative decoding
+
+MTP/speculation is an optional runtime lane.
+
+Benchmark an **existing implementation first**. Do not train a new MTP head for V1 unless profiling later shows decode is the product bottleneck and no existing path solves it.
+
+Record end-to-end first-useful-option/top-10 latency rather than only tokens/sec.
+
+## Results
+
+Raw generation output is intentionally preserved so candidate scoring/ranking can be replayed without burning model compute again.
+
+Use `../english-studio-v3/v1-result-schema.json` for normalized run reports.
+
+Do not collapse results into one universal score. Report route-specific quality/latency/memory Pareto views.
+
+## Current known blocker
+
+The model download/install plumbing still contains stale Qwen-specific fallback assumptions and `scripts/download-models.mjs` currently contains an orphaned `requiredFiles` fragment. Track/fix this under issue #15 before treating model-install automation as trustworthy.
