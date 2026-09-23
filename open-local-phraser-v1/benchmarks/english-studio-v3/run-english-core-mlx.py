@@ -13,8 +13,8 @@ Examples:
         --tasks english-core-prompt-robustness.jsonl
 
 Use --prompt-mode plain for a base model that should not be wrapped in a chat
-template. `auto` uses the tokenizer chat template when available and otherwise
-falls back to the raw prompt.
+template. `auto` is exploratory only; promotion-quality runs should choose an
+explicit adaptation mode and record exact artifact/revision metadata.
 """
 
 import argparse
@@ -22,6 +22,7 @@ import hashlib
 import importlib.metadata
 import json
 import platform
+import re
 import subprocess
 import sys
 import time
@@ -29,6 +30,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_TASKS = HERE / "english-core-shadow.jsonl"
+SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
 def strip_think(text: str) -> str:
@@ -69,16 +71,28 @@ def package_version(name: str) -> str:
         return "unknown"
 
 
+def sysctl_value(key: str) -> str | None:
+    if sys.platform != "darwin":
+        return None
+    try:
+        value = subprocess.check_output(["sysctl", "-n", key], text=True).strip()
+        return value or None
+    except Exception:
+        return None
+
+
 def chip_name() -> str:
-    if sys.platform == "darwin":
-        for key in ("machdep.cpu.brand_string", "hw.model"):
-            try:
-                value = subprocess.check_output(["sysctl", "-n", key], text=True).strip()
-                if value:
-                    return value
-            except Exception:
-                pass
-    return platform.processor() or "unknown"
+    return sysctl_value("machdep.cpu.brand_string") or sysctl_value("hw.model") or platform.processor() or "unknown"
+
+
+def memory_gb() -> float | None:
+    value = sysctl_value("hw.memsize")
+    if not value:
+        return None
+    try:
+        return round(int(value) / (1024 ** 3), 3)
+    except ValueError:
+        return None
 
 
 def prompt_for_task(tokenizer, text: str, mode: str):
@@ -114,7 +128,8 @@ def main() -> None:
     ap.add_argument("--top-k", type=int, default=0)
     ap.add_argument("--seed", type=int, default=0, help="Generation RNG seed; default 0 for reproducibility")
     ap.add_argument("--model-revision", default="unknown")
-    ap.add_argument("--quantization", default="unknown")
+    ap.add_argument("--artifact-sha256", default=None, help="SHA-256 identifying the exact evaluated model artifact/build")
+    ap.add_argument("--quantization", default="unknown", help="Explicit value such as full/fp16/bf16/q8/q4")
     ap.add_argument("--checkpoint-type", choices=["base", "instruct", "chat", "specialized", "unknown"], default="unknown")
     ap.add_argument("--prompt-mode", choices=["auto", "chat", "plain"], default="auto")
     ap.add_argument("--chat-template-label", default="tokenizer.apply_chat_template")
@@ -125,6 +140,10 @@ def main() -> None:
         raise SystemExit("--top-p must be in [0,1]")
     if args.top_k < 0:
         raise SystemExit("--top-k must be >= 0")
+    if args.max_tokens < 1:
+        raise SystemExit("--max-tokens must be >= 1")
+    if args.artifact_sha256 is not None and not SHA256_RE.fullmatch(args.artifact_sha256):
+        raise SystemExit("--artifact-sha256 must be exactly 64 hexadecimal characters")
 
     task_path = resolve_path(args.tasks)
     if not task_path.exists():
@@ -132,6 +151,11 @@ def main() -> None:
 
     task_bytes = task_path.read_bytes()
     tasks = [json.loads(line) for line in task_bytes.decode("utf-8").splitlines() if line.strip()]
+    task_ids = [task.get("id") for task in tasks]
+    if any(not task_id for task_id in task_ids):
+        raise SystemExit("Task file contains an item without an id")
+    if len(task_ids) != len(set(task_ids)):
+        raise SystemExit("Task file contains duplicate ids")
 
     import mlx.core as mx
     from mlx_lm import load
@@ -186,6 +210,7 @@ def main() -> None:
             "name": Path(args.model_dir).name,
             "repoOrName": args.model_dir,
             "revision": args.model_revision,
+            "artifactSha256": args.artifact_sha256,
             "quantization": args.quantization,
             "checkpointType": args.checkpoint_type,
             "runtime": "mlx-lm",
@@ -197,11 +222,13 @@ def main() -> None:
         "hardware": {
             "machine": platform.machine(),
             "chip": chip_name(),
+            "memoryGB": memory_gb(),
             "os": platform.platform(),
             "python": platform.python_version(),
         },
         "taskFile": str(task_path),
         "taskFileSha256": sha256_bytes(task_bytes),
+        "taskCount": len(tasks),
         "promptModeRequested": args.prompt_mode,
         "promptAdaptationModesObserved": sorted(adaptation_modes),
         "promptAdaptationDetailsObserved": sorted(adaptation_details),
@@ -221,10 +248,11 @@ def main() -> None:
             "benchmarkRevision": args.benchmark_revision,
             "rawOutputSha256": sha256_bytes(outputs_bytes),
             "notes": [
-                "Model artifact hash is not inferred from a directory path; supply/record it separately when promotion-quality reproducibility requires it.",
-                "Checkpoint type and quantization are caller-supplied metadata and should be verified against the actual model artifact.",
-                "Base models should generally be run with --prompt-mode plain; instruct/chat checkpoints should use their official tokenizer chat template when available.",
-                "The tokenizer chat-template hash is recorded when the tokenizer exposes a string template; adaptation details record whether enable_thinking=false was accepted or the tokenizer default path was used."
+                "artifactSha256 is caller-supplied because hashing an arbitrary model directory safely/portably is outside this runner; promotion validation requires an exact artifact/build identity.",
+                "Checkpoint type, revision, artifact hash and quantization are caller-supplied metadata and must match the evaluated artifact.",
+                "Base models should generally be run with --prompt-mode plain; instruct/chat checkpoints should use their official tokenizer chat template when appropriate.",
+                "The tokenizer chat-template hash is recorded when the tokenizer exposes a string template; adaptation details record whether enable_thinking=false was accepted or the tokenizer default path was used.",
+                "Promotion-quality runs should use explicit --prompt-mode, --model-revision, --artifact-sha256, --quantization, --checkpoint-type and --benchmark-revision values, then pass validate-english-core-run.py --promotion."
             ],
         },
     }
