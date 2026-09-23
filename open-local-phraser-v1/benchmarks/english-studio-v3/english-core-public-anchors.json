@@ -1,11 +1,12 @@
 {
-  "version": 1,
+  "version": 2,
   "purpose": "Registry of established public benchmarks used to validate the fresh Pari English Core shadow suite. Public-anchor results are reported separately from shadow results.",
   "policy": {
     "usage": "evaluation_only",
     "training": "forbidden for V1 selection",
     "reportSeparately": true,
-    "licenseRule": "Verify the current dataset/repository license and official evaluation split before downloading or redistributing benchmark data. This registry intentionally does not copy benchmark data into Pari."
+    "licenseRule": "Verify the current dataset/repository license and official evaluation split before downloading or redistributing benchmark data. This registry intentionally does not copy benchmark data into Pari.",
+    "researchBasis": "See ENGLISH_CORE_RESEARCH_BASIS.md for construct validity, caveats, and citations."
   },
   "anchors": [
     {
@@ -13,8 +14,8 @@
       "name": "SWORDS",
       "dimension": "lexical_context",
       "reference": "https://aclanthology.org/2021.naacl-main.345/",
-      "role": "high-coverage contextual lexical substitution and candidate acceptability",
-      "preferredMetrics": ["precision", "recall", "F-score", "human-reference candidate coverage"]
+      "role": "high-coverage contextual lexical substitution and candidate acceptability for writing assistance",
+      "preferredMetrics": ["official lexical-substitution metrics", "human-reference candidate coverage", "usable candidate rate"]
     },
     {
       "id": "wic",
@@ -45,7 +46,7 @@
       "name": "BLiMP",
       "dimension": "grammar_syntax",
       "reference": "https://aclanthology.org/2020.tacl-1.25/",
-      "role": "minimal-pair grammatical knowledge across many linguistic phenomena",
+      "role": "minimal-pair grammatical knowledge across 67 linguistic phenomena",
       "preferredMetrics": ["accuracy", "per-phenomenon accuracy"]
     },
     {
@@ -54,7 +55,7 @@
       "dimension": "grammar_syntax",
       "reference": "https://aclanthology.org/Q19-1040/",
       "role": "grammatical acceptability from linguistics literature",
-      "preferredMetrics": ["Matthews correlation", "accuracy diagnostic"]
+      "preferredMetrics": ["Matthews correlation under official protocol", "accuracy diagnostic"]
     },
     {
       "id": "paws",
@@ -69,8 +70,8 @@
       "name": "JFLEG",
       "dimension": "fluency_register",
       "reference": "https://aclanthology.org/E17-2037/",
-      "role": "human fluency correction",
-      "preferredMetrics": ["GLEU"]
+      "role": "human fluency correction beyond minimal grammar repair",
+      "preferredMetrics": ["official GLEU", "human/reference analysis"]
     },
     {
       "id": "gyafc",
@@ -81,10 +82,28 @@
       "preferredMetrics": ["human/register evaluation", "task-specific automatic metrics"]
     },
     {
+      "id": "editeval",
+      "name": "EditEval relevant editing tasks",
+      "dimension": "generative_expression",
+      "reference": "https://aclanthology.org/2024.conll-1.7/",
+      "role": "primary external anchor for iterative text improvement, paraphrasing and cohesion",
+      "preferredMetrics": ["task-level official metrics", "per-task results"],
+      "primaryForEditing": true
+    },
+    {
+      "id": "iterater_holdout",
+      "name": "IteraTeR held-out human revisions",
+      "dimension": "generative_expression",
+      "reference": "https://aclanthology.org/2022.acl-long.250/",
+      "role": "human iterative revision across domains, intentions and granularities",
+      "preferredMetrics": ["held-out revision metrics", "edit-intention breakdown"],
+      "primaryForEditing": true
+    },
+    {
       "id": "writingbench_subset",
       "name": "WritingBench selected style/language subset",
       "dimension": "generative_expression",
-      "reference": "https://github.com/X-PLUG/WritingBench",
+      "reference": "https://arxiv.org/abs/2503.05244",
       "role": "secondary open-ended writing diagnostic only",
       "preferredMetrics": ["criteria-level scores"],
       "secondaryOnly": true
