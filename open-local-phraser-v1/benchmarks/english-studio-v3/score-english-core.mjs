@@ -14,6 +14,7 @@ if (!resultPath) {
 
 const config = JSON.parse(fs.readFileSync(path.join(here, "english-core-config.json"), "utf8"));
 const seed = JSON.parse(fs.readFileSync(path.join(here, "english-core-shadow.seed.json"), "utf8"));
+const metricContract = JSON.parse(fs.readFileSync(path.join(here, "english-core-generative-metric-contract.json"), "utf8"));
 const run = JSON.parse(fs.readFileSync(resultPath, "utf8"));
 const outputs = new Map((run.outputs ?? []).map((x) => [x.id, x]));
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -88,6 +89,7 @@ function approvedMetricProvenance(provenance) {
   if (!provenance || typeof provenance !== "object") return { approved: false, reason: "missing_metricProvenance" };
   if (provenance.candidateSelfGrade !== false) return { approved: false, reason: "candidate_self_grade_or_unspecified" };
   if (!String(provenance.name ?? "").trim()) return { approved: false, reason: "missing_metric_name" };
+  if (!String(provenance.protocol ?? "").trim()) return { approved: false, reason: "missing_metric_normalization_protocol" };
 
   const direct = new Set(["deterministic", "human_reference", "official_benchmark_metric", "blinded_human"]);
   if (direct.has(provenance.kind)) return { approved: true, reason: null };
@@ -105,6 +107,21 @@ function approvedMetricProvenance(provenance) {
   return { approved: false, reason: "unknown_metric_kind" };
 }
 
+function metricUtility(metricName, observedValue) {
+  const definition = metricContract.metrics?.[metricName];
+  if (!definition) return { ok: false, reason: "unregistered_metric", utility: null };
+  if (typeof observedValue !== "number" || observedValue < 0 || observedValue > 1) {
+    return { ok: false, reason: "metric_out_of_range", utility: null };
+  }
+  if (definition.direction === "higher_is_better") {
+    return { ok: true, reason: null, utility: observedValue, direction: definition.direction };
+  }
+  if (definition.direction === "lower_is_better") {
+    return { ok: true, reason: null, utility: 1 - observedValue, direction: definition.direction };
+  }
+  return { ok: false, reason: "unknown_metric_direction", utility: null };
+}
+
 const detail = [];
 for (const row of seed.cases) {
   const got = outputs.get(row.id);
@@ -116,9 +133,23 @@ for (const row of seed.cases) {
   if (row.dimension === "generative_expression") {
     const requiredMetrics = row.scoring ?? [];
     const scores = got.metricScores ?? {};
-    const missing = requiredMetrics.filter((m) => typeof scores[m] !== "number" || scores[m] < 0 || scores[m] > 1);
+    const missing = requiredMetrics.filter((m) => typeof scores[m] !== "number");
+    const contractIssues = [];
+    const metricUtilities = {};
+    const metricDirections = {};
+
+    for (const metric of requiredMetrics) {
+      if (typeof scores[metric] !== "number") continue;
+      const converted = metricUtility(metric, scores[metric]);
+      if (!converted.ok) contractIssues.push({ metric, issue: converted.reason });
+      else {
+        metricUtilities[metric] = converted.utility;
+        metricDirections[metric] = converted.direction;
+      }
+    }
+
     const provenanceCheck = approvedMetricProvenance(got.metricProvenance);
-    if (missing.length || !provenanceCheck.approved) {
+    if (missing.length || contractIssues.length || !provenanceCheck.approved) {
       detail.push({
         id: row.id,
         dimension: row.dimension,
@@ -126,12 +157,14 @@ for (const row of seed.cases) {
         phenomenon: row.phenomenon ?? null,
         status: "needs_external_scoring",
         missingMetrics: missing,
+        metricContractIssues: contractIssues,
         provenanceIssue: provenanceCheck.approved ? null : provenanceCheck.reason,
         score: null,
       });
       continue;
     }
-    const score = mean(requiredMetrics.map((m) => scores[m]));
+
+    const score = mean(requiredMetrics.map((m) => metricUtilities[m]));
     detail.push({
       id: row.id,
       dimension: row.dimension,
@@ -139,6 +172,9 @@ for (const row of seed.cases) {
       phenomenon: row.phenomenon ?? null,
       status: "scored",
       score,
+      rawMetricScores: Object.fromEntries(requiredMetrics.map((m) => [m, scores[m]])),
+      metricUtilities,
+      metricDirections,
       metricProvenance: got.metricProvenance,
     });
     continue;
@@ -196,10 +232,11 @@ for (const [dimension, weight] of Object.entries(config.composite.weights)) {
 
 const equalWeightMean100 = complete && completeDimensionValues.length ? mean(completeDimensionValues) : null;
 const report = {
-  version: 4,
+  version: 5,
   runId: run.runId ?? null,
   model: run.model ?? null,
   shadowCases: seed.cases.length,
+  generativeMetricContractVersion: metricContract.version ?? null,
   dimensionScores,
   englishCoreShadow100: complete ? Number(englishCore100.toFixed(3)) : null,
   equalWeightDimensionMean100: typeof equalWeightMean100 === "number" ? Number(equalWeightMean100.toFixed(3)) : null,
@@ -211,11 +248,12 @@ const report = {
     "This scorer covers the fresh Pari shadow set only; public-anchor benchmark results must be reported separately.",
     "Forced-choice option positions are deterministically permuted per case ID to reduce answer-position artifacts.",
     "Forced-choice cases are deterministically scored from the private seed answer key.",
-    "Generative cases require complete normalized metricScores plus structured approved metricProvenance. The legacy metricSource string alone no longer qualifies a score.",
+    "Generative metricScores are normalized observations in [0,1], not assumed utilities. Directionality comes from english-core-generative-metric-contract.json; lower-is-better criteria are inverted before aggregation.",
+    "Generative cases require complete registered metricScores plus structured approved metricProvenance including the normalization/scoring protocol.",
     "General-purpose LLM judges are secondary diagnostics and cannot by themselves enter the official generative composite; validated specialist models require an explicit human-validation reference.",
     "The product-weighted composite is a Pari product prior, not a literature-derived psychometric scale; compare it with the equal-weight dimension mean and all seven subscores.",
     "Run analyze-english-core-statistics.mjs for uncertainty and compare-english-core-models.mjs for paired model comparison.",
-    "Runtime, RAM and quantization do not affect English Core competence scores."
+    "Runtime, RAM and quantization do not affect English Core competence evidence."
   ],
   detail,
 };
