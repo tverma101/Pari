@@ -1,14 +1,17 @@
-"""Run a local MLX model over the Pari English Core shadow benchmark.
+"""Run a local MLX model over a Pari English Core task JSONL.
 
-Prerequisite:
+Examples:
     node build-english-core.mjs
+    python run-english-core-mlx.py <model_dir> shadow-result.json
 
-Usage:
-    python run-english-core-mlx.py <model_dir> <result.json> [--max-tokens 220]
+    python build-english-core-public-fast.py
+    python run-english-core-mlx.py <model_dir> public-result.json \
+        --tasks english-core-public-fast.jsonl
 
-The result format is compatible with english-core-result-schema.json and
-score-english-core.mjs. Generative-expression cases are emitted raw and require
-external scoring before the full English Core shadow composite can be computed.
+The result format is compatible with english-core-result-schema.json. Shadow
+forced-choice cases can be scored with score-english-core.mjs. Public-fast cases
+use their separate answer key/scorer. Generative-expression cases remain raw
+until independently scored.
 """
 
 import argparse
@@ -17,7 +20,7 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-TASKS = HERE / "english-core-shadow.jsonl"
+DEFAULT_TASKS = HERE / "english-core-shadow.jsonl"
 
 
 def strip_think(text: str) -> str:
@@ -29,25 +32,40 @@ def strip_think(text: str) -> str:
     return text
 
 
+def resolve_path(value: str | None) -> Path:
+    if value is None:
+        return DEFAULT_TASKS
+    p = Path(value)
+    if not p.is_absolute():
+        local = HERE / p
+        if local.exists():
+            return local
+        p = Path.cwd() / p
+    return p.resolve()
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("model_dir")
     ap.add_argument("result_file")
+    ap.add_argument("--tasks", default=None, help="Task JSONL path; defaults to english-core-shadow.jsonl")
     ap.add_argument("--max-tokens", type=int, default=220)
     ap.add_argument("--temperature", type=float, default=0.0)
     args = ap.parse_args()
 
-    if not TASKS.exists():
+    task_path = resolve_path(args.tasks)
+    if not task_path.exists():
         raise SystemExit(
-            f"Missing {TASKS.name}. Run `node {HERE / 'build-english-core.mjs'}` first."
+            f"Missing task file: {task_path}. Build the requested English Core suite first."
         )
 
-    tasks = [json.loads(line) for line in TASKS.read_text().splitlines() if line.strip()]
+    tasks = [json.loads(line) for line in task_path.read_text().splitlines() if line.strip()]
 
     from mlx_lm import load
     from mlx_lm.generate import generate
     from mlx_lm.sample_utils import make_sampler
 
+    print(f"tasks: {task_path} cases={len(tasks)}", flush=True)
     print(f"loading {args.model_dir} ...", flush=True)
     t0 = time.time()
     model, tokenizer = load(args.model_dir)
@@ -90,7 +108,7 @@ def main() -> None:
                 "latencySeconds": round(latency, 4),
             }
         )
-        print(f"[{i:02d}/{len(tasks):02d}] {task['id']} {latency:.2f}s  {text[:100]}", flush=True)
+        print(f"[{i:04d}/{len(tasks):04d}] {task['id']} {latency:.2f}s  {text[:100]}", flush=True)
 
     result = {
         "runId": f"english-core-{int(time.time())}",
@@ -100,6 +118,7 @@ def main() -> None:
             "repoOrName": args.model_dir,
             "runtime": "mlx-lm",
         },
+        "taskFile": str(task_path),
         "decoding": {
             "temperature": args.temperature,
             "maxNewTokens": args.max_tokens,
