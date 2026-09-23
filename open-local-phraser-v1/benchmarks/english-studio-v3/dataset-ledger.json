@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "policy": {
+    "shipping_train": "May be considered for training a shippable model, subject to source-level audit and attribution requirements.",
+    "research_train": "May be used for internal experiments but must not become a shipping dependency without further license/provenance review.",
+    "eval_only": "Frozen benchmark/reference material. Never train on it.",
+    "blocked_pending_review": "Do not use until licensing/provenance questions are resolved."
+  },
+  "datasets": [
+    {
+      "id": "iterater_v2",
+      "name": "IteraTeR v2",
+      "url": "https://huggingface.co/datasets/wanyu/IteraTeR_v2",
+      "license": "apache-2.0",
+      "provenance": "human revision histories / iterative text revision",
+      "scale": {"train": 292929, "dev": 34029, "test": 39511},
+      "usage": {"train": "shipping_train", "dev": "eval_only", "test": "eval_only"},
+      "pari_roles": ["sentence_revision", "paragraph_revision", "span_extraction", "edit_intent"],
+      "notes": "Primary real human-revision source. Preserve official holdouts. Validate local-span extraction yield before using derived span pairs."
+    },
+    {
+      "id": "iterater_full",
+      "name": "IteraTeR-FULL",
+      "url": "https://github.com/vipulraheja/iterater",
+      "license": "apache-2.0 repository; audit source-level provenance before shipping training",
+      "provenance": "revision histories across multiple writing domains",
+      "scale": {"sentence_train": 157579, "document_train": 29848},
+      "usage": {"train": "research_train", "dev": "eval_only", "test": "eval_only"},
+      "pari_roles": ["sentence_revision", "document_revision", "edit_intent"],
+      "notes": "Use only after overlap analysis against IteraTeR v2 so the same revisions are not double-counted."
+    },
+    {
+      "id": "coedit_public",
+      "name": "CoEdIT public dataset",
+      "url": "https://huggingface.co/datasets/grammarly/coedit",
+      "license": "apache-2.0 dataset card",
+      "provenance": "curated public text-editing datasets assembled for task-specific instruction tuning",
+      "scale": {"train": 69100},
+      "usage": {"train": "shipping_train", "validation": "eval_only"},
+      "pari_roles": ["grammar_repair", "paraphrase", "editing_instruction"],
+      "notes": "Public release excludes restricted simplification/formality examples. Audit constituent-source lineage before final shipping decision. CoEdIT model checkpoints themselves are CC-BY-NC-4.0 and are research references only."
+    },
+    {
+      "id": "smart_word_suggestions_train",
+      "name": "Smart Word Suggestions distant training data",
+      "url": "https://github.com/microsoft/SmartWordSuggestions",
+      "license": "MIT repository; verify dataset-specific terms in data package before shipping training",
+      "provenance": "rule-generated / distantly supervised substitutions",
+      "scale": {"sentences": 3700000, "suggestions": 12700000},
+      "usage": {"train": "research_train"},
+      "pari_roles": ["lexical_candidates", "word_phrase_substitution"],
+      "notes": "Weak supervision only. Never treat as gold. Use for candidate-generator pretraining or augmentation after human-data baselines."
+    },
+    {
+      "id": "smart_word_suggestions_test",
+      "name": "Smart Word Suggestions human test set",
+      "url": "https://github.com/microsoft/SmartWordSuggestions",
+      "license": "MIT repository; keep frozen regardless",
+      "provenance": "1,000 English-learner sentences with >16k suggestions annotated by 10 native speakers",
+      "scale": {"sentences": 1000, "human_suggestions": 16000},
+      "usage": {"test": "eval_only"},
+      "pari_roles": ["word_phrase_suggestion", "candidate_ranking"],
+      "notes": "Core external benchmark for contextual word/phrase suggestions."
+    },
+    {
+      "id": "jfleg",
+      "name": "JFLEG",
+      "url": "https://github.com/keisks/jfleg",
+      "license": "CC-BY-NC-SA-4.0",
+      "provenance": "English learner sentences with four human fluency corrections",
+      "usage": {"dev": "eval_only", "test": "eval_only"},
+      "pari_roles": ["grammar", "fluency"],
+      "notes": "Use official GLEU evaluation. Do not train shipping model on it."
+    },
+    {
+      "id": "asset",
+      "name": "ASSET",
+      "url": "https://github.com/facebookresearch/asset",
+      "license": "CC-BY-NC-4.0",
+      "provenance": "source sentences with multiple human simplifications",
+      "usage": {"validation": "eval_only", "test": "eval_only"},
+      "pari_roles": ["simplification", "compression", "split_join", "phrase_length_change"],
+      "notes": "Use SARI plus independent meaning/safety checks."
+    },
+    {
+      "id": "tsar_english",
+      "name": "TSAR English lexical simplification",
+      "url": "https://aclanthology.org/2022.tsar-1.31/",
+      "license": "CC-BY-NC-SA-4.0 evaluation data",
+      "provenance": "human lexical simplification alternatives",
+      "usage": {"test": "eval_only"},
+      "pari_roles": ["lexical_alternatives", "candidate_ranking"],
+      "notes": "Use MAP/Potential/Accuracy ranking metrics."
+    },
+    {
+      "id": "paws_wiki",
+      "name": "PAWS-Wiki",
+      "url": "https://github.com/google-research-datasets/paws",
+      "license": "dataset may be freely used for any purpose; acknowledgement requested",
+      "provenance": "human-labeled adversarial paraphrase pairs",
+      "scale": {"labeled_train": 49401, "dev": 8000, "test": 8000},
+      "usage": {"train": "research_train", "dev": "eval_only", "test": "eval_only"},
+      "pari_roles": ["meaning_safety", "word_order", "role_reversal"],
+      "notes": "Prefer as semantic-gate training/evaluation rather than rewrite-generation data."
+    },
+    {
+      "id": "wiki_atomic_edits",
+      "name": "WikiAtomicEdits",
+      "url": "https://github.com/google-research-datasets/wiki-atomic-edits",
+      "license": "repository notes CC-BY-SA-4.0 for query-wellformedness and third-party content as-is; source-level audit required",
+      "provenance": "~43M atomic human Wikipedia insertions/deletions across 8 languages",
+      "scale": {"edits": 43000000},
+      "usage": {"train": "blocked_pending_review"},
+      "pari_roles": ["span_edit_detection", "expansion_compression_patterns"],
+      "notes": "Potentially valuable for 1->many/many->1 span behavior, but not a paraphrase-equivalence corpus. Must filter edits by intent/meaning and resolve licensing before use."
+    },
+    {
+      "id": "editeval",
+      "name": "EditEval",
+      "url": "https://github.com/facebookresearch/EditEval",
+      "license": "benchmark paper/repo notes CC-BY-NC-SA-4.0",
+      "provenance": "instruction-based text-improvement benchmark aggregating high-quality editing datasets",
+      "usage": {"test": "eval_only"},
+      "pari_roles": ["paraphrase", "cohesion", "editing_control"],
+      "notes": "First-class external benchmark. Report task-level results, not only aggregate."
+    },
+    {
+      "id": "writingbench",
+      "name": "WritingBench",
+      "url": "https://github.com/X-PLUG/WritingBench",
+      "license": "Apache-2.0 repository/benchmark",
+      "provenance": "1,000 broad writing queries refined with human/domain-expert review and dynamic criteria",
+      "usage": {"test": "eval_only"},
+      "pari_roles": ["writer_teacher_screen", "style_requirement_secondary"],
+      "notes": "Secondary diagnostic only: generation-from-prompt differs from conservative editing. Use for teacher screening and writing-specialization experiments, not as a production gate."
+    },
+    {
+      "id": "par3",
+      "name": "PAR3",
+      "url": "https://github.com/katherinethai/par3",
+      "license": "repository has a license file; source translations/public-domain alignment provenance requires detailed audit before training",
+      "provenance": "multiple human English translations of public-domain foreign-language novels aligned at paragraph level",
+      "scale": {"aligned_paragraphs": 122819, "aligned_sentences_est": 1581988},
+      "usage": {"train": "research_train"},
+      "pari_roles": ["paragraph_paraphrase", "lexical_diversity", "reordering"],
+      "notes": "Useful for paragraph paraphrase diversity research but literary-translation register differs from student/professional prose. Do not make it the core training distribution."
+    }
+  ]
+}
