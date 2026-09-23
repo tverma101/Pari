@@ -8,11 +8,47 @@ The benchmark has one job:
 
 > measure whether a model or pipeline is useful for a human-controlled rewriting studio without requiring the project owner to be an expert English judge.
 
-No single benchmark and no single scalar score decides the winner.
+No single benchmark and no single scalar score decides the shipping winner.
 
 ---
 
-# 1. Two-speed benchmark design
+# 0. Base-LLM English selection is a separate research lane
+
+Before comparing RAM, latency or product routing, plausible base LLMs can be screened with **Pari English Core**. English Core asks a narrower question:
+
+> which model shows the strongest underlying English competence for Pari's editing workload?
+
+It deliberately separates lexical sense, contextual substitution, collocation, grammar, semantic equivalence, register/fluency, controlled generation and discourse from coding/math/general-agent ability.
+
+Canonical English Core files:
+
+- [`ENGLISH_CORE.md`](./ENGLISH_CORE.md) — construct/dimension overview;
+- [`ENGLISH_CORE_RUN.md`](./ENGLISH_CORE_RUN.md) — required execution sequence;
+- [`ENGLISH_CORE_RESEARCH_BASIS.md`](./ENGLISH_CORE_RESEARCH_BASIS.md) — primary research evidence and validity notes;
+- [`ENGLISH_CORE_ROBUSTNESS.md`](./ENGLISH_CORE_ROBUSTNESS.md) — prompt sensitivity, statistics, distribution and claim tiers;
+- [`ENGLISH_CORE_HUMAN_EVAL.md`](./ENGLISH_CORE_HUMAN_EVAL.md) — independent gold-label and generative human-evaluation protocols;
+- [`RESEARCH_GROUNDING_POLICY.md`](./RESEARCH_GROUNDING_POLICY.md) — standing evidence rules for benchmark changes;
+- `english-core-config.json` — machine-readable construct/weight/protocol contract;
+- `english-core-shadow.seed.json` — fresh Pari shadow probes, explicitly author-labeled/unvalidated until independent annotation;
+- `english-core-public-anchors.json` — established external benchmark registry.
+
+Important distinction:
+
+- **English Core may use a product-weighted composite for candidate selection**, but the exact weights are Pari engineering priorities rather than literature-derived psychometric constants.
+- **The normal V1 benchmark still makes the shipping/routing decision.** A model with stronger English competence can still lose a product route because of safety, latency, RAM or specialist performance.
+
+Research-grounding rule:
+
+- established constructs use primary/official benchmark evidence where available;
+- common prompted screens are labeled as screens, not official benchmark scores;
+- public anchors and fresh shadow tests are reported separately;
+- close contenders require prompt-robustness and paired/statistical analysis rather than winner-by-raw-mean;
+- general-purpose LLM judges cannot by themselves define official generative scores;
+- strong English claims require official anchors, reproducibility, independent shadow validation and protocol/weight robustness.
+
+---
+
+# 1. Two-speed product benchmark design
 
 ## V1 fast acceptance suite
 
@@ -56,11 +92,10 @@ These are important regression tests but are not independent proof of human-qual
 
 Use by route, not indiscriminately:
 
-- **Smart Word Suggestions** — contextual word/phrase suggestion;
-- **TSAR** — lexical alternative ranking;
-- **JFLEG** — grammar/fluency;
+- **SWORDS / Smart Word Suggestions / TSAR** — contextual lexical substitution/suggestion and ranking;
+- **JFLEG** — grammar/fluency using official GLEU where applicable;
 - **IteraTeR held-out revisions** — real human revision behavior;
-- **EditEval** — modular editing capabilities;
+- **EditEval** — modular editing capabilities with official task-level metrics;
 - **PAWS** — adversarial semantic/order traps;
 - **ASSET** — simplification/compression/split-join where relevant.
 
@@ -254,7 +289,7 @@ For compatible models compare:
 
 If the end-user latency improvement is small, omit it even if raw tokens/sec rises.
 
-Do not train a new MTP head for V1 unless normal decoding is proven to be the blocking bottleneck.
+Do not train a new MTP head for V1 unless normal decode is proven to be the blocking bottleneck.
 
 ---
 
@@ -269,7 +304,9 @@ Rules:
 - teacher/model-generated text never becomes an independent gold benchmark;
 - if post-V1 adaptation uses IteraTeR train, official dev/test remain frozen;
 - NC/NC-SA datasets stay evaluation-only unless licensing is explicitly resolved;
-- synthetic data is post-V1 augmentation only, never the sole quality authority.
+- synthetic data is post-V1 augmentation only, never the sole quality authority;
+- benchmark-native official metrics remain distinct from common prompted English Core screens;
+- fresh shadow items remain evaluation-only and must rotate if repeated optimization begins to target them.
 
 ---
 
@@ -279,14 +316,15 @@ Do not publish one `Pari score`.
 
 For every candidate produce:
 
-1. word/phrase alternatives table;
-2. sentence alternatives table;
-3. paragraph first-draft table;
-4. hard safety table;
-5. strength/register table;
-6. latency/RAM table;
-7. quantization delta table where applicable;
-8. MTP/speculative delta table where applicable.
+1. English Core dimension profile and robustness evidence when base-LLM selection is relevant;
+2. word/phrase alternatives table;
+3. sentence alternatives table;
+4. paragraph first-draft table;
+5. hard safety table;
+6. strength/register table;
+7. latency/RAM table;
+8. quantization delta table where applicable;
+9. MTP/speculative delta table where applicable.
 
 Then show Pareto views:
 
