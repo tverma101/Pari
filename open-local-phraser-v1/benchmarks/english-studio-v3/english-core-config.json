@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "name": "Pari English Core",
   "purpose": "Select the base LLM by underlying English competence before runtime, memory, quantization, or product routing are considered.",
   "researchBasis": {
@@ -10,7 +10,12 @@
     "sensitivityPolicy": "Always report all seven dimensions and an equal-weight mean beside the product-weighted composite. If model ranking changes materially under equal weighting, treat the winner as weight-sensitive rather than universal.",
     "contaminationBasis": "Public benchmark results are separated from fresh shadow cases because benchmark contamination can inflate static benchmark scores; shadow cases test the same constructs with new surface forms.",
     "choiceOrderBasis": "Forced-choice options are deterministically permuted because LLM multiple-choice performance is known to be sensitive to answer-option order.",
-    "judgeBasis": "Generative outputs must not be scored solely by one general-purpose LLM judge; use human references, deterministic metrics, or independently validated specialized evaluators where possible."
+    "promptRobustnessBasis": "Multi-prompt evaluation is required for close contenders because intent-preserving instruction paraphrases can materially change absolute scores and model rankings.",
+    "uncertaintyBasis": "Small score differences require uncertainty reporting; bootstrap intervals are interpreted conditionally on the current item set rather than as universal-English confidence bounds.",
+    "pairedComparisonBasis": "Models evaluated on the same items are compared with paired item-level analysis rather than only independent averages.",
+    "distributionBasis": "Benchmark item mixtures are not assumed to be random samples from one universal real-world distribution; public, shadow, and product-use distributions are reported separately.",
+    "judgeBasis": "Generative outputs must not be scored solely by one general-purpose LLM judge; use human references, deterministic metrics, official metrics, or independently human-validated specialized evaluators where possible.",
+    "reproducibilityBasis": "Promotion-quality runs must preserve enough model/runtime/task/scorer metadata to reproduce the result."
   },
   "scope": {
     "measures": [
@@ -106,20 +111,34 @@
     "forcedChoice": "Prefer direct A/B or label responses. Do not request explanations or chain-of-thought. Deterministically permute option order per case and record the permutation policy.",
     "probabilityScoring": "When local runtimes expose token/logit probabilities reliably, record calibrated preference margins in addition to text-answer accuracy; do not silently substitute first-token scoring for observed text answers.",
     "generation": "Use fixed task prompts and decoding settings per model class; preserve raw outputs.",
-    "judgePolicy": "Do not let one generative LLM judge define English Core. Prefer gold labels, human references, deterministic checks, and specialized classifiers; use LLM judges only as secondary diagnostics.",
+    "judgePolicy": "Official generative metric scores require structured metricProvenance. General-purpose LLM judges are secondary diagnostics. Specialist model judges require explicit human-validation evidence before entering the official composite.",
     "contamination": "Report public-anchor and fresh-shadow results separately. A model with strong public scores but weak shadow scores is flagged for possible contamination/benchmark overfitting.",
     "runtimeSeparation": "Latency, RAM, quantization and MTP are reported after English Core. They do not change the English competence score.",
     "sampling": "Fast public subsets are engineering screens. Official/full benchmark metrics remain authoritative for research reporting.",
-    "weightSensitivity": "Report both product-weighted and equal-weight composites and inspect per-dimension rankings before selecting a winner."
+    "weightSensitivity": "Report both product-weighted and equal-weight composites and inspect per-dimension rankings before selecting a winner.",
+    "multiPrompt": "For close contenders, run the three-variant shadow robustness lane and report mean, worst-prompt, all-prompts-correct, answer consistency, and prompt spread. Never choose the best prompt after observing model results.",
+    "uncertainty": "Report per-dimension and composite item-bootstrap intervals for the shadow set, explicitly labeled as conditional on the current item set.",
+    "pairedComparison": "Use aligned item-level paired comparison for close models. If the paired bootstrap interval includes zero, report the comparison as inconclusive.",
+    "distributionValidity": "Do not interpret the shadow/public mixture as a random sample of universal English. Preserve per-source, per-dimension, and per-phenomenon views.",
+    "modelFamilyAdaptation": "Record base/instruct/chat checkpoint type and adaptation mode. Base models may use plain prompts; instruct/chat models should use their official chat template where appropriate.",
+    "reproducibility": "Promotion-quality runs should record exact model/revision/quantization/runtime/task hash/decoding/hardware and raw-output provenance."
   },
   "promotion": {
     "englishCoreUse": "Rank base LLM candidates by English Core profile and composites.",
     "productUse": "After English Core selection, run the existing Pari route-specific V1 acceptance suite.",
-    "hardRule": "A high English Core score does not override semantic/safety veto failures in the product benchmark."
+    "hardRule": "A high English Core score does not override semantic/safety veto failures in the product benchmark.",
+    "closeResultRule": "A small observed lead without robust paired/statistical support is inconclusive, not a winner.",
+    "strongClaimGate": "A strong cross-model English claim additionally requires primary official anchors, prompt/protocol robustness, independently validated shadow labels, reproducibility metadata, and evidence that reasonable weighting choices do not materially reverse the conclusion."
   },
   "files": {
     "shadowSeed": "english-core-shadow.seed.json",
     "documentation": "ENGLISH_CORE.md",
-    "researchBasis": "ENGLISH_CORE_RESEARCH_BASIS.md"
+    "researchBasis": "ENGLISH_CORE_RESEARCH_BASIS.md",
+    "researchPolicy": "RESEARCH_GROUNDING_POLICY.md",
+    "robustnessProtocol": "ENGLISH_CORE_ROBUSTNESS.md",
+    "promptRobustnessBuilder": "build-english-core-prompt-robustness.mjs",
+    "promptRobustnessScorer": "score-english-core-prompt-robustness.mjs",
+    "uncertaintyAnalyzer": "analyze-english-core-statistics.mjs",
+    "pairedComparator": "compare-english-core-models.mjs"
   }
 }
