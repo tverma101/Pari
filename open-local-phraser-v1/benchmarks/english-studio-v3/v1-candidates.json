@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "asOf": "2026-09-23",
+  "selectionRule": "Candidates are hypotheses. Promotion requires Pari route-specific quality, latency, whole-app memory, safety and runtime reliability measurements on the target Mac.",
+  "candidates": [
+    {
+      "id": "pari-current-qwen",
+      "role": ["incumbent", "general_generator", "regression_control"],
+      "status": "required",
+      "repoState": "Pari tooling currently contains Qwen3.5-4B MLX fallback paths while older probes reference Qwen3-4B; resolve exact packaged production checkpoint before the first run.",
+      "runtime": "current Pari native MLX path",
+      "quantization": "current packaged/configured build",
+      "mtp": "not assumed",
+      "questions": [
+        "What exact checkpoint is actually used by the installed production path?",
+        "Does any challenger materially improve the V1 routes over this incumbent?"
+      ]
+    },
+    {
+      "id": "minicpm5-2b-mlx4",
+      "model": "openbmb/MiniCPM5-2B-MLX",
+      "base": "openbmb/MiniCPM5-2B",
+      "license": "Apache-2.0",
+      "parameters": 2516756480,
+      "role": ["fast_general_generator", "phrase_sentence_candidate"],
+      "status": "required",
+      "runtime": "MLX / 4-bit Apple Silicon",
+      "quantization": "official MLX 4-bit",
+      "architecture": "LlamaForCausalLM",
+      "mtp": "No V1 training. Separate official DSpark draft-model acceleration path exists and may be benchmarked later as a runtime experiment.",
+      "evidence": [
+        "https://huggingface.co/openbmb/MiniCPM5-2B-MLX"
+      ],
+      "hypothesis": "A 2B model may already be sufficient for interactive suggestions because the human chooses and edits the result; if so its latency/RAM advantage is more valuable than a small top-1 paragraph-quality gain from a larger model."
+    },
+    {
+      "id": "qwen35-4b-mlx4",
+      "model": "mlx-community/Qwen3.5-4B-MLX-4bit",
+      "base": "Qwen/Qwen3.5-4B",
+      "license": "Apache-2.0",
+      "role": ["dense_4b_control", "general_generator"],
+      "status": "required",
+      "runtime": "MLX / mlx-vlm",
+      "quantization": "4-bit affine, group size 64",
+      "diskApproxGB": 3.06,
+      "mtp": "not a V1 dependency",
+      "evidence": [
+        "https://huggingface.co/mlx-community/Qwen3.5-4B-MLX-4bit"
+      ],
+      "hypothesis": "Tests whether a modest increase from 2B materially improves context-sensitive alternatives and sentence rewriting enough to justify additional latency/RAM."
+    },
+    {
+      "id": "ministral3-8b-q4km",
+      "model": "mistralai/Ministral-3-8B-Instruct-2512-GGUF",
+      "variant": "Ministral-3-8B-Instruct-2512-Q4_K_M.gguf",
+      "license": "Apache-2.0",
+      "parametersClass": "8B",
+      "role": ["non_qwen_control", "general_generator"],
+      "status": "required_first_non_qwen_control",
+      "runtime": "llama.cpp",
+      "quantization": "Q4_K_M",
+      "diskApproxGB": 5.2,
+      "mtp": "not assumed",
+      "evidence": [
+        "https://huggingface.co/mistralai/Ministral-3-8B-Instruct-2512-GGUF"
+      ],
+      "hypothesis": "A different model family helps detect Qwen-family prose/ranking habits and provides a clean, officially published GGUF control with a stable local runtime."
+    },
+    {
+      "id": "bonsai2-27b-ternary",
+      "model": "PrismML Ternary Bonsai 2 27B",
+      "base": "Qwen3.8-27B",
+      "license": "Apache-2.0 per release announcement",
+      "role": ["aggressive_low_bit_large_model", "quality_ceiling_local_candidate", "hard_case_generator"],
+      "status": "required_experimental",
+      "runtime": "PrismML/Bonsai-supported local runtime",
+      "quantization": "ternary {-1,0,+1} with FP16 group-wise scaling; 1.76 effective bits/weight",
+      "modelFootprintGB": 5.9,
+      "mtp": "Published compact pack should not be assumed to retain the original Qwen3.8 MTP block. Benchmark an existing compatible speculative path only if reproducible; do not train a new head for V1.",
+      "evidence": [
+        "https://prismml.com/news/bonsai-2-27b"
+      ],
+      "hypothesis": "Tests whether aggressive low-bit compression can buy noticeably better sentence/paragraph alternatives at a weight footprint comparable to an ordinary 8B Q4 model."
+    },
+    {
+      "id": "ling30-tiny-int4",
+      "model": "inclusionAI/Ling-3.0-tiny",
+      "role": ["optional_sparse_control", "fast_generation_experiment"],
+      "status": "optional_after_core_four",
+      "runtime": "Apple-Silicon-compatible INT4/MLX path only if stable at test time",
+      "quantization": "INT4 candidate",
+      "mtp": "not assumed",
+      "hypothesis": "Sparse 7.9B-total/1.3B-active design may offer a useful throughput/capacity tradeoff, but it should not delay the four required model classes."
+    }
+  ],
+  "nonModelRoutes": [
+    {
+      "id": "existing-contextual-lexical",
+      "status": "required",
+      "role": "cheap word-level/contextual candidate source"
+    },
+    {
+      "id": "deterministic-transformations",
+      "status": "required_as_available",
+      "role": "zero-generation-cost repair/expansion/compression candidates where rules are reliable"
+    }
+  ],
+  "firstSweepOrder": [
+    "pari-current-qwen",
+    "minicpm5-2b-mlx4",
+    "qwen35-4b-mlx4",
+    "ministral3-8b-q4km",
+    "bonsai2-27b-ternary"
+  ],
+  "stopRule": "Do not add another candidate unless it plausibly changes the quality/latency/memory Pareto frontier or represents a materially different architecture/runtime family."
+}
