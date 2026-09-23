@@ -40,7 +40,7 @@ const metricContract = readJson("english-core-generative-metric-contract.json");
 const compatibilitySources = readJson("english-core-sources.json");
 
 if (config) {
-  if (Number(config.version) < 5) errors.push(`english-core-config.json version ${config.version} is older than required v5`);
+  if (Number(config.version) < 6) errors.push(`english-core-config.json version ${config.version} is older than required v6`);
 
   const weights = config.composite?.weights ?? {};
   const total = Object.values(weights).reduce((a, b) => a + Number(b), 0);
@@ -63,6 +63,19 @@ if (config) {
   }
 
   for (const [label, name] of Object.entries(config.files ?? {})) checkFile(name, label);
+
+  for (const requiredFileKey of [
+    "runValidator",
+    "packageValidator",
+    "selfCheck",
+    "uncertaintyAnalyzer",
+    "pairedComparator",
+    "choiceOrderRobustnessBuilder",
+    "choiceOrderRobustnessScorer",
+    "generativeMetricContract"
+  ]) {
+    if (!config.files?.[requiredFileKey]) errors.push(`config.files missing required key: ${requiredFileKey}`);
+  }
 
   for (const requiredRule of [
     "sourceRevisionPinning",
@@ -102,6 +115,7 @@ if (metricContract) {
   if (!Object.keys(metricContract.metrics ?? {}).length) errors.push("generative metric contract has no metrics");
 }
 
+let shadowCounts = {};
 if (seed && config) {
   if (!Array.isArray(seed.cases) || seed.cases.length === 0) errors.push("shadow seed has no cases");
   if (!seed.validationStatus) errors.push("shadow seed missing validationStatus");
@@ -129,16 +143,15 @@ if (seed && config) {
       }
     }
   }
+  shadowCounts = counts;
 
   for (const dimension of Object.keys(config.dimensions ?? {})) {
     if (!counts[dimension]) errors.push(`shadow seed has no cases for dimension ${dimension}`);
   }
 
-  // Do not invent a universal minimum sample-size threshold. Thin dimensions are
-  // surfaced as warnings and handled through uncertainty/claim-tier discipline.
-  for (const [dimension, count] of Object.entries(counts)) {
-    if (count < 6) warnings.push(`shadow dimension ${dimension} has only ${count} cases`);
-  }
+  // Deliberately do not impose a universal per-dimension sample-size cutoff.
+  // Counts are reported below and interpreted through uncertainty, phenomenon
+  // coverage, external anchors, and claim-tier discipline.
 
   const configuredGenerative = new Set(config.dimensions?.generative_expression?.metrics ?? []);
   for (const row of seed.cases ?? []) {
@@ -190,11 +203,23 @@ if (resultSchema) {
     if (!decoding[field]) errors.push(`result schema must preserve decoding.${field}`);
   }
 
-  if (!resultSchema.properties?.taskCount) errors.push("result schema must preserve taskCount");
+  const taskCount = resultSchema.properties?.taskCount;
+  if (!taskCount) errors.push("result schema must preserve taskCount");
+  else if (Number(taskCount.minimum) < 1) errors.push("result schema taskCount.minimum must be >= 1");
+
+  const outputsSchema = resultSchema.properties?.outputs;
+  if (!outputsSchema) errors.push("result schema must preserve outputs");
+  else if (Number(outputsSchema.minItems) < 1) errors.push("result schema outputs.minItems must be >= 1");
 
   const modelProps = resultSchema.properties?.model?.properties ?? {};
   for (const field of ["artifactSha256", "tokenizerName", "chatTemplateSha256", "checkpointType", "quantization", "revision"]) {
     if (!modelProps[field]) errors.push(`result schema model must preserve ${field}`);
+  }
+  const artifactTypes = Array.isArray(modelProps.artifactSha256?.type)
+    ? modelProps.artifactSha256.type
+    : [modelProps.artifactSha256?.type].filter(Boolean);
+  if (!artifactTypes.includes("string") || !artifactTypes.includes("null")) {
+    errors.push("result schema model.artifactSha256 must allow string for pinned runs and null for exploratory runs");
   }
 }
 
@@ -218,6 +243,7 @@ for (const requiredImplementation of [
   "english-core-generative-metric-contract.json",
   "run-english-core-mlx.py",
   "validate-english-core-run.py",
+  "build-english-core-repro-manifest.py",
   "build-english-core.mjs",
   "score-english-core.mjs",
   "build-english-core-prompt-robustness.mjs",
@@ -240,12 +266,13 @@ for (const requiredImplementation of [
 }
 
 const report = {
-  version: 4,
+  version: 5,
   configVersion: config?.version ?? null,
   seedVersion: seed?.version ?? null,
   metricContractVersion: metricContract?.version ?? null,
   shadowValidationStatus: seed?.validationStatus ?? null,
   shadowCases: seed?.cases?.length ?? null,
+  shadowCasesByDimension: shadowCounts,
   dimensions: Object.keys(config?.dimensions ?? {}),
   publicAnchors: anchors?.anchors?.length ?? null,
   registeredGenerativeMetrics: Object.keys(metricContract?.metrics ?? {}).length,
@@ -255,6 +282,7 @@ const report = {
   interpretation: [
     "This validates benchmark package consistency, not linguistic validity.",
     "A passing package validator does not upgrade author-written shadow labels to independent human gold.",
+    "Per-dimension case counts are reported rather than judged against an invented universal adequacy threshold; evidence strength is assessed through construct coverage, uncertainty, external anchors, and claim tiers.",
     "Generative metric registration/direction checks prevent accidental inversion but do not validate the evaluator itself.",
     "Choice-parser regression tests and task-builder leakage checks are separate executable checks run by self-check-english-core.sh.",
     "Public data revision/fingerprint requirements are enforced at promotion-run/workflow level; package validation alone cannot prove that a future download used immutable source bytes.",
