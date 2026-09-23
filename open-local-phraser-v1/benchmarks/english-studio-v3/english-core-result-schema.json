@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pari.local/schemas/english-core-result-schema.json",
+  "title": "Pari English Core model result",
+  "type": "object",
+  "required": ["runId", "model", "outputs"],
+  "properties": {
+    "runId": {"type": "string"},
+    "timestamp": {"type": "string"},
+    "model": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {"type": "string"},
+        "repoOrName": {"type": "string"},
+        "revision": {"type": "string"},
+        "quantization": {"type": "string"},
+        "runtime": {"type": "string"}
+      }
+    },
+    "decoding": {
+      "type": "object",
+      "properties": {
+        "temperature": {"type": "number"},
+        "topP": {"type": "number"},
+        "topK": {"type": "integer"},
+        "maxNewTokens": {"type": "integer"},
+        "seed": {"type": ["integer", "null"]}
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "output"],
+        "properties": {
+          "id": {"type": "string"},
+          "output": {"type": "string"},
+          "latencySeconds": {"type": "number"},
+          "probabilities": {
+            "type": "object",
+            "additionalProperties": {"type": "number"}
+          },
+          "metricScores": {
+            "description": "For generative-expression cases only. Each value must be normalized to 0..1 and come from the benchmark's approved scorer/human-reference pipeline, not from the model under test.",
+            "type": "object",
+            "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
+          },
+          "metricSource": {
+            "description": "Records how generative metricScores were produced, e.g. deterministic, human-reference, specialist-ranker, blinded-human. Self-grading by the candidate model is forbidden.",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
