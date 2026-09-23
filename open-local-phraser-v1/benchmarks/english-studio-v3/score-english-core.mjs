@@ -151,28 +151,39 @@ for (const dimension of Object.keys(config.dimensions)) {
 
 let englishCore100 = 0;
 let complete = true;
+const completeDimensionValues = [];
 for (const [dimension, weight] of Object.entries(config.composite.weights)) {
   const value = dimensionScores[dimension]?.score100;
   if (typeof value !== "number") {
     complete = false;
     continue;
   }
+  completeDimensionValues.push(value);
   englishCore100 += value * (weight / 100);
 }
 
+const equalWeightMean100 = complete && completeDimensionValues.length
+  ? mean(completeDimensionValues)
+  : null;
+
 const report = {
-  version: 2,
+  version: 3,
   runId: run.runId ?? null,
   model: run.model ?? null,
   shadowCases: seed.cases.length,
   dimensionScores,
   englishCoreShadow100: complete ? Number(englishCore100.toFixed(3)) : null,
+  equalWeightDimensionMean100: typeof equalWeightMean100 === "number" ? Number(equalWeightMean100.toFixed(3)) : null,
+  weightSensitivityDelta: complete && typeof equalWeightMean100 === "number"
+    ? Number((englishCore100 - equalWeightMean100).toFixed(3))
+    : null,
   complete,
   notes: [
     "This scorer covers the fresh Pari shadow set only; public-anchor benchmark results must be reported separately.",
     "Forced-choice option positions are deterministically permuted per case ID to reduce answer-position artifacts.",
     "Forced-choice cases are deterministically scored from the private seed answer key.",
     "Generative cases require normalized external metricScores and a metricSource; candidate-model self-grading is not accepted.",
+    "The product-weighted composite is a Pari product prior, not a literature-derived psychometric scale; compare it with the equal-weight dimension mean and all seven subscores.",
     "Runtime, RAM and quantization do not affect English Core competence scores.",
   ],
   detail,
