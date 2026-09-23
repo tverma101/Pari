@@ -8,9 +8,11 @@ The central rule is simple:
 
 ## 1. Multi-prompt robustness
 
-Mizrahi et al. (TACL 2024) evaluate 20 LLMs over 39 tasks and 6.5M instances using paraphrased instructions and show that instruction templates can materially change both absolute performance and relative model rankings.
+Mizrahi et al. (TACL 2024) evaluated 20 LLMs over 39 tasks and 6.5M instances using paraphrased instructions and found that instruction templates can materially change both absolute performance and relative model rankings.
 
-Reference: https://aclanthology.org/2024.tacl-1.52/
+Primary reference:
+
+- https://aclanthology.org/2024.tacl-1.52/
 
 Related prompt-sensitivity evidence:
 
@@ -22,7 +24,7 @@ English Core implementation:
 
 - `build-english-core-prompt-robustness.mjs` creates three intent-preserving instruction variants per shadow case;
 - item content, candidate options, and deterministic option order remain fixed within a case;
-- only the task wording changes;
+- only task wording changes;
 - `score-english-core-prompt-robustness.mjs` reports mean prompt accuracy, worst-prompt accuracy, best/worst spread, all-prompts-correct rate, majority-prompt accuracy, and answer consistency;
 - the best prompt must **not** be selected after observing model results.
 
@@ -30,17 +32,18 @@ A model with high canonical accuracy but poor worst-prompt performance or low an
 
 ## 2. Answer-order and selection-bias robustness
 
-Alzahrani et al. (ACL 2024) show that benchmark perturbations including answer ordering and answer-selection method can materially change model rankings. Wei et al. (Findings ACL 2024) directly study option-order/token selection bias and show that ordered-choice presentation can affect LLM decisions.
+Published 2024 work directly shows that option order and answer-selection details can change LLM decisions and even leaderboard rankings.
 
-References:
+Primary references:
 
-- https://aclanthology.org/2024.acl-long.744/
-- https://aclanthology.org/2024.findings-acl.333/
+- Wei et al., *Unveiling Selection Biases: Exploring Order and Token Sensitivity in Large Language Models*: https://aclanthology.org/2024.findings-acl.333/
+- Pezeshkpour & Hruschka, *Large Language Models Sensitivity to The Order of Options in Multiple-Choice Questions*: https://aclanthology.org/2024.findings-naacl.130/
+- Alzahrani et al., *When Benchmarks are Targets: Revealing the Sensitivity of Large Language Model Leaderboards*: https://aclanthology.org/2024.acl-long.744/
 
 English Core therefore uses two controls:
 
 1. every normal forced-choice item is deterministically permuted instead of placing hand-authored gold answers in a fixed position;
-2. close contenders must also run `build-english-core-choice-order-robustness.mjs` and `score-english-core-choice-order-robustness.mjs`, which present each forced-choice shadow item in two different option orders.
+2. close contenders also run `build-english-core-choice-order-robustness.mjs` and `score-english-core-choice-order-robustness.mjs`, which present each forced-choice shadow item in two different option orders.
 
 Report at least:
 
@@ -53,39 +56,41 @@ The order-robustness lane is a **diagnostic gate**, not another weighted English
 
 The shared parsers `english-core-choice-parser.mjs` and `english_core_choice_parser.py` accept only narrowly defined unambiguous answer wrappers such as `A`, `A.`, `Answer: A`, or `The answer is A`. They reject free-form/multi-answer outputs so format tolerance does not become answer inference.
 
-## 3. Statistical uncertainty
+## 3. Statistical uncertainty and dependence sensitivity
 
 Small score differences are not treated as exact facts.
 
-BooStSa describes bootstrap significance testing for NLP model evaluation and emphasizes that slightly higher observed scores alone are insufficient evidence that an advantage will generalize.
+BooStSa provides bootstrap-based significance/evaluation tooling for NLP and motivates uncertainty analysis beyond slightly higher point estimates:
 
-Reference: https://aclanthology.org/2022.acl-demo.12/
+- https://aclanthology.org/2022.acl-demo.12/
 
-English Core implementation:
+English Core reports two different uncertainty views:
 
-- `analyze-english-core-statistics.mjs` reports deterministic item-bootstrap intervals for each English dimension and both product/equal-weight composites;
-- it additionally reports **phenomenon-cluster bootstrap sensitivity** for each dimension because several author-written items share linguistic phenomena/templates;
-- item intervals are labeled as conditional on the current shadow item set;
-- cluster sensitivity is explicitly exploratory when the number of phenomenon clusters is small.
+1. **item bootstrap** — resamples current shadow items within each dimension;
+2. **phenomenon hierarchical-bootstrap sensitivity** — resamples phenomenon groups and then resamples items inside each selected group.
 
-Why both views:
+The second lane exists because shadow items sharing a linguistic phenomenon/template may be dependent. Relevant methodology includes:
 
-Language-evaluation observations can be nested or clustered. Treating dependent rows as fully independent can understate uncertainty. Hierarchical/cluster resampling is therefore useful as a sensitivity analysis, but with only a small number of clusters it is itself unstable and must not be oversold.
+- Burchill & Jaeger, *How reliable are standard reading time analyses? Hierarchical bootstrap reveals substantial power over-optimism and scale-dependent Type I error inflation*, Journal of Memory and Language 136 (2024): https://doi.org/10.1016/j.jml.2023.104494
+- Anglin, *Estimating Uncertainty in Classifier Performance with Applications to Large Language Models and Nested Data* (2026 preprint): https://arxiv.org/abs/2606.26422
 
-Relevant methodology:
+Important scope limitation:
 
-- Burchill & Jaeger, Journal of Memory and Language 2024, hierarchical bootstrap in language data;
-- Anglin 2026 preprint, uncertainty estimation for LLM/classifier performance with nested data.
+- those papers motivate respecting hierarchical/nested dependence;
+- they **do not validate Pari's phenomenon tags as a random-effects population**;
+- grouping Pari items by `phenomenon` is therefore an application-specific sensitivity analysis, not a literature-derived inferential model;
+- no universal minimum phenomenon count is asserted;
+- neither interval implies that the handcrafted shadow set is an i.i.d. sample from a universal population of English usage.
 
-Important limitation:
-
-Neither interval implies that Pari's handcrafted items are an i.i.d. random sample from a universal population of English usage. Material disagreement between item-level and cluster-sensitive intervals is evidence against a fine-grained winner claim.
+Material disagreement between item-level and hierarchical intervals is evidence against a fine-grained winner claim.
 
 ## 4. Paired model comparison
 
-Peyrard et al. (ACL 2021) show that NLP systems evaluated on the same instances should be compared using the pairing rather than only independent averages; they found that aggregation choices could change state-of-the-art conclusions in a substantial fraction of the evaluation setups they reanalyzed.
+Peyrard et al. (ACL 2021) show that NLP systems evaluated on the same instances should preserve that pairing rather than be compared only through independent averages.
 
-Reference: https://aclanthology.org/2021.acl-long.179/
+Primary reference:
+
+- https://aclanthology.org/2021.acl-long.179/
 
 Additional evidence:
 
@@ -103,13 +108,13 @@ Do not infer pairwise significance merely because two separately calculated conf
 
 ## 5. Distributional validity
 
-Siska et al. (ACL 2024) challenge the assumption that benchmark test prompts are a random sample from a single real-world distribution and show that correlations and distribution assumptions can change model rankings.
+Siska et al. (ACL 2024) show that benchmark prompts need not behave like independent random samples from one use-case distribution; accounting for prompt correlations can change model rankings.
 
-Reference: https://aclanthology.org/2024.acl-long.560/
+- https://aclanthology.org/2024.acl-long.560/
 
-Kovatchev and Lease (NAACL 2024) likewise show that dataset characteristics and sampling distributions can significantly affect absolute performance and relative rankings.
+Kovatchev & Lease (NAACL 2024) show that benchmark data characteristics/distributions can materially affect absolute scores and relative rankings.
 
-Reference: https://aclanthology.org/2024.naacl-long.86/
+- https://aclanthology.org/2024.naacl-long.86/
 
 English Core therefore does not claim its shadow mix estimates a universal English distribution.
 
@@ -130,7 +135,7 @@ A common prompted A/B task is useful for comparing chat/instruct models under on
 
 Examples:
 
-- BLiMP's grammar evidence should include its native sentence-likelihood/minimal-pair protocol; the chat-style BLiMP subset remains a prompted robustness screen.
+- BLiMP grammar evidence includes its native sentence-likelihood/minimal-pair protocol; the chat-style BLiMP subset remains a prompted screen.
 - CoLA headline reporting uses Matthews correlation coefficient on its native distribution where supported; balanced-screen accuracy is not called the official CoLA metric.
 - SWORDS and JFLEG use their official evaluators rather than Pari redefinitions.
 
@@ -138,32 +143,56 @@ See `ENGLISH_CORE_NATIVE_PROTOCOLS.md` and `english-core-public-anchors.json`.
 
 ## 7. Contamination
 
-PaCoST and other contamination research show that public benchmark exposure can distort apparent model performance.
+PaCoST is direct evidence that public benchmark exposure can distort apparent model performance:
 
-Reference: https://aclanthology.org/2024.findings-emnlp.97/
+- Zhang et al., Findings EMNLP 2024: https://aclanthology.org/2024.findings-emnlp.97/
 
 English Core response:
 
 - public anchors and fresh shadow results are always separate;
 - shadow cases are never training/prompt-optimization data;
-- repeated optimization against one frozen shadow file eventually contaminates it too, so cases must rotate;
+- repeated optimization against one frozen shadow file eventually compromises its freshness too, so cases must rotate;
 - unexpectedly large public-anchor versus shadow gaps are investigated rather than averaged away.
+
+Freshness alone is not proof of validity: the current shadow set remains author-labeled until independent annotation/adjudication.
 
 ## 8. Metric-model uncertainty
 
 Hu, Goyal, and Gupta (EMNLP 2023) show that when a learned metric model is used for evaluation, ignoring metric-model error can change significance conclusions.
 
-Reference: https://aclanthology.org/2023.emnlp-main.464/
+- https://aclanthology.org/2023.emnlp-main.464/
 
 Consequences for English Core:
 
 - gold/human-reference/deterministic scores are preferred;
-- scores from learned judges must preserve judge identity, version, validation evidence, protocol, and raw sub-scores;
+- scores from learned judges preserve judge identity, version, validation evidence, protocol, and raw sub-scores;
 - a judge-based metric is not treated as noise-free ground truth;
 - general LLM judges remain secondary unless specifically validated against humans for the exact criterion;
 - generative metric directionality is declared in `english-core-generative-metric-contract.json` so failure rates such as `stock_phrase_rate` and `length_inflation` are not accidentally rewarded.
 
-## 9. Claim tiers
+## 9. Source pinning and reproducibility
+
+Promotion-quality public runs pin immutable dataset revisions where the source supports it and preserve resolved dataset fingerprints plus library versions. Mutable defaults are exploratory only.
+
+Every promotion-quality result records:
+
+- model repository/name and exact revision;
+- model artifact/build SHA-256;
+- quantization;
+- runtime and version/commit;
+- checkpoint type and explicit prompt adaptation mode;
+- tokenizer identity and chat-template hash where available;
+- hardware and OS;
+- benchmark source/config/split/revision;
+- model-visible task-file hash and count;
+- decoding parameters (`temperature`, `top_p`, `top_k`, token limits) and seed;
+- scorer/metric-contract revision;
+- metric/judge provenance;
+- raw-output hash.
+
+`--prompt-mode auto`, unknown model revision, or unknown quantization may be acceptable for exploration, but they are not sufficient metadata for a promotion-quality comparison. Use `validate-english-core-run.py --promotion` and the frozen reproducibility manifest before promotion claims.
+
+## 10. Claim tiers
 
 These tiers are Pari governance categories, not literature-derived universal thresholds.
 
@@ -189,7 +218,7 @@ Minimum evidence:
 - public-fast anchors;
 - multi-prompt forced-choice robustness;
 - choice-order robustness for close contenders;
-- uncertainty reporting including cluster sensitivity;
+- item-bootstrap plus hierarchical dependence sensitivity;
 - paired comparison for close contenders;
 - weight sensitivity shown.
 
@@ -205,6 +234,7 @@ Add:
 - native BLiMP grammar evaluation where applicable;
 - full-distribution prompted WiC/CoLA/PAWS lane;
 - official JFLEG/EditEval or other relevant native protocols;
+- pinned public-source provenance;
 - quantization delta and product V1 route testing;
 - reproducibility manifest and promotion-run validation.
 
@@ -217,32 +247,10 @@ Allowed claim:
 Add:
 
 - independently annotated/adjudicated shadow cases;
-- adequate human agreement;
+- reported human agreement/reliability appropriate to the annotation task;
 - protocol sensitivity analysis;
 - independent replication where practical;
 - statistically supported paired differences;
 - no material ranking flip under reasonable weighting/protocol choices.
 
 Even here, prefer scoped claims over `objectively best English model`.
-
-## 10. Reproducibility and promotion-run metadata
-
-Every promotion-quality result should record:
-
-- model repository/name and exact revision;
-- model artifact hash where available;
-- quantization;
-- runtime and version/commit;
-- checkpoint type and explicit prompt adaptation mode;
-- tokenizer identity and chat-template hash where available;
-- hardware and OS;
-- benchmark source/config/split/revision;
-- model-visible task-file hash;
-- decoding parameters (`temperature`, `top_p`, `top_k`, token limits) and seed;
-- scorer/metric-contract revision;
-- metric/judge provenance;
-- raw-output hash.
-
-`--prompt-mode auto`, unknown model revision, or unknown quantization may be acceptable for exploration, but they are not sufficient metadata for a promotion-quality comparison. Promotion validation should fail or downgrade such runs rather than treating them as equivalent to fully specified runs.
-
-Without enough metadata to reproduce a result, treat it as exploratory evidence rather than a promotion result.
