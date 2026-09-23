@@ -9,6 +9,7 @@
     "timestamp": {"type": "string"},
     "taskFile": {"type": "string"},
     "taskFileSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+    "taskCount": {"type": "integer", "minimum": 0},
     "promptModeRequested": {"type": "string", "enum": ["auto", "chat", "plain"]},
     "promptAdaptationModesObserved": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "promptAdaptationDetailsObserved": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
@@ -19,7 +20,7 @@
         "name": {"type": "string"},
         "repoOrName": {"type": "string"},
         "revision": {"type": "string"},
-        "artifactSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "artifactSha256": {"type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$"},
         "quantization": {"type": "string"},
         "checkpointType": {"type": "string", "enum": ["base", "instruct", "chat", "specialized", "unknown"]},
         "runtime": {"type": "string"},
@@ -34,7 +35,7 @@
       "properties": {
         "machine": {"type": "string"},
         "chip": {"type": "string"},
-        "memoryGB": {"type": "number"},
+        "memoryGB": {"type": ["number", "null"]},
         "os": {"type": "string"},
         "python": {"type": "string"}
       }
