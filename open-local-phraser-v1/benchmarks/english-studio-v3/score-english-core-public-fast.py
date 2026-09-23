@@ -9,31 +9,15 @@ BLiMP/WiC/CoLA/PAWS. Source-level results are the primary view.
 
 import json
 import math
-import re
 import sys
 from collections import defaultdict
 from pathlib import Path
 
+from english_core_choice_parser import parse_choice_letter
+
 HERE = Path(__file__).resolve().parent
 TASKS = HERE / "english-core-public-fast.jsonl"
 ANSWERS = HERE / "english-core-public-fast.answers.json"
-
-
-def parse_letter(text: str) -> str | None:
-    s = str(text or "").strip().upper()
-    if not s:
-        return None
-    patterns = [
-        r"^([A-Z])$",
-        r"^([A-Z])(?:[.)\]:-])(?:\s|$)",
-        r"^ANSWER\s*[:=-]\s*([A-Z])(?:\b|[.)\]:-])",
-        r"^OPTION\s+([A-Z])(?:\b|[.)\]:-])",
-    ]
-    for pattern in patterns:
-        match = re.match(pattern, s)
-        if match:
-            return match.group(1)
-    return None
 
 
 def wilson95(successes: int, n: int) -> list[float] | None:
@@ -79,7 +63,7 @@ def main() -> None:
 
     for task in tasks:
         got = outputs.get(task["id"])
-        predicted = parse_letter(got.get("output", "")) if got else None
+        predicted = parse_choice_letter(got.get("output", "")) if got else None
         expected = answers[task["id"]]
         score = int(predicted == expected) if predicted else 0
         phenomenon = task.get("phenomenon") or "unspecified"
@@ -102,7 +86,7 @@ def main() -> None:
     all_scores = [row["score"] for row in detail]
     wins = sum(all_scores)
     report = {
-        "version": 2,
+        "version": 3,
         "runId": run.get("runId"),
         "model": run.get("model"),
         "cases": len(detail),
@@ -115,6 +99,7 @@ def main() -> None:
         "bySourcePhenomenon": summarize(by_source_phenomenon),
         "notes": [
             "This is a deterministic prompted public-anchor screening subset, not an official full-suite score.",
+            "The shared choice parser accepts only unambiguous letter forms such as A, A., Answer: A, The answer is A, or Option A; free-form prose remains invalid.",
             "The 95% Wilson intervals quantify binomial screening uncertainty under this fixed sampled set; they do not solve benchmark contamination or distribution-shift concerns.",
             "Compare by-source and per-phenomenon results; do not treat the unweighted overall accuracy as the final English Core composite.",
             "The fast-screen sampling distribution is deliberately balanced for WiC/CoLA/PAWS and therefore differs from each benchmark's native/full distribution.",
