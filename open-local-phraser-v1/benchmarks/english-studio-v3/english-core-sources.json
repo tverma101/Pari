@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "policy": "All public benchmark evaluation splits are frozen evaluation-only. Do not train or prompt-tune against them. Report public-anchor and Pari-shadow results separately.",
+  "sources": [
+    {
+      "id": "swords",
+      "name": "SWORDS",
+      "dimension": "lexical_context",
+      "reference": "https://aclanthology.org/2021.naacl-main.345/",
+      "role": "primary contextual lexical-substitution anchor",
+      "status": "adapter_required"
+    },
+    {
+      "id": "wic",
+      "name": "WiC",
+      "dimension": "lexical_context",
+      "reference": "https://aclanthology.org/N19-1128/",
+      "role": "context-sensitive word-sense discrimination",
+      "status": "adapter_required"
+    },
+    {
+      "id": "lexical_collocations_eacl2021",
+      "name": "Lexical collocation retrieval/categorization benchmark",
+      "dimension": "collocation_naturalness",
+      "reference": "https://aclanthology.org/2021.eacl-main.120/",
+      "role": "collocation and context-sensitive lexical-combination anchor",
+      "status": "adapter_required"
+    },
+    {
+      "id": "blimp",
+      "name": "BLiMP",
+      "dimension": "grammar_syntax",
+      "reference": "https://aclanthology.org/2020.tacl-1.25/",
+      "role": "linguistic minimal-pair grammar/syntax anchor",
+      "status": "adapter_required"
+    },
+    {
+      "id": "cola",
+      "name": "Corpus of Linguistic Acceptability (CoLA)",
+      "dimension": "grammar_syntax",
+      "reference": "https://aclanthology.org/Q19-1040/",
+      "role": "real linguistics-literature acceptability anchor",
+      "status": "adapter_required"
+    },
+    {
+      "id": "paws",
+      "name": "PAWS",
+      "dimension": "paraphrase_semantics",
+      "reference": "https://github.com/google-research-datasets/paws",
+      "role": "high-overlap adversarial semantic-equivalence anchor",
+      "status": "existing_dataset_ledger_entry_adapter_required"
+    },
+    {
+      "id": "jfleg",
+      "name": "JFLEG",
+      "dimension": "fluency_register",
+      "reference": "https://github.com/keisks/jfleg",
+      "role": "human fluency-correction anchor",
+      "status": "existing_dataset_ledger_entry_adapter_required"
+    },
+    {
+      "id": "gyafc",
+      "name": "GYAFC",
+      "dimension": "fluency_register",
+      "reference": "https://aclanthology.org/N18-1012/",
+      "role": "formality/register distinction anchor",
+      "status": "adapter_required_license_review"
+    },
+    {
+      "id": "writingbench_selected",
+      "name": "WritingBench selected style/language subsets",
+      "dimension": "generative_expression",
+      "reference": "https://github.com/X-PLUG/WritingBench",
+      "role": "secondary broad writing diagnostic only",
+      "status": "existing_dataset_ledger_entry_subset_adapter_required"
+    },
+    {
+      "id": "bediscover_english",
+      "name": "BeDiscovER focused English subset",
+      "dimension": "discourse",
+      "reference": "https://aclanthology.org/2026.eacl-long.207/",
+      "role": "discourse relation/temporal/sentence-order anchor",
+      "status": "adapter_required_task_level_license_review"
+    }
+  ]
+}
