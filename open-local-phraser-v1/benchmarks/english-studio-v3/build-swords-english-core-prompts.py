@@ -4,10 +4,12 @@ This script does not vendor or modify SWORDS data. Download an official SWORDS
 benchmark file from https://github.com/p-lambda/swords and pass its path here.
 
 Usage:
-    python build-swords-english-core-prompts.py swords-v1.1_test.json.gz swords-prompts.jsonl
+    python build-swords-english-core-prompts.py swords-v1.1_test.json.gz swords-prompts.jsonl \
+      --swords-revision OFFICIAL_REPO_COMMIT
 
 The output contains model-visible prompts only. Official SWORDS evaluation remains
-authoritative and should be run with the SWORDS repository evaluator.
+authoritative and should be run with the SWORDS repository evaluator. For
+promotion-quality evidence, pin the official repository/evaluator revision.
 """
 
 from __future__ import annotations
@@ -17,6 +19,8 @@ import gzip
 import hashlib
 import json
 from pathlib import Path
+
+UNPINNED = "unrecorded_not_pinned"
 
 
 def read_json(path: Path) -> dict:
@@ -35,9 +39,15 @@ def main() -> None:
     ap.add_argument("swords_json")
     ap.add_argument("out_jsonl")
     ap.add_argument("--count", type=int, default=40, help="Maximum ranked substitutes requested per target")
+    ap.add_argument("--swords-revision", default=None, help="Immutable commit/revision of the official p-lambda/swords checkout used for source/evaluation provenance")
     args = ap.parse_args()
 
+    if args.count < 1:
+        raise SystemExit("--count must be >= 1")
+
     source = Path(args.swords_json).resolve()
+    if not source.is_file():
+        raise SystemExit(f"Missing SWORDS source file: {source}")
     data = read_json(source)
     contexts = data.get("contexts", {})
     targets = data.get("targets", {})
@@ -47,6 +57,8 @@ def main() -> None:
     tasks = []
     for target_id, target in targets.items():
         context_id = target["context_id"]
+        if context_id not in contexts:
+            raise SystemExit(f"Target {target_id} references missing context {context_id}")
         context = contexts[context_id]["context"]
         target_text = target["target"]
         offset = target.get("offset")
@@ -74,20 +86,44 @@ def main() -> None:
             },
         })
 
-    out = Path(args.out_jsonl)
+    ids = [row["id"] for row in tasks]
+    if len(ids) != len(set(ids)):
+        raise SystemExit("Duplicate SWORDS target IDs encountered")
+
+    out = Path(args.out_jsonl).resolve()
     out.write_text("\n".join(json.dumps(row, ensure_ascii=False) for row in tasks) + "\n")
+    source_hash = sha256(source)
+    prompt_hash = sha256(out)
+    revision = args.swords_revision or UNPINNED
+
     manifest = out.with_suffix(out.suffix + ".manifest.json")
     manifest.write_text(json.dumps({
-        "version": 1,
+        "version": 2,
         "sourceFile": str(source),
-        "sourceSha256": sha256(source),
+        "sourceSha256": source_hash,
+        "promptFile": str(out),
+        "promptFileSha256": prompt_hash,
         "targets": len(tasks),
         "requestedCandidates": args.count,
-        "officialEvaluator": "Use the SWORDS repository CLI/Docker evaluator; Pari does not redefine official SWORDS metrics.",
         "officialRepository": "https://github.com/p-lambda/swords",
+        "officialRepositoryRevision": revision,
+        "officialEvaluator": "Use the SWORDS repository evaluator at the recorded immutable revision; Pari does not redefine official SWORDS metrics.",
         "researchReference": "https://aclanthology.org/2021.naacl-main.345/",
+        "promotionReadySourceProvenance": revision != UNPINNED,
+        "notes": [
+            "sourceSha256 pins the exact benchmark JSON/JSON.GZ bytes used to construct prompts.",
+            "promptFileSha256 pins the exact model-visible prompt JSONL.",
+            "The official evaluator revision is separate provenance from the benchmark-file hash and must be pinned for promotion-quality comparisons."
+        ]
     }, indent=2) + "\n")
-    print(json.dumps({"targets": len(tasks), "out": str(out), "manifest": str(manifest)}, indent=2))
+    print(json.dumps({
+        "targets": len(tasks),
+        "out": str(out),
+        "sourceSha256": source_hash,
+        "promptFileSha256": prompt_hash,
+        "manifest": str(manifest),
+        "officialRepositoryRevision": revision,
+    }, indent=2))
 
 
 if __name__ == "__main__":
