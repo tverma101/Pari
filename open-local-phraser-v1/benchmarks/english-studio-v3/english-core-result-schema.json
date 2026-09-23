@@ -7,6 +7,8 @@
   "properties": {
     "runId": {"type": "string"},
     "timestamp": {"type": "string"},
+    "taskFile": {"type": "string"},
+    "taskFileSha256": {"type": "string"},
     "model": {
       "type": "object",
       "required": ["name"],
@@ -14,8 +16,22 @@
         "name": {"type": "string"},
         "repoOrName": {"type": "string"},
         "revision": {"type": "string"},
+        "artifactSha256": {"type": "string"},
         "quantization": {"type": "string"},
-        "runtime": {"type": "string"}
+        "checkpointType": {"type": "string", "enum": ["base", "instruct", "chat", "specialized", "unknown"]},
+        "runtime": {"type": "string"},
+        "runtimeVersion": {"type": "string"},
+        "chatTemplate": {"type": "string"}
+      }
+    },
+    "hardware": {
+      "type": "object",
+      "properties": {
+        "machine": {"type": "string"},
+        "chip": {"type": "string"},
+        "memoryGB": {"type": "number"},
+        "os": {"type": "string"},
+        "python": {"type": "string"}
       }
     },
     "decoding": {
@@ -39,18 +55,54 @@
           "latencySeconds": {"type": "number"},
           "probabilities": {
             "type": "object",
+            "description": "Optional diagnostic probabilities/logits. Text-output scoring remains the cross-runtime primary prompted measure.",
             "additionalProperties": {"type": "number"}
           },
           "metricScores": {
-            "description": "For generative-expression cases only. Each value must be normalized to 0..1 and come from the benchmark's approved scorer/human-reference pipeline, not from the model under test.",
+            "description": "For generative-expression cases only. Each value must be normalized to 0..1 and produced by an approved independent evaluation source, never by the candidate model grading itself.",
             "type": "object",
             "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
           },
+          "metricProvenance": {
+            "description": "Structured provenance for generative metricScores. A free-form source name alone is insufficient for official English Core scoring.",
+            "type": "object",
+            "required": ["kind", "name", "candidateSelfGrade"],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "deterministic",
+                  "human_reference",
+                  "official_benchmark_metric",
+                  "specialist_model",
+                  "blinded_human",
+                  "general_llm_diagnostic"
+                ]
+              },
+              "name": {"type": "string"},
+              "version": {"type": "string"},
+              "reference": {"type": "string"},
+              "protocol": {"type": "string"},
+              "validatedAgainstHumans": {"type": "boolean"},
+              "validationReference": {"type": "string"},
+              "candidateSelfGrade": {"const": false},
+              "notes": {"type": "string"}
+            }
+          },
           "metricSource": {
-            "description": "Records how generative metricScores were produced, e.g. deterministic, human-reference, specialist-ranker, blinded-human. Self-grading by the candidate model is forbidden.",
+            "description": "Legacy informational field only. It no longer qualifies generative scores for the official composite without metricProvenance.",
             "type": "string"
           }
         }
+      }
+    },
+    "reproducibility": {
+      "type": "object",
+      "properties": {
+        "benchmarkRevision": {"type": "string"},
+        "scorerRevision": {"type": "string"},
+        "rawOutputSha256": {"type": "string"},
+        "notes": {"type": "array", "items": {"type": "string"}}
       }
     }
   }
