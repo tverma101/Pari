@@ -119,9 +119,6 @@ if (seed && config) {
     if (!counts[dimension]) errors.push(`shadow seed has no cases for dimension ${dimension}`);
   }
 
-  // The author-labeled shadow is deliberately not required to hit one arbitrary
-  // sample-size threshold. Flag thin dimensions instead of inventing a universal
-  // research constant.
   for (const [dimension, count] of Object.entries(counts)) {
     if (count < 6) warnings.push(`shadow dimension ${dimension} has only ${count} cases`);
   }
@@ -151,6 +148,15 @@ if (resultSchema) {
   if (!provenanceKind.includes("official_benchmark_metric")) errors.push("result schema metricProvenance must support official_benchmark_metric");
   if (!provenanceKind.includes("blinded_human")) errors.push("result schema metricProvenance must support blinded_human");
   if (!provenanceRequired.has("protocol")) errors.push("result schema metricProvenance must require protocol/normalization description");
+
+  const decoding = resultSchema.properties?.decoding?.properties ?? {};
+  if (!decoding.topP || !decoding.topK || !decoding.temperature || !decoding.seed) {
+    errors.push("result schema must preserve temperature/topP/topK/seed decoding provenance");
+  }
+  const modelProps = resultSchema.properties?.model?.properties ?? {};
+  if (!modelProps.tokenizerName || !modelProps.chatTemplateSha256) {
+    errors.push("result schema must preserve tokenizer identity and chat-template hash fields");
+  }
 }
 
 for (const requiredDoc of [
@@ -165,8 +171,25 @@ for (const requiredDoc of [
   if (!fs.existsSync(path.join(here, requiredDoc))) errors.push(`missing governance/research document: ${requiredDoc}`);
 }
 
+for (const requiredImplementation of [
+  "english-core-choice-parser.mjs",
+  "english_core_choice_parser.py",
+  "test-english-core-choice-parser.mjs",
+  "test_english_core_choice_parser.py",
+  "english-core-generative-metric-contract.json",
+  "run-english-core-mlx.py",
+  "score-english-core.mjs",
+  "analyze-english-core-statistics.mjs",
+  "compare-english-core-models.mjs",
+  "score-english-core-prompt-robustness.mjs",
+  "score-english-core-public-fast.py",
+  "score-english-core-public-full-classification.py"
+]) {
+  if (!fs.existsSync(path.join(here, requiredImplementation))) errors.push(`missing required implementation file: ${requiredImplementation}`);
+}
+
 const report = {
-  version: 2,
+  version: 3,
   configVersion: config?.version ?? null,
   seedVersion: seed?.version ?? null,
   metricContractVersion: metricContract?.version ?? null,
@@ -182,6 +205,7 @@ const report = {
     "This validates benchmark package consistency, not linguistic validity.",
     "A passing package validator does not upgrade author-written shadow labels to independent human gold.",
     "Generative metric registration/direction checks prevent accidental inversion but do not validate the evaluator itself.",
+    "Choice-parser regression tests are separate executable checks and should be run before promotion-quality evaluation.",
     "Run audit-english-core-shadow.mjs separately for item-level structural/distribution diagnostics.",
     "Research-level claims still require the claim-tier gates in ENGLISH_CORE_ROBUSTNESS.md."
   ]
