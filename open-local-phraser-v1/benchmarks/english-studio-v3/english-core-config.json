@@ -1,7 +1,17 @@
 {
-  "version": 1,
+  "version": 2,
   "name": "Pari English Core",
   "purpose": "Select the base LLM by underlying English competence before runtime, memory, quantization, or product routing are considered.",
+  "researchBasis": {
+    "designFramework": "Evidence-Centered Benchmark Design (ACL 2024) + HELM-style multi-dimensional reporting",
+    "constructPolicy": "Every dimension must be tied to a published linguistic/NLP construct or editing benchmark plus a Pari-specific shadow analogue.",
+    "weightBasis": "product-prior, not a literature-derived psychometric scale",
+    "weightRationale": "Lexical context and collocation are intentionally emphasized because Pari's primary interaction is contextual word/phrase replacement. Exact percentages are engineering priorities and must not be presented as empirically discovered constants.",
+    "sensitivityPolicy": "Always report all seven dimensions and an equal-weight mean beside the product-weighted composite. If model ranking changes materially under equal weighting, treat the winner as weight-sensitive rather than universal.",
+    "contaminationBasis": "Public benchmark results are separated from fresh shadow cases because benchmark contamination can inflate static benchmark scores; shadow cases test the same constructs with new surface forms.",
+    "choiceOrderBasis": "Forced-choice options are deterministically permuted because LLM multiple-choice performance is known to be sensitive to answer-option order.",
+    "judgeBasis": "Generative outputs must not be scored solely by one general-purpose LLM judge; use human references, deterministic metrics, or independently validated specialized evaluators where possible."
+  },
   "scope": {
     "measures": [
       "context-sensitive lexical meaning",
@@ -35,47 +45,56 @@
       "generative_expression": 10,
       "discourse": 5
     },
-    "rule": "Always publish all seven subscores beside the composite. This score must never replace Pari route-specific product acceptance."
+    "secondaryComposite": "equal_weight_dimension_mean_100",
+    "rule": "Always publish all seven subscores, the product-weighted composite, and the equal-weight dimension mean. This score must never replace Pari route-specific product acceptance."
   },
   "dimensions": {
     "lexical_context": {
       "weight": 25,
+      "researchConstruct": "context-sensitive word meaning and lexical substitution",
       "publicAnchors": ["SWORDS", "WiC", "CoInCo/LS07 when available"],
       "shadowFamilies": ["word_sense_discrimination", "contextual_substitution", "target_meaning_preservation"],
       "metrics": ["forced_choice_accuracy", "human_reference_recall_at_10", "human_reference_recall_at_40", "valid_at_10", "valid_at_40", "ranking_quality"]
     },
     "collocation_naturalness": {
       "weight": 20,
+      "researchConstruct": "lexical collocation retrieval/classification and idiomatic compatibility",
       "publicAnchors": ["EACL-2021 lexical-collocation retrieval/categorization benchmark"],
       "shadowFamilies": ["verb_noun_collocation", "adjective_noun_collocation", "adverb_adjective_collocation", "preposition_compatibility"],
       "metrics": ["minimal_pair_accuracy", "contextual_collocation_accuracy", "awkward_replacement_rejection"]
     },
     "grammar_syntax": {
       "weight": 15,
+      "researchConstruct": "linguistic acceptability and targeted grammatical phenomena",
       "publicAnchors": ["BLiMP", "CoLA"],
       "shadowFamilies": ["agreement", "negative_polarity", "binding", "argument_structure", "determiners", "word_order"],
       "metrics": ["minimal_pair_accuracy", "matthews_correlation_when_supported"]
     },
     "paraphrase_semantics": {
       "weight": 15,
+      "researchConstruct": "structural/context-sensitive paraphrase equivalence under high lexical overlap",
       "publicAnchors": ["PAWS", "Pari semantic adversarial suite"],
       "shadowFamilies": ["actor_patient", "cause_effect", "negation", "modality", "quantity", "temporal_order"],
       "metrics": ["same_meaning_accuracy", "semantic_veto_recall", "false_equivalence_rate"]
     },
     "fluency_register": {
       "weight": 10,
+      "researchConstruct": "holistic English fluency plus formality/register discrimination",
       "publicAnchors": ["JFLEG", "GYAFC", "Pari register/vocabulary-ceiling cases"],
       "shadowFamilies": ["casual_preservation", "neutral_preservation", "formality_discrimination", "fluency_preference"],
       "metrics": ["register_pair_accuracy", "fluency_pair_accuracy", "register_drift", "rare_word_inflation"]
     },
     "generative_expression": {
       "weight": 10,
-      "publicAnchors": ["WritingBench selected style/language subsets", "EQ-Bench Creative Writing diagnostics"],
+      "researchConstruct": "controlled text improvement, revision, paraphrasing, and generative writing",
+      "publicAnchors": ["EditEval relevant tasks", "IteraTeR held-out revisions", "WritingBench selected style/language subsets as secondary evidence"],
+      "secondaryDiagnostics": ["EQ-Bench Creative Writing diagnostics"],
       "shadowFamilies": ["contextual_alternatives", "sentence_restructure", "concise_rewrite", "non_ai_stock_language"],
       "metrics": ["meaning_preservation", "naturalness", "structural_diversity", "stock_phrase_rate", "unnecessary_length_inflation"]
     },
     "discourse": {
       "weight": 5,
+      "researchConstruct": "discourse relation, temporal relation, coherence, and sentence ordering",
       "publicAnchors": ["BeDiscovER focused English subset"],
       "shadowFamilies": ["condition_vs_certainty", "cause_vs_contrast", "concession", "temporal_relation", "sentence_order"],
       "metrics": ["relation_accuracy", "temporal_accuracy", "sentence_order_accuracy"]
@@ -84,20 +103,23 @@
   "evaluationProtocol": {
     "publicAnchorPolicy": "Use official frozen evaluation splits only. Never fine-tune on evaluation data.",
     "shadowPolicy": "Fresh Pari-authored cases are evaluation-only, rotated periodically, and must never be used for training or prompt optimization.",
-    "forcedChoice": "Prefer direct A/B or label responses. Do not request explanations or chain-of-thought.",
-    "probabilityScoring": "When local runtimes expose token/logit probabilities reliably, record calibrated preference margins in addition to accuracy.",
+    "forcedChoice": "Prefer direct A/B or label responses. Do not request explanations or chain-of-thought. Deterministically permute option order per case and record the permutation policy.",
+    "probabilityScoring": "When local runtimes expose token/logit probabilities reliably, record calibrated preference margins in addition to text-answer accuracy; do not silently substitute first-token scoring for observed text answers.",
     "generation": "Use fixed task prompts and decoding settings per model class; preserve raw outputs.",
     "judgePolicy": "Do not let one generative LLM judge define English Core. Prefer gold labels, human references, deterministic checks, and specialized classifiers; use LLM judges only as secondary diagnostics.",
     "contamination": "Report public-anchor and fresh-shadow results separately. A model with strong public scores but weak shadow scores is flagged for possible contamination/benchmark overfitting.",
-    "runtimeSeparation": "Latency, RAM, quantization and MTP are reported after English Core. They do not change the English competence score."
+    "runtimeSeparation": "Latency, RAM, quantization and MTP are reported after English Core. They do not change the English competence score.",
+    "sampling": "Fast public subsets are engineering screens. Official/full benchmark metrics remain authoritative for research reporting.",
+    "weightSensitivity": "Report both product-weighted and equal-weight composites and inspect per-dimension rankings before selecting a winner."
   },
   "promotion": {
-    "englishCoreUse": "Rank base LLM candidates by English Core profile and composite.",
+    "englishCoreUse": "Rank base LLM candidates by English Core profile and composites.",
     "productUse": "After English Core selection, run the existing Pari route-specific V1 acceptance suite.",
     "hardRule": "A high English Core score does not override semantic/safety veto failures in the product benchmark."
   },
   "files": {
     "shadowSeed": "english-core-shadow.seed.json",
-    "documentation": "ENGLISH_CORE.md"
+    "documentation": "ENGLISH_CORE.md",
+    "researchBasis": "ENGLISH_CORE_RESEARCH_BASIS.md"
   }
 }
