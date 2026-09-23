@@ -15,7 +15,6 @@ if (!resultPath) {
 const config = JSON.parse(fs.readFileSync(path.join(here, "english-core-config.json"), "utf8"));
 const seed = JSON.parse(fs.readFileSync(path.join(here, "english-core-shadow.seed.json"), "utf8"));
 const run = JSON.parse(fs.readFileSync(resultPath, "utf8"));
-
 const outputs = new Map((run.outputs ?? []).map((x) => [x.id, x]));
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -33,24 +32,17 @@ function permutation(length, id) {
 function baseChoiceIndex(row) {
   switch (row.task) {
     case "same_sense":
-    case "same_meaning":
-      return ["same", "different"].indexOf(row.answer);
-    case "relation_preservation":
-      return ["preserved", "changed"].indexOf(row.answer);
+    case "same_meaning": return ["same", "different"].indexOf(row.answer);
+    case "relation_preservation": return ["preserved", "changed"].indexOf(row.answer);
     case "best_substitute":
     case "minimal_pair":
-    case "relation_label":
-      return row.choices.indexOf(row.answer);
-    case "acceptability_pair":
-      return letters.indexOf(row.answer);
+    case "relation_label": return row.choices.indexOf(row.answer);
+    case "acceptability_pair": return letters.indexOf(row.answer);
     case "closer_register":
     case "closer_meaning_and_register":
-    case "more_natural":
-      return row.answer;
-    case "sentence_order":
-      return row.choices.findIndex((x) => JSON.stringify(x) === JSON.stringify(row.answer));
-    default:
-      return -1;
+    case "more_natural": return row.answer;
+    case "sentence_order": return row.choices.findIndex((x) => JSON.stringify(x) === JSON.stringify(row.answer));
+    default: return -1;
   }
 }
 
@@ -62,11 +54,8 @@ function expectedLetter(row) {
     case "same_sense":
     case "same_meaning":
     case "relation_preservation":
-    case "acceptability_pair":
-      choiceCount = 2;
-      break;
-    default:
-      choiceCount = row.choices?.length ?? -1;
+    case "acceptability_pair": choiceCount = 2; break;
+    default: choiceCount = row.choices?.length ?? -1;
   }
   if (choiceCount < 1) return null;
   const order = permutation(choiceCount, row.id);
@@ -95,11 +84,32 @@ function mean(values) {
   return values.reduce((a, b) => a + b, 0) / values.length;
 }
 
+function approvedMetricProvenance(provenance) {
+  if (!provenance || typeof provenance !== "object") return { approved: false, reason: "missing_metricProvenance" };
+  if (provenance.candidateSelfGrade !== false) return { approved: false, reason: "candidate_self_grade_or_unspecified" };
+  if (!String(provenance.name ?? "").trim()) return { approved: false, reason: "missing_metric_name" };
+
+  const direct = new Set(["deterministic", "human_reference", "official_benchmark_metric", "blinded_human"]);
+  if (direct.has(provenance.kind)) return { approved: true, reason: null };
+
+  if (provenance.kind === "specialist_model") {
+    if (provenance.validatedAgainstHumans === true && String(provenance.validationReference ?? "").trim()) {
+      return { approved: true, reason: null };
+    }
+    return { approved: false, reason: "specialist_model_lacks_human_validation" };
+  }
+
+  if (provenance.kind === "general_llm_diagnostic") {
+    return { approved: false, reason: "general_llm_judge_is_secondary_only" };
+  }
+  return { approved: false, reason: "unknown_metric_kind" };
+}
+
 const detail = [];
 for (const row of seed.cases) {
   const got = outputs.get(row.id);
   if (!got) {
-    detail.push({ id: row.id, dimension: row.dimension, task: row.task, status: "missing", score: null });
+    detail.push({ id: row.id, dimension: row.dimension, task: row.task, phenomenon: row.phenomenon ?? null, status: "missing", score: null });
     continue;
   }
 
@@ -107,19 +117,30 @@ for (const row of seed.cases) {
     const requiredMetrics = row.scoring ?? [];
     const scores = got.metricScores ?? {};
     const missing = requiredMetrics.filter((m) => typeof scores[m] !== "number" || scores[m] < 0 || scores[m] > 1);
-    if (missing.length || !got.metricSource) {
+    const provenanceCheck = approvedMetricProvenance(got.metricProvenance);
+    if (missing.length || !provenanceCheck.approved) {
       detail.push({
         id: row.id,
         dimension: row.dimension,
         task: row.task,
+        phenomenon: row.phenomenon ?? null,
         status: "needs_external_scoring",
         missingMetrics: missing,
+        provenanceIssue: provenanceCheck.approved ? null : provenanceCheck.reason,
         score: null,
       });
       continue;
     }
     const score = mean(requiredMetrics.map((m) => scores[m]));
-    detail.push({ id: row.id, dimension: row.dimension, task: row.task, status: "scored", score, metricSource: got.metricSource });
+    detail.push({
+      id: row.id,
+      dimension: row.dimension,
+      task: row.task,
+      phenomenon: row.phenomenon ?? null,
+      status: "scored",
+      score,
+      metricProvenance: got.metricProvenance,
+    });
     continue;
   }
 
@@ -130,6 +151,7 @@ for (const row of seed.cases) {
     id: row.id,
     dimension: row.dimension,
     task: row.task,
+    phenomenon: row.phenomenon ?? null,
     status: predicted ? "scored" : "invalid_output",
     expected,
     predicted,
@@ -141,11 +163,21 @@ const dimensionScores = {};
 for (const dimension of Object.keys(config.dimensions)) {
   const rows = detail.filter((x) => x.dimension === dimension);
   const scored = rows.filter((x) => typeof x.score === "number");
+  const byPhenomenon = {};
+  for (const row of scored) {
+    const key = row.phenomenon ?? "unspecified";
+    if (!byPhenomenon[key]) byPhenomenon[key] = [];
+    byPhenomenon[key].push(row.score);
+  }
   dimensionScores[dimension] = {
     cases: rows.length,
     scored: scored.length,
     missing: rows.length - scored.length,
     score100: scored.length === rows.length ? mean(scored.map((x) => x.score)) * 100 : null,
+    byPhenomenon: Object.fromEntries(Object.entries(byPhenomenon).map(([k, xs]) => [k, {
+      cases: xs.length,
+      score100: Number((mean(xs) * 100).toFixed(3)),
+    }]))
   };
 }
 
@@ -162,12 +194,9 @@ for (const [dimension, weight] of Object.entries(config.composite.weights)) {
   englishCore100 += value * (weight / 100);
 }
 
-const equalWeightMean100 = complete && completeDimensionValues.length
-  ? mean(completeDimensionValues)
-  : null;
-
+const equalWeightMean100 = complete && completeDimensionValues.length ? mean(completeDimensionValues) : null;
 const report = {
-  version: 3,
+  version: 4,
   runId: run.runId ?? null,
   model: run.model ?? null,
   shadowCases: seed.cases.length,
@@ -182,9 +211,11 @@ const report = {
     "This scorer covers the fresh Pari shadow set only; public-anchor benchmark results must be reported separately.",
     "Forced-choice option positions are deterministically permuted per case ID to reduce answer-position artifacts.",
     "Forced-choice cases are deterministically scored from the private seed answer key.",
-    "Generative cases require normalized external metricScores and a metricSource; candidate-model self-grading is not accepted.",
+    "Generative cases require complete normalized metricScores plus structured approved metricProvenance. The legacy metricSource string alone no longer qualifies a score.",
+    "General-purpose LLM judges are secondary diagnostics and cannot by themselves enter the official generative composite; validated specialist models require an explicit human-validation reference.",
     "The product-weighted composite is a Pari product prior, not a literature-derived psychometric scale; compare it with the equal-weight dimension mean and all seven subscores.",
-    "Runtime, RAM and quantization do not affect English Core competence scores.",
+    "Run analyze-english-core-statistics.mjs for uncertainty and compare-english-core-models.mjs for paired model comparison.",
+    "Runtime, RAM and quantization do not affect English Core competence scores."
   ],
   detail,
 };
