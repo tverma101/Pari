@@ -10,7 +10,8 @@ Usage:
 The output contains model-visible prompts only. Official SWORDS evaluation remains
 authoritative and should be run with the SWORDS repository evaluator. For
 promotion-quality evidence, pin the official repository/evaluator revision to a
-full immutable Git commit SHA.
+full immutable Git commit SHA and use an official `swords-*.json(.gz)` dataset
+filename so the evaluator dataset ID can be cross-checked later.
 """
 
 from __future__ import annotations
@@ -24,6 +25,7 @@ from pathlib import Path
 
 UNPINNED = "unrecorded_not_pinned"
 GIT_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+OFFICIAL_DATASET_ID_RE = re.compile(r"^swords-v[0-9]+(?:\.[0-9]+)*(?:_[A-Za-z0-9-]+)+$")
 
 
 def read_json(path: Path) -> dict:
@@ -35,6 +37,17 @@ def read_json(path: Path) -> dict:
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dataset_id_from_filename(path: Path) -> str | None:
+    name = path.name
+    if name.endswith(".json.gz"):
+        candidate = name[:-8]
+    elif name.endswith(".json"):
+        candidate = name[:-5]
+    else:
+        return None
+    return candidate if OFFICIAL_DATASET_ID_RE.fullmatch(candidate) else None
 
 
 def main() -> None:
@@ -99,12 +112,16 @@ def main() -> None:
     prompt_hash = sha256(out)
     revision = args.swords_revision or UNPINNED
     immutable_revision = bool(GIT_COMMIT_RE.fullmatch(revision))
+    dataset_id = dataset_id_from_filename(source)
+    promotion_ready = immutable_revision and dataset_id is not None
 
     manifest = out.with_suffix(out.suffix + ".manifest.json")
     manifest.write_text(json.dumps({
-        "version": 3,
+        "version": 4,
         "sourceFile": str(source),
         "sourceSha256": source_hash,
+        "officialDatasetId": dataset_id,
+        "sourceFilenameMatchesOfficialDatasetIdPattern": dataset_id is not None,
         "promptFile": str(out),
         "promptFileSha256": prompt_hash,
         "targets": len(tasks),
@@ -114,9 +131,10 @@ def main() -> None:
         "officialRepositoryRevisionIsFullCommit": immutable_revision,
         "officialEvaluator": "Use the SWORDS repository evaluator at the recorded immutable revision; Pari does not redefine official SWORDS metrics.",
         "researchReference": "https://aclanthology.org/2021.naacl-main.345/",
-        "promotionReadySourceProvenance": immutable_revision,
+        "promotionReadySourceProvenance": promotion_ready,
         "notes": [
             "sourceSha256 pins the exact benchmark JSON/JSON.GZ bytes used to construct prompts.",
+            "officialDatasetId is derived only from an official-looking swords-*.json(.gz) filename and is later cross-checked against the pinned SWORDS checkout before evaluation.",
             "promptFileSha256 pins the exact model-visible prompt JSONL.",
             "Promotion-quality evidence requires the official evaluator checkout's full 40-hex commit SHA rather than a mutable branch/tag label.",
             "The official evaluator revision is separate provenance from the benchmark-file hash and must be pinned for promotion-quality comparisons."
@@ -126,11 +144,12 @@ def main() -> None:
         "targets": len(tasks),
         "out": str(out),
         "sourceSha256": source_hash,
+        "officialDatasetId": dataset_id,
         "promptFileSha256": prompt_hash,
         "manifest": str(manifest),
         "officialRepositoryRevision": revision,
         "officialRepositoryRevisionIsFullCommit": immutable_revision,
-        "promotionReadySourceProvenance": immutable_revision,
+        "promotionReadySourceProvenance": promotion_ready,
     }, indent=2))
 
 
