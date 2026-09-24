@@ -32,6 +32,10 @@ function checkFile(name, label) {
   }
 }
 
+function isFullGitSha(value) {
+  return typeof value === "string" && /^[0-9a-f]{40}$/i.test(value);
+}
+
 const config = readJson("english-core-config.json");
 const seed = readJson("english-core-shadow.seed.json");
 const anchors = readJson("english-core-public-anchors.json");
@@ -40,7 +44,9 @@ const metricContract = readJson("english-core-generative-metric-contract.json");
 const compatibilitySources = readJson("english-core-sources.json");
 
 if (config) {
-  if (Number(config.version) < 7) errors.push(`english-core-config.json version ${config.version} is older than required v7`);
+  if (Number(config.version) < 8) {
+    errors.push(`english-core-config.json version ${config.version} is older than required v8`);
+  }
 
   const weights = config.composite?.weights ?? {};
   const total = Object.values(weights).reduce((a, b) => a + Number(b), 0);
@@ -52,14 +58,24 @@ if (config) {
   for (const dimension of dimensions) {
     const dimWeight = config.dimensions[dimension]?.weight;
     const compositeWeight = weights[dimension];
-    if (typeof compositeWeight !== "number") errors.push(`dimension ${dimension} missing from composite weights`);
-    if (dimWeight !== compositeWeight) errors.push(`weight mismatch for ${dimension}: dimension=${dimWeight}, composite=${compositeWeight}`);
-    if (!config.dimensions[dimension]?.researchConstruct) errors.push(`dimension ${dimension} missing researchConstruct`);
-    if (!(config.dimensions[dimension]?.publicAnchors?.length > 0)) warnings.push(`dimension ${dimension} has no publicAnchors`);
+    if (typeof compositeWeight !== "number") {
+      errors.push(`dimension ${dimension} missing from composite weights`);
+    }
+    if (dimWeight !== compositeWeight) {
+      errors.push(`weight mismatch for ${dimension}: dimension=${dimWeight}, composite=${compositeWeight}`);
+    }
+    if (!config.dimensions[dimension]?.researchConstruct) {
+      errors.push(`dimension ${dimension} missing researchConstruct`);
+    }
+    if (!(config.dimensions[dimension]?.publicAnchors?.length > 0)) {
+      warnings.push(`dimension ${dimension} has no publicAnchors`);
+    }
   }
 
   for (const dimension of Object.keys(weights)) {
-    if (!config.dimensions?.[dimension]) errors.push(`composite weight references unknown dimension ${dimension}`);
+    if (!config.dimensions?.[dimension]) {
+      errors.push(`composite weight references unknown dimension ${dimension}`);
+    }
   }
 
   for (const [label, name] of Object.entries(config.files ?? {})) checkFile(name, label);
@@ -74,10 +90,14 @@ if (config) {
     "choiceOrderRobustnessBuilder",
     "choiceOrderRobustnessScorer",
     "generativeMetricContract",
+    "semanticQaLccBuilder",
+    "semanticQaLccScorer",
     "swordsOfficialEvaluatorRunner",
     "jflegOfficialEvaluatorRunner"
   ]) {
-    if (!config.files?.[requiredFileKey]) errors.push(`config.files missing required key: ${requiredFileKey}`);
+    if (!config.files?.[requiredFileKey]) {
+      errors.push(`config.files missing required key: ${requiredFileKey}`);
+    }
   }
 
   for (const requiredRule of [
@@ -87,6 +107,7 @@ if (config) {
     "choiceOrderRobustness",
     "choiceParser",
     "nativeProtocolSeparation",
+    "collocationProtocolSeparation",
     "metricDirectionContract",
     "multiPrompt",
     "uncertainty",
@@ -95,14 +116,19 @@ if (config) {
     "promotionValidation",
     "reproducibility"
   ]) {
-    if (!config.evaluationProtocol?.[requiredRule]) errors.push(`evaluationProtocol missing required rule: ${requiredRule}`);
+    if (!config.evaluationProtocol?.[requiredRule]) {
+      errors.push(`evaluationProtocol missing required rule: ${requiredRule}`);
+    }
   }
 
   if (!String(config.evaluationProtocol?.pairedComparison ?? "").includes("hierarchical")) {
-    errors.push("evaluationProtocol.pairedComparison must preserve the v7 paired phenomenon/item hierarchical sensitivity rule");
+    errors.push("evaluationProtocol.pairedComparison must preserve paired phenomenon/item hierarchical sensitivity");
   }
   if (!config.researchBasis?.externalEvaluatorBasis) {
     errors.push("researchBasis.externalEvaluatorBasis missing; official evaluator provenance must be documented");
+  }
+  if (!config.researchBasis?.collocationProtocolBasis) {
+    errors.push("researchBasis.collocationProtocolBasis missing; EACL-2021 vs SemanticQA-2026 protocol separation must be documented");
   }
 
   for (const lane of [
@@ -114,15 +140,27 @@ if (config) {
   ]) {
     if (!config.evidenceLanes?.[lane]) errors.push(`evidenceLanes missing ${lane}`);
   }
+
+  const collocationAnchors = config.dimensions?.collocation_naturalness?.publicAnchors ?? [];
+  if (!collocationAnchors.some((x) => String(x).includes("SemanticQA 2026"))) {
+    errors.push("collocation_naturalness must name SemanticQA 2026 as the modern LLM-facing anchor");
+  }
+  if (!collocationAnchors.some((x) => String(x).includes("EACL 2021"))) {
+    errors.push("collocation_naturalness must retain EACL 2021 as foundational/native supporting evidence");
+  }
 }
 
 if (metricContract) {
   const directions = new Set(["higher_is_better", "lower_is_better"]);
   for (const [name, definition] of Object.entries(metricContract.metrics ?? {})) {
-    if (!directions.has(definition.direction)) errors.push(`metric ${name} has invalid direction ${definition.direction}`);
+    if (!directions.has(definition.direction)) {
+      errors.push(`metric ${name} has invalid direction ${definition.direction}`);
+    }
     if (!definition.construct) errors.push(`metric ${name} missing construct definition`);
   }
-  if (!Object.keys(metricContract.metrics ?? {}).length) errors.push("generative metric contract has no metrics");
+  if (!Object.keys(metricContract.metrics ?? {}).length) {
+    errors.push("generative metric contract has no metrics");
+  }
 }
 
 let shadowCounts = {};
@@ -183,11 +221,44 @@ if (anchors && config) {
     if (!anchor.evidencePriority) warnings.push(`${anchor.id}: missing evidencePriority`);
     if (!anchor.implementationStatus) warnings.push(`${anchor.id}: missing implementationStatus`);
     if (!(anchor.preferredMetrics?.length > 0)) warnings.push(`${anchor.id}: missing preferredMetrics`);
-    if (!anchor.nativeProtocol && anchor.evidencePriority !== "secondary") warnings.push(`${anchor.id}: primary/supporting anchor lacks nativeProtocol description`);
+    if (!anchor.nativeProtocol && anchor.evidencePriority !== "secondary") {
+      warnings.push(`${anchor.id}: primary/supporting anchor lacks nativeProtocol description`);
+    }
     for (const file of anchor.pariFiles ?? []) {
       if (!fs.existsSync(path.join(here, file))) errors.push(`${anchor.id}: pariFiles references missing file ${file}`);
     }
   }
+
+  const semanticQa = (anchors.anchors ?? []).find((x) => x.id === "semanticqa_lcc_2026");
+  if (!semanticQa) {
+    errors.push("public anchor registry missing semanticqa_lcc_2026");
+  } else {
+    if (semanticQa.dimension !== "collocation_naturalness") {
+      errors.push("semanticqa_lcc_2026 must belong to collocation_naturalness");
+    }
+    if (Number(semanticQa.testSize) !== 305) {
+      errors.push(`semanticqa_lcc_2026 testSize=${semanticQa.testSize}, expected 305`);
+    }
+    if (Number(semanticQa.taxonomyCategories) !== 8) {
+      errors.push(`semanticqa_lcc_2026 taxonomyCategories=${semanticQa.taxonomyCategories}, expected 8`);
+    }
+    if (!isFullGitSha(semanticQa.sourceRevision)) {
+      errors.push("semanticqa_lcc_2026 sourceRevision must be a full immutable Git commit SHA");
+    }
+    for (const file of [
+      "build-semanticqa-lcc-english-core.py",
+      "score-semanticqa-lcc-english-core.py",
+      "convert-semanticqa-lcc-official-output.py",
+      "run-semanticqa-lcc-official-eval.py"
+    ]) {
+      if (!(semanticQa.pariFiles ?? []).includes(file)) {
+        errors.push(`semanticqa_lcc_2026 pariFiles missing ${file}`);
+      }
+    }
+  }
+
+  const eacl = (anchors.anchors ?? []).find((x) => x.id === "lexical_collocations_eacl2021");
+  if (!eacl) errors.push("public anchor registry missing lexical_collocations_eacl2021");
 }
 
 if (compatibilitySources) {
@@ -239,6 +310,7 @@ for (const requiredDoc of [
   "ENGLISH_CORE_ROBUSTNESS.md",
   "ENGLISH_CORE_HUMAN_EVAL.md",
   "ENGLISH_CORE_NATIVE_PROTOCOLS.md",
+  "ENGLISH_CORE_COLLOCATION_AUDIT.md",
   "RESEARCH_GROUNDING_POLICY.md"
 ]) {
   if (!fs.existsSync(path.join(here, requiredDoc))) errors.push(`missing governance/research document: ${requiredDoc}`);
@@ -265,6 +337,10 @@ for (const requiredImplementation of [
   "score-english-core-public-fast.py",
   "build-english-core-public-full-classification.py",
   "score-english-core-public-full-classification.py",
+  "build-semanticqa-lcc-english-core.py",
+  "score-semanticqa-lcc-english-core.py",
+  "convert-semanticqa-lcc-official-output.py",
+  "run-semanticqa-lcc-official-eval.py",
   "build-swords-english-core-prompts.py",
   "convert-swords-english-core-output.py",
   "run-swords-official-eval.py",
@@ -277,7 +353,7 @@ for (const requiredImplementation of [
 }
 
 const report = {
-  version: 7,
+  version: 8,
   configVersion: config?.version ?? null,
   seedVersion: seed?.version ?? null,
   metricContractVersion: metricContract?.version ?? null,
@@ -287,6 +363,11 @@ const report = {
   dimensions: Object.keys(config?.dimensions ?? {}),
   publicAnchors: anchors?.anchors?.length ?? null,
   registeredGenerativeMetrics: Object.keys(metricContract?.metrics ?? {}).length,
+  collocationEvidence: {
+    modernLlmAnchor: "SemanticQA 2026 LCC",
+    foundationalNativeAnchor: "EACL 2021 lexical collocations",
+    protocolSeparationEnforced: Boolean(config?.evaluationProtocol?.collocationProtocolSeparation)
+  },
   errors,
   warnings,
   status: errors.length ? "fail" : warnings.length ? "pass_with_warnings" : "pass",
@@ -296,9 +377,10 @@ const report = {
     "Per-dimension case counts are reported rather than judged against an invented universal adequacy threshold; evidence strength is assessed through construct coverage, uncertainty, external anchors, and claim tiers.",
     "Generative metric registration/direction checks prevent accidental inversion but do not validate the evaluator itself.",
     "Registered public-anchor adapter/evaluator files are checked for existence so protocol documentation cannot silently point at missing tooling.",
+    "SemanticQA 2026 LCC and EACL 2021 collocation evidence are intentionally separate protocols and must not be averaged or relabeled as the same benchmark.",
     "Choice-parser regression tests and task-builder leakage checks are separate executable checks run by self-check-english-core.sh.",
     "Public data/evaluator revision and fingerprint requirements are enforced at promotion-run/workflow level; package validation alone cannot prove that a future external checkout used immutable source bytes.",
-    "The v7 paired-comparison contract requires both item-level paired bootstrap and phenomenon/item hierarchical sensitivity for close-model robustness claims.",
+    "The v8 contract retains paired item-bootstrap plus phenomenon/item hierarchical sensitivity for close-model robustness claims.",
     "Run audit-english-core-shadow.mjs separately for item-level structural/distribution diagnostics.",
     "Research-level claims still require the claim-tier gates in ENGLISH_CORE_ROBUSTNESS.md."
   ]
