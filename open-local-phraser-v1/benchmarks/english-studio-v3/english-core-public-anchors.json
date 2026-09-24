@@ -1,11 +1,12 @@
 {
-  "version": 3,
+  "version": 4,
   "purpose": "Registry of established public benchmarks used as external evidence for Pari English Core. Native/official, full-distribution prompted, fast prompted, and secondary diagnostic results are never silently conflated.",
   "policy": {
     "usage": "evaluation_only",
     "training": "forbidden for V1 selection",
     "reportSeparately": true,
     "protocolSeparation": true,
+    "officialEvaluatorProvenance": "When an official evaluator exists, promotion-quality evidence pins the evaluator checkout to a full immutable commit, verifies benchmark/reference bytes, executes official code directly where practical, and archives raw evaluator output plus provenance.",
     "licenseRule": "Verify the current dataset/repository license and official evaluation split before downloading or redistributing benchmark data. This registry intentionally does not copy benchmark data into Pari.",
     "researchBasis": "See ENGLISH_CORE_RESEARCH_BASIS.md, ENGLISH_CORE_NATIVE_PROTOCOLS.md, and RESEARCH_GROUNDING_POLICY.md for construct validity, adaptation caveats, and claim rules."
   },
@@ -17,10 +18,10 @@
       "reference": "https://aclanthology.org/2021.naacl-main.345/",
       "role": "high-coverage contextual lexical substitution and candidate acceptability for writing assistance",
       "evidencePriority": "primary",
-      "nativeProtocol": "Use the official SWORDS benchmark/result format and official evaluator; Pari adapters only prepare prompts and convert outputs.",
-      "implementationStatus": "adapter_ready_official_evaluator_external",
-      "pariFiles": ["build-swords-english-core-prompts.py", "convert-swords-english-core-output.py"],
-      "preferredMetrics": ["official SWORDS lexical-substitution metrics", "human-reference candidate coverage", "usable candidate analysis"]
+      "nativeProtocol": "Use the official SWORDS benchmark/result format and official evaluator. Promotion evidence binds the official compressed dataset bytes, official dataset ID, converted result, and evaluator checkout to one provenance chain.",
+      "implementationStatus": "adapter_and_pinned_official_evaluator_runner_ready",
+      "pariFiles": ["build-swords-english-core-prompts.py", "convert-swords-english-core-output.py", "run-swords-official-eval.py"],
+      "preferredMetrics": ["official strict/lenient SWORDS F@10 metrics", "strict conceivable P@1", "optional GAP/legacy metrics when official assets are present", "human-reference candidate analysis"]
     },
     {
       "id": "wic",
@@ -99,10 +100,10 @@
       "reference": "https://aclanthology.org/E17-2037/",
       "role": "human fluency correction beyond minimal grammar repair",
       "evidencePriority": "primary",
-      "nativeProtocol": "Generate one hypothesis per source sentence and use the official four-reference GLEU evaluation workflow.",
-      "implementationStatus": "adapter_ready_official_evaluator_external",
-      "pariFiles": ["build-jfleg-english-core-prompts.py", "convert-jfleg-english-core-output.py"],
-      "preferredMetrics": ["official GLEU", "official evaluator uncertainty output", "human/reference analysis"]
+      "nativeProtocol": "Generate one hypothesis per source sentence and use the official four-reference GLEU evaluation workflow. Promotion evidence pins source, four distinct references, official checkout, evaluator code, hypothesis bytes, and evaluator environment.",
+      "implementationStatus": "adapter_and_pinned_official_evaluator_runner_ready",
+      "pariFiles": ["build-jfleg-english-core-prompts.py", "convert-jfleg-english-core-output.py", "run-jfleg-official-eval.py"],
+      "preferredMetrics": ["official GLEU mean", "official standard deviation/confidence interval", "human/reference analysis"]
     },
     {
       "id": "gyafc",
