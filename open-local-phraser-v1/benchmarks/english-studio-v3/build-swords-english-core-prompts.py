@@ -9,7 +9,8 @@ Usage:
 
 The output contains model-visible prompts only. Official SWORDS evaluation remains
 authoritative and should be run with the SWORDS repository evaluator. For
-promotion-quality evidence, pin the official repository/evaluator revision.
+promotion-quality evidence, pin the official repository/evaluator revision to a
+full immutable Git commit SHA.
 """
 
 from __future__ import annotations
@@ -18,9 +19,11 @@ import argparse
 import gzip
 import hashlib
 import json
+import re
 from pathlib import Path
 
 UNPINNED = "unrecorded_not_pinned"
+GIT_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
 def read_json(path: Path) -> dict:
@@ -39,7 +42,7 @@ def main() -> None:
     ap.add_argument("swords_json")
     ap.add_argument("out_jsonl")
     ap.add_argument("--count", type=int, default=40, help="Maximum ranked substitutes requested per target")
-    ap.add_argument("--swords-revision", default=None, help="Immutable commit/revision of the official p-lambda/swords checkout used for source/evaluation provenance")
+    ap.add_argument("--swords-revision", default=None, help="Full 40-hex commit SHA of the official p-lambda/swords checkout used for source/evaluation provenance")
     args = ap.parse_args()
 
     if args.count < 1:
@@ -95,10 +98,11 @@ def main() -> None:
     source_hash = sha256(source)
     prompt_hash = sha256(out)
     revision = args.swords_revision or UNPINNED
+    immutable_revision = bool(GIT_COMMIT_RE.fullmatch(revision))
 
     manifest = out.with_suffix(out.suffix + ".manifest.json")
     manifest.write_text(json.dumps({
-        "version": 2,
+        "version": 3,
         "sourceFile": str(source),
         "sourceSha256": source_hash,
         "promptFile": str(out),
@@ -107,12 +111,14 @@ def main() -> None:
         "requestedCandidates": args.count,
         "officialRepository": "https://github.com/p-lambda/swords",
         "officialRepositoryRevision": revision,
+        "officialRepositoryRevisionIsFullCommit": immutable_revision,
         "officialEvaluator": "Use the SWORDS repository evaluator at the recorded immutable revision; Pari does not redefine official SWORDS metrics.",
         "researchReference": "https://aclanthology.org/2021.naacl-main.345/",
-        "promotionReadySourceProvenance": revision != UNPINNED,
+        "promotionReadySourceProvenance": immutable_revision,
         "notes": [
             "sourceSha256 pins the exact benchmark JSON/JSON.GZ bytes used to construct prompts.",
             "promptFileSha256 pins the exact model-visible prompt JSONL.",
+            "Promotion-quality evidence requires the official evaluator checkout's full 40-hex commit SHA rather than a mutable branch/tag label.",
             "The official evaluator revision is separate provenance from the benchmark-file hash and must be pinned for promotion-quality comparisons."
         ]
     }, indent=2) + "\n")
@@ -123,6 +129,8 @@ def main() -> None:
         "promptFileSha256": prompt_hash,
         "manifest": str(manifest),
         "officialRepositoryRevision": revision,
+        "officialRepositoryRevisionIsFullCommit": immutable_revision,
+        "promotionReadySourceProvenance": immutable_revision,
     }, indent=2))
 
 
