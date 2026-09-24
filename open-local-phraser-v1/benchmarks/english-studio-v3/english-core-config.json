@@ -1,5 +1,5 @@
 {
-  "version": 7,
+  "version": 8,
   "name": "Pari English Core",
   "purpose": "Compare candidate LLMs across research-backed English-language capabilities relevant to Pari before runtime, memory, quantization, or product routing are considered.",
   "claimScope": "Application-grounded multi-dimensional model selection; not a universal psychometric measure of one latent quantity called English ability.",
@@ -16,10 +16,11 @@
     "pairedComparisonBasis": "Models evaluated on the same items are compared with paired item-level bootstrap rather than independent averages. Because shadow items are clustered by benchmark-authored linguistic phenomena, close-model comparisons also report a paired phenomenon/item hierarchical-bootstrap sensitivity lane. A directional robustness claim survives only when the item-level and hierarchical lanes agree; this agreement rule is a conservative Pari engineering policy, not a universal statistical law.",
     "distributionBasis": "Benchmark item mixtures are not assumed to be random samples from one universal real-world distribution; public-native, public-prompted, shadow, and product-use distributions are reported separately.",
     "nativeProtocolBasis": "Where a benchmark has a native/official protocol, that result is reported separately from Pari's common prompted adaptation. Prompted convenience scores must never be relabeled as official benchmark scores.",
+    "collocationProtocolBasis": "EACL 2021 establishes the lexical-collocation retrieval/categorization construct and lexical-disjoint evaluation design, while SemanticQA ACL 2026 provides a modern LLM-facing 305-item LCC zero-shot protocol. These are related evidence sources but not interchangeable scores.",
     "judgeBasis": "Generative outputs must not be scored solely by one general-purpose LLM judge; use human references, deterministic metrics, official metrics, or independently human-validated specialized evaluators where possible.",
     "metricDirectionBasis": "Generative metric observations retain their natural direction and are transformed to utility only through the versioned english-core-generative-metric-contract.json; failure rates are never implicitly treated as higher-is-better.",
     "sourcePinningBasis": "Promotion-quality public benchmark runs pin immutable source revisions where tooling supports it and record resolved dataset fingerprints/library versions.",
-    "externalEvaluatorBasis": "Promotion-quality SWORDS/JFLEG evidence pins the official evaluator checkout to a full Git commit, binds exact benchmark/reference/model-output bytes, executes the official evaluator directly, and archives evaluator code/output provenance instead of reimplementing the metric.",
+    "externalEvaluatorBasis": "Promotion-quality SWORDS/JFLEG evidence pins the official evaluator checkout to a full Git commit, binds exact benchmark/reference/model-output bytes, executes the official evaluator directly, and archives evaluator code/output provenance instead of reimplementing the metric. SemanticQA LCC promotion builds bind the official dataset archive, prompt, taxonomy, task bytes and source commit; accuracy is the primary published LCC metric.",
     "reproducibilityBasis": "Promotion-quality runs must preserve enough model/runtime/task/scorer/source metadata to reproduce the result."
   },
   "scope": {
@@ -68,10 +69,10 @@
     },
     "collocation_naturalness": {
       "weight": 20,
-      "researchConstruct": "lexical collocation retrieval/classification and idiomatic compatibility",
-      "publicAnchors": ["EACL-2021 lexical-collocation retrieval/categorization benchmark"],
+      "researchConstruct": "lexical collocation retrieval/classification, lexical-function semantics, and idiomatic compatibility",
+      "publicAnchors": ["SemanticQA 2026 LCC 8-category zero-shot (primary modern LLM anchor)", "EACL 2021 lexical-collocation retrieval/categorization (foundational/native supporting anchor)"],
       "shadowFamilies": ["verb_noun_collocation", "adjective_noun_collocation", "adverb_adjective_collocation", "preposition_compatibility"],
-      "metrics": ["minimal_pair_accuracy", "contextual_collocation_accuracy", "awkward_replacement_rejection"]
+      "metrics": ["semanticqa_lcc_accuracy", "semanticqa_lcc_macro_f1", "minimal_pair_accuracy", "contextual_collocation_accuracy", "awkward_replacement_rejection"]
     },
     "grammar_syntax": {
       "weight": 15,
@@ -127,6 +128,7 @@
     "choiceParser": "Use the shared conservative JS/Python parsers so harmless answer wrappers are accepted consistently while free-form/multi-answer outputs remain invalid.",
     "probabilityScoring": "When local runtimes expose token/logit probabilities reliably, record calibrated preference margins in addition to text-answer accuracy; do not silently substitute first-token scoring for observed text answers.",
     "nativeProtocolSeparation": "Never relabel a common prompted adaptation as an official/native benchmark score. Report native, full-distribution prompted, and fast prompted lanes separately.",
+    "collocationProtocolSeparation": "Report SemanticQA 2026 prompted LCC separately from EACL 2021 supervised categorization/MLM retrieval. The former is the primary modern LLM selection anchor; the latter validates the construct and historical native protocol.",
     "generation": "Use fixed task prompts and decoding settings per model class; preserve raw outputs.",
     "metricDirectionContract": "Every required generative metric must exist in english-core-generative-metric-contract.json. Raw normalized observations preserve natural direction; lower-is-better metrics are inverted only by the scorer's declared utility transformation.",
     "judgePolicy": "Official generative metric scores require structured metricProvenance. General-purpose LLM judges are secondary diagnostics. Specialist model judges require explicit human-validation evidence before entering the official composite.",
@@ -158,6 +160,7 @@
     "robustnessProtocol": "ENGLISH_CORE_ROBUSTNESS.md",
     "humanEvalProtocol": "ENGLISH_CORE_HUMAN_EVAL.md",
     "nativeProtocolDocument": "ENGLISH_CORE_NATIVE_PROTOCOLS.md",
+    "collocationAudit": "ENGLISH_CORE_COLLOCATION_AUDIT.md",
     "shadowAudit": "audit-english-core-shadow.mjs",
     "shadowBuilder": "build-english-core.mjs",
     "shadowScorer": "score-english-core.mjs",
@@ -179,6 +182,8 @@
     "publicFullClassificationBuilder": "build-english-core-public-full-classification.py",
     "publicFullClassificationScorer": "score-english-core-public-full-classification.py",
     "publicAnchorRegistry": "english-core-public-anchors.json",
+    "semanticQaLccBuilder": "build-semanticqa-lcc-english-core.py",
+    "semanticQaLccScorer": "score-semanticqa-lcc-english-core.py",
     "swordsPromptBuilder": "build-swords-english-core-prompts.py",
     "swordsOutputConverter": "convert-swords-english-core-output.py",
     "swordsOfficialEvaluatorRunner": "run-swords-official-eval.py",
