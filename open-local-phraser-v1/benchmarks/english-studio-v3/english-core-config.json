@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "name": "Pari English Core",
   "purpose": "Compare candidate LLMs across research-backed English-language capabilities relevant to Pari before runtime, memory, quantization, or product routing are considered.",
   "claimScope": "Application-grounded multi-dimensional model selection; not a universal psychometric measure of one latent quantity called English ability.",
@@ -13,12 +13,13 @@
     "choiceOrderBasis": "Forced-choice options are deterministically permuted and close contenders receive a two-presentation counterbalanced order test because LLM selection is sensitive to answer order/token position.",
     "promptRobustnessBasis": "Multi-prompt evaluation is required for close contenders because intent-preserving instruction paraphrases can materially change absolute scores and model rankings.",
     "uncertaintyBasis": "Small score differences require uncertainty reporting. Item bootstrap is supplemented by a two-level phenomenon/item hierarchical-bootstrap sensitivity analysis because author-written cases can share linguistic/template dependencies. Neither is interpreted as a universal-English confidence bound, and no universal minimum phenomenon count is asserted.",
-    "pairedComparisonBasis": "Models evaluated on the same items are compared with paired item-level analysis rather than only independent averages.",
+    "pairedComparisonBasis": "Models evaluated on the same items are compared with paired item-level bootstrap rather than independent averages. Because shadow items are clustered by benchmark-authored linguistic phenomena, close-model comparisons also report a paired phenomenon/item hierarchical-bootstrap sensitivity lane. A directional robustness claim survives only when the item-level and hierarchical lanes agree; this agreement rule is a conservative Pari engineering policy, not a universal statistical law.",
     "distributionBasis": "Benchmark item mixtures are not assumed to be random samples from one universal real-world distribution; public-native, public-prompted, shadow, and product-use distributions are reported separately.",
     "nativeProtocolBasis": "Where a benchmark has a native/official protocol, that result is reported separately from Pari's common prompted adaptation. Prompted convenience scores must never be relabeled as official benchmark scores.",
     "judgeBasis": "Generative outputs must not be scored solely by one general-purpose LLM judge; use human references, deterministic metrics, official metrics, or independently human-validated specialized evaluators where possible.",
     "metricDirectionBasis": "Generative metric observations retain their natural direction and are transformed to utility only through the versioned english-core-generative-metric-contract.json; failure rates are never implicitly treated as higher-is-better.",
     "sourcePinningBasis": "Promotion-quality public benchmark runs pin immutable source revisions where tooling supports it and record resolved dataset fingerprints/library versions.",
+    "externalEvaluatorBasis": "Promotion-quality SWORDS/JFLEG evidence pins the official evaluator checkout to a full Git commit, binds exact benchmark/reference/model-output bytes, executes the official evaluator directly, and archives evaluator code/output provenance instead of reimplementing the metric.",
     "reproducibilityBasis": "Promotion-quality runs must preserve enough model/runtime/task/scorer/source metadata to reproduce the result."
   },
   "scope": {
@@ -114,7 +115,7 @@
     "publicPromptedFull": "Full locally scoreable public distribution under a common zero-shot prompted adaptation; adaptation must be named explicitly and source revision/fingerprint preserved for promotion use.",
     "publicPromptedFast": "Balanced/subsampled common prompted screen for inexpensive triage only.",
     "freshShadow": "Pari-authored fresh-surface diagnostic; currently author_labeled_unvalidated until independent annotation/adjudication.",
-    "robustnessDiagnostics": "Prompt paraphrase, option-order counterbalancing, item/hierarchical uncertainty, protocol sensitivity and paired comparisons; these diagnose evidence stability rather than adding another competence dimension."
+    "robustnessDiagnostics": "Prompt paraphrase, option-order counterbalancing, item/hierarchical uncertainty, protocol sensitivity and paired item-plus-phenomenon comparison; these diagnose evidence stability rather than adding another competence dimension."
   },
   "evaluationProtocol": {
     "publicAnchorPolicy": "Use official frozen evaluation splits and native/official evaluators where available. Never fine-tune on evaluation data.",
@@ -135,18 +136,18 @@
     "weightSensitivity": "Report both product-weighted and equal-weight composites and inspect per-dimension rankings before selecting a winner.",
     "multiPrompt": "For close contenders, run the three-variant shadow robustness lane and report mean, worst-prompt, all-prompts-correct, answer consistency, and prompt spread. Never choose the best prompt after observing model results.",
     "uncertainty": "Report per-dimension item-bootstrap intervals plus a two-level phenomenon/item hierarchical-bootstrap sensitivity analysis. Both are conditional on the current shadow construction; the hierarchical lane is explicitly exploratory because benchmark phenomena were deliberately designed rather than randomly sampled.",
-    "pairedComparison": "Use aligned item-level paired comparison for close models. Headline comparison requires complete aligned coverage and identical benchmark/task hashes; if the paired interval includes zero, report the comparison as inconclusive.",
+    "pairedComparison": "Use complete aligned paired comparison for close models. Report both paired item-bootstrap and paired phenomenon/item hierarchical-bootstrap sensitivity. Headline comparison requires identical benchmark/task hashes and full coverage. If the item interval includes zero, report inconclusive; if item and hierarchical directions disagree, report sensitivity_inconclusive rather than forcing a winner.",
     "distributionValidity": "Do not interpret the shadow/public mixture as a random sample of universal English. Preserve per-source, per-dimension, per-phenomenon, and per-protocol views.",
     "modelFamilyAdaptation": "Record base/instruct/chat checkpoint type and adaptation mode. Base models may use plain/native likelihood protocols; instruct/chat models should use their official chat template for prompted tasks where appropriate.",
     "promotionValidation": "Before a promotion-quality comparison, run validate-english-core-run.py --promotion. Auto adaptation, unknown checkpoint/revision/quantization, missing artifact/task hashes, mixed adaptation modes or incomplete decoding/template provenance block promotion status.",
-    "reproducibility": "Promotion-quality runs record exact model/revision/artifact hash/quantization/runtime/task hash/decoding/template/hardware/source revision/fingerprint and raw-output provenance."
+    "reproducibility": "Promotion-quality runs record exact model/revision/artifact hash/quantization/runtime/task hash/decoding/template/hardware/source revision/fingerprint, official evaluator revision/code hash where relevant, and raw-output provenance."
   },
   "promotion": {
     "englishCoreUse": "Use the English Core profile and scoped composites to narrow Pari base-model candidates.",
     "productUse": "After English Core selection, run the existing Pari route-specific V1 acceptance suite.",
     "hardRule": "A high English Core score does not override semantic/safety veto failures in the product benchmark.",
-    "closeResultRule": "A small observed lead without prompt/order robustness and paired/statistical support is inconclusive, not a winner.",
-    "strongClaimGate": "A strong cross-model English claim additionally requires primary native/official anchors, pinned public-source provenance, prompt/order/protocol robustness, independently validated shadow labels, reproducibility metadata, and evidence that reasonable weighting choices do not materially reverse the conclusion."
+    "closeResultRule": "A small observed lead without prompt/order robustness and paired item-plus-phenomenon statistical support is inconclusive, not a winner.",
+    "strongClaimGate": "A strong cross-model English claim additionally requires primary native/official anchors, pinned public-source and official-evaluator provenance, prompt/order/protocol robustness, independently validated shadow labels, reproducibility metadata, and evidence that reasonable weighting choices do not materially reverse the conclusion."
   },
   "files": {
     "shadowSeed": "english-core-shadow.seed.json",
@@ -172,6 +173,7 @@
     "runValidator": "validate-english-core-run.py",
     "packageValidator": "validate-english-core.mjs",
     "selfCheck": "self-check-english-core.sh",
+    "reproManifestBuilder": "build-english-core-repro-manifest.py",
     "publicFastBuilder": "build-english-core-public-fast.py",
     "publicFastScorer": "score-english-core-public-fast.py",
     "publicFullClassificationBuilder": "build-english-core-public-full-classification.py",
@@ -179,8 +181,10 @@
     "publicAnchorRegistry": "english-core-public-anchors.json",
     "swordsPromptBuilder": "build-swords-english-core-prompts.py",
     "swordsOutputConverter": "convert-swords-english-core-output.py",
+    "swordsOfficialEvaluatorRunner": "run-swords-official-eval.py",
     "jflegPromptBuilder": "build-jfleg-english-core-prompts.py",
     "jflegOutputConverter": "convert-jfleg-english-core-output.py",
+    "jflegOfficialEvaluatorRunner": "run-jfleg-official-eval.py",
     "resultSchema": "english-core-result-schema.json"
   }
 }
