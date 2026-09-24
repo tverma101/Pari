@@ -43,13 +43,26 @@ def git_head(repo: Path) -> str | None:
 
 
 def evaluator_environment(python_executable: str) -> dict:
-    script = (
-        "import importlib.metadata,json,platform,sys;"
-        "def v(n):\n"
-        "  try:return importlib.metadata.version(n)\n"
-        "  except importlib.metadata.PackageNotFoundError:return None\n"
-        "print(json.dumps({'pythonExecutable':sys.executable,'pythonVersion':sys.version,'platform':platform.platform(),'numpy':v('numpy'),'scipy':v('scipy')}))"
-    )
+    script = """
+import importlib.metadata
+import json
+import platform
+import sys
+
+def version(name):
+    try:
+        return importlib.metadata.version(name)
+    except importlib.metadata.PackageNotFoundError:
+        return None
+
+print(json.dumps({
+    "pythonExecutable": sys.executable,
+    "pythonVersion": sys.version,
+    "platform": platform.platform(),
+    "numpy": version("numpy"),
+    "scipy": version("scipy"),
+}))
+"""
     try:
         proc = subprocess.run(
             [python_executable, "-c", script],
@@ -172,7 +185,7 @@ def main() -> None:
         )
 
     result = {
-        "version": 2,
+        "version": 3,
         "purpose": "Frozen output from JFLEG's official GLEU evaluator; Pari does not reimplement the metric.",
         "jflegRepository": str(repo),
         "jflegRepositoryRevision": actual_revision,
