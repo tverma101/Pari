@@ -25,7 +25,7 @@ import json
 import re
 from pathlib import Path
 
-UNPINNED = {"", "unknown", "unrecorded_not_pinned", "main", "master", "latest", "default"}
+GIT_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
 def read_json(path: Path) -> dict:
@@ -39,8 +39,8 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def known_revision(value: object) -> bool:
-    return str(value or "").strip().lower() not in UNPINNED
+def immutable_git_revision(value: object) -> bool:
+    return bool(GIT_COMMIT_RE.fullmatch(str(value or "").strip()))
 
 
 def parse_candidates(text: str) -> list[str]:
@@ -125,8 +125,11 @@ def main() -> None:
             provenance_errors.append("prompt_manifest_prompt_hash_does_not_match_run_task_hash")
         if int(prompt_manifest.get("targets", -1)) != len(targets):
             provenance_errors.append("prompt_manifest_target_count_mismatch")
-        if not known_revision(prompt_manifest.get("officialRepositoryRevision")):
-            provenance_errors.append("official_swords_repository_revision_not_pinned")
+        revision = prompt_manifest.get("officialRepositoryRevision")
+        if not immutable_git_revision(revision):
+            provenance_errors.append("official_swords_repository_revision_not_full_commit")
+        if prompt_manifest.get("promotionReadySourceProvenance") is not True:
+            provenance_errors.append("prompt_manifest_not_promotion_ready")
     else:
         provenance_errors.append("missing_prompt_manifest")
 
@@ -170,7 +173,7 @@ def main() -> None:
 
     conversion_manifest = out_path.with_suffix(out_path.suffix + ".manifest.json")
     conversion_manifest.write_text(json.dumps({
-        "version": 2,
+        "version": 3,
         "benchmarkFile": str(benchmark_path),
         "benchmarkSha256": benchmark_hash,
         "modelResultFile": str(run_path),
@@ -196,6 +199,7 @@ def main() -> None:
         "notes": [
             "Missing run records and genuinely empty model candidate lists are distinct: missing records are a provenance/completeness error, while an empty candidate list is a model behavior that the official evaluator may score poorly.",
             "Pari rank scores preserve model ordering only; official SWORDS preprocessing/evaluation determines lexical quality.",
+            "Promotion provenance requires the official SWORDS repository's full 40-hex commit SHA.",
             "For promotion-quality evidence, evaluate this exact .lsr.json with the official repository at officialSwordsRepositoryRevision and archive the evaluator output as a separate artifact."
         ]
     }, indent=2) + "\n")
@@ -210,7 +214,7 @@ def main() -> None:
         "promotionProvenanceErrors": provenance_errors,
         "out": str(out_path),
         "manifest": str(conversion_manifest),
-        "nextStep": "Run the official SWORDS evaluator at the pinned revision; do not substitute a Pari-invented lexical score for the official metrics."
+        "nextStep": "Run run-swords-official-eval.py against the pinned official checkout; it executes the official evaluator and archives provenance."
     }, indent=2))
 
 
