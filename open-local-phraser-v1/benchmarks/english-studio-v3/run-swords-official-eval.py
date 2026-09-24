@@ -19,6 +19,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -32,6 +33,7 @@ CORE_METRICS = (
     "strict_c_f@10",
     "strict_c_p@1",
 )
+GIT_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
 def sha256(path: Path) -> str:
@@ -45,6 +47,17 @@ def git_head(repo: Path) -> str | None:
             text=True,
             stderr=subprocess.DEVNULL,
         ).strip() or None
+    except Exception:
+        return None
+
+
+def git_dirty(repo: Path) -> bool | None:
+    try:
+        return bool(subprocess.check_output(
+            ["git", "-C", str(repo), "status", "--porcelain"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip())
     except Exception:
         return None
 
@@ -117,10 +130,15 @@ def main() -> None:
 
     expected_revision = str(manifest.get("officialSwordsRepositoryRevision") or "").strip()
     actual_revision = git_head(repo)
-    if not expected_revision:
-        errors.append("missing_expected_swords_revision")
+    dirty = git_dirty(repo)
+    if not GIT_COMMIT_RE.fullmatch(expected_revision):
+        errors.append("expected_swords_revision_is_not_full_commit_sha")
     elif actual_revision != expected_revision:
         errors.append("swords_checkout_revision_mismatch")
+    if dirty is None:
+        errors.append("could_not_determine_swords_worktree_cleanliness")
+    elif dirty:
+        errors.append("swords_checkout_is_dirty")
 
     dataset_id = str(manifest.get("officialDatasetId") or "").strip()
     if not dataset_id:
@@ -147,6 +165,8 @@ def main() -> None:
     evaluator_env = evaluator_environment(args.python, repo)
     if evaluator_env.get("error"):
         errors.append("could_not_query_evaluator_python_environment")
+    if evaluator_env.get("numpy") is None or evaluator_env.get("nltk") is None:
+        errors.append("evaluator_python_missing_numpy_or_nltk")
 
     if errors:
         raise SystemExit("SWORDS evaluator provenance failed:\n- " + "\n- ".join(errors))
@@ -189,10 +209,11 @@ def main() -> None:
         for module in required_modules
     }
     result = {
-        "version": 1,
+        "version": 2,
         "purpose": "Frozen output from SWORDS' official evaluator; Pari does not reimplement the lexical-substitution metrics.",
         "swordsRepository": str(repo),
         "swordsRepositoryRevision": actual_revision,
+        "swordsWorktreeDirty": dirty,
         "officialDatasetId": dataset_id,
         "officialDatasetFile": str(official_dataset_file),
         "officialDatasetSha256": sha256(official_dataset_file),
@@ -207,6 +228,7 @@ def main() -> None:
         "elapsedSeconds": round(elapsed, 6),
         "returnCode": proc.returncode,
         "stdout": proc.stdout,
+        "stdoutSha256": hashlib.sha256(proc.stdout.encode("utf-8")).hexdigest(),
         "stderr": proc.stderr,
         "metrics": metrics,
         "metricsJsonSha256": hashlib.sha256(metrics_bytes).hexdigest(),
@@ -215,6 +237,7 @@ def main() -> None:
         "officialRepository": "https://github.com/p-lambda/swords",
         "notes": [
             "The official CLI/evaluator is executed directly; Pari only verifies inputs and archives provenance.",
+            "The pinned SWORDS checkout must be clean, preventing uncommitted evaluator/data changes from masquerading as the recorded commit.",
             "The benchmark source used to build prompts must be byte-identical to assets/parsed/<officialDatasetId>.json.gz in the pinned checkout.",
             "The official SWORDS loader also verifies the parsed dataset's internal dataset ID against its registry before evaluation.",
             "Core strict/lenient F@10 and strict conceivable P@1 metrics must be present; optional GAP/legacy metrics may depend on additional official assets."
@@ -224,6 +247,7 @@ def main() -> None:
     print(json.dumps({
         "out": str(out),
         "swordsRepositoryRevision": actual_revision,
+        "swordsWorktreeDirty": dirty,
         "officialDatasetId": dataset_id,
         "officialDatasetSha256": result["officialDatasetSha256"],
         "lsrSha256": result["lsrSha256"],
