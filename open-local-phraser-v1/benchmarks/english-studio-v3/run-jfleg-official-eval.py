@@ -21,10 +21,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+GIT_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
 def sha256(path: Path) -> str:
@@ -38,6 +41,17 @@ def git_head(repo: Path) -> str | None:
             text=True,
             stderr=subprocess.DEVNULL,
         ).strip() or None
+    except Exception:
+        return None
+
+
+def git_dirty(repo: Path) -> bool | None:
+    try:
+        return bool(subprocess.check_output(
+            ["git", "-C", str(repo), "status", "--porcelain"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip())
     except Exception:
         return None
 
@@ -88,6 +102,18 @@ def resolve_recorded_path(value: object, fallback_root: Path | None = None) -> P
     return p.resolve()
 
 
+def official_jfleg_file(repo: Path, recorded: Path) -> Path | None:
+    """Map canonical dev/test JFLEG filenames back into the pinned checkout."""
+    name = recorded.name
+    if name.startswith("dev."):
+        candidate = repo / "dev" / name
+    elif name.startswith("test."):
+        candidate = repo / "test" / name
+    else:
+        return None
+    return candidate.resolve()
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("jfleg_repo")
@@ -119,25 +145,39 @@ def main() -> None:
 
     expected_revision = str(manifest.get("officialJflegRepositoryRevision") or "").strip()
     actual_revision = git_head(repo)
-    if not expected_revision:
-        errors.append("missing_expected_jfleg_revision")
+    dirty = git_dirty(repo)
+    if not GIT_COMMIT_RE.fullmatch(expected_revision):
+        errors.append("expected_jfleg_revision_is_not_full_commit_sha")
     elif actual_revision != expected_revision:
         errors.append("jfleg_checkout_revision_mismatch")
+    if dirty is None:
+        errors.append("could_not_determine_jfleg_worktree_cleanliness")
+    elif dirty:
+        errors.append("jfleg_checkout_is_dirty")
 
     evaluator = repo / "eval" / "gleu.py"
     if not evaluator.is_file():
         errors.append("missing_official_eval_gleu_py")
 
     source = resolve_recorded_path(manifest.get("sourceFile"), repo)
+    official_source = None
     if source is None or not source.is_file():
         errors.append("recorded_source_file_missing")
-    elif manifest.get("sourceSha256") != sha256(source):
-        errors.append("source_hash_mismatch")
+    else:
+        digest = sha256(source)
+        if manifest.get("sourceSha256") != digest:
+            errors.append("source_hash_mismatch")
+        official_source = official_jfleg_file(repo, source)
+        if official_source is None or not official_source.is_file():
+            errors.append("source_filename_not_mappable_to_official_dev_or_test_file")
+        elif sha256(official_source) != digest:
+            errors.append("recorded_source_bytes_do_not_match_pinned_checkout")
 
     reference_records = manifest.get("references") or []
     if len(reference_records) != 4:
         errors.append("expected_exactly_four_reference_records")
     references: list[Path] = []
+    official_references: list[Path] = []
     seen_paths: set[Path] = set()
     seen_hashes: set[str] = set()
     for i, record in enumerate(reference_records):
@@ -154,7 +194,19 @@ def main() -> None:
         seen_hashes.add(digest)
         if record.get("sha256") != digest:
             errors.append(f"reference_{i}_hash_mismatch")
+        official_ref = official_jfleg_file(repo, ref)
+        if official_ref is None or not official_ref.is_file():
+            errors.append(f"reference_{i}_filename_not_mappable_to_official_dev_or_test_file")
+        elif sha256(official_ref) != digest:
+            errors.append(f"reference_{i}_bytes_do_not_match_pinned_checkout")
+        else:
+            official_references.append(official_ref)
         references.append(ref)
+
+    if official_source is not None and official_source.is_file() and official_references:
+        source_split = official_source.parent.name
+        if any(ref.parent.name != source_split for ref in official_references):
+            errors.append("source_and_references_do_not_share_same_official_split")
 
     evaluator_env = evaluator_environment(args.python)
     if evaluator_env.get("error"):
@@ -169,32 +221,35 @@ def main() -> None:
         args.python,
         str(evaluator),
         "-r",
-        *[str(ref) for ref in references],
+        *[str(ref) for ref in official_references],
         "-s",
-        str(source),
+        str(official_source),
         "--hyp",
         str(hyp),
     ]
     started = time.time()
-    proc = subprocess.run(command, text=True, capture_output=True)
+    proc = subprocess.run(command, cwd=repo, text=True, capture_output=True)
     elapsed = time.time() - started
     if proc.returncode != 0:
         raise SystemExit(
             "Official JFLEG evaluator failed with exit code "
             f"{proc.returncode}:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
         )
+    if not proc.stdout.strip():
+        raise SystemExit("Official JFLEG evaluator returned empty stdout; refusing to archive an unverifiable metric result")
 
     result = {
-        "version": 3,
+        "version": 4,
         "purpose": "Frozen output from JFLEG's official GLEU evaluator; Pari does not reimplement the metric.",
         "jflegRepository": str(repo),
         "jflegRepositoryRevision": actual_revision,
+        "jflegWorktreeDirty": dirty,
         "evaluatorFile": str(evaluator),
         "evaluatorSha256": sha256(evaluator),
-        "sourceFile": str(source),
-        "sourceSha256": sha256(source),
+        "sourceFile": str(official_source),
+        "sourceSha256": sha256(official_source),
         "references": [
-            {"path": str(ref), "sha256": sha256(ref)} for ref in references
+            {"path": str(ref), "sha256": sha256(ref)} for ref in official_references
         ],
         "hypothesisFile": str(hyp),
         "hypothesisSha256": sha256(hyp),
@@ -212,11 +267,14 @@ def main() -> None:
         "elapsedSeconds": round(elapsed, 6),
         "returnCode": proc.returncode,
         "stdout": proc.stdout,
+        "stdoutSha256": hashlib.sha256(proc.stdout.encode("utf-8")).hexdigest(),
         "stderr": proc.stderr,
         "researchReference": "https://aclanthology.org/E17-2037/",
         "officialRepository": "https://github.com/keisks/jfleg",
         "notes": [
             "The official evaluator code is executed directly; this wrapper only verifies and records provenance.",
+            "The pinned JFLEG checkout must be clean, preventing uncommitted evaluator/data changes from masquerading as the recorded commit.",
+            "Source and all four references are byte-checked against their canonical dev/ or test/ files in the pinned checkout before evaluation.",
             "The repository's default 500-iteration protocol is retained because eval/gleu.py uses deterministic per-iteration seeds under that default.",
             "Python/NumPy/SciPy versions are queried from the exact interpreter used to execute eval/gleu.py, not from the wrapper process by assumption.",
             "Keep this JSON artifact with the exact hypothesis conversion manifest for promotion-quality comparison."
@@ -226,8 +284,10 @@ def main() -> None:
     print(json.dumps({
         "out": str(out),
         "jflegRepositoryRevision": actual_revision,
+        "jflegWorktreeDirty": dirty,
         "evaluatorSha256": result["evaluatorSha256"],
         "hypothesisSha256": result["hypothesisSha256"],
+        "stdoutSha256": result["stdoutSha256"],
         "elapsedSeconds": result["elapsedSeconds"],
     }, indent=2))
 
