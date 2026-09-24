@@ -101,7 +101,7 @@
       "publicAnchors": ["EditEval relevant tasks", "IteraTeR held-out revisions"],
       "secondaryDiagnostics": ["WritingBench selected style/language subsets", "EQ-Bench Creative Writing diagnostics"],
       "shadowFamilies": ["contextual_alternatives", "sentence_restructure", "paragraph_revision", "split_join", "non_ai_stock_language"],
-      "metrics": ["meaning_preservation", "naturalness", "structural_diversity", "register_fit", "stock_phrase_rate", "length_inflation"]
+      "metrics": ["meaning_preservation", "naturalness", "structural_diversity", "register_fit", "stock_phrase_rate", "length_inflation", "valid_candidate_rate", "semantic_diversity", "length_diversity", "context_fit", "relation_preservation", "semantic_safety", "coherence", "grammar"]
     },
     "discourse": {
       "weight": 5,

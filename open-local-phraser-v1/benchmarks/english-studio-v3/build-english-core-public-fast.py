@@ -106,7 +106,7 @@ def main() -> None:
         "BLiMP": resolve_dataset_revision(api, "nyu-mll/blimp", args.blimp_revision),
         "WiC": resolve_dataset_revision(api, "aps/super_glue", args.super_glue_revision),
         "CoLA": resolve_dataset_revision(api, "nyu-mll/glue", args.glue_revision),
-        "PAWS": resolve_dataset_revision(api, "paws", args.paws_revision),
+        "PAWS": resolve_dataset_revision(api, "google-research-datasets/paws", args.paws_revision),
     }
 
     tasks: list[dict] = []
@@ -177,7 +177,12 @@ def main() -> None:
             "acceptability",
         )
 
-    paws_ds = load_dataset("paws", "labeled_final", split="validation", revision=source_revisions["PAWS"]["resolvedRevision"])
+    paws_ds = load_dataset(
+        "google-research-datasets/paws",
+        "labeled_final",
+        split="validation",
+        revision=source_revisions["PAWS"]["resolvedRevision"],
+    )
     fingerprints["PAWS"] = getattr(paws_ds, "_fingerprint", None)
     paws_rows = list(paws_ds)
     for i, row in enumerate(stable_take_binary_balanced(paws_rows, PAWS_COUNT, "paws:labeled_final:validation")):
@@ -202,7 +207,7 @@ def main() -> None:
         "BLiMP": {"dataset": "nyu-mll/blimp", "split": "train-by-dataset-convention", "perConfig": BLIMP_PER_CONFIG, **source_revisions["BLiMP"]},
         "WiC": {"dataset": "aps/super_glue", "config": "wic", "split": "validation", "count": WIC_COUNT, "balanced": True, **source_revisions["WiC"]},
         "CoLA": {"dataset": "nyu-mll/glue", "config": "cola", "split": "validation", "count": COLA_COUNT, "balanced": True, **source_revisions["CoLA"]},
-        "PAWS": {"dataset": "paws", "config": "labeled_final", "split": "validation", "count": PAWS_COUNT, "balanced": True, **source_revisions["PAWS"]},
+        "PAWS": {"dataset": "google-research-datasets/paws", "config": "labeled_final", "split": "validation", "count": PAWS_COUNT, "balanced": True, **source_revisions["PAWS"]},
     }
     manifest_path.write_text(
         json.dumps(

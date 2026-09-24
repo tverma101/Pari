@@ -37,6 +37,7 @@ PINNED_SEMANTICQA_COMMIT = "56c82a587f4a6cef609255cd10af372d8c76600a"
 PROMPT_REL = Path("semantic_qa/prompts/collocation_categorization_zeroshot.txt")
 TAXONOMY_REL = Path("semantic_qa/taxonomy/SEM_REL_CATEGORY_8_0-shots.txt")
 ARCHIVE_REL = Path("resources/dataset.zip")
+DEFAULT_DATASET_MEMBER = "dataset/collocation_categorization/prepared/collocation_categorization_prepared.tsv"
 EXPECTED_TEST_SIZE = 305
 LABELS = ("Magn", "AntiMagn", "Ver", "AntiVer", "Bon", "AntiBon", "Son", "Oper1")
 LABEL_SET = set(LABELS)
@@ -143,7 +144,11 @@ def render_prompt(template: str, taxonomy: str, context: str, collocation: str) 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--semanticqa-checkout", required=True, type=Path)
-    ap.add_argument("--dataset-member", default=None, help="Optional explicit member path inside resources/dataset.zip")
+    ap.add_argument(
+        "--dataset-member",
+        default=DEFAULT_DATASET_MEMBER,
+        help="Protocol-canonical LCC TSV member path inside resources/dataset.zip",
+    )
     ap.add_argument("--tasks", default="semanticqa-lcc-english-core.jsonl", type=Path)
     ap.add_argument("--answers", default="semanticqa-lcc-english-core.answers.json", type=Path)
     ap.add_argument("--manifest", default="semanticqa-lcc-english-core.manifest.json", type=Path)

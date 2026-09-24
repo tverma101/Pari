@@ -14,6 +14,9 @@ Read first:
 
 A canonical score alone is not enough to declare a close winner.
 
+For the Kaggle CUDA/T4 execution target and pinned candidate roster, see
+`KAGGLE_2XT4_RUN.md` and `kaggle-candidate-roster.json`.
+
 ---
 
 ## 0. Validate the benchmark package
@@ -21,8 +24,13 @@ A canonical score alone is not enough to declare a close winner.
 Before running a model:
 
 ```bash
-./self-check-english-core.sh
+bash self-check-english-core.sh
 ```
+
+The package validator cross-checks each shadow generative metric against both
+`english-core-generative-metric-contract.json` and the dimension's `metrics`
+list in `english-core-config.json`. Keep that list complete when the frozen
+seed changes; this is contract validation, not a post-result scoring adjustment.
 
 This runs the package validator, shadow structural audit, JS/Python choice-parser regression tests, rebuilds the shadow/prompt/order task files, and verifies that model-visible JSONL does not expose gold fields.
 
@@ -216,7 +224,12 @@ python build-english-core-public-fast.py \
   --paws-revision PAWS_DATASET_COMMIT
 ```
 
-The manifest records the requested revisions, resolved Hugging Face dataset fingerprints, and `datasets` library version. A manifest containing `mutable_default_not_pinned` is exploratory evidence only.
+The manifest records the requested revisions, resolved Hugging Face dataset fingerprints, and `datasets` library version. PAWS is loaded from its canonical Hub ID, `google-research-datasets/paws`. A manifest containing `mutable_default_not_pinned` is exploratory evidence only.
+
+For SemanticQA, the builder defaults to the official 305-row
+`collocation_categorization_prepared.tsv` member. Do not select the neighboring
+collocation-extraction table just because it has the same row count and label
+set; the LCC protocol is specifically categorization.
 
 Current fast screen:
 
