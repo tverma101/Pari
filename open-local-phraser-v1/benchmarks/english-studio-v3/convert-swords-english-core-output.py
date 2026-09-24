@@ -116,6 +116,7 @@ def main() -> None:
     manifest_path = Path(args.prompt_manifest).resolve() if args.prompt_manifest else infer_prompt_manifest(run)
     prompt_manifest = None
     provenance_errors: list[str] = []
+    dataset_id = None
     if manifest_path and manifest_path.is_file():
         prompt_manifest = json.loads(manifest_path.read_text())
         if prompt_manifest.get("sourceSha256") != benchmark_hash:
@@ -125,6 +126,9 @@ def main() -> None:
             provenance_errors.append("prompt_manifest_prompt_hash_does_not_match_run_task_hash")
         if int(prompt_manifest.get("targets", -1)) != len(targets):
             provenance_errors.append("prompt_manifest_target_count_mismatch")
+        dataset_id = prompt_manifest.get("officialDatasetId")
+        if not dataset_id:
+            provenance_errors.append("official_swords_dataset_id_missing")
         revision = prompt_manifest.get("officialRepositoryRevision")
         if not immutable_git_revision(revision):
             provenance_errors.append("official_swords_repository_revision_not_full_commit")
@@ -173,9 +177,10 @@ def main() -> None:
 
     conversion_manifest = out_path.with_suffix(out_path.suffix + ".manifest.json")
     conversion_manifest.write_text(json.dumps({
-        "version": 3,
+        "version": 4,
         "benchmarkFile": str(benchmark_path),
         "benchmarkSha256": benchmark_hash,
+        "officialDatasetId": dataset_id,
         "modelResultFile": str(run_path),
         "modelResultSha256": sha256(run_path),
         "runTaskFileSha256": run.get("taskFileSha256"),
@@ -199,13 +204,14 @@ def main() -> None:
         "notes": [
             "Missing run records and genuinely empty model candidate lists are distinct: missing records are a provenance/completeness error, while an empty candidate list is a model behavior that the official evaluator may score poorly.",
             "Pari rank scores preserve model ordering only; official SWORDS preprocessing/evaluation determines lexical quality.",
-            "Promotion provenance requires the official SWORDS repository's full 40-hex commit SHA.",
-            "For promotion-quality evidence, evaluate this exact .lsr.json with the official repository at officialSwordsRepositoryRevision and archive the evaluator output as a separate artifact."
+            "Promotion provenance requires the official SWORDS repository's full 40-hex commit SHA and an official dataset ID bound to the prompt source.",
+            "The official evaluator runner cross-checks this dataset ID and benchmark bytes against the pinned checkout before scoring."
         ]
     }, indent=2) + "\n")
 
     print(json.dumps({
         "targets": len(targets),
+        "officialDatasetId": dataset_id,
         "convertedOutputRecords": len(targets) - len(missing),
         "missingOutputs": len(missing),
         "extraOutputs": len(extra),
@@ -214,7 +220,7 @@ def main() -> None:
         "promotionProvenanceErrors": provenance_errors,
         "out": str(out_path),
         "manifest": str(conversion_manifest),
-        "nextStep": "Run run-swords-official-eval.py against the pinned official checkout; it executes the official evaluator and archives provenance."
+        "nextStep": "Run run-swords-official-eval.py against the pinned official checkout; it verifies dataset identity, executes the official evaluator, and archives provenance."
     }, indent=2))
 
 
