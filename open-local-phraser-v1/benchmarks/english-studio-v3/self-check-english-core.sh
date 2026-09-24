@@ -4,6 +4,22 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 cd "$HERE"
 
+# The benchmark tooling is part of the measurement instrument. Syntax-check all
+# local Python and Node modules before trusting any model result. This is a
+# structural regression check only; it does not execute optional public-dataset or
+# model dependencies.
+python3 - <<'PY'
+from pathlib import Path
+import py_compile
+
+for path in sorted(Path('.').glob('*.py')):
+    py_compile.compile(str(path), doraise=True)
+PY
+
+for module in ./*.mjs; do
+  node --check "$module" >/dev/null
+done
+
 node validate-english-core.mjs
 node audit-english-core-shadow.mjs
 node test-english-core-choice-parser.mjs
