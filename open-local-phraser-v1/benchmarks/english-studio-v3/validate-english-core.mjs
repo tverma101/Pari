@@ -178,6 +178,9 @@ if (anchors && config) {
     if (!anchor.implementationStatus) warnings.push(`${anchor.id}: missing implementationStatus`);
     if (!(anchor.preferredMetrics?.length > 0)) warnings.push(`${anchor.id}: missing preferredMetrics`);
     if (!anchor.nativeProtocol && anchor.evidencePriority !== "secondary") warnings.push(`${anchor.id}: primary/supporting anchor lacks nativeProtocol description`);
+    for (const file of anchor.pariFiles ?? []) {
+      if (!fs.existsSync(path.join(here, file))) errors.push(`${anchor.id}: pariFiles references missing file ${file}`);
+    }
   }
 }
 
@@ -260,13 +263,14 @@ for (const requiredImplementation of [
   "convert-swords-english-core-output.py",
   "build-jfleg-english-core-prompts.py",
   "convert-jfleg-english-core-output.py",
+  "run-jfleg-official-eval.py",
   "self-check-english-core.sh"
 ]) {
   if (!fs.existsSync(path.join(here, requiredImplementation))) errors.push(`missing required implementation file: ${requiredImplementation}`);
 }
 
 const report = {
-  version: 5,
+  version: 6,
   configVersion: config?.version ?? null,
   seedVersion: seed?.version ?? null,
   metricContractVersion: metricContract?.version ?? null,
@@ -284,6 +288,7 @@ const report = {
     "A passing package validator does not upgrade author-written shadow labels to independent human gold.",
     "Per-dimension case counts are reported rather than judged against an invented universal adequacy threshold; evidence strength is assessed through construct coverage, uncertainty, external anchors, and claim tiers.",
     "Generative metric registration/direction checks prevent accidental inversion but do not validate the evaluator itself.",
+    "Registered public-anchor adapter files are checked for existence so protocol documentation cannot silently point at missing tooling.",
     "Choice-parser regression tests and task-builder leakage checks are separate executable checks run by self-check-english-core.sh.",
     "Public data revision/fingerprint requirements are enforced at promotion-run/workflow level; package validation alone cannot prove that a future download used immutable source bytes.",
     "Run audit-english-core-shadow.mjs separately for item-level structural/distribution diagnostics.",
