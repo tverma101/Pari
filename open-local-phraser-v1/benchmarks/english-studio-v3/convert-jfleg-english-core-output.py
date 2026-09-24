@@ -16,17 +16,18 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
-UNPINNED = {"", "unknown", "unrecorded_not_pinned", "main", "master", "latest", "default"}
+GIT_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def known_revision(value: object) -> bool:
-    return str(value or "").strip().lower() not in UNPINNED
+def immutable_git_revision(value: object) -> bool:
+    return bool(GIT_COMMIT_RE.fullmatch(str(value or "").strip()))
 
 
 def normalize_one_line(text: str) -> str:
@@ -95,13 +96,28 @@ def main() -> None:
         if len(references) != 4:
             provenance_errors.append("jfleg_four_reference_bundle_not_pinned")
         else:
+            paths = []
+            hashes = []
             for index, ref in enumerate(references):
-                if not ref.get("sha256") or not ref.get("path"):
+                path = ref.get("path")
+                digest = ref.get("sha256")
+                if not digest or not path:
                     provenance_errors.append(f"jfleg_reference_{index}_missing_hash_or_path")
                 if int(ref.get("lines", -1)) != len(tasks):
                     provenance_errors.append(f"jfleg_reference_{index}_line_count_mismatch")
-        if not known_revision(prompt_manifest.get("officialRepositoryRevision")):
-            provenance_errors.append("official_jfleg_repository_revision_not_pinned")
+                if path:
+                    paths.append(str(path))
+                if digest:
+                    hashes.append(str(digest))
+            if len(paths) != len(set(paths)):
+                provenance_errors.append("jfleg_reference_paths_not_distinct")
+            if len(hashes) != len(set(hashes)):
+                provenance_errors.append("jfleg_reference_hashes_not_distinct")
+        revision = prompt_manifest.get("officialRepositoryRevision")
+        if not immutable_git_revision(revision):
+            provenance_errors.append("official_jfleg_repository_revision_not_full_commit")
+        if prompt_manifest.get("promotionReadySourceProvenance") is not True:
+            provenance_errors.append("prompt_manifest_not_promotion_ready")
     else:
         provenance_errors.append("missing_prompt_manifest")
 
@@ -135,7 +151,7 @@ def main() -> None:
     out_path.write_text("\n".join(hypotheses) + "\n")
     conversion_manifest = out_path.with_suffix(out_path.suffix + ".manifest.json")
     conversion_manifest.write_text(json.dumps({
-        "version": 2,
+        "version": 3,
         "promptFile": str(prompt_path),
         "promptFileSha256": prompt_hash,
         "promptManifest": str(manifest_path) if manifest_path else None,
@@ -163,6 +179,7 @@ def main() -> None:
         "notes": [
             "Missing model-result records are provenance/completeness errors; a present but empty model output is retained as model behavior and should score accordingly.",
             "Only whitespace/newline formatting is normalized to JFLEG's one-hypothesis-per-line interface; Pari does not otherwise rewrite model hypotheses before official scoring.",
+            "Promotion provenance requires the official JFLEG repository's full 40-hex commit SHA and four distinct pinned reference files.",
             "For promotion-quality evidence, archive the official GLEU output produced from this exact hypothesis file, the pinned source, all four pinned references, and the pinned repository revision."
         ]
     }, indent=2) + "\n")
@@ -177,7 +194,7 @@ def main() -> None:
         "promotionProvenanceErrors": provenance_errors,
         "out": str(out_path),
         "manifest": str(conversion_manifest),
-        "nextStep": "Run the official pinned JFLEG eval/gleu.py with the four references recorded in the prompt manifest."
+        "nextStep": "Run run-jfleg-official-eval.py against the pinned official checkout; it executes eval/gleu.py directly and archives evaluator provenance."
     }, indent=2))
 
 
