@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "purpose": "Registry of established public benchmarks used as external evidence for Pari English Core. Native/official, full-distribution prompted, fast prompted, and secondary diagnostic results are never silently conflated.",
   "policy": {
     "usage": "evaluation_only",
@@ -8,7 +8,7 @@
     "protocolSeparation": true,
     "officialEvaluatorProvenance": "When an official evaluator exists, promotion-quality evidence pins the evaluator checkout to a full immutable commit, verifies benchmark/reference bytes, executes official code directly where practical, and archives raw evaluator output plus provenance.",
     "licenseRule": "Verify the current dataset/repository license and official evaluation split before downloading or redistributing benchmark data. This registry intentionally does not copy benchmark data into Pari.",
-    "researchBasis": "See ENGLISH_CORE_RESEARCH_BASIS.md, ENGLISH_CORE_NATIVE_PROTOCOLS.md, and RESEARCH_GROUNDING_POLICY.md for construct validity, adaptation caveats, and claim rules."
+    "researchBasis": "See ENGLISH_CORE_RESEARCH_BASIS.md, ENGLISH_CORE_NATIVE_PROTOCOLS.md, ENGLISH_CORE_COLLOCATION_AUDIT.md, and RESEARCH_GROUNDING_POLICY.md for construct validity, adaptation caveats, and claim rules."
   },
   "anchors": [
     {
@@ -47,15 +47,33 @@
       "preferredMetrics": ["best", "oot", "ranking metrics"]
     },
     {
+      "id": "semanticqa_lcc_2026",
+      "name": "SemanticQA Lexical Collocation Categorization (LCC), 8-category zero-shot",
+      "dimension": "collocation_naturalness",
+      "reference": "https://aclanthology.org/2026.acl-long.1185/",
+      "role": "modern LLM-facing semantic categorization of lexical collocations using an 8-category lexical-function taxonomy",
+      "evidencePriority": "primary",
+      "nativeProtocol": "Use the published 305-item LCC test, official zero-shot prompt, official 8-category zero-shot taxonomy, temperature 0, and report accuracy as the primary published metric; macro/micro/weighted F1 are supporting diagnostics where reproduced.",
+      "pariProtocol": "Build model-visible tasks directly from the pinned SemanticQA resources/dataset.zip plus official prompt/taxonomy files. Keep answers separate, record exact source bytes/hashes, and score invalid outputs as incorrect while reporting valid-output coverage.",
+      "implementationStatus": "pinned_prompt_data_adapter_and_scorer_ready",
+      "pariFiles": ["build-semanticqa-lcc-english-core.py", "score-semanticqa-lcc-english-core.py"],
+      "preferredMetrics": ["accuracy", "macro F1", "micro F1", "weighted F1", "valid-output coverage"],
+      "sourceRevision": "56c82a587f4a6cef609255cd10af372d8c76600a",
+      "testSize": 305,
+      "taxonomyCategories": 8,
+      "claimCaveat": "This is a modern prompted LLM protocol. Do not relabel it as the EACL 2021 supervised classifier or MLM retrieval result, even though SemanticQA derives its collocation task from that research line."
+    },
+    {
       "id": "lexical_collocations_eacl2021",
-      "name": "Lexical collocation retrieval/categorization benchmark",
+      "name": "EACL 2021 lexical-collocation retrieval/categorization benchmark",
       "dimension": "collocation_naturalness",
       "reference": "https://aclanthology.org/2021.eacl-main.120/",
-      "role": "natural English collocation knowledge",
-      "evidencePriority": "primary",
-      "nativeProtocol": "Reproduce the paper's retrieval/categorization tasks and metrics if the official data/code package can be verified.",
-      "implementationStatus": "pending_reproducibility_audit",
-      "preferredMetrics": ["accuracy", "retrieval/ranking metrics"]
+      "role": "construct/data foundation for lexical-function collocation knowledge and lexical-disjoint evaluation",
+      "evidencePriority": "foundational_native_supporting",
+      "nativeProtocol": "The paper evaluates MLM collocate retrieval and supervised lexical-function categorization over 16 categories with lexical-disjoint train/dev/test splits. Reproduce those native protocols only when comparing models under the same training/scoring assumptions.",
+      "implementationStatus": "official_data_source_verified_native_llm_comparison_not_equivalent",
+      "preferredMetrics": ["paper-native retrieval metrics", "paper-native categorization accuracy"],
+      "claimCaveat": "Do not treat the 2021 supervised categorization score as directly comparable to zero-shot/instruction LLM performance. SemanticQA 2026 LCC is the primary modern prompted LLM anchor."
     },
     {
       "id": "blimp",
