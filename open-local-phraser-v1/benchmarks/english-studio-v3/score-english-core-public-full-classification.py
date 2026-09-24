@@ -8,10 +8,13 @@ Important:
 - It is not identical to a supervised benchmark-native model adaptation.
 - CoLA reports MCC only when every item has a valid class prediction; invalid or
   missing outputs are never silently dropped.
+- The scorer binds itself to the exact generated task/answer files by SHA-256 and
+  rejects duplicate/extra outputs rather than silently taking the last record.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import sys
@@ -23,6 +26,11 @@ from english_core_choice_parser import parse_choice_letter
 HERE = Path(__file__).resolve().parent
 TASKS = HERE / "english-core-public-full-classification.jsonl"
 ANSWERS = HERE / "english-core-public-full-classification.answers.json"
+MANIFEST = HERE / "english-core-public-full-classification.manifest.json"
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def safe_div(a: float, b: float) -> float | None:
@@ -47,11 +55,18 @@ def confusion(gold: list[int], pred: list[int]) -> dict[str, int]:
     return {"tp": tp, "tn": tn, "fp": fp, "fn": fn}
 
 
-def mcc(cm: dict[str, int]) -> float | None:
+def mcc_sklearn_convention(cm: dict[str, int]) -> float:
+    """Binary MCC with the zero-denominator convention used by sklearn.
+
+    GLUE/CoLA tooling commonly delegates to sklearn.metrics.matthews_corrcoef.
+    Scikit-learn returns 0.0 for degenerate constant-class predictions where the
+    denominator is zero. We reproduce that convention without adding a runtime
+    sklearn dependency to this scorer.
+    """
     tp, tn, fp, fn = cm["tp"], cm["tn"], cm["fp"], cm["fn"]
     denom = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
     if denom == 0:
-        return None
+        return 0.0
     return (tp * tn - fp * fn) / denom
 
 
@@ -66,7 +81,7 @@ def binary_metrics(gold: list[int], pred: list[int]) -> dict:
         "cases": len(gold),
         "accuracy": round(correct / len(gold), 6) if gold else None,
         "accuracyWilson95": wilson_interval(correct, len(gold)),
-        "mcc": None if (value := mcc(cm)) is None else round(value, 6),
+        "mcc": round(mcc_sklearn_convention(cm), 6) if gold else None,
         "precisionPositive": None if precision is None else round(precision, 6),
         "recallPositive": None if recall is None else round(recall, 6),
         "f1Positive": None if f1 is None else round(f1, 6),
@@ -79,13 +94,45 @@ def binary_metrics(gold: list[int], pred: list[int]) -> dict:
 def main() -> None:
     if len(sys.argv) != 2:
         raise SystemExit("Usage: python score-english-core-public-full-classification.py <result.json>")
-    if not TASKS.exists() or not ANSWERS.exists():
-        raise SystemExit("Build the full classification tasks first.")
+    if not TASKS.exists() or not ANSWERS.exists() or not MANIFEST.exists():
+        raise SystemExit("Build the full classification tasks first; task, answer, and manifest files are required.")
 
-    run = json.loads(Path(sys.argv[1]).read_text())
+    result_path = Path(sys.argv[1]).resolve()
+    run = json.loads(result_path.read_text())
     tasks = [json.loads(line) for line in TASKS.read_text().splitlines() if line.strip()]
-    answer_data = json.loads(ANSWERS.read_text())["answers"]
-    outputs = {row["id"]: row for row in run.get("outputs", [])}
+    answer_file = json.loads(ANSWERS.read_text())
+    answer_data = answer_file["answers"]
+    manifest = json.loads(MANIFEST.read_text())
+
+    task_ids = [task["id"] for task in tasks]
+    if len(task_ids) != len(set(task_ids)):
+        raise SystemExit("Public-full task file contains duplicate IDs")
+    if set(answer_data) != set(task_ids):
+        raise SystemExit("Public-full answer keys do not exactly match task IDs")
+    if int(manifest.get("cases", -1)) != len(tasks):
+        raise SystemExit("Public-full manifest case count does not match task file")
+
+    expected_task_hash = sha256(TASKS)
+    run_task_hash = run.get("taskFileSha256")
+    if run_task_hash != expected_task_hash:
+        raise SystemExit("Result taskFileSha256 does not match english-core-public-full-classification.jsonl")
+    if run.get("taskCount") != len(tasks):
+        raise SystemExit("Result taskCount does not match public-full task count")
+
+    run_outputs = run.get("outputs", [])
+    if not isinstance(run_outputs, list):
+        raise SystemExit("Result outputs is not an array")
+    output_ids = [row.get("id") for row in run_outputs if isinstance(row, dict)]
+    if len(output_ids) != len(run_outputs):
+        raise SystemExit("Result contains a non-object output row")
+    if any(not value for value in output_ids):
+        raise SystemExit("Result contains an output without an ID")
+    if len(output_ids) != len(set(output_ids)):
+        raise SystemExit("Result contains duplicate output IDs")
+    extra = sorted(set(output_ids) - set(task_ids))
+    if extra:
+        raise SystemExit(f"Result contains {len(extra)} IDs not present in the public-full task file")
+    outputs = {row["id"]: row for row in run_outputs}
 
     by_source: dict[str, list[dict]] = defaultdict(list)
     detail = []
@@ -143,20 +190,39 @@ def main() -> None:
     }
 
     report = {
-        "version": 2,
+        "version": 3,
         "runId": run.get("runId"),
         "model": run.get("model"),
         "adaptation": "zero-shot prompted classification on full locally scoreable validation distributions",
+        "inputs": {
+            "resultFile": str(result_path),
+            "resultFileSha256": sha256(result_path),
+            "taskFile": str(TASKS),
+            "taskFileSha256": expected_task_hash,
+            "answerFileSha256": sha256(ANSWERS),
+            "manifestSha256": sha256(MANIFEST),
+            "manifestSources": manifest.get("sources"),
+            "resolvedDatasetFingerprints": manifest.get("resolvedDatasetFingerprints"),
+            "datasetsLibraryVersion": manifest.get("datasetsLibraryVersion"),
+        },
         "headline": headline,
         "bySource": source_reports,
         "notes": [
             "This lane preserves the public validation distribution; it is separate from Pari's balanced public-fast screen.",
+            "The scorer requires an exact task-file hash/count match and rejects duplicate or extra output IDs before computing metrics.",
+            "Missing/invalid expected outputs remain visible as coverage failures and prevent MCC/F1/native-distribution headline metrics from being computed; they are never silently dropped.",
             "The shared choice parser accepts only unambiguous letter forms such as A, A., Answer: A, The answer is A, or Option A; free-form prose remains invalid.",
             "Prompted zero-shot classification is not identical to the supervised model adaptation used in the original benchmark literature.",
-            "CoLA headline reporting uses MCC when all predictions are valid; balanced-screen accuracy must not be called an official CoLA score.",
-            "Invalid/missing outputs are never silently dropped from headline classification metrics.",
-            "Report exact prompt/adaptation/model/runtime provenance alongside these metrics."
+            "CoLA headline reporting uses the standard GLUE MCC convention: Hugging Face GLUE and other established GLUE tooling delegate to sklearn.metrics.matthews_corrcoef; zero-denominator/constant-prediction cases therefore map to MCC 0.0 rather than an undefined score.",
+            "Balanced-screen accuracy must not be called an official CoLA score.",
+            "Report exact prompt/adaptation/model/runtime/source provenance alongside these metrics."
         ],
+        "researchReferences": {
+            "WiC": "https://aclanthology.org/N19-1128/",
+            "CoLA": "https://aclanthology.org/Q19-1040/",
+            "PAWS": "https://aclanthology.org/N19-1131/",
+            "GLUE_metric_implementation": "https://github.com/huggingface/evaluate/blob/main/metrics/glue/glue.py"
+        },
         "detail": detail,
     }
     print(json.dumps(report, indent=2))
