@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "status": "synthetic_hand_authored_unvalidated",
+  "purpose": "Stress test meaning preservation and edit-strength response on paragraph rewrites. This is original synthetic content; its author-written expectations are not validated human gold.",
+  "cases": [
+    {
+      "id": "ws-syn-01",
+      "input": "I updated the file at 8:15 a.m., but I have not sent it to Maya because the figures still need checking. I will send it only after I compare them with the original report.",
+      "expectations": ["keep 8:15 a.m.", "preserve Maya as recipient", "preserve not-yet-sent status", "figures require checking against the original report", "retain future condition"]
+    },
+    {
+      "id": "ws-syn-02",
+      "input": "If the final upload finishes before 6 p.m., I can review the charts tonight. The upload is still in progress, so that plan may change.",
+      "expectations": ["preserve if-condition and before 6 p.m.", "review is possible, not certain", "review charts tonight", "upload is still in progress", "plan may change"]
+    },
+    {
+      "id": "ws-syn-03",
+      "input": "The $49 plan dropped to $39 on September 2, 2026, but the annual plan stayed at $120. The notice does not say whether either price includes tax.",
+      "expectations": ["preserve all prices and date exactly", "preserve decrease and unchanged annual plan", "do not invent tax treatment", "preserve the notice's uncertainty"]
+    },
+    {
+      "id": "ws-syn-04",
+      "input": "We tested the change on 12 accounts, not all customers. The results suggest fewer errors, but they do not prove why the errors fell.",
+      "expectations": ["preserve 12 accounts", "retain not-all-customer limitation", "suggestive rather than conclusive result", "do not claim a cause"]
+    },
+    {
+      "id": "ws-syn-05",
+      "input": "The first export failed because the folder was read-only. After I changed the permission, the second export completed; I did not change the source file.",
+      "expectations": ["preserve failure cause", "preserve event order", "second export completed", "source file was not changed"]
+    },
+    {
+      "id": "ws-syn-06",
+      "input": "Although the meeting ended early, we did not approve the proposal. Luis will send one revised draft by Friday if the legal team returns its notes.",
+      "expectations": ["preserve concession", "proposal was not approved", "Luis sends one revised draft", "Friday timing is conditional on legal notes"]
+    },
+    {
+      "id": "ws-syn-07",
+      "input": "The new instructions are shorter, but step 4 still assumes the reader has already opened the settings panel. I have not checked that assumption with new users.",
+      "expectations": ["preserve shorter instructions", "step 4 assumption remains", "new-user validation has not happened", "do not claim the assumption is true"]
+    },
+    {
+      "id": "ws-syn-08",
+      "input": "I thought the button was missing; it was hidden under the menu. This fix may help first-time users, but we have not tested it on mobile.",
+      "expectations": ["button was hidden, not missing", "fix may help, not proven", "first-time-user scope", "mobile not tested"]
+    },
+    {
+      "id": "ws-syn-09",
+      "input": "The report says 18 of 24 participants finished the task without help. Six asked for help, and two stopped before the last step.",
+      "expectations": ["preserve 18 of 24", "six asked for help", "two stopped before the last step", "do not change counts or imply all finished"]
+    },
+    {
+      "id": "ws-syn-10",
+      "input": "After the storm, the north entrance was closed for repairs, while the south entrance remained open. Staff expected repairs to end in late October but did not give an exact day.",
+      "expectations": ["preserve north/south contrast", "north closed and south open", "repair end expected in late October", "no exact date was supplied"]
+    },
+    {
+      "id": "ws-syn-11",
+      "input": "The label reads “Keep the original file,” and the link points to version-3.pdf. Change the explanation, not the quoted label or filename.",
+      "expectations": ["preserve quoted text exactly", "preserve version-3.pdf exactly", "preserve instruction to change explanation only"]
+    },
+    {
+      "id": "ws-syn-12",
+      "input": "I found two different totals in the spreadsheet. The summary shows $2,460, while the itemized rows add up to $2,406, so I have not sent the invoice.",
+      "expectations": ["preserve both amounts exactly", "preserve discrepancy", "invoice has not been sent", "do not guess which total is correct"]
+    },
+    {
+      "id": "ws-syn-13",
+      "input": "The team could move the launch to Tuesday if testing passes. If the memory issue returns, they may delay it again rather than ship with the bug.",
+      "expectations": ["preserve first conditional", "launch Tuesday is possible, not certain", "memory issue may return", "delay is possible rather than ship with bug"]
+    },
+    {
+      "id": "ws-syn-14",
+      "input": "No one said the feature caused the crash. The crash happened after the update, but we still need logs before assigning a cause.",
+      "expectations": ["preserve explicit no-one-claimed-causation", "preserve temporal order", "logs are needed before causal attribution"]
+    },
+    {
+      "id": "ws-syn-15",
+      "input": "I replaced the heading because it sounded too formal for a note to classmates. The explanation itself is accurate and should stay informal.",
+      "expectations": ["preserve reason for replacing heading", "audience is classmates", "explanation is accurate", "keep informal register"]
+    },
+    {
+      "id": "ws-syn-16",
+      "input": "The app opens faster when fewer large files are active. That does not mean it will always run faster; only the three test files were measured.",
+      "expectations": ["preserve conditional context", "do not generalize to always", "only three test files measured"]
+    }
+  ]
+}

@@ -1,298 +1,180 @@
-# Pari remaining work — canonical execution plan
+# Pari remaining work — V1 execution index
 
-**Last reorganized:** 2026-09-07
+**Updated:** 2026-09-23
 
-This is the canonical tracker for unfinished Pari quality work. Research notes explain *why* a technique is interesting; benchmark READMEs explain *how* to run experiments; this document records **what remains, in what order, and what counts as done**.
+The old paragraph-first quality roadmap in this file has been superseded by the English Studio V1 plan.
 
-## Product target
+Do not use historical versions of this document as the current product contract.
 
-Pari's target is deliberately narrow:
+## Current product target
 
-> Paste a paragraph, receive one coherent and grammatical rewrite that preserves the writer's facts and intent, then manually adjust wording through contextually sane synonym/phrase suggestions.
-
-The product is not trying to maximize edit distance or imitate thesaurus-style paraphrasing. A conservative sentence that still makes sense is preferable to a more different sentence that drifts in meaning.
-
-Priority order for quality decisions:
-
-1. meaning / factual preservation;
-2. whole-paragraph coherence and sentence relationships;
-3. grammatical, natural English;
-4. useful reconstruction of broken prose;
-5. requested rewrite strength;
-6. lexical variety.
-
-## Current truth — do not conflate these roles
-
-| Role | Current state |
-| --- | --- |
-| Production local paragraph generator | **Qwen3-4B MLX 4-bit** via the external native model path |
-| General-model benchmark control | **Qwen3.5-4B** |
-| New must-test challenger | **MiniCPM5-2B** — tracked in [issue #10](https://github.com/tverma101/Pari/issues/10) |
-| Deterministic fallback | `local-safe-engine`; intentionally conservative |
-| Manual synonym generation | local DistilBERT + DistilRoBERTa candidate generation with contextual ranking |
-| Semantic / safety referee | local protected-span, grammar, discourse, semantic and approval gates |
-| Remote model routing | **research/optional only; not the shipping default** |
-
-Generic benchmark leadership is evidence to test a model, not evidence to promote it. MiniCPM5-2B currently has unusually strong small-model results and a much smaller footprint than the 4B control, but Pari must decide on its own paragraph-rewrite corpus.
-
-## Recently completed quality work
-
-- ConCat-style synonym context and whole-sentence semantic reranking were added in `6602d84`.
-- Production candidate selection now enforces the benchmark-aligned semantic floor for ordinary rewrites, with a looser reconstruction floor only for structurally broken input (`e506474`).
-- Contextual-synonym research, licensing cautions and implementation principles are documented in `research/contextual-synonyms.md` (`e56720d`).
-- The model shootout already supports direct MLX and OpenAI-compatible local runtimes and preserves raw outputs for replayable scoring.
-
-These items are implemented but still require target-Mac validation before they should be treated as fully proven.
-
----
-
-# P0 — prove the core local product
-
-P0 is the shortest route to a trustworthy "better than default QuillBot for pasted paragraphs" product. Do these before adding more architecture.
-
-## P0.1 — MiniCPM5-2B vs Qwen controls
-
-**Tracking:** [#10 — Benchmark MiniCPM5-2B vs Qwen3.5-4B](https://github.com/tverma101/Pari/issues/10)
-
-Run one frozen corpus and one prompt contract against:
-
-- MiniCPM5-2B;
-- Qwen3.5-4B benchmark control;
-- Qwen3-4B production incumbent;
-- deterministic/original fallback where useful as a safety reference.
-
-Record:
-
-- grammar/syntax;
-- natural collocations;
-- paragraph coherence;
-- broken-prose reconstruction;
-- semantic preservation / unsupported inventions;
-- protected spans, negation, modality, quantity and actor-role safety;
-- overcorrection;
-- production-gate acceptance rate;
-- first-token and end-to-end latency;
-- tokens/sec where available;
-- peak memory on the target 16-GB Apple-Silicon Mac;
-- model disk footprint;
-- installed-app/runtime reliability.
-
-**Done when:** the raw outputs, automatic scores and a blind human spot-check are saved, and a model decision is written down. Do not change the shipping model in the benchmark commit itself.
-
-**Promotion rule:** the challenger must introduce zero new hard-safety regressions and either improve rewrite quality or deliver a meaningful memory/latency reduction at comparable quality. If generic benchmarks improve but Pari paragraph quality declines, keep Qwen.
-
-## P0.2 — validate contextual synonym quality on the actual app
-
-The synonym architecture is now in place; validation remains.
-
-Test at least these classes:
-
-- common verbs/adjectives where many dictionary synonyms exist;
-- tense and number-sensitive replacements;
-- words inside strong collocations;
-- academic/student prose;
-- informal prose;
-- words near negation or protected spans;
-- phrase-like expressions where replacing only one token would sound wrong.
-
-For each clicked target verify:
-
-- 6–10 suggestions appear when enough safe candidates exist;
-- the original remains available;
-- the top suggestions fit the **whole sentence**, not merely the dictionary sense;
-- wrong POS/inflection, antonyms, garbage subwords and meaning-changing choices are demoted or absent;
-- manual replacement, sentence revert and undo still behave correctly.
-
-**Done when:** a human spot-check shows the top few choices are routinely usable and installed-app QA has no interaction regressions.
-
-## P0.3 — rerun the complete safety/quality regression after the new semantic floor
-
-Run the existing suites before further model work:
-
-```bash
-npm ci
-npm run models:check
-npm run qa:approval
-npm run qa:grammar:harper
-npm run qa:grammar:ewt
-npm run qa:native:prompt
-npm run qa:native:model
-npm run benchmark:quality
-```
-
-Any new hard safety failure blocks model promotion.
-
-## P0.4 — target-Mac installed-app validation
-
-Build and exercise the real packaged application:
-
-```bash
-npm run build:desktop
-npm run qa:installed
-npm run qa:installed:missing-model
-npm run qa:installed:connected
-```
-
-Then paste a representative set of real messy paragraphs into the visible app. The important human question is not "did it change enough?" but **"does the result make more sense while still saying the same thing?"**
-
-For a QuillBot comparison, use the same source paragraphs and default/conservative QuillBot behavior. Pari should show a clear majority of wins/ties on coherence and meaning preservation before claiming superiority; isolated cherry-picked wins do not count.
-
----
-
-# P1 — strengthen the referee and widen the candidate pool
-
-Only begin these once P0 identifies the best local general generator and establishes a stable baseline.
-
-## P1.1 — wire the winning local model cleanly
-
-If #10 produces a new winner:
-
-- update the external native model installer/discovery path;
-- keep migration/backward compatibility where practical;
-- update model manifests and checksums;
-- update the installed-app connected test;
-- update README wording so production backend and benchmark control remain distinct concepts;
-- rerun every P0 regression.
-
-One model promotion per commit/PR. Do not combine it with unrelated ranking changes.
-
-## P1.2 — grammar-specialist shootout
-
-Test compact grammar/editing models as **candidate generators or repairers**, not trusted authorities:
-
-- GECToR;
-- DeCoGLM;
-- a license-compatible BART-family GEC checkpoint;
-- CoEdIT-large as a research/reference comparison only unless licensing permits shipping.
-
-Compare specialist-only, general-model-only and specialist+general cascades. Reward precision and meaning preservation, not edit count.
-
-**Keep the ensemble only if it beats the single-model path enough to justify extra latency/memory.**
-
-## P1.3 — stronger entailment / contradiction gate
-
-MiniLM cosine is useful but can miss negation, role and causal reversals. Evaluate a compact local NLI/entailment model as an additional veto signal.
-
-Requirements:
-
-- local/offline;
-- small enough for the 16-GB target;
-- no unacceptable false rejection of legitimate paraphrases;
-- measurable improvement on adversarial negation/role/quantity fixtures.
-
-Do not add the model merely because NLI is theoretically attractive; it must reduce real Pari failures.
-
-## P1.4 — CI quality floors
-
-Add a CI job that runs the replayable evaluation corpus against committed fixture outputs and fails on hard safety-floor regressions. Hardware-specific MLX speed/memory tests remain local and should not make ordinary CI nondeterministic.
-
----
-
-# P1 optional — online multi-provider candidate routing
-
-Remote routing is a **quality-ceiling experiment**, not a prerequisite for the local product.
-
-Potential sources should be investigated provider-by-provider rather than treating OpenRouter as the only API source. Direct provider keys can provide independent quotas and model catalogs.
-
-Design boundary:
+Pari V1 is a **fast, local, human-controlled rewriting studio**, not an autonomous paraphraser.
 
 ```text
-local candidate -----------\
-remote provider candidate --+--> local Pari safety/meaning/grammar referee --> winner
-remote provider candidate --/
+paste paragraph
+  -> optional rewrite-strength draft
+  -> select word / phrase / clause / sentence
+  -> get fast context-aware alternatives
+  -> choose / mix / type / undo / revert
 ```
 
-Rules:
+The first whole-paragraph rewrite only needs to be a useful starting point. The main V1 value is interactive control over wording.
 
-- local/offline mode must remain fully functional;
-- remote mode must be explicit opt-in;
-- clearly disclose that pasted text leaves the device and identify the selected provider;
-- never silently route personal text to a free endpoint;
-- keep provider adapters isolated behind an OpenAI-compatible/general transport boundary where possible;
-- handle quota exhaustion, 429s, outages and model removal without breaking local generation;
-- do not evade provider quotas through duplicate accounts;
-- do not let a remote candidate bypass local safety gates;
-- benchmark quality per provider/model rather than assuming a larger cloud model is better at conservative rewriting.
+Replacement length is free:
 
-This track becomes production-worthy only if it gives a consistent, meaningful quality win over the best local model and the privacy/availability UX is acceptable.
+- 1 word -> 1 word;
+- 1 word -> many words;
+- many words -> 1 word;
+- phrase -> phrase;
+- clause -> clause;
+- sentence -> sentence;
+- split/join where safe.
 
----
+V1 must not systematically turn ordinary writing into academic/corporate prose.
 
-# P2 — personalization and optimization after correctness
+## V1 training rule
 
-## P2.1 — approval-derived style improvements
+**No paraphraser training for V1.**
 
-Continue using bounded approved examples and explicit preference memory. Do not fine-tune on unapproved drafts.
+Do not spend the V1 critical path on:
 
-## P2.2 — LoRA/distillation only with enough evidence
+- generator fine-tuning;
+- teacher/student distillation;
+- synthetic training-corpus creation;
+- training a new MTP head.
 
-Do not train a Pari-specific checkpoint until there is a sufficiently large, clean approval set (the existing research threshold is roughly 200+ useful approved pairs) and the desired behavior is stable enough to justify training.
+Allowed V1 research:
 
-A future distillation target is reasonable only if the multi-model/cascade path proves a quality advantage worth compressing.
+- local model/runtime shootouts;
+- direct quantization comparisons;
+- native aggressive-low-bit model experiments;
+- existing MTP/speculative runtime experiments;
+- benchmark/evaluator work;
+- UI/candidate-routing work.
 
-## P2.3 — polish rather than architecture churn
+Post-V1 personalization begins with a small preference/ranking layer trained from real user choices among objectively valid suggestions.
 
-After quality is stable, optimize:
+## Canonical docs
 
-- startup/model discovery;
-- memory pressure;
-- latency;
-- synonym-popup responsiveness;
-- model download/install UX;
-- clearer diagnostics when the native model is missing or rejected.
+Use these files under `benchmarks/english-studio-v3/`:
 
----
+- `PROJECT_PLAN.md` — product and architecture decisions;
+- `V1_SHOOTOUT.md` — V1 model/runtime experiment;
+- `README.md` — benchmark design;
+- `BENCHMARK_MODEL_MAP.md` — route-specific benchmark/model mapping;
+- `v1-candidates.json` — pinned candidate roster;
+- `v1-suite-config.json` — fast-suite target layout;
+- `v1-result-schema.json` — reproducible result format;
+- `v1-prompt-contracts.json` — model-agnostic generation behavior;
+- `dataset-ledger.json` — dataset provenance and train/eval policy;
+- `interactive.seed.json` — product-specific interactive acceptance cases;
+- `build-v1-core.mjs` — deterministic internal V1 core builder;
+- `build-composite.mjs` — broader release/research composite builder.
 
-# Work split: what can be done remotely vs. what requires the target Mac
+## Issue map
 
-## Can be done from GitHub / remote tooling
+- **#13** — V1 EPIC / canonical project checklist.
+- **#14** — primary editor implementation: arbitrary span selection and fast alternatives.
+- **#15** — model/runtime registry cleanup so benchmarks load the model they claim to load.
+- **#10** — V1 model/runtime shootout.
+- **#7** — objective candidate validation/ranking gates.
+- **#11** — broad release validation.
+- **#8** — QuillBot paragraph comparison as a secondary report.
+- **#6** — closed as superseded; Ling research retained historically.
 
-- research and model/license triage;
-- benchmark harness changes;
-- prompt/ranker/safety logic;
-- provider adapters;
-- fixture expansion;
-- documentation;
-- replaying already-generated candidate files;
-- CI/static tests.
+## Execution order
 
-## Requires the target M4/16-GB Mac
+### Phase A — make experimentation reliable
 
-- downloading/running Apple-Silicon model conversions;
-- proving `mlx-lm`/alternate runtime compatibility;
-- first-token and total-generation latency;
-- real peak unified-memory measurements;
-- packaged `.app` + Swift/WKWebView + native-worker integration;
-- visible synonym/editor interaction checks;
-- final human judgment on real paragraphs.
+1. #15: resolve exact production checkpoint and remove ambiguous hard-coded fallback behavior.
+2. Build the V1 fast suite and result capture around the new registry.
+3. Preserve raw outputs so evaluator/ranker changes can be replayed without regeneration.
 
-The desired local loop is:
+### Phase B — build the actual product interaction
+
+1. #14: arbitrary span selection.
+2. 1->many / many->1 replacement support.
+3. clause/sentence alternatives.
+4. direct typing, undo and revert.
+5. progressive candidate loading.
+6. protected-content-safe insertion.
+
+This can proceed in parallel with the first model shootout.
+
+### Phase C — choose the simplest good-enough local generation stack
+
+Run #10 against the pinned candidate roster.
+
+Required first sweep:
+
+1. current Pari incumbent;
+2. MiniCPM5-2B MLX 4-bit;
+3. Qwen3.5-4B MLX 4-bit;
+4. Ministral 3 8B Q4_K_M as the first non-Qwen control;
+5. Ternary Bonsai 2 27B as the aggressive-low-bit large-model experiment.
+
+Ling-3.0-tiny is optional after the required core sweep.
+
+Choose by route-specific quality/latency/memory Pareto results, not one intelligence score.
+
+### Phase D — candidate validity and ranking
+
+Use #7 to combine:
 
 ```text
-GitHub change -> pull/build on target Mac -> run scripted QA -> try real paragraphs
-             -> save logs/outputs -> diagnose/fix in repo -> rerun
+protected anchors
+-> negation/modality/role/quantity checks
+-> grammar in the resulting full sentence
+-> semantic contradiction gate
+-> dedupe/diversity
+-> register/vocabulary-drift checks
+-> contextual ranking
 ```
 
-The Mac-side role should mostly be execution and observation, not manual debugging.
+Keep the stack cheap enough for interactive use. Remove expensive judges that do not measurably reduce real errors.
 
----
+### Phase E — release validation
 
-# Definition of "ready"
+Run #11 after a candidate stack looks good on the V1 fast suite.
 
-Pari is ready for the narrow v1 quality goal when all of the following are true:
+Use route-relevant external human/reference benchmarks plus all old Pari regressions.
 
-- one local generator has won the frozen product-specific shootout;
-- hard protected-content / meaning-safety fixtures have no regressions;
-- ordinary and badly broken paragraphs produce coherent, grammatical output more reliably than the current baseline;
-- the semantic/grammar gates reject unsafe fluent nonsense rather than merely ranking it lower;
-- contextual synonym suggestions are routinely useful in sentence context;
-- installed-app connected, disconnected and missing-model modes pass on the target Mac;
-- a blind real-paragraph comparison shows Pari clearly competitive with or better than default QuillBot on **sense, meaning preservation and grammar**, not merely lexical difference;
-- model choice, runtime requirements and privacy boundaries are accurately documented.
+Do not collapse the report to one `Pari score`.
 
-## Supporting documents
+### Phase F — comparison/reporting
 
-- `research/quality-roadmap.md` — quality-system principles and specialist-model research.
-- `research/contextual-synonyms.md` — contextual lexical-substitution research and licensing notes.
-- `benchmarks/llm-shootout/README.md` — model experiment runners and promotion rules.
-- `docs/engine-upgrade-plan.md` — historical SOTA-push plan; retained for context but superseded by this file for execution order.
+Run #8 for QuillBot overlap on paragraph-first-draft behavior.
+
+Do not use QuillBot head-to-head as the definition of the whole product because it does not measure Pari's interactive word/phrase/sentence control.
+
+## V1 ready when
+
+- a pasted paragraph receives a safe, usable starting rewrite;
+- selected words/phrases quickly receive several sensible alternatives;
+- shorter and longer replacements work naturally;
+- sentence alternatives are useful;
+- user can mix, type, undo and revert without unrelated text mutating;
+- protected facts remain exact;
+- simple writing is not systematically inflated into academic language;
+- whole app fits and behaves acceptably on the target 16-GB Mac;
+- another model's gain is too small to justify its extra RAM/latency/runtime complexity;
+- no paraphraser training was required.
+
+## Post-V1
+
+Collect real local interaction events for personalization:
+
+```text
+source context
+selected span
+candidate set shown
+candidate chosen
+candidate ignored/reverted
+manual replacement
+final approved text if approval is used
+strength/action type
+```
+
+Objective quality gates remain authoritative for correctness. User behavior only teaches preference among valid expressions.
+
+Start with preference-memory/ranking. Fine-tune the generator only if real usage later proves ranking is insufficient.

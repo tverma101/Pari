@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "purpose": "Define semantics and directionality for every generative-expression metric used by the Pari English Core shadow suite. metricScores are normalized observations in [0,1]; the English Core scorer converts them to a common utility orientation where 1 is always better before aggregation.",
+  "policy": {
+    "range": "Every metricScores value must be normalized to [0,1] by the recorded evaluation protocol.",
+    "aggregationOrientation": "The English Core scorer converts each registered metric to utility in [0,1], where 1 is best. lower_is_better metrics are transformed as 1 - observed_value.",
+    "unregisteredMetrics": "A generative case cannot enter the official shadow composite if any required metric is absent from this registry.",
+    "normalization": "The normalization procedure must be described in metricProvenance.protocol. Arbitrary clipping/rescaling chosen after viewing candidate-model results is forbidden.",
+    "judgePolicy": "Directionality does not make an evaluator valid. metricProvenance approval rules still apply independently.",
+    "researchNote": "EditEval reports disagreement among editing metrics and motivates criterion-level reporting rather than treating one automatic score as complete text quality. Human-evaluation methodology likewise recommends explicit construct/rubric definition."
+  },
+  "metrics": {
+    "valid_candidate_rate": {
+      "direction": "higher_is_better",
+      "construct": "fraction of requested candidates that are independently judged usable in the exact context",
+      "notes": "Denominator and validity criteria must be fixed before model comparison."
+    },
+    "semantic_diversity": {
+      "direction": "higher_is_better",
+      "construct": "material semantic/wording diversity among candidates that already pass validity/meaning gates",
+      "notes": "Do not reward nonsensical variety; diversity is evaluated only among valid candidates."
+    },
+    "length_diversity": {
+      "direction": "higher_is_better",
+      "construct": "coverage of useful shorter/same/longer replacement forms when the case explicitly requests length variation",
+      "notes": "The evaluation protocol must define the requested length categories; raw token variance alone is insufficient."
+    },
+    "register_fit": {
+      "direction": "higher_is_better",
+      "construct": "preservation of source register, formality, intensity and voice unless a register change was requested"
+    },
+    "context_fit": {
+      "direction": "higher_is_better",
+      "construct": "grammatical and idiomatic fit after insertion into the exact surrounding context"
+    },
+    "meaning_preservation": {
+      "direction": "higher_is_better",
+      "construct": "preservation of intended propositions, roles, negation, modality, quantities and relevant implications"
+    },
+    "naturalness": {
+      "direction": "higher_is_better",
+      "construct": "idiomatic, fluent English appropriate to the supplied context/register"
+    },
+    "structural_diversity": {
+      "direction": "higher_is_better",
+      "construct": "useful syntactic/restructuring diversity among outputs that preserve meaning and register",
+      "notes": "Do not reward structural change that damages meaning."
+    },
+    "stock_phrase_rate": {
+      "direction": "lower_is_better",
+      "construct": "fraction/severity of unwanted stock assistant-like filler or templated phrasing under the fixed evaluator protocol",
+      "notes": "A raw rate of 0 is best. The scorer transforms utility as 1 - rate. The stock-phrase definition/list or human rubric must be versioned in provenance."
+    },
+    "relation_preservation": {
+      "direction": "higher_is_better",
+      "construct": "preservation of discourse relation such as concession, cause, condition, contrast or temporal ordering"
+    },
+    "length_inflation": {
+      "direction": "lower_is_better",
+      "construct": "normalized unnecessary expansion beyond what is required to preserve/express the content",
+      "notes": "A raw value of 0 is best. The evaluator must define normalization before comparison; raw token-count growth is not automatically equivalent to unnecessary inflation."
+    },
+    "semantic_safety": {
+      "direction": "higher_is_better",
+      "construct": "absence of invented, removed, contradicted or materially altered facts/relations"
+    },
+    "coherence": {
+      "direction": "higher_is_better",
+      "construct": "local and paragraph-level logical/linguistic coherence after editing"
+    },
+    "grammar": {
+      "direction": "higher_is_better",
+      "construct": "grammatical acceptability of the resulting edited text"
+    }
+  },
+  "references": [
+    "https://aclanthology.org/2024.conll-1.7/",
+    "https://aclanthology.org/W19-8643/",
+    "https://aclanthology.org/2024.acl-long.63/"
+  ]
+}
