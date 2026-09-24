@@ -23,12 +23,44 @@ function sha256Text(text) {
 const configText = readText("english-core-config.json");
 const seedText = readText("english-core-shadow.seed.json");
 const metricContractText = readText("english-core-generative-metric-contract.json");
+const taskText = readText("english-core-shadow.jsonl");
+const manifestText = readText("english-core-shadow.manifest.json");
 const config = JSON.parse(configText);
 const seed = JSON.parse(seedText);
 const metricContract = JSON.parse(metricContractText);
+const shadowManifest = JSON.parse(manifestText);
+const taskRows = taskText.split("\n").filter(Boolean).map(JSON.parse);
 const run = JSON.parse(fs.readFileSync(resultPath, "utf8"));
-const outputs = new Map((run.outputs ?? []).map((x) => [x.id, x]));
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+const seedIds = seed.cases.map((row) => row.id);
+const taskIds = taskRows.map((row) => row.id);
+if (new Set(seedIds).size !== seedIds.length) throw new Error("Shadow seed contains duplicate IDs");
+if (new Set(taskIds).size !== taskIds.length) throw new Error("Generated shadow task file contains duplicate IDs");
+if (seedIds.length !== taskIds.length || seedIds.some((id, i) => id !== taskIds[i])) {
+  throw new Error("Generated english-core-shadow.jsonl is stale or does not match the current seed; rebuild it before scoring");
+}
+if (Number(shadowManifest.cases) !== taskRows.length) {
+  throw new Error("Shadow manifest case count does not match english-core-shadow.jsonl");
+}
+const canonicalTaskSha256 = sha256Text(taskText);
+if (run.taskFileSha256 !== canonicalTaskSha256) {
+  throw new Error("Result taskFileSha256 does not match the current english-core-shadow.jsonl; refusing cross-suite scoring");
+}
+if (Number(run.taskCount) !== taskRows.length) {
+  throw new Error(`Result taskCount ${run.taskCount} does not match shadow task count ${taskRows.length}`);
+}
+
+const outputRows = run.outputs ?? [];
+if (!Array.isArray(outputRows)) throw new Error("Result outputs must be an array");
+const outputIds = outputRows.map((row) => row?.id);
+if (outputIds.some((id) => !id)) throw new Error("Result contains an output without an ID");
+if (new Set(outputIds).size !== outputIds.length) throw new Error("Result contains duplicate output IDs");
+const extraOutputIds = outputIds.filter((id) => !new Set(seedIds).has(id));
+if (extraOutputIds.length) {
+  throw new Error(`Result contains ${extraOutputIds.length} output IDs not present in the shadow suite`);
+}
+const outputs = new Map(outputRows.map((row) => [row.id, row]));
 
 function permutation(length, id) {
   const order = Array.from({ length }, (_, i) => i);
@@ -39,6 +71,23 @@ function permutation(length, id) {
     [order[i], order[j]] = [order[j], order[i]];
   }
   return order;
+}
+
+function choiceCount(row) {
+  switch (row.task) {
+    case "same_sense":
+    case "same_meaning":
+    case "relation_preservation":
+    case "acceptability_pair": return 2;
+    case "best_substitute":
+    case "minimal_pair":
+    case "relation_label":
+    case "closer_register":
+    case "closer_meaning_and_register":
+    case "more_natural":
+    case "sentence_order": return row.choices?.length ?? -1;
+    default: return -1;
+  }
 }
 
 function baseChoiceIndex(row) {
@@ -60,19 +109,18 @@ function baseChoiceIndex(row) {
 
 function expectedLetter(row) {
   const baseIndex = baseChoiceIndex(row);
-  if (baseIndex < 0) return null;
-  let choiceCount;
-  switch (row.task) {
-    case "same_sense":
-    case "same_meaning":
-    case "relation_preservation":
-    case "acceptability_pair": choiceCount = 2; break;
-    default: choiceCount = row.choices?.length ?? -1;
-  }
-  if (choiceCount < 1) return null;
-  const order = permutation(choiceCount, row.id);
+  const count = choiceCount(row);
+  if (baseIndex < 0 || count < 1 || baseIndex >= count) return null;
+  const order = permutation(count, row.id);
   const permutedIndex = order.indexOf(baseIndex);
   return permutedIndex >= 0 ? letters[permutedIndex] : null;
+}
+
+function validDisplayedChoice(row, parsedLetter) {
+  if (!parsedLetter) return null;
+  const count = choiceCount(row);
+  const index = letters.indexOf(parsedLetter);
+  return count > 0 && index >= 0 && index < count ? parsedLetter : null;
 }
 
 function mean(values) {
@@ -177,7 +225,8 @@ for (const row of seed.cases) {
 
   const expected = expectedLetter(row);
   if (!expected) throw new Error(`Cannot derive permuted gold answer for ${row.id}`);
-  const predicted = parseChoiceLetter(got.output);
+  const parsed = parseChoiceLetter(got.output);
+  const predicted = validDisplayedChoice(row, parsed);
   detail.push({
     id: row.id,
     dimension: row.dimension,
@@ -185,6 +234,7 @@ for (const row of seed.cases) {
     phenomenon: row.phenomenon ?? null,
     status: predicted ? "scored" : "invalid_output",
     expected,
+    parsedLetter: parsed,
     predicted,
     score: predicted ? Number(predicted === expected) : 0,
   });
@@ -228,11 +278,12 @@ for (const [dimension, weight] of Object.entries(config.composite.weights)) {
 
 const equalWeightMean100 = complete && completeDimensionValues.length ? mean(completeDimensionValues) : null;
 const report = {
-  version: 7,
+  version: 8,
   runId: run.runId ?? null,
   model: run.model ?? null,
   taskFile: run.taskFile ?? null,
   taskFileSha256: run.taskFileSha256 ?? null,
+  taskCount: run.taskCount ?? null,
   promptModeRequested: run.promptModeRequested ?? null,
   promptAdaptationModesObserved: run.promptAdaptationModesObserved ?? null,
   promptAdaptationDetailsObserved: run.promptAdaptationDetailsObserved ?? null,
@@ -242,6 +293,8 @@ const report = {
   benchmarkInputs: {
     configSha256: sha256Text(configText),
     shadowSeedSha256: sha256Text(seedText),
+    shadowTaskSha256: canonicalTaskSha256,
+    shadowManifestSha256: sha256Text(manifestText),
     generativeMetricContractSha256: sha256Text(metricContractText),
   },
   dimensionScores,
@@ -253,15 +306,16 @@ const report = {
   complete,
   notes: [
     "This scorer covers the fresh Pari shadow set only; public-anchor benchmark results must be reported separately.",
+    "The scorer is bound to the exact current english-core-shadow.jsonl bytes/count and rejects duplicate or extra output IDs before scoring.",
     "Forced-choice option positions are deterministically permuted per case ID to reduce answer-position artifacts.",
-    "The shared choice parser accepts only unambiguous forms such as A, A., Answer: A, The answer is A, or Option A; free-form prose and inferred choices remain invalid.",
+    "The shared choice parser accepts only unambiguous forms such as A, A., Answer: A, The answer is A, or Option A; a parsed letter outside the actual option range is an invalid output rather than a normal classification error.",
     "Forced-choice cases are deterministically scored from the private seed answer key.",
     "Generative metricScores are normalized observations in [0,1], not assumed utilities. Directionality comes from english-core-generative-metric-contract.json; lower-is-better criteria are inverted before aggregation.",
     "Generative cases require complete registered metricScores plus structured approved metricProvenance including the normalization/scoring protocol.",
     "General-purpose LLM judges are secondary diagnostics and cannot by themselves enter the official generative composite; validated specialist models require an explicit human-validation reference.",
-    "Benchmark input hashes are embedded so paired/statistical tooling can reject comparisons across different seed/config/metric-contract versions.",
+    "Benchmark input hashes include the config, private seed, model-visible shadow task file, shadow manifest, and generative metric contract so paired/statistical tooling can reject incompatible benchmark states.",
     "The product-weighted composite is a Pari product prior, not a literature-derived psychometric scale; compare it with the equal-weight dimension mean and all seven subscores.",
-    "Run analyze-english-core-statistics.mjs for uncertainty and compare-english-core-models.mjs for paired model comparison.",
+    "Run validate-english-core-run.py before relying on a result's raw-output provenance, analyze-english-core-statistics.mjs for uncertainty, and compare-english-core-models.mjs for paired model comparison.",
     "Runtime, RAM and quantization do not affect English Core competence evidence."
   ],
   detail,
