@@ -40,7 +40,7 @@ const metricContract = readJson("english-core-generative-metric-contract.json");
 const compatibilitySources = readJson("english-core-sources.json");
 
 if (config) {
-  if (Number(config.version) < 6) errors.push(`english-core-config.json version ${config.version} is older than required v6`);
+  if (Number(config.version) < 7) errors.push(`english-core-config.json version ${config.version} is older than required v7`);
 
   const weights = config.composite?.weights ?? {};
   const total = Object.values(weights).reduce((a, b) => a + Number(b), 0);
@@ -68,11 +68,14 @@ if (config) {
     "runValidator",
     "packageValidator",
     "selfCheck",
+    "reproManifestBuilder",
     "uncertaintyAnalyzer",
     "pairedComparator",
     "choiceOrderRobustnessBuilder",
     "choiceOrderRobustnessScorer",
-    "generativeMetricContract"
+    "generativeMetricContract",
+    "swordsOfficialEvaluatorRunner",
+    "jflegOfficialEvaluatorRunner"
   ]) {
     if (!config.files?.[requiredFileKey]) errors.push(`config.files missing required key: ${requiredFileKey}`);
   }
@@ -93,6 +96,13 @@ if (config) {
     "reproducibility"
   ]) {
     if (!config.evaluationProtocol?.[requiredRule]) errors.push(`evaluationProtocol missing required rule: ${requiredRule}`);
+  }
+
+  if (!String(config.evaluationProtocol?.pairedComparison ?? "").includes("hierarchical")) {
+    errors.push("evaluationProtocol.pairedComparison must preserve the v7 paired phenomenon/item hierarchical sensitivity rule");
+  }
+  if (!config.researchBasis?.externalEvaluatorBasis) {
+    errors.push("researchBasis.externalEvaluatorBasis missing; official evaluator provenance must be documented");
   }
 
   for (const lane of [
@@ -148,10 +158,6 @@ if (seed && config) {
   for (const dimension of Object.keys(config.dimensions ?? {})) {
     if (!counts[dimension]) errors.push(`shadow seed has no cases for dimension ${dimension}`);
   }
-
-  // Deliberately do not impose a universal per-dimension sample-size cutoff.
-  // Counts are reported below and interpreted through uncertainty, phenomenon
-  // coverage, external anchors, and claim-tier discipline.
 
   const configuredGenerative = new Set(config.dimensions?.generative_expression?.metrics ?? []);
   for (const row of seed.cases ?? []) {
@@ -261,6 +267,7 @@ for (const requiredImplementation of [
   "score-english-core-public-full-classification.py",
   "build-swords-english-core-prompts.py",
   "convert-swords-english-core-output.py",
+  "run-swords-official-eval.py",
   "build-jfleg-english-core-prompts.py",
   "convert-jfleg-english-core-output.py",
   "run-jfleg-official-eval.py",
@@ -270,7 +277,7 @@ for (const requiredImplementation of [
 }
 
 const report = {
-  version: 6,
+  version: 7,
   configVersion: config?.version ?? null,
   seedVersion: seed?.version ?? null,
   metricContractVersion: metricContract?.version ?? null,
@@ -288,9 +295,10 @@ const report = {
     "A passing package validator does not upgrade author-written shadow labels to independent human gold.",
     "Per-dimension case counts are reported rather than judged against an invented universal adequacy threshold; evidence strength is assessed through construct coverage, uncertainty, external anchors, and claim tiers.",
     "Generative metric registration/direction checks prevent accidental inversion but do not validate the evaluator itself.",
-    "Registered public-anchor adapter files are checked for existence so protocol documentation cannot silently point at missing tooling.",
+    "Registered public-anchor adapter/evaluator files are checked for existence so protocol documentation cannot silently point at missing tooling.",
     "Choice-parser regression tests and task-builder leakage checks are separate executable checks run by self-check-english-core.sh.",
-    "Public data revision/fingerprint requirements are enforced at promotion-run/workflow level; package validation alone cannot prove that a future download used immutable source bytes.",
+    "Public data/evaluator revision and fingerprint requirements are enforced at promotion-run/workflow level; package validation alone cannot prove that a future external checkout used immutable source bytes.",
+    "The v7 paired-comparison contract requires both item-level paired bootstrap and phenomenon/item hierarchical sensitivity for close-model robustness claims.",
     "Run audit-english-core-shadow.mjs separately for item-level structural/distribution diagnostics.",
     "Research-level claims still require the claim-tier gates in ENGLISH_CORE_ROBUSTNESS.md."
   ]
