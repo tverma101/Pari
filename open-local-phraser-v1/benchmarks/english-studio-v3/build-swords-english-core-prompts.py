@@ -10,8 +10,8 @@ Usage:
 The output contains model-visible prompts only. Official SWORDS evaluation remains
 authoritative and should be run with the SWORDS repository evaluator. For
 promotion-quality evidence, pin the official repository/evaluator revision to a
-full immutable Git commit SHA and use an official `swords-*.json(.gz)` dataset
-filename so the evaluator dataset ID can be cross-checked later.
+full immutable Git commit SHA and use the official compressed `swords-*.json.gz`
+bytes so source identity can be cross-checked against the pinned checkout.
 """
 
 from __future__ import annotations
@@ -113,15 +113,17 @@ def main() -> None:
     revision = args.swords_revision or UNPINNED
     immutable_revision = bool(GIT_COMMIT_RE.fullmatch(revision))
     dataset_id = dataset_id_from_filename(source)
-    promotion_ready = immutable_revision and dataset_id is not None
+    source_is_official_compressed_shape = source.name.endswith(".json.gz") and dataset_id is not None
+    promotion_ready = immutable_revision and source_is_official_compressed_shape
 
     manifest = out.with_suffix(out.suffix + ".manifest.json")
     manifest.write_text(json.dumps({
-        "version": 4,
+        "version": 5,
         "sourceFile": str(source),
         "sourceSha256": source_hash,
         "officialDatasetId": dataset_id,
         "sourceFilenameMatchesOfficialDatasetIdPattern": dataset_id is not None,
+        "sourceIsOfficialCompressedShape": source_is_official_compressed_shape,
         "promptFile": str(out),
         "promptFileSha256": prompt_hash,
         "targets": len(tasks),
@@ -133,11 +135,12 @@ def main() -> None:
         "researchReference": "https://aclanthology.org/2021.naacl-main.345/",
         "promotionReadySourceProvenance": promotion_ready,
         "notes": [
-            "sourceSha256 pins the exact benchmark JSON/JSON.GZ bytes used to construct prompts.",
-            "officialDatasetId is derived only from an official-looking swords-*.json(.gz) filename and is later cross-checked against the pinned SWORDS checkout before evaluation.",
+            "sourceSha256 pins the exact benchmark bytes used to construct prompts.",
+            "Promotion-quality source identity requires the official compressed swords-*.json.gz shape so the source hash can be compared byte-for-byte with assets/parsed/<dataset-id>.json.gz in the pinned checkout.",
+            "Decompressed .json inputs remain valid for exploratory prompt construction but are not marked promotion-ready because byte identity with the distributed official artifact is lost.",
+            "officialDatasetId is derived from the source filename and is later cross-checked against the pinned SWORDS checkout before evaluation.",
             "promptFileSha256 pins the exact model-visible prompt JSONL.",
-            "Promotion-quality evidence requires the official evaluator checkout's full 40-hex commit SHA rather than a mutable branch/tag label.",
-            "The official evaluator revision is separate provenance from the benchmark-file hash and must be pinned for promotion-quality comparisons."
+            "Promotion-quality evidence requires the official evaluator checkout's full 40-hex commit SHA rather than a mutable branch/tag label."
         ]
     }, indent=2) + "\n")
     print(json.dumps({
@@ -145,6 +148,7 @@ def main() -> None:
         "out": str(out),
         "sourceSha256": source_hash,
         "officialDatasetId": dataset_id,
+        "sourceIsOfficialCompressedShape": source_is_official_compressed_shape,
         "promptFileSha256": prompt_hash,
         "manifest": str(manifest),
         "officialRepositoryRevision": revision,
