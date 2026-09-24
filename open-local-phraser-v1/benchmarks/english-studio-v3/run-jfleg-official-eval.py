@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib.metadata
 import json
 import subprocess
 import sys
@@ -43,11 +42,24 @@ def git_head(repo: Path) -> str | None:
         return None
 
 
-def package_version(name: str) -> str | None:
+def evaluator_environment(python_executable: str) -> dict:
+    script = (
+        "import importlib.metadata,json,platform,sys;"
+        "def v(n):\n"
+        "  try:return importlib.metadata.version(n)\n"
+        "  except importlib.metadata.PackageNotFoundError:return None\n"
+        "print(json.dumps({'pythonExecutable':sys.executable,'pythonVersion':sys.version,'platform':platform.platform(),'numpy':v('numpy'),'scipy':v('scipy')}))"
+    )
     try:
-        return importlib.metadata.version(name)
-    except importlib.metadata.PackageNotFoundError:
-        return None
+        proc = subprocess.run(
+            [python_executable, "-c", script],
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        return json.loads(proc.stdout.strip())
+    except Exception as exc:
+        return {"error": f"could_not_query_evaluator_environment: {exc}"}
 
 
 def resolve_recorded_path(value: object, fallback_root: Path | None = None) -> Path | None:
@@ -114,17 +126,28 @@ def main() -> None:
         errors.append("expected_exactly_four_reference_records")
     references: list[Path] = []
     seen_paths: set[Path] = set()
+    seen_hashes: set[str] = set()
     for i, record in enumerate(reference_records):
         ref = resolve_recorded_path(record.get("path"), repo)
         if ref is None or not ref.is_file():
             errors.append(f"reference_{i}_missing")
             continue
+        digest = sha256(ref)
         if ref in seen_paths:
             errors.append(f"reference_{i}_duplicates_another_reference_path")
+        if digest in seen_hashes:
+            errors.append(f"reference_{i}_duplicates_another_reference_bytes")
         seen_paths.add(ref)
-        if record.get("sha256") != sha256(ref):
+        seen_hashes.add(digest)
+        if record.get("sha256") != digest:
             errors.append(f"reference_{i}_hash_mismatch")
         references.append(ref)
+
+    evaluator_env = evaluator_environment(args.python)
+    if evaluator_env.get("error"):
+        errors.append("could_not_query_evaluator_python_environment")
+    if evaluator_env.get("numpy") is None or evaluator_env.get("scipy") is None:
+        errors.append("evaluator_python_missing_numpy_or_scipy")
 
     if errors:
         raise SystemExit("JFLEG evaluator provenance failed:\n- " + "\n- ".join(errors))
@@ -149,7 +172,7 @@ def main() -> None:
         )
 
     result = {
-        "version": 1,
+        "version": 2,
         "purpose": "Frozen output from JFLEG's official GLEU evaluator; Pari does not reimplement the metric.",
         "jflegRepository": str(repo),
         "jflegRepositoryRevision": actual_revision,
@@ -172,11 +195,7 @@ def main() -> None:
             "referenceSampling": "official evaluator reseeds each iteration with j*101",
             "referencesUsed": 4,
         },
-        "environment": {
-            "python": sys.version,
-            "numpy": package_version("numpy"),
-            "scipy": package_version("scipy"),
-        },
+        "environment": evaluator_env,
         "elapsedSeconds": round(elapsed, 6),
         "returnCode": proc.returncode,
         "stdout": proc.stdout,
@@ -186,6 +205,7 @@ def main() -> None:
         "notes": [
             "The official evaluator code is executed directly; this wrapper only verifies and records provenance.",
             "The repository's default 500-iteration protocol is retained because eval/gleu.py uses deterministic per-iteration seeds under that default.",
+            "Python/NumPy/SciPy versions are queried from the exact interpreter used to execute eval/gleu.py, not from the wrapper process by assumption.",
             "Keep this JSON artifact with the exact hypothesis conversion manifest for promotion-quality comparison."
         ],
     }
