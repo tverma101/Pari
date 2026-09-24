@@ -1,10 +1,20 @@
 """Convert a Pari English Core model run into SemanticQA's LCC result JSONL.
 
-The official SemanticQA LCC evaluator compares result_obj['prediction'] to
-result_obj['label'] by exact string equality. This converter therefore preserves
-the model's raw output as `prediction`; it does not apply Pari's tolerant label
-parser. That keeps official strict accuracy distinct from Pari's formatting-
-tolerant diagnostic scorer.
+Protocol fidelity matters here. SemanticQA's normal benchmark path is:
+
+    query_llm(...) -> postprocess(..., task="collocation-categorization")
+    -> result JSONL -> eval.py
+
+The pinned SemanticQA postprocessor first normalizes whitespace, then for LCC:
+  * if ``is: `` occurs, keep the suffix after the last occurrence;
+  * else if ``Output:`` occurs, keep the suffix after the last occurrence;
+  * otherwise keep the whitespace-normalized response.
+
+The official standalone evaluator then compares ``prediction`` with ``label`` by
+exact string equality. This converter mirrors that benchmark postprocessing and
+nothing broader. Pari's separate tolerant diagnostic scorer may recover a clear
+label from additional harmless wrappers, but that diagnostic must never be
+relabeled as the official SemanticQA protocol result.
 """
 
 from __future__ import annotations
@@ -22,6 +32,16 @@ def sha256_bytes(data: bytes) -> str:
 
 def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def semanticqa_lcc_postprocess(text: str) -> str:
+    """Mirror pinned SemanticQA data_utils.postprocess for LCC exactly."""
+    s = " ".join(str(text or "").split())
+    if "is: " in s:
+        s = s.split("is: ")[-1].strip()
+    elif "Output:" in s:
+        s = s.split("Output:")[-1].strip()
+    return s
 
 
 def main() -> None:
@@ -70,11 +90,16 @@ def main() -> None:
     output_map = {row["id"]: row for row in outputs}
 
     converted = []
+    postprocess_changed = 0
     for task_id in task_ids:
         ans = answer_map[task_id]
+        raw = str(output_map[task_id].get("output", ""))
+        prediction = semanticqa_lcc_postprocess(raw)
+        if prediction != raw:
+            postprocess_changed += 1
         converted.append({
             "label": ans["label"],
-            "prediction": str(output_map[task_id].get("output", "")).strip(),
+            "prediction": prediction,
             "collocation": ans.get("collocation"),
             "pari_task_id": task_id,
         })
@@ -82,8 +107,8 @@ def main() -> None:
     output_text = "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in converted)
     args.output.write_text(output_text, encoding="utf-8")
     manifest = {
-        "version": 1,
-        "benchmark": "SemanticQA LCC official-evaluator conversion",
+        "version": 2,
+        "benchmark": "SemanticQA LCC official-protocol conversion",
         "sourceCommit": build_manifest.get("sourceCommit"),
         "taskFileSha256": sha256_bytes(task_bytes),
         "answerFileSha256": sha256_bytes(answer_bytes),
@@ -91,11 +116,14 @@ def main() -> None:
         "modelResultSha256": sha256_bytes(args.result.read_bytes()),
         "convertedFileSha256": sha256_bytes(output_text.encode("utf-8")),
         "cases": len(converted),
-        "rawPredictionPolicy": "Preserve stripped raw model output exactly; do not apply Pari tolerant parsing before official SemanticQA exact-match evaluation.",
+        "postprocessChangedOutputs": postprocess_changed,
+        "predictionPolicy": "Mirror pinned SemanticQA data_utils.postprocess for collocation-categorization: whitespace normalization, then suffix after 'is: ' if present, else suffix after 'Output:' if present; no broader Pari label recovery.",
+        "officialPipelineReference": "semantic_qa/main.py calls postprocess(query_llm(...), task, args) before writing prediction; semantic_qa/eval.py then compares prediction and label by exact equality.",
         "generatedAtUtc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
     args.manifest.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(f"Converted {len(converted)} LCC outputs -> {args.output}")
+    print(f"Official postprocess changed {postprocess_changed} outputs")
 
 
 if __name__ == "__main__":
