@@ -11,14 +11,18 @@ Example:
       --artifact prompt-score=prompt-score.json \
       --artifact order-score=order-score.json \
       --public-manifest public-fast=english-core-public-fast.manifest.json \
-      --public-manifest public-full=english-core-public-full-classification.manifest.json \
+      --official-evidence swords=swords-official-result.json \
+      --official-evidence jfleg=jfleg-gleu-result.json \
+      --official-evidence semanticqa=semanticqa-lcc-official-score.json \
       --output repro-manifest.json \
       --require-promotion-ready
 
-Use repeated --artifact LABEL=PATH for native/public benchmark outputs, official
-SWORDS/JFLEG evaluator files, human-eval exports, or other frozen evidence.
+Use repeated --artifact LABEL=PATH for generic frozen diagnostics whose bytes
+should be preserved but whose semantics are not validated here.
 Use repeated --public-manifest LABEL=PATH for Hugging Face-derived builder
 manifests whose revisions/fingerprints must be immutable for promotion use.
+Use repeated --official-evidence LABEL=PATH for supported official benchmark
+result JSONs. Those files are semantically inspected rather than merely hashed.
 """
 
 from __future__ import annotations
@@ -26,12 +30,21 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 MUTABLE_REVISIONS = {"", "unknown", "mutable_default_not_pinned", "main", "master", "latest", "default"}
+GIT_SHA_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+SWORDS_CORE_METRICS = (
+    "lenient_a_f@10",
+    "lenient_c_f@10",
+    "strict_a_f@10",
+    "strict_c_f@10",
+    "strict_c_p@1",
+)
 
 
 def sha256_file(path: Path) -> str:
@@ -52,7 +65,7 @@ def canonical_outputs_sha256(outputs: list[dict]) -> str:
 
 
 def load_json(path: Path) -> dict:
-    return json.loads(path.read_text())
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def git_value(args: list[str]) -> str | None:
@@ -77,14 +90,18 @@ def parse_labeled_file(value: str) -> tuple[str, Path]:
     return label, path
 
 
-def is_sha256(value: str | None) -> bool:
-    if not value or len(value) != 64:
+def is_sha256(value: object) -> bool:
+    if not isinstance(value, str) or len(value) != 64:
         return False
     try:
         int(value, 16)
         return True
     except ValueError:
         return False
+
+
+def is_git_sha(value: object) -> bool:
+    return isinstance(value, str) and bool(GIT_SHA_RE.fullmatch(value))
 
 
 def known(value) -> bool:
@@ -131,6 +148,155 @@ def unique_metric_provenance(score: dict | None) -> list[dict]:
         seen.add(canonical)
         result.append(provenance)
     return result
+
+
+def looks_like_official_evidence(data: dict) -> bool:
+    benchmark = str(data.get("benchmark") or "").lower()
+    purpose = str(data.get("purpose") or "").lower()
+    return any(
+        (
+            "semanticqa lcc" in benchmark,
+            "swordsrepositoryrevision" in {str(k).lower() for k in data},
+            "jflegrepositoryrevision" in {str(k).lower() for k in data},
+            "swords' official evaluator" in purpose,
+            "jfleg's official gleu evaluator" in purpose,
+        )
+    )
+
+
+def detect_official_evidence_kind(data: dict) -> str | None:
+    benchmark = str(data.get("benchmark") or "").lower()
+    if "semanticqa lcc official" in benchmark:
+        return "semanticqa_lcc"
+    if "swordsRepositoryRevision" in data or "swordsRepository" in data:
+        return "swords"
+    if "jflegRepositoryRevision" in data or "jflegRepository" in data:
+        return "jfleg"
+    return None
+
+
+def official_evidence_blockers(label: str, data: dict) -> tuple[str | None, list[str], dict]:
+    kind = detect_official_evidence_kind(data)
+    blockers: list[str] = []
+    summary: dict = {}
+
+    if kind is None:
+        return None, [f"{label}:official_evidence_unrecognized"], summary
+
+    if kind == "semanticqa_lcc":
+        commit = data.get("sourceCommit")
+        metrics = data.get("metrics") or {}
+        evaluator = data.get("officialEvaluator") or {}
+        conversion = data.get("conversion") or {}
+        converted = data.get("convertedResult") or {}
+        if data.get("promotionReady") is not True:
+            blockers.append(f"{label}:semanticqa_not_promotion_ready")
+        if data.get("promotionEvaluation") is not True:
+            blockers.append(f"{label}:semanticqa_not_run_in_promotion_mode")
+        if not is_git_sha(commit):
+            blockers.append(f"{label}:semanticqa_source_commit_not_full_sha")
+        if data.get("checkoutDirty") is not False:
+            blockers.append(f"{label}:semanticqa_checkout_not_clean")
+        if int(metrics.get("cases", -1)) != 305:
+            blockers.append(f"{label}:semanticqa_case_count_not_305")
+        if metrics.get("accuracy") is None:
+            blockers.append(f"{label}:semanticqa_missing_accuracy")
+        if not is_sha256(evaluator.get("sha256")):
+            blockers.append(f"{label}:semanticqa_missing_evaluator_sha256")
+        if not is_sha256(conversion.get("manifestSha256")):
+            blockers.append(f"{label}:semanticqa_missing_conversion_manifest_sha256")
+        if int(conversion.get("manifestVersion") or 0) < 2:
+            blockers.append(f"{label}:semanticqa_conversion_manifest_too_old")
+        if not is_sha256(converted.get("sha256")):
+            blockers.append(f"{label}:semanticqa_missing_converted_result_sha256")
+        policy = str(conversion.get("predictionPolicy") or "")
+        if not all(fragment in policy for fragment in ("whitespace normalization", "is: ", "Output:")):
+            blockers.append(f"{label}:semanticqa_missing_official_postprocess_provenance")
+        summary = {
+            "sourceCommit": commit,
+            "cases": metrics.get("cases"),
+            "accuracy": metrics.get("accuracy"),
+            "officialEvaluatorSha256": evaluator.get("sha256"),
+            "conversionManifestSha256": conversion.get("manifestSha256"),
+            "convertedResultSha256": converted.get("sha256"),
+        }
+
+    elif kind == "swords":
+        revision = data.get("swordsRepositoryRevision")
+        metrics = data.get("metrics") or {}
+        module_hashes = data.get("officialModuleSha256") or {}
+        if not is_git_sha(revision):
+            blockers.append(f"{label}:swords_revision_not_full_sha")
+        if data.get("swordsWorktreeDirty") is not False:
+            blockers.append(f"{label}:swords_checkout_not_clean")
+        if not str(data.get("officialDatasetId") or "").strip():
+            blockers.append(f"{label}:swords_missing_dataset_id")
+        for key, value in (
+            ("official_dataset", data.get("officialDatasetSha256")),
+            ("lsr", data.get("lsrSha256")),
+            ("conversion_manifest", data.get("conversionManifestSha256")),
+            ("metrics_json", data.get("metricsJsonSha256")),
+        ):
+            if not is_sha256(value):
+                blockers.append(f"{label}:swords_missing_{key}_sha256")
+        if not module_hashes or any(not is_sha256(v) for v in module_hashes.values()):
+            blockers.append(f"{label}:swords_missing_official_module_hashes")
+        for metric in SWORDS_CORE_METRICS:
+            if metrics.get(metric) is None:
+                blockers.append(f"{label}:swords_missing_core_metric:{metric}")
+        summary = {
+            "sourceCommit": revision,
+            "officialDatasetId": data.get("officialDatasetId"),
+            "officialDatasetSha256": data.get("officialDatasetSha256"),
+            "lsrSha256": data.get("lsrSha256"),
+            "coreMetrics": {name: metrics.get(name) for name in SWORDS_CORE_METRICS},
+        }
+
+    elif kind == "jfleg":
+        revision = data.get("jflegRepositoryRevision")
+        protocol = data.get("protocol") or {}
+        refs = data.get("references") or []
+        stdout = str(data.get("stdout") or "")
+        if not is_git_sha(revision):
+            blockers.append(f"{label}:jfleg_revision_not_full_sha")
+        if data.get("jflegWorktreeDirty") is not False:
+            blockers.append(f"{label}:jfleg_checkout_not_clean")
+        for key, value in (
+            ("evaluator", data.get("evaluatorSha256")),
+            ("source", data.get("sourceSha256")),
+            ("hypothesis", data.get("hypothesisSha256")),
+            ("conversion_manifest", data.get("conversionManifestSha256")),
+            ("stdout", data.get("stdoutSha256")),
+        ):
+            if not is_sha256(value):
+                blockers.append(f"{label}:jfleg_missing_{key}_sha256")
+        if len(refs) != 4:
+            blockers.append(f"{label}:jfleg_requires_four_references")
+        else:
+            hashes = [row.get("sha256") for row in refs if isinstance(row, dict)]
+            if len(hashes) != 4 or any(not is_sha256(v) for v in hashes):
+                blockers.append(f"{label}:jfleg_invalid_reference_hashes")
+            elif len(set(hashes)) != 4:
+                blockers.append(f"{label}:jfleg_reference_hashes_not_unique")
+        if int(protocol.get("iterations", -1)) != 500:
+            blockers.append(f"{label}:jfleg_nonofficial_iteration_count")
+        if int(protocol.get("referencesUsed", -1)) != 4:
+            blockers.append(f"{label}:jfleg_protocol_not_four_reference")
+        if "official JFLEG GLEU" not in str(protocol.get("metric") or ""):
+            blockers.append(f"{label}:jfleg_metric_not_official_gleu")
+        if not stdout.strip():
+            blockers.append(f"{label}:jfleg_empty_evaluator_stdout")
+        summary = {
+            "sourceCommit": revision,
+            "evaluatorSha256": data.get("evaluatorSha256"),
+            "sourceSha256": data.get("sourceSha256"),
+            "hypothesisSha256": data.get("hypothesisSha256"),
+            "referenceSha256": [row.get("sha256") for row in refs if isinstance(row, dict)],
+            "protocol": protocol,
+            "stdoutSha256": data.get("stdoutSha256"),
+        }
+
+    return kind, blockers, summary
 
 
 def inspect_run_integrity(run: dict) -> tuple[list[str], dict]:
@@ -187,10 +353,6 @@ def inspect_run_integrity(run: dict) -> tuple[list[str], dict]:
         except Exception:
             blockers.append("task_file_parse_failed")
     else:
-        # The task hash still identifies the model-visible bytes, but the manifest
-        # cannot independently recheck those bytes if the original task path is
-        # unavailable. Treat that as a promotion blocker rather than assuming the
-        # run is self-authenticating.
         blockers.append("task_file_not_locally_resolvable_for_integrity_check")
 
     return blockers, {
@@ -210,6 +372,7 @@ def main() -> None:
     ap.add_argument("--score", type=Path)
     ap.add_argument("--artifact", action="append", default=[], type=parse_labeled_file)
     ap.add_argument("--public-manifest", action="append", default=[], type=parse_labeled_file)
+    ap.add_argument("--official-evidence", action="append", default=[], type=parse_labeled_file)
     ap.add_argument("--model-artifact-sha256", help="override/supply exact model artifact hash")
     ap.add_argument("--output", required=True, type=Path)
     ap.add_argument(
@@ -252,11 +415,19 @@ def main() -> None:
         )
 
     used_labels = {row["label"] for row in artifacts}
+    generic_artifact_blockers: list[str] = []
     for label, path in args.artifact:
         if label in used_labels:
             raise SystemExit(f"Duplicate artifact label: {label}")
         used_labels.add(label)
-        artifacts.append({"label": label, "path": str(path), "sha256": sha256_file(path), "bytes": path.stat().st_size})
+        artifact_row = {"label": label, "path": str(path), "sha256": sha256_file(path), "bytes": path.stat().st_size}
+        artifacts.append(artifact_row)
+        try:
+            data = load_json(path)
+        except Exception:
+            data = None
+        if isinstance(data, dict) and looks_like_official_evidence(data):
+            generic_artifact_blockers.append(f"{label}:official_evidence_must_use_official_evidence_flag")
 
     public_manifests = []
     public_blockers = []
@@ -276,6 +447,27 @@ def main() -> None:
             "resolvedDatasetFingerprints": data.get("resolvedDatasetFingerprints"),
             "promotionBlockers": blockers_for_source,
         })
+        artifacts.append({"label": label, "path": str(path), "sha256": sha256_file(path), "bytes": path.stat().st_size})
+
+    official_evidence = []
+    official_blockers: list[str] = []
+    for label, path in args.official_evidence:
+        if label in used_labels:
+            raise SystemExit(f"Duplicate artifact label: {label}")
+        used_labels.add(label)
+        data = load_json(path)
+        kind, blockers_for_evidence, summary = official_evidence_blockers(label, data)
+        official_blockers.extend(blockers_for_evidence)
+        row = {
+            "label": label,
+            "kind": kind,
+            "path": str(path),
+            "sha256": sha256_file(path),
+            "promotionReady": not blockers_for_evidence,
+            "promotionBlockers": blockers_for_evidence,
+            "summary": summary,
+        }
+        official_evidence.append(row)
         artifacts.append({"label": label, "path": str(path), "sha256": sha256_file(path), "bytes": path.stat().st_size})
 
     model = run.get("model") or {}
@@ -348,10 +540,12 @@ def main() -> None:
             blockers.append("incomplete_shadow_score")
 
     blockers.extend(public_blockers)
+    blockers.extend(generic_artifact_blockers)
+    blockers.extend(official_blockers)
     blockers = list(dict.fromkeys(blockers))
 
     manifest = {
-        "version": 4,
+        "version": 5,
         "generatedAtUtc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "purpose": "Frozen provenance manifest for English Core evidence; not a quality metric.",
         "promotionReady": not blockers,
@@ -377,6 +571,7 @@ def main() -> None:
             "declaredMatchesCurrent": bool(current_commit and declared_benchmark_revision == current_commit),
         },
         "publicSourceManifests": public_manifests,
+        "officialEvidence": official_evidence,
         "artifacts": artifacts,
         "rules": [
             "All supplied evidence files are hashed byte-for-byte.",
@@ -389,7 +584,10 @@ def main() -> None:
             "Chat-template runs require a recorded tokenizer chat-template hash.",
             "Supplied Hugging Face public-source manifests require immutable requested revisions and resolved fingerprints for every represented source.",
             "Public-fast reproducibility does not convert that lane into an official/native benchmark result.",
-            "External/native evaluator outputs should be attached with --artifact and evaluator/source revisions preserved in accompanying artifacts/notes."
+            "Generic --artifact inputs are byte-hashed only. A JSON that looks like supported official benchmark evidence must be supplied through --official-evidence or it blocks promotion readiness.",
+            "Supported --official-evidence JSONs are semantically inspected for frozen revision/clean-checkout/hash/protocol requirements rather than trusted by filename or existence alone.",
+            "SemanticQA official evidence must preserve the benchmark's own LCC postprocessing before exact-label evaluation; the broader Pari tolerant parser remains a separate diagnostic.",
+            "SWORDS, JFLEG, and SemanticQA official evidence remain separate benchmark lanes and are never collapsed into one pseudo-official score by this manifest."
         ],
     }
 
