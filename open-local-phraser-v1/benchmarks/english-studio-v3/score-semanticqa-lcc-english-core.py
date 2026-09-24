@@ -5,6 +5,12 @@ macro/micro/weighted F1), adds valid-output coverage, and binds the result to th
 exact task/answer/manifest bytes used for the run. It does not merge this score
 into the Pari shadow composite automatically; public anchors remain separately
 reported evidence.
+
+SemanticQA's official evaluator uses strict exact-label equality. This local
+scorer is intentionally a format-tolerant diagnostic: it can recover one clear
+label from harmless wrappers such as ``Answer: Magn``. Promotion-quality reports
+must preserve the separate official strict score rather than relabel this tolerant
+diagnostic as the official SemanticQA result.
 """
 
 from __future__ import annotations
@@ -18,6 +24,7 @@ from pathlib import Path
 
 LABELS = ("Magn", "AntiMagn", "Ver", "AntiVer", "Bon", "AntiBon", "Son", "Oper1")
 LABEL_SET = set(LABELS)
+INVALID_LABEL = "__INVALID__"
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -49,7 +56,7 @@ def parse_prediction(text: str) -> str | None:
     return unique[0] if len(unique) == 1 else None
 
 
-def f1_for_label(golds: list[str], preds: list[str | None], label: str) -> tuple[float, int, int, int]:
+def f1_for_label(golds: list[str], preds: list[str], label: str) -> tuple[float, int, int, int]:
     tp = sum(g == label and p == label for g, p in zip(golds, preds))
     fp = sum(g != label and p == label for g, p in zip(golds, preds))
     fn = sum(g == label and p != label for g, p in zip(golds, preds))
@@ -110,40 +117,74 @@ def main() -> None:
 
     output_map = {row["id"]: row for row in outputs}
     golds: list[str] = []
-    preds: list[str | None] = []
+    parsed_preds: list[str | None] = []
     detail = []
     for task_id in task_ids:
         gold = answer_map[task_id]
         raw = output_map[task_id].get("output", "")
         pred = parse_prediction(raw)
         golds.append(gold)
-        preds.append(pred)
-        detail.append({"id": task_id, "gold": gold, "prediction": pred, "validOutput": pred is not None, "correct": pred == gold})
+        parsed_preds.append(pred)
+        detail.append({
+            "id": task_id,
+            "gold": gold,
+            "prediction": pred,
+            "validOutput": pred is not None,
+            "correct": pred == gold,
+        })
 
-    valid = sum(p is not None for p in preds)
-    correct = sum(p == g for p, g in zip(preds, golds))
+    valid = sum(p is not None for p in parsed_preds)
+    correct = sum(p == g for p, g in zip(parsed_preds, golds))
     accuracy = correct / len(golds)
 
-    per_label = {}
-    f1s = []
+    # Treat malformed/ambiguous outputs as an explicit ninth predicted class for
+    # multiclass accounting. This means each invalid prediction contributes a FN
+    # for its gold class and a FP for __INVALID__, matching standard single-label
+    # multiclass micro-F1 semantics instead of artificially inflating micro-F1.
+    preds = [p if p is not None else INVALID_LABEL for p in parsed_preds]
     supports = Counter(golds)
-    total_tp = total_fp = total_fn = 0
+    per_label = {}
+    raw_f1_by_label: dict[str, float] = {}
     for label in LABELS:
         f1, tp, fp, fn = f1_for_label(golds, preds, label)
-        f1s.append(f1)
+        raw_f1_by_label[label] = f1
+        per_label[label] = {
+            "support": supports[label],
+            "f1": round(f1, 6),
+            "tp": tp,
+            "fp": fp,
+            "fn": fn,
+        }
+
+    invalid_fp = sum(p == INVALID_LABEL for p in preds)
+    per_label[INVALID_LABEL] = {
+        "support": 0,
+        "f1": 0.0,
+        "tp": 0,
+        "fp": invalid_fp,
+        "fn": 0,
+    }
+
+    macro_f1 = sum(raw_f1_by_label.values()) / len(LABELS)
+    weighted_f1 = sum(raw_f1_by_label[label] * supports[label] for label in LABELS) / len(golds)
+
+    # In single-label multiclass classification, micro-F1 across the union of gold
+    # and predicted classes equals accuracy. Keeping the explicit formula here
+    # makes invalid-output treatment auditable rather than relying on that identity.
+    all_labels = (*LABELS, INVALID_LABEL)
+    total_tp = total_fp = total_fn = 0
+    for label in all_labels:
+        _, tp, fp, fn = f1_for_label(golds, preds, label)
         total_tp += tp
         total_fp += fp
         total_fn += fn
-        per_label[label] = {"support": supports[label], "f1": round(f1, 6), "tp": tp, "fp": fp, "fn": fn}
-
-    macro_f1 = sum(f1s) / len(f1s)
-    weighted_f1 = sum(per_label[l]["f1"] * supports[l] for l in LABELS) / len(golds)
     micro_denom = 2 * total_tp + total_fp + total_fn
     micro_f1 = (2 * total_tp / micro_denom) if micro_denom else 0.0
 
     report = {
-        "version": 1,
+        "version": 2,
         "benchmark": "SemanticQA LCC 8-category zero-shot",
+        "scoreKind": "pari_format_tolerant_diagnostic",
         "model": result.get("model"),
         "cases": len(golds),
         "validOutputs": valid,
@@ -166,7 +207,9 @@ def main() -> None:
         },
         "detail": detail,
         "interpretation": [
-            "Accuracy/F1 follow SemanticQA's LCC classification construct; invalid or malformed outputs count as incorrect and are additionally exposed through validOutputCoverage.",
+            "This is a Pari format-tolerant diagnostic, not the official strict SemanticQA score. Promotion-quality reports must also run the pinned official evaluator.",
+            "Accuracy/F1 retain SemanticQA's LCC classification construct; invalid or malformed outputs count as incorrect and are additionally exposed through validOutputCoverage.",
+            "Invalid outputs are modeled as an explicit predicted class for micro-F1 accounting, preventing malformed responses from artificially increasing micro-F1 relative to accuracy.",
             "This is modern prompted LLM evidence for collocation-semantic categorization. Do not relabel it as the EACL 2021 supervised/native score.",
             "Report this public anchor separately from Pari shadow collocation cases and from product-weighted English Core composites.",
         ],
