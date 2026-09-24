@@ -5,11 +5,15 @@ reproducible screening set from public evaluation/benchmark splits so candidate
 LLMs can be compared before expensive full-suite runs.
 
 Requires:
-    pip install datasets
+    pip install datasets huggingface_hub
 
-For promotion-quality reproducibility, pass immutable dataset revisions (commit
-SHAs) with the --*-revision flags. Omitting them is allowed for exploration but
-is recorded as a mutable-default source in the manifest.
+Revision policy:
+- `datasets.load_dataset(..., revision=...)` accepts branches, tags, or commits.
+- To avoid a moving-ref race, this builder resolves each requested revision to the
+  Hub repository's immutable commit SHA first, then loads the dataset using that
+  resolved SHA.
+- The manifest records both the originally requested revision and the resolved
+  commit SHA, plus Datasets fingerprints and library versions.
 """
 
 from __future__ import annotations
@@ -17,13 +21,17 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
 import datasets
+import huggingface_hub
 from datasets import get_dataset_config_names, load_dataset
+from huggingface_hub import HfApi
 
 HERE = Path(__file__).resolve().parent
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+GIT_SHA_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 
 BLIMP_PER_CONFIG = 10
 WIC_COUNT = 300
@@ -73,17 +81,33 @@ def choice_prompt(prefix: str, choices: list[str]) -> str:
     return f"{prefix}\n{opts}\nAnswer only with the letter."
 
 
-def revision_record(value: str | None) -> str:
-    return value if value else "mutable_default_not_pinned"
+def resolve_dataset_revision(api: HfApi, repo_id: str, requested: str | None) -> dict[str, str]:
+    requested_revision = requested or "main"
+    info = api.dataset_info(repo_id, revision=requested_revision)
+    resolved = str(info.sha or "")
+    if not GIT_SHA_RE.fullmatch(resolved):
+        raise RuntimeError(f"Could not resolve {repo_id}@{requested_revision} to a full 40-hex Hub commit SHA: {resolved!r}")
+    return {
+        "requestedRevision": requested_revision,
+        "resolvedRevision": resolved,
+    }
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--blimp-revision", default=None)
-    ap.add_argument("--super-glue-revision", default=None)
-    ap.add_argument("--glue-revision", default=None)
-    ap.add_argument("--paws-revision", default=None)
+    ap.add_argument("--blimp-revision", default=None, help="Hub branch/tag/commit to resolve; default main")
+    ap.add_argument("--super-glue-revision", default=None, help="Hub branch/tag/commit to resolve; default main")
+    ap.add_argument("--glue-revision", default=None, help="Hub branch/tag/commit to resolve; default main")
+    ap.add_argument("--paws-revision", default=None, help="Hub branch/tag/commit to resolve; default main")
     args = ap.parse_args()
+
+    api = HfApi()
+    source_revisions = {
+        "BLiMP": resolve_dataset_revision(api, "nyu-mll/blimp", args.blimp_revision),
+        "WiC": resolve_dataset_revision(api, "aps/super_glue", args.super_glue_revision),
+        "CoLA": resolve_dataset_revision(api, "nyu-mll/glue", args.glue_revision),
+        "PAWS": resolve_dataset_revision(api, "paws", args.paws_revision),
+    }
 
     tasks: list[dict] = []
     answers: dict[str, str] = {}
@@ -103,10 +127,11 @@ def main() -> None:
         answers[task_id] = answer_letter
         counts[source] = counts.get(source, 0) + 1
 
-    blimp_configs = get_dataset_config_names("nyu-mll/blimp", revision=args.blimp_revision)
+    blimp_revision = source_revisions["BLiMP"]["resolvedRevision"]
+    blimp_configs = get_dataset_config_names("nyu-mll/blimp", revision=blimp_revision)
     blimp_fingerprints = {}
     for config in sorted(blimp_configs):
-        ds = load_dataset("nyu-mll/blimp", config, split="train", revision=args.blimp_revision)
+        ds = load_dataset("nyu-mll/blimp", config, split="train", revision=blimp_revision)
         blimp_fingerprints[config] = getattr(ds, "_fingerprint", None)
         rows = list(ds)
         for i, row in enumerate(stable_take(rows, BLIMP_PER_CONFIG, f"blimp:{config}")):
@@ -122,7 +147,7 @@ def main() -> None:
             )
     fingerprints["BLiMP"] = blimp_fingerprints
 
-    wic_ds = load_dataset("aps/super_glue", "wic", split="validation", revision=args.super_glue_revision)
+    wic_ds = load_dataset("aps/super_glue", "wic", split="validation", revision=source_revisions["WiC"]["resolvedRevision"])
     fingerprints["WiC"] = getattr(wic_ds, "_fingerprint", None)
     wic_rows = list(wic_ds)
     for i, row in enumerate(stable_take_binary_balanced(wic_rows, WIC_COUNT, "wic:validation")):
@@ -137,7 +162,7 @@ def main() -> None:
             "word_sense_discrimination",
         )
 
-    cola_ds = load_dataset("nyu-mll/glue", "cola", split="validation", revision=args.glue_revision)
+    cola_ds = load_dataset("nyu-mll/glue", "cola", split="validation", revision=source_revisions["CoLA"]["resolvedRevision"])
     fingerprints["CoLA"] = getattr(cola_ds, "_fingerprint", None)
     cola_rows = list(cola_ds)
     for i, row in enumerate(stable_take_binary_balanced(cola_rows, COLA_COUNT, "cola:validation")):
@@ -152,7 +177,7 @@ def main() -> None:
             "acceptability",
         )
 
-    paws_ds = load_dataset("paws", "labeled_final", split="validation", revision=args.paws_revision)
+    paws_ds = load_dataset("paws", "labeled_final", split="validation", revision=source_revisions["PAWS"]["resolvedRevision"])
     fingerprints["PAWS"] = getattr(paws_ds, "_fingerprint", None)
     paws_rows = list(paws_ds)
     for i, row in enumerate(stable_take_binary_balanced(paws_rows, PAWS_COUNT, "paws:labeled_final:validation")):
@@ -167,40 +192,48 @@ def main() -> None:
             "high_overlap_paraphrase",
         )
 
-    (HERE / "english-core-public-fast.jsonl").write_text(
-        "\n".join(json.dumps(row, ensure_ascii=False) for row in tasks) + "\n"
-    )
-    (HERE / "english-core-public-fast.answers.json").write_text(
-        json.dumps({"version": 3, "answers": answers}, indent=2) + "\n"
-    )
-    (HERE / "english-core-public-fast.manifest.json").write_text(
+    task_path = HERE / "english-core-public-fast.jsonl"
+    answer_path = HERE / "english-core-public-fast.answers.json"
+    manifest_path = HERE / "english-core-public-fast.manifest.json"
+    task_path.write_text("\n".join(json.dumps(row, ensure_ascii=False) for row in tasks) + "\n")
+    answer_path.write_text(json.dumps({"version": 4, "answers": answers}, indent=2) + "\n")
+
+    sources = {
+        "BLiMP": {"dataset": "nyu-mll/blimp", "split": "train-by-dataset-convention", "perConfig": BLIMP_PER_CONFIG, **source_revisions["BLiMP"]},
+        "WiC": {"dataset": "aps/super_glue", "config": "wic", "split": "validation", "count": WIC_COUNT, "balanced": True, **source_revisions["WiC"]},
+        "CoLA": {"dataset": "nyu-mll/glue", "config": "cola", "split": "validation", "count": COLA_COUNT, "balanced": True, **source_revisions["CoLA"]},
+        "PAWS": {"dataset": "paws", "config": "labeled_final", "split": "validation", "count": PAWS_COUNT, "balanced": True, **source_revisions["PAWS"]},
+    }
+    manifest_path.write_text(
         json.dumps(
             {
-                "version": 3,
+                "version": 4,
                 "purpose": "deterministic public-anchor screening set; not a substitute for official full benchmark evaluation",
                 "cases": len(tasks),
                 "countsBySource": counts,
                 "datasetsLibraryVersion": datasets.__version__,
+                "huggingfaceHubLibraryVersion": huggingface_hub.__version__,
                 "resolvedDatasetFingerprints": fingerprints,
                 "sourcePolicy": "evaluation only; never use these rows for model training or prompt optimization",
-                "revisionPolicy": "promotion runs should provide immutable dataset commit revisions; omitted revisions are explicitly marked mutable",
+                "revisionPolicy": "Every requested Hub revision (including default main or a tag) is resolved once to DatasetInfo.sha, and all dataset/config loading uses that immutable resolved commit SHA.",
                 "screeningDesign": {
                     "optionOrder": "deterministic SHA-256 permutation for every forced-choice item",
                     "binarySources": "WiC, CoLA, and PAWS are approximately label-balanced in this fast screen",
                     "budgets": "engineering choices for cheap screening, not literature-derived construct weights",
                 },
-                "sources": {
-                    "BLiMP": {"dataset": "nyu-mll/blimp", "split": "train-by-dataset-convention", "perConfig": BLIMP_PER_CONFIG, "requestedRevision": revision_record(args.blimp_revision)},
-                    "WiC": {"dataset": "aps/super_glue", "config": "wic", "split": "validation", "count": WIC_COUNT, "balanced": True, "requestedRevision": revision_record(args.super_glue_revision)},
-                    "CoLA": {"dataset": "nyu-mll/glue", "config": "cola", "split": "validation", "count": COLA_COUNT, "balanced": True, "requestedRevision": revision_record(args.glue_revision)},
-                    "PAWS": {"dataset": "paws", "config": "labeled_final", "split": "validation", "count": PAWS_COUNT, "balanced": True, "requestedRevision": revision_record(args.paws_revision)},
-                },
+                "sources": sources,
             },
             indent=2,
         ) + "\n"
     )
 
-    print(json.dumps({"cases": len(tasks), "countsBySource": counts, "datasetsVersion": datasets.__version__}, indent=2))
+    print(json.dumps({
+        "cases": len(tasks),
+        "countsBySource": counts,
+        "datasetsVersion": datasets.__version__,
+        "huggingfaceHubVersion": huggingface_hub.__version__,
+        "resolvedRevisions": {name: meta["resolvedRevision"] for name, meta in source_revisions.items()},
+    }, indent=2))
 
 
 if __name__ == "__main__":
