@@ -593,6 +593,9 @@ function ensureLiveEditEvent(
   };
 }
 
+/** Hard cap on source text, matching the textarea maxLength. */
+const MAX_INPUT_CHARS = 10000;
+
 export default function App() {
   const [input, setInput] = useState("");
   const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
@@ -917,15 +920,26 @@ export default function App() {
     []
   );
 
-  const handleInputChange = (value: string) => {
+  const handleInputChange = (requested: string) => {
+    // maxLength only constrains what the user types; it does not constrain the
+    // controlled value, so the Paste button and any programmatic write could put
+    // more in than the limit. The field then refuses every further keystroke
+    // because it is already "full", while still looking normal — the user is
+    // stuck with no message. Clamp here so every path agrees, and say so.
+    const value = requested.length > MAX_INPUT_CHARS ? requested.slice(0, MAX_INPUT_CHARS) : requested;
+    const truncatedBy = requested.length - value.length;
     clearStrengthRegeneration();
     contextualRequestRef.current += 1;
     setContextualLoadingTokenId(null);
     setContextualAlternatives({});
-    if (session) {
+    if (session || isParaphrasing) {
       controllerRef.current?.abort();
       requestIdRef.current += 1;
       setSession(null);
+      // The in-flight run's own `finally` skips its reset because the request id
+      // moved on, so clear the busy flag here rather than leave the workspace
+      // showing a permanent skeleton.
+      setIsParaphrasing(false);
       closeTokenTools();
     }
     setInput(value);
@@ -937,7 +951,9 @@ export default function App() {
     // correction and synonym swap in it, with nothing to recover from. Say so
     // explicitly, and say more when there was real editing to lose.
     setGenerationNotice(
-      session && session.currentEditedText !== session.generatedText
+      truncatedBy > 0
+        ? `Input is limited to ${MAX_INPUT_CHARS.toLocaleString()} characters, so ${truncatedBy.toLocaleString()} characters were removed.`
+        : session && session.currentEditedText !== session.generatedText
         ? "Source text changed, so the draft and your edits to it were discarded. Press Paraphrase to work on the new text."
         : session
         ? "Source text changed, so the previous draft was discarded. Press Paraphrase to work on the new text."
@@ -1329,7 +1345,7 @@ export default function App() {
               value={input}
               onChange={(event) => handleInputChange(event.target.value)}
               placeholder="Paste text to paraphrase…"
-              maxLength={10000}
+              maxLength={MAX_INPUT_CHARS}
               className="input-editor min-h-[220px] flex-1 resize-none text-[15px] leading-[1.72] outline-none"
               aria-label="Original text"
             />
