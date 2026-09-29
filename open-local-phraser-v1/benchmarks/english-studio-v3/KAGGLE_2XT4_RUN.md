@@ -116,6 +116,128 @@ those do not predict Kaggle T4 latency. No MTP label is assigned to Bonsai
 unless the chosen checkpoint/runtime exposes a working draft path and the
 ordinary-vs-speculative pair is measured.
 
+### Pinned PrismML prebuilt ABI rerun
+
+The first private CLI attempt used upstream llama.cpp `b11179` and failed before
+inference because it requires `GLIBC_2.38` and `GLIBCXX_3.4.32`, while Kaggle
+provides glibc 2.35. CUDA libraries resolved; this is an OS ABI mismatch, not
+a T4 or Bonsai-model failure. Reject this exact binary for Kaggle.
+
+The follow-up compatibility experiment uses an official pinned PrismML prebuilt;
+it does not change the candidate model or frozen tasks. The vendor's official
+release is `prism-b10735-842b188`, built from the exact candidate-roster commit
+`842b1880415d6f508f03b789e5ce70194def7bfd` and described as a PrismML fork
+prebuilt with Q1_0 support. Its CUDA 12.8 x64 asset is
+`llama-prism-b10735-842b188-bin-linux-cuda-12.8-x64.tar.gz` (168,052,249 bytes;
+published SHA-256
+`5cbac5269804e4eb63676aeaec1ee7d4cff6e22b87da91de9b05795bf635998e`). The
+[official release page](https://github.com/PrismML-Eng/llama.cpp/releases/tag/prism-b10735-842b188)
+and [pinned release workflow](https://github.com/PrismML-Eng/llama.cpp/blob/842b1880415d6f508f03b789e5ce70194def7bfd/.github/workflows/release-prism.yml)
+show the asset and an Ubuntu 22.04 / CUDA 12.8 build. That is a promising match
+for Kaggle's observed glibc 2.35, but compatibility remains a hypothesis until
+the runner's exact link and launch checks pass.
+
+The CLI runner verifies the release checksum, checks `ldd` for both
+`llama-server` and `libggml-cuda.so`, and invokes version/help checks **before**
+fetching the 3.8 GB model. It records Kaggle's libc and the exact source commit.
+Only after runtime checks pass does it fetch the pinned model and verify its
+known SHA-256. It then requires a 16-case smoke, explicit CUDA layer-offload
+evidence, the full frozen screen, and the separate 112-case Word Studio slider
+suite. The completed v4 result below establishes runtime compatibility and an
+initial quality/latency baseline, but not model selection. This is a prebuilt
+artifact of the pinned PrismML fork, not stock upstream and not a fresh source
+build. Bonsai Q1_0 has no validated MTP path,
+so this run does not claim speculative-decoding speedup. The
+[Bonsai runtime notes](https://github.com/PrismML-Eng/Bonsai-demo/blob/main/README.md)
+document support for the original Q1_0 model format; that does not establish
+compatibility for every Bonsai quantization or Bonsai 2's ternary Q2_0 path.
+
+The first PrismML-prebuilt CLI run (kernel version 3, 2026-09-25) verified the
+published binary hash, resolved all shared libraries on Kaggle glibc 2.35, and
+downloaded the pinned 3,803,452,480-byte model with the expected hash. The
+server log said `model loaded`, but its default verbosity omitted the CUDA
+layer-allocation lines; the runner correctly stopped before sending any task
+because it could not prove GPU offload. This is **not** a Bonsai score, nor
+proof that the server ran on CPU. The pinned server README documents
+`--list-devices`, `--device`, and `--verbose` (log all messages):
+[pinned server CLI documentation](https://github.com/PrismML-Eng/llama.cpp/blob/842b1880415d6f508f03b789e5ce70194def7bfd/tools/server/README.md).
+The next bounded attempt enumerates CUDA before downloading weights, explicitly
+selects `CUDA0`, enables verbose startup evidence, and waits for that evidence
+before running the smoke or benchmark. The job ended with error; Kaggle's
+control plane was verified afterward with Draft Session off, accelerator
+`None`, and Internet off.
+
+### Version 4 execution and results
+
+The fourth private CLI submission (kernel version 4; run ID
+`20260925T172959Z`) used Kaggle kernel slug
+`nirasushi/pari-issue-25-bonsai-27b-q1-0-upstream-prebuilt`; the slug retains a
+legacy `upstream-prebuilt` name, but version 4 used the PrismML runtime below.
+It passed preflight, the 16-case smoke, GPU-offload checks, the
+1,943-case fixed screen, and all 112 Word Studio cases at strengths 15, 40, 60,
+and 90. The private archive SHA-256 is
+`1d5cb9005d41ea1f6659b0bff49fa714ac9e77db398bbde7a188b496fe9bf6a9`. It
+contains outputs and summaries, not the private answer keys.
+
+The exact model was `prism-ml/Bonsai-27B-gguf` revision
+`f10afb355f104535e3e3e98cf7ab7795c72bd292`, file
+`Bonsai-27B-Q1_0.gguf` (3,803,452,480 bytes; SHA-256
+`17ef842e47450caeb8eaa3ebfbbab5d2f2278b62b79be107985fb69a2f819aa0`). The
+official PrismML CUDA 12.8 prebuilt hash matched the release. Kaggle exposed
+two T4s; this run used only `CUDA0`, and startup logs verified 65/65 layers
+offloaded to that T4. The server stopped before export. MTP was not used or
+claimed. Total run time was 3,748 seconds; the full screen's recorded wall time
+was about 1,749 seconds. First-token latency over the 1,943 screen outputs was
+0.676 seconds median / 1.385 seconds p95. For Word Studio, complete-output
+latency was 19.64 seconds median / 27.06 seconds p95; its first-token median
+was 1.216 seconds. Word Studio outputs still require human review and have no
+automated quality score.
+
+The original public-fast score uses the strict parser and remains the frozen
+benchmark baseline. An offline parser replay against the exact same raw outputs
+does not change prompts, generations, or labels:
+
+| Public-fast scoring view | Correct / cases | Accuracy (invalid as wrong) | Valid-output coverage |
+| --- | ---: | ---: | ---: |
+| Frozen run score, strict parser | 943 / 1,570 | 60.06% | 74.97% |
+| Offline replay, anchored-explanation parser | 1,225 / 1,570 | 78.03% | 99.81% |
+
+The replay parsed 390 additional outputs; 282 were correct and 108 wrong, with
+three outputs still invalid. Typical previously rejected answers were
+`A. same`, `A. acceptable`, or `A. different`: the selected letter was
+explicit, but the scorer discarded it because explanatory text followed.
+Treat the accuracy increase as a parser/format-coverage result, not improved
+generation or a model-quality uplift. The separate SemanticQA LCC lane scored
+121/305 (39.67% accuracy; macro-F1 35.44%; 100% output coverage). The 68 shadow
+cases remain unvalidated and unscored. Do not combine these protocols into one
+number or select a model from this one candidate's screen.
+
+Kaggle reported the job complete. The control page showed the session off,
+accelerator `None`, and Internet off before results were downloaded. Local
+kernel metadata was also restored to GPU/network off. Results remain in a
+private temporary directory and were not added to Git or published.
+
+For repeatable submission, use the official [Kaggle CLI kernel guide](https://github.com/Kaggle/kaggle-cli/blob/main/docs/kernels.md)
+with account credentials already configured locally (never place a token in
+notebook code). Prefer a
+fresh, private script kernel for an isolated run: `kernels push` executes the
+uploaded code, so pushing this historical multi-run notebook would replay its
+prior cells. Keep the local metadata at `enable_gpu: false`,
+`enable_internet: false`, and an empty `machine_shape`; only temporarily enable
+the exact T4×2 accelerator and Internet for an explicitly authorized run and
+its public model/runtime downloads, then restore those local defaults. Use CLI
+status/output/logs for runs and fetch only the intended result artifact. The
+[Kaggle CLI v2.2.4 changelog](https://github.com/Kaggle/kaggle-cli/blob/v2.2.4/CHANGELOG.md)
+documents the SSE implementation for `kernels logs --follow`. In this run,
+installed Kaggle CLI 2.2.4 returned 404 when that command was given
+`owner/kernel/4`, but streamed live logs when called with `owner/kernel`
+(without the version suffix). This is an observed invocation-specific result,
+not a claim that all version-specific log requests fail. A 404, missing CLI
+status, or script error is not evidence that the provider session stopped.
+After completion or failure, verify the draft session is off, the
+accelerator is `None`, and Internet is off in Kaggle's control plane. The
+documented CLI commands do not provide a stop-and-disable operation.
+
 ## Word Studio slider suite
 
 Use `build-word-studio-strength-suite.py` with the hand-authored synthetic seed

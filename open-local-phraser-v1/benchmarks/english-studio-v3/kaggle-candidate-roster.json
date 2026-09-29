@@ -1,7 +1,7 @@
 {
   "version": 1,
   "target": "Kaggle 2x NVIDIA T4, 16 GB each",
-  "status": "predeclared_candidate_roster; feasibility and quality remain unmeasured",
+  "status": "Bonsai 27B Q1_0 runtime validated and English Core screened; no model selected; remaining candidates unmeasured",
   "selectionRule": "Pari English Core and Word Studio only; do not promote from generic coding/math reputation",
   "candidates": [
     {
@@ -113,6 +113,6 @@
     "mtp": "Run an ordinary-decode baseline first; probe documented MTP methods separately. Unsupported configurations remain explicit failures with no silent fallback.",
     "quality": "MTP and quantization comparisons must use the same fixed prompts and decoding policy; report model quality separately from runtime feasibility.",
     "bonsai": "Bonsai GGUF uses a separate llama.cpp path and cannot be represented as a vLLM run. Use the official PrismML llama.cpp fork pinned per candidate; record build flags and GPU offload.",
-    "evidence": "All sizes, quantizations, and runtimes are predeclared hypotheses. No candidate has yet passed Kaggle hardware validation."
+    "evidence": "Bonsai 27B Q1_0 passed Kaggle T4 CUDA0 runtime/offload checks and completed its frozen screen; see KAGGLE_2XT4_RUN.md. Its one-candidate screen does not select a model, Word Studio requires human review, and all other roster candidates remain unmeasured."
   }
 }

@@ -2,6 +2,14 @@
 
 This directory is the canonical production app. Do not implement production behavior in `../open-local-phraser-v1-safe-rewrite-lab/`.
 
+## Cloud benchmark shutdown (mandatory)
+
+- Keep Kaggle and other cloud accelerator sessions stopped by default. Start or run one only when the user explicitly authorizes that cloud run.
+- After an authorized run finishes, fails, is cancelled, or is no longer actively needed, stop the provider session and set its accelerator to off/None. A terminated inference server, idle notebook, closed browser tab, zero GPU utilization/memory, or saved notebook version does not prove the cloud session stopped.
+- Verify the provider control plane reports the session stopped and accelerator off before reporting cleanup complete. Do not leave a session running while reviewing results locally or waiting in the background.
+- Before stopping, preserve only authorized outputs in the authorized location; never publish or expose private benchmark inputs/results unless explicitly requested. Do not stop unrelated user-owned sessions.
+- An exception to shutdown requires an explicit user override naming the exact resource and how long it may remain active. Stop and verify it when that window ends. If shutdown cannot be confirmed, report the exact uncertainty and do not claim it is off.
+
 ## Architecture
 
 - React 19 + TypeScript + Vite frontend.
