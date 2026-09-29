@@ -142,9 +142,49 @@ function restoreDroppedEmbeddedRelation(
     // it verbatim while retaining safe candidate material before/after it.
     // This is deliberately domain-agnostic: it applies to cause, time,
     // condition and contrast clauses alike.
-    let restored = `${before}${separator}${sourceClause}`;
+    //
+    // The exception is a candidate that carries its own subject. "the deadline
+    // changed again" adds meaning the source never had, and rebuilding from the
+    // source clause would drop the "again". But "handle distractions" is a bare
+    // predicate: the source clause is what supplies its subject, and splicing
+    // the marker onto it yields "when handle distractions". So prefer the
+    // candidate wording only when it starts from a non-verb.
+    const sourceEndsAtAnchor = anchor
+      ? new RegExp(`\\b${escapeRegExp(anchor)}[.!?]?$`, "i").test(sourceClause.slice(originalRelation.text.length).trim())
+      : false;
+    // A bare predicate is shorter than the source clause it is meant to
+    // replace: "handle distractions" against "there are distractions". A
+    // candidate that carries a real clause is at least as long as the source
+    // ("the deadline changed again" against "the deadline changed"). Preferring
+    // the shorter form is exactly what produced "when handle distractions",
+    // and the fallback when this is false is the source clause, which is the
+    // conservative choice anyway.
+    const sourceWordCount = sourceClause
+      .slice(originalRelation.text.length)
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+    const candidateWordCount = remainder
+      .replace(/[.!?]+$/, "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+    const candidateSuppliesSubject = candidateWordCount >= sourceWordCount;
+    const clauseToUse = sourceEndsAtAnchor && candidateSuppliesSubject
+      ? `${originalRelation.text} ${remainder}`.trim()
+      : sourceClause;
+
+    let restored = `${before}${separator}${clauseToUse}`;
     if (after) restored += `,${after}`;
-    return restored;
+      // relationClause() stops the clause at its punctuation boundary, so
+      // sourceClause never carries the sentence's closing mark. Re-apply the
+      // candidate's own terminal punctuation, otherwise a restored sentence
+      // silently loses its full stop and runs into the next one.
+      if (!/[.!?]$/.test(restored) && /[.!?]["')\]]?$/.test(candidateSentence)) {
+        const terminal = candidateSentence.match(/([.!?])(["')\]]?)$/);
+        if (terminal) restored += terminal[0];
+      }
+      return restored;
   }
 
   commaSegments[targetIndex] = `${leadingWhitespace}${leadingCoordinator}${originalRelation.text} ${remainder}`;

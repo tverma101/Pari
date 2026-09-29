@@ -217,7 +217,23 @@ function normalizeFragment(fragment: string, repairStandaloneNotes = false): str
     .replace(/^reason(?:s)?\s+unclear$/i, "The reasons are unclear")
     .replace(/^deadline\s+missed$/i, "The deadline was missed")
     .replace(/^(.+?)\s+performance\s+unacceptable$/i, "The $1's performance is unacceptable")
-    .replace(/^meeting\s+(today|tomorrow)\s+with\s+(.+)$/i, "The meeting with $2 is $1")
+      // `planNoteStream` handles the unpunctuated note stream, but it bails on
+      // any input containing sentence punctuation, so a punctuated note like
+      // "meeting tomorrow with the client, who is upset due to the delay." never
+      // reached it and was only capitalised. Repair the leading fragment here.
+      // The day is a protected factual anchor and arrives masked, so accept the
+      // placeholder alongside the literal word, exactly as planNoteStream does,
+      // and keep the masked form mid-sentence so its exact casing survives.
+      .replace(
+        /^meeting\s+(today|tomorrow|\uE000[\s\S]\uE001)\s+with\s+(.+?)(?=[.!?]|$)/i,
+        (_match, day: string, who: string) => {
+          const trimmedWho = who.trim().replace(/[,;:]$/, "");
+          const tail = who.slice(trimmedWho.length);
+          const protectedDay = /^\uE000[\s\S]\uE001$/.test(day);
+          const lead = protectedDay ? `The meeting ${day} is` : `${capitalizeSentence(day)}'s meeting is`;
+          return `${lead} with ${trimmedWho}${tail}`;
+        },
+      )
     .replace(/^(.+?)\s+not\s+(finished|ready|clear|complete)$/i, (_match, subject: string, adjective: string) => {
       const normalizedSubject = /^(?:project|work|draft|plan|task|request)$/i.test(subject.trim()) ? `the ${subject.trim().toLowerCase()}` : subject.trim();
       return `${normalizedSubject} is not ${adjective}`;

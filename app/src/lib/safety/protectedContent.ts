@@ -69,7 +69,15 @@ const PROTECTED_PATTERNS: Array<{ kind: ProtectedSpanKind; pattern: RegExp; prio
   { kind: "list-marker", pattern: /^\s*(?:[-*•]|\d+[.)])(?=\s)/gm, priority: 70 },
   {
     kind: "negation",
-    pattern: new RegExp(`\\b(?:failed\\s+to|fails\\s+to|${NEGATIVE_AUXILIARY}\\s+not|not|never|no|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|haven['’]t|hasn['’]t|hadn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|hardly|rarely|seldom|invalid|unacceptable|impossible)\\b`, "gi"),
+    // Frozen negations only. Evaluative stance words that used to sit here
+    // (failed to, fails to, invalid, unacceptable, impossible) express the
+    // writer's judgement rather than a fact, and freezing them was actively
+    // wrong twice over: it masked them so the warmth pass could not rewrite
+    // "failed to comply" into warmer wording, and then the protected-content
+    // gate rejected the rewrite for changing a "protected" span. Negation
+    // meaning is still enforced, by meaningContract's own detector, which
+    // keeps all of these words.
+    pattern: new RegExp(`\\b(?:${NEGATIVE_AUXILIARY}\\s+not|not|never|no|without|cannot|can['’]t|couldn['’]t|don['’]t|doesn['’]t|didn['’]t|haven['’]t|hasn['’]t|hadn['’]t|won['’]t|wouldn['’]t|shouldn['’]t|mustn['’]t|mightn['’]t|shan['’]t|needn['’]t|isn['’]t|aren['’]t|wasn['’]t|weren['’]t|hardly|rarely|seldom)\\b`, "gi"),
     priority: 65,
   },
   { kind: "modality", pattern: /\b(?:may|might|could|can|must|should|will|would|shall)\b/gi, priority: 64 },

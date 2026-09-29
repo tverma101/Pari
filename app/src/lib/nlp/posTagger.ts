@@ -114,6 +114,25 @@ const NOUN_OVERRIDES = new Set([
   "methods",
   "perspective",
   "perspectives",
+  // Nouns whose "-ive" ending collides with ADJECTIVE_SUFFIXES. These are
+  // nouns in their dominant sense, and misreading them as adjectives has a real
+  // cost: isReferentToken() in the NLI judge drops adjectives, so an
+  // institution like "the archive" stopped counting as a participant and a
+  // dative role swap went undetected. Listed individually rather than by
+  // relaxing the suffix rule, because -ive also covers genuine adjectives
+  // ("active", "creative", "sensitive") that must keep their current tagging.
+  "archive",
+  "archives",
+  "initiative",
+  "initiatives",
+  "motive",
+  "motives",
+  "narrative",
+  "narratives",
+  "detective",
+  "detectives",
+  "executive",
+  "executives",
   "argument",
   "arguments",
   "researcher",

@@ -146,10 +146,14 @@ export function rewriteChangeProfile(originalText: string, candidateText: string
 
 function targetChangeRate(strength: number): number {
   const normalized = Math.max(0, Math.min(100, strength)) / 100;
-  // The slider should favor a visibly different safe candidate at Strong and
-  // Deep. Meaning/grammar gates remain hard vetoes, so this is only a ranking
-  // preference among candidates that already survived inspection.
-  return 0.04 + normalized * 0.38;
+  // Aim for restrained difference even at Deep: sentence structure carries
+  // part of the requested change, so the target must not reward word dumping.
+  // The slope is also bounded by strengthFitScore, which scores a candidate by
+  // 1 - |achieved - target| / 0.2. A steeper slope pushes the Deep target to
+  // ~0.37, which is outside the band any safe rewrite reaches (~0.18), so the
+  // score saturates at 0 and a strong rewrite is ranked as a worse fit for a
+  // high amount than for a light one.
+  return 0.035 + normalized * 0.22;
 }
 
 export function strengthFitScore(originalText: string, candidateText: string, strength: number): number {

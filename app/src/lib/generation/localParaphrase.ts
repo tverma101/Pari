@@ -223,7 +223,62 @@ export function applyWarmthAdjustments(
     `(^|\\s)((?:no|${protectedPlaceholder}))\\s+excuses\\b`,
     "gi",
   );
-  const polished = withProtectedPlaceholders(text, protectedValues, (masked) => masked
+  // Wholesale style substitutions replace the entire phrase, so masking the very
+  // tokens they are about to replace defeats them. NEGATION_RE protects
+  // "failed to" and "invalid", which made /\bfailed to comply\b/ and
+  // /\brequest is invalid\b/ permanently unreachable and left a cold refusal
+  // reading as a cold refusal. Run these against the real text.
+  const warmed = text
+      .replace(/\bindividuals\b/gi, "people")
+      .replace(/\bpersons\b/gi, "people")
+      .replace(/\butili[sz](?:e|ed|es|ing)\b/gi, (match) => {
+        if (/ing$/i.test(match)) return "using";
+        if (/ed$/i.test(match)) return "used";
+        if (/es$/i.test(match)) return "uses";
+        return "use";
+      })
+      .replace(/\bassistance\b/gi, "help")
+      .replace(/\bassist(?:s|ed|ing)?\b/gi, (match) => {
+        if (/ing$/i.test(match)) return "helping";
+        if (/ed$/i.test(match)) return "helped";
+        if (/s$/i.test(match)) return "helps";
+        return "help";
+      })
+      .replace(/\bcommence(?:s|d)?\b/gi, (match) => /s$/i.test(match) ? "begins" : /d$/i.test(match) ? "began" : "begin")
+      .replace(/\bterminate(?:s|d)?\b/gi, (match) => /s$/i.test(match) ? "ends" : /d$/i.test(match) ? "ended" : "end")
+      .replace(/\bprior to\b/gi, "before")
+      .replace(/\bsubsequent to\b/gi, "after")
+      .replace(/\bregarding\b/gi, "about")
+      .replace(/\bcannot\b/gi, "can't")
+      .replace(/\bdo not\b/gi, "don't")
+      .replace(/\bdoes not\b/gi, "doesn't")
+      .replace(/\bdid not\b/gi, "didn't")
+      .replace(/\bwill not\b/gi, "won't")
+      .replace(/\bis not\b/gi, "isn't")
+      .replace(/\bare not\b/gi, "aren't")
+      .replace(/\bwas not\b/gi, "wasn't")
+      .replace(/\bwere not\b/gi, "weren't")
+      .replace(/\bfailed to comply\b/gi, "didn't follow the instructions")
+      .replace(/\bfailed to\b/gi, "didn't")
+      .replace(/\bfails to comply\b/gi, "doesn't follow the instructions")
+      .replace(/\bfails to\b/gi, "doesn't")
+      .replace(/\brequest is invalid\b/gi, "request doesn't meet the requirements")
+      .replace(/\bthis is your responsibility\b/gi, "you'll need to handle the next step")
+      .replace(/\bfix immediately\b/gi, "please address this as soon as possible")
+      .replace(/\bthe problem is obvious\b/gi, "the problem is clear")
+      .replace(/\bI am disappointed\b/g, "I'm concerned")
+      .replace(/\b(team(?:'s)? performance)\s+unacceptable\b/gi, "$1 is not where it needs to be")
+      .replace(/\bis unacceptable\b/gi, "is not where it needs to be")
+      .replace(/\bunacceptable\b/gi, "not where it needs to be")
+      .replace(/\bcan't help\b(?!\s+with)/gi, "can't help with this")
+      .replace(/\bno further (?:assistance|help) will be (?:provided|given) until\s+([^.!?]+)/gi, (_match, condition: string) => `Once ${condition.trim()}, the next step can move forward smoothly`)
+      .replace(/\bno further help will be available until\s+([^.!?]+)/gi, (_match, condition: string) => `Once ${condition.trim()}, the next step can move forward smoothly`)
+      .replace(/\b(the user) (?:didn't|did not) meet the requirements\b/gi, "$1 didn't meet the requirements. The missing pieces can be worked through")
+      .replace(/\b(the deadline) was missed\b/gi, "$1 was missed. Let's focus on the next step");
+
+  // The refusal rules must stay masked: they deliberately keep the protected
+  // "no" and "will" verbatim, including their original casing.
+  const polished = withProtectedPlaceholders(warmed, protectedValues, (masked) => masked
     .replace(warmConditionalRefusal, (_match, prefix: string, noWord: string, willWord: string, condition: string) =>
       `${prefix}${noWord} further help ${willWord} be available until ${condition.trim()}, and clarification about the next step is welcome`
     )
@@ -233,52 +288,6 @@ export function applyWarmthAdjustments(
     .replace(warmNoExcuses, (_match, prefix: string, noWord: string) =>
       `${prefix}${noWord} valid excuses are needed; let's focus on the next step`
     )
-    .replace(/\bindividuals\b/gi, "people")
-    .replace(/\bpersons\b/gi, "people")
-    .replace(/\butili[sz](?:e|ed|es|ing)\b/gi, (match) => {
-      if (/ing$/i.test(match)) return "using";
-      if (/ed$/i.test(match)) return "used";
-      if (/es$/i.test(match)) return "uses";
-      return "use";
-    })
-    .replace(/\bassistance\b/gi, "help")
-    .replace(/\bassist(?:s|ed|ing)?\b/gi, (match) => {
-      if (/ing$/i.test(match)) return "helping";
-      if (/ed$/i.test(match)) return "helped";
-      if (/s$/i.test(match)) return "helps";
-      return "help";
-    })
-    .replace(/\bcommence(?:s|d)?\b/gi, (match) => /s$/i.test(match) ? "begins" : /d$/i.test(match) ? "began" : "begin")
-    .replace(/\bterminate(?:s|d)?\b/gi, (match) => /s$/i.test(match) ? "ends" : /d$/i.test(match) ? "ended" : "end")
-    .replace(/\bprior to\b/gi, "before")
-    .replace(/\bsubsequent to\b/gi, "after")
-    .replace(/\bregarding\b/gi, "about")
-    .replace(/\bcannot\b/gi, "can't")
-    .replace(/\bdo not\b/gi, "don't")
-    .replace(/\bdoes not\b/gi, "doesn't")
-    .replace(/\bdid not\b/gi, "didn't")
-    .replace(/\bwill not\b/gi, "won't")
-    .replace(/\bis not\b/gi, "isn't")
-    .replace(/\bare not\b/gi, "aren't")
-    .replace(/\bwas not\b/gi, "wasn't")
-    .replace(/\bwere not\b/gi, "weren't")
-    .replace(/\bfailed to comply\b/gi, "didn't follow the instructions")
-    .replace(/\bfailed to\b/gi, "didn't")
-    .replace(/\bfails to comply\b/gi, "doesn't follow the instructions")
-    .replace(/\bfails to\b/gi, "doesn't")
-    .replace(/\brequest is invalid\b/gi, "request doesn't meet the requirements")
-    .replace(/\bthis is your responsibility\b/gi, "you'll need to handle the next step")
-    .replace(/\bfix immediately\b/gi, "please address this as soon as possible")
-    .replace(/\bthe problem is obvious\b/gi, "the problem is clear")
-    .replace(/\bI am disappointed\b/g, "I'm concerned")
-    .replace(/\b(team(?:'s)? performance)\s+unacceptable\b/gi, "$1 is not where it needs to be")
-    .replace(/\bis unacceptable\b/gi, "is not where it needs to be")
-    .replace(/\bunacceptable\b/gi, "not where it needs to be")
-    .replace(/\bcan't help\b(?!\s+with)/gi, "can't help with this")
-    .replace(/\bno further (?:assistance|help) will be (?:provided|given) until\s+([^.!?]+)/gi, (_match, condition: string) => `Once ${condition.trim()}, the next step can move forward smoothly`)
-    .replace(/\bno further help will be available until\s+([^.!?]+)/gi, (_match, condition: string) => `Once ${condition.trim()}, the next step can move forward smoothly`)
-    .replace(/\b(the user) (?:didn't|did not) meet the requirements\b/gi, "$1 didn't meet the requirements. The missing pieces can be worked through")
-    .replace(/\b(the deadline) was missed\b/gi, "$1 was missed. Let's focus on the next step")
   );
   return polished;
 }

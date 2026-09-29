@@ -33,6 +33,7 @@ const SIGNIFICANT_DEGREE_RE = /\bsignificantly\b(?!\s*,)/gi;
 const FREQUENCY_RE = /\b(?:not\s+ever|hardly\s+ever|never|rarely|seldom|occasionally|sometimes|frequently|often|usually|always)\b/gi;
 const QUANTITY_RE = /\b(?:a\s+number\s+of|a\s+majority\s+of|the\s+majority\s+of|all|every|each|both|only|none|neither|few|little|most|many|several|some|any|enough)\b/gi;
 const NUMERIC_QUANTITY_RE = /\b(?:at\s+least|no\s+less\s+than|at\s+most|no\s+more\s+than|more\s+than|less\s+than|fewer\s+than|up\s+to|approximately|roughly|about|around|nearly|almost|exactly|precisely)(?=\s+(?:[$€£¥]\s*)?\d)/gi;
+const RELATION_IDIOM_RE = /\bas soon as possible\b/gi;
 const RELATION_RE = /\b(?:due\s+to\s+the\s+fact\s+that|notwithstanding\s+the\s+fact\s+that|in\s+spite\s+of\s+the\s+fact\s+that|despite\s+the\s+fact\s+that|in\s+the\s+event\s+that|for\s+unspecified\s+reasons|because\s+of|owing\s+to|due\s+to|in\s+spite\s+of|as\s+soon\s+as|as\s+long\s+as|provided\s+that|given\s+that|as\s+a\s+result|even\s+though|even\s+if|because|since|although|though|despite|whereas|if|unless|when|whilst|while|once|after|before|until|till|therefore|thus|consequently|however|but|yet)\b|(?:^|[^A-Za-z])['’]til\b/gi;
 const SO_RELATION_RE = /(?:[,;]\s+so\b|(?:^|[.!?]\s+)so,\s+)/gi;
 const PERSON_RE = /\b(?:I|me|my|mine|myself|we|us|our|ourselves|you|your|yours|yourself|yourselves|he|him|his|himself|she|her|hers|herself|they|them|their|theirs|themselves)\b/gi;
@@ -55,7 +56,12 @@ function collect(text: string, family: MarkerFamily, pattern: RegExp): Marker[] 
 }
 
 function collectRelations(text: string): Marker[] {
-  const markers = collect(text, "relation", RELATION_RE);
+  // "as soon as possible" is a fixed time filler. Left in, its "as soon as"
+  // reads as a temporal claim and its "possible" as a likelihood statement, so
+  // any warmer rewrite that used the idiom was rejected for inventing a
+  // relation and a certainty the source never expressed. Mask it first.
+  const masked = text.replace(RELATION_IDIOM_RE, (match) => " ".repeat(match.length));
+  const markers = collect(masked, "relation", RELATION_RE).map((marker) => ({ ...marker }));
   SO_RELATION_RE.lastIndex = 0;
   for (const match of text.matchAll(SO_RELATION_RE)) {
     if (match[0]) markers.push({ family: "relation", value: "so" });
@@ -72,18 +78,40 @@ function collectImplicitNegations(text: string): Marker[] {
 }
 
 function markerProfile(text: string): Marker[] {
+  // A bare quantity word can sit inside a numeric bound: the "most" in "at
+  // most 30" matched QUANTITY_RE on its own *and* "at most" matched
+  // NUMERIC_QUANTITY_RE, so the source produced two quantity markers where
+  // "up to 30" produced one. The counts then differ, hasSameFamilyShape
+  // reports a shape change, and a faithful "at most" -> "up to" rewrite is
+  // flagged as quantity drift. Keep only the outermost marker for any span
+  // covered by a numeric bound. NEGATION_RE already guards its own overlap
+  // ("no(?!\s+(?:more|less)\s+than\s+\d)") for the same reason.
+  const bareQuantity = collect(text, "quantity", QUANTITY_RE);
+  const numericBounds = collect(text, "quantity", NUMERIC_QUANTITY_RE);
+  const numericSpans = [...text.matchAll(NUMERIC_QUANTITY_RE)].map((match) => [
+    match.index,
+    match.index + match[0].length,
+  ] as const);
+  const coveredByNumericBound = (value: string, offset: number) =>
+    numericSpans.some(([start, end]) => offset >= start && offset + value.length <= end);
+
   return [
     ...collect(text, "negation", NEGATION_RE),
     ...collectImplicitNegations(text),
     ...collect(text, "modality", MODALITY_RE),
-    ...collect(text, "certainty", CERTAINTY_RE),
+    ...collect(text.replace(RELATION_IDIOM_RE, (m) => " ".repeat(m.length)), "certainty", CERTAINTY_RE),
     ...collect(text, "certainty", CERTAIN_EPISTEMIC_RE),
     ...collect(text, "degree", DEGREE_RE),
     ...collect(text, "degree", SIGNIFICANT_DEGREE_RE),
     ...collect(text, "frequency", FREQUENCY_RE),
-    ...collect(text, "quantity", QUANTITY_RE),
+    ...bareQuantity.filter((_, index) => {
+      // matchAll preserves order, so re-derive the offset of this hit.
+      const hits = [...text.matchAll(QUANTITY_RE)];
+      const hit = hits[index];
+      return !hit || !coveredByNumericBound(hit[0], hit.index);
+    }),
     ...collect(text, "quantity", CERTAIN_SUBSET_RE),
-    ...collect(text, "quantity", NUMERIC_QUANTITY_RE),
+    ...numericBounds,
     ...collectRelations(text),
     ...collect(text, "person", PERSON_RE),
   ];
@@ -155,12 +183,18 @@ function quantityClass(value: string): string {
   return value;
 }
 
-function relationClass(value: string): string {
+function relationClass(value: string, hasNegation = false): string {
   if (/^(?:due to the fact that|for unspecified reasons|given that|because|because of|due to|owing to)$/.test(value)) return "cause";
   if (/^(?:therefore|thus|so|consequently|as a result)$/.test(value)) return "result";
   if (/^(?:notwithstanding the fact that|in spite of the fact that|despite the fact that|in spite of|despite|although|though|even though|whereas|however|but|yet)$/.test(value)) return "contrast";
   if (/^even if$/.test(value)) return "concessive-condition";
-  if (/^(?:in the event that|if|unless|provided that|as long as)$/.test(value)) return "positive-condition";
+  // "unless" and a negated "if" denote the same thing ("unless it rains" ==
+  // "if it does not rain"), so both normalize to a negative condition. A bare
+  // "if" is a positive condition. Treating "unless" as a positive condition
+  // lost the polarity reversal, and treating "if" as constant broke the
+  // equivalence in the other direction.
+  if (/^unless$/.test(value)) return "negative-condition";
+  if (/^(?:in the event that|if|provided that|as long as)$/.test(value)) return hasNegation ? "negative-condition" : "positive-condition";
   if (/^since$/.test(value)) return "ambiguous-since";
   if (/^(?:while|whilst)$/.test(value)) return "ambiguous-while";
   if (/^before$/.test(value)) return "time-before";
@@ -242,9 +276,14 @@ function sameCounts(left: string[], right: string[]): boolean {
   return true;
 }
 
-function hasSameFamilyShape(original: string[], candidate: string[], normalize: (value: string) => string): boolean {
+function hasSameFamilyShape(
+  original: string[],
+  candidate: string[],
+  normalize: (value: string, hasNegation: boolean) => string,
+  hasNegation: boolean,
+): boolean {
   if (original.length !== candidate.length) return false;
-  return sameCounts(original.map(normalize), candidate.map(normalize));
+  return sameCounts(original.map((value) => normalize(value, hasNegation)), candidate.map((value) => normalize(value, hasNegation)));
 }
 
 export function meaningContractIssues(
@@ -275,8 +314,13 @@ export function meaningContractIssues(
   for (const contract of contracts) {
     const originalValues = familyValues(originalMarkers, contract.family);
     const candidateValues = familyValues(candidateMarkers, contract.family);
-    const normalize = contract.normalize ?? ((value: string) => value);
-    if (!hasSameFamilyShape(originalValues, candidateValues, normalize)) {
+    const normalize = contract.normalize ?? ((_value: string) => _value);
+    // A conditional word is read against the sentence's negation: "if" under
+    // an explicit negation denotes a negative condition, matching "unless".
+    const bothHaveNegation =
+      originalMarkers.some((marker) => marker.family === "negation") &&
+      candidateMarkers.some((marker) => marker.family === "negation");
+    if (!hasSameFamilyShape(originalValues, candidateValues, normalize, bothHaveNegation)) {
       issues.push({ id: contract.id, detail: contract.detail });
     }
   }
