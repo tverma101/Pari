@@ -50,50 +50,59 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  /* Stepped warm elevation: backdrop < panels < editors < popover.
-     Editors sit LIGHTER than panels (raised work surface), footers
-     sink darker (recessed wells). Borders are hairlines, depth comes
-     from inner top highlights, not pure-black shadows. */
-  --app-bg: #100e0c;
-  --header-bg: rgba(16, 14, 12, 0.78);
-  --surface: #1a1714;
-  --surface-2: #211d19;
-  --editor-bg: #242019;
-  --border: #38302a;
-  --border-soft: #292420;
-  --text: #ece4d8;
-  --text-strong: #fff9ef;
-  --muted: #b3a797;
-  --muted-strong: #d6cabd;
-  --accent: #e09563;
-  --accent-hover: #eba87c;
-  --accent-strong: #f0b78d;
-  --accent-soft: #33241a;
-  --accent-border: #71492f;
-  --accent-ink: #2a160d;
-  --ring: rgba(224, 149, 99, 0.42);
-  --token-candidate-bg: #3a2a1f;
-  --token-candidate-text: #f4ede1;
-  --token-candidate-line: #e09563;
-  --token-changed-bg: #4a3320;
-  --token-changed-text: #ffd9a8;
-  --token-changed-line: #b8813f;
-  --token-warning-bg: #472c1c;
-  --token-warning-line: #f0955a;
-  --token-warning-text: #ffcf9f;
-  --notice-error-bg: #37241e;
-  --notice-error-border: #74463a;
-  --notice-error-text: #ffc6b6;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.55);
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 20px 52px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 32px 80px rgba(0, 0, 0, 0.6);
-  --glow-a: rgba(224, 149, 99, 0.07);
-  --glow-b: rgba(224, 149, 99, 0.035);
-  --grain-opacity: 0.05;
-  --sunken: #131110;
-  --popover: rgba(38, 33, 28, 0.97);
-  --highlight: rgba(255, 235, 210, 0.06);
-  --panel-sheen: rgba(255, 240, 220, 0.028);
+  /* Dark is its own palette, not the light palette with the lightness flipped.
+     The substrate is a cool neutral (hue 220) so the warm terracotta accent is
+     the only warm thing on screen and therefore reads as deliberate.
+
+     Elevation runs on surface lightness plus hairline borders, because a drop
+     shadow on a near-black base does nothing. The ramp is ordered by intent:
+     backdrop < recessed wells < inset controls < panels < raised editor <
+     popover. Every step is at least ~1.5% apart so adjacent levels stay
+     distinguishable, and insets sit *below* their panel rather than above it. */
+  --app-bg: #0d0e0f;
+  --header-bg: rgba(13, 14, 15, 0.82);
+  --surface: #1b1d21;
+  --surface-2: #141518;
+  --editor-bg: #23252b;
+  --border: #30343b;
+  --border-soft: #26292e;
+  --text: #ecedee;
+  --text-strong: #f9fafa;
+  --muted: #a4a9b2;
+  --muted-strong: #cacdd3;
+  --accent: #dca574;
+  --accent-hover: #e7b488;
+  --accent-strong: #e8bd96;
+  --accent-soft: #32251b;
+  --accent-border: #65462f;
+  --accent-ink: #271507;
+  --ring: rgba(220, 165, 116, 0.5);
+  --token-candidate-bg: #3d3024;
+  --token-candidate-text: #ece5df;
+  --token-candidate-line: #dca574;
+  --token-changed-bg: #423424;
+  --token-changed-text: #eae1d7;
+  --token-changed-line: #ae7e47;
+  --token-warning-bg: #3e291e;
+  --token-warning-line: #d47a54;
+  --token-warning-text: #eedcd3;
+  --notice-error-bg: #331e1f;
+  --notice-error-border: #653436;
+  --notice-error-text: #ebcbcc;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.36), 0 18px 44px rgba(0, 0, 0, 0.44);
+  --shadow-lg: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 28px 72px rgba(0, 0, 0, 0.6);
+  /* Warmth stays in the accent; the backdrop glow is a trace of it so the top
+     of the window is not dead flat, but low enough not to haze the base. */
+  --glow-a: rgba(220, 165, 116, 0.035);
+  --glow-b: rgba(120, 150, 190, 0.03);
+  /* Paper grain reads as noise over a near-black base. */
+  --grain-opacity: 0.02;
+  --sunken: #101114;
+  --popover: rgba(39, 42, 48, 0.97);
+  /* Neutral inner highlight: a warm one would tint the cool base. */
+  --highlight: rgba(255, 255, 255, 0.05);
+  --panel-sheen: rgba(255, 255, 255, 0.022);
 }
 
 html,
