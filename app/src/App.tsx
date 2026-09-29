@@ -608,10 +608,17 @@ export default function App() {
   const [isParaphrasing, setIsParaphrasing] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [generationNotice, setGenerationNotice] = useState<string | null>(null);
+  // A generation failure writes into the same variable as a progress or success
+  // message, so the styling used to be inferred from which of the four variables
+  // happened to be set, and a failed rewrite rendered with the success box. Carry
+  // the tone explicitly instead.
+  const [noticeTone, setNoticeTone] = useState<"info" | "error">("info");
   const [approvalMessage, setApprovalMessage] = useState<string | null>(null);
   const [approvalError, setApprovalError] = useState<string | null>(null);
   const [persistenceError, setPersistenceError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
+  const copiedTimerRef = useRef<number | null>(null);
   const [activeTokenId, setActiveTokenId] = useState<string | null>(null);
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const [contextualAlternatives, setContextualAlternatives] = useState<Record<string, CandidateOption[]>>({});
@@ -646,7 +653,12 @@ export default function App() {
   const refreshCustomStyles = useCallback(async () => {
     try {
       setCustomStyles(await loadCustomStyles());
+    // persistenceError has no clearing path outside a successful save, so a
+    // single startup hiccup pinned the notice box to that error for the rest of
+    // the session and masked every later message.
+    setPersistenceError(null);
     } catch (error) {
+      setNoticeTone("error");
       setPersistenceError(error instanceof Error ? error.message : String(error));
     } finally {
       setCustomStylesLoaded(true);
@@ -683,6 +695,11 @@ export default function App() {
     return () => {
       mounted = false;
     };
+  }, []);
+
+  useEffect(() => () => {
+    if (copiedTimerRef.current !== null) window.clearTimeout(copiedTimerRef.current);
+    controllerRef.current?.abort();
   }, []);
 
   useEffect(() => {
@@ -1006,7 +1023,8 @@ export default function App() {
       .catch((error) => {
         if (contextualRequestRef.current !== requestId) return;
         setContextualLoadingTokenId(null);
-        setGenerationNotice(error instanceof Error ? error.message : "Contextual alternatives were unavailable.");
+        setNoticeTone("error");
+      setGenerationNotice(error instanceof Error ? error.message : "Contextual alternatives were unavailable.");
       });
   };
 
@@ -1030,6 +1048,7 @@ export default function App() {
       ? effectiveStyleStrength(requestedStyle, requestedStrength)
       : requestedStrength;
 
+    setNoticeTone("info");
     setIsParaphrasing(true);
     contextualRequestRef.current += 1;
     setContextualLoadingTokenId(null);
@@ -1037,6 +1056,7 @@ export default function App() {
     setGenerationNotice("Preparing the private on-device paraphraser…");
     setApprovalMessage(null);
     setApprovalError(null);
+    setNoticeTone("info");
     closeTokenTools();
 
     try {
@@ -1071,6 +1091,7 @@ export default function App() {
       setGenerationNotice(result.notice ?? `Ready in ${result.durationMs} ms. Review the wording, then save it to teach Pari.`);
     } catch (error) {
       if (controller.signal.aborted || requestId !== requestIdRef.current) return;
+      setNoticeTone("error");
       setGenerationNotice(error instanceof Error ? error.message : String(error));
       setSession(null);
     } finally {
@@ -1111,12 +1132,29 @@ export default function App() {
   };
 
   const handleCopy = async (text = session?.currentEditedText ?? "") => {
+    if (!text.trim()) {
+      setNoticeTone("error");
+      setApprovalError("There is nothing to copy — the rewrite is empty.");
+      return;
+    }
     try {
+      setIsCopying(true);
       await copyToClipboard(text);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1400);
-    } catch {
-      setApprovalError("Copy is unavailable in this environment.");
+      // Keep the timer handle so a second copy does not get cut short by the
+      // first one's timeout, and clear it on unmount.
+      if (copiedTimerRef.current !== null) window.clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = window.setTimeout(() => {
+        copiedTimerRef.current = null;
+        setCopied(false);
+      }, 1600);
+    } catch (error) {
+      setNoticeTone("error");
+      setApprovalError(
+        `Copy is unavailable in this environment.${error instanceof Error ? ` ${error.message}` : ""}`,
+      );
+    } finally {
+      setIsCopying(false);
     }
   };
 
@@ -1297,7 +1335,7 @@ export default function App() {
             when Paraphrase is pressed — was never announced. These two regions
             are always present; the visible notices stay presentational. */}
         <div role="status" aria-live="polite" className="sr-only">
-          {generationNotice ?? approvalMessage ?? ""}
+          {copied ? "Copied to the clipboard." : generationNotice ?? approvalMessage ?? ""}
         </div>
         <div role="alert" aria-live="assertive" className="sr-only">
           {approvalError ?? persistenceError ?? ""}
@@ -1332,8 +1370,19 @@ export default function App() {
               </div>
               <div className="flex flex-none items-center gap-1.5 text-[12px]">
                 <button type="button" onClick={async () => {
-                  try { const text = await readClipboardText(); if (text) handleInputChange(text); }
-                  catch { setApprovalError("Paste is unavailable in this environment."); }
+                  try {
+                    const text = await readClipboardText();
+                    if (!text.trim()) {
+                      // Previously a silent no-op: nothing pasted, nothing said.
+                      setNoticeTone("error");
+                      setApprovalError("There is no text on the clipboard to paste.");
+                      return;
+                    }
+                    handleInputChange(text);
+                  } catch (error) {
+                    setNoticeTone("error");
+                    setApprovalError(`Paste is unavailable in this environment.${error instanceof Error ? ` ${error.message}` : ""}`);
+                  }
                 }} className="text-action px-2.5 py-1">Paste</button>
                 <button type="button" onClick={() => handleInputChange(input ? "" : SAMPLE_TEXT)} className="text-action px-2.5 py-1 underline decoration-dotted underline-offset-2">
                   {input ? "Clear" : "Example"}
@@ -1417,13 +1466,19 @@ export default function App() {
                   </div>
                 )}
                 {(generationNotice || approvalMessage || approvalError || persistenceError) && (
-                  <div className={cn("notice mt-2.5 rounded-[12px] border px-3 py-2 text-[12.5px] leading-relaxed", approvalError || persistenceError ? "notice-error" : "notice-success")} aria-live="polite">
+                  <div className={cn("notice mt-2.5 rounded-[12px] border px-3 py-2 text-[12.5px] leading-relaxed", approvalError || persistenceError || noticeTone === "error" ? "notice-error" : "notice-success")}>
                     {approvalError ?? persistenceError ?? approvalMessage ?? generationNotice}
                   </div>
                 )}
               </div>
-              <button type="button" onClick={() => void handleCopy()} disabled={!hasOutput} className="text-action flex-none rounded-full px-2.5 py-1 text-[12px]">
-                {copied ? "Copied" : "Copy"}
+              <button
+                type="button"
+                onClick={() => void handleCopy()}
+                disabled={!hasOutput || isCopying}
+                aria-busy={isCopying}
+                className="text-action flex-none rounded-full px-2.5 py-1 text-[12px]"
+              >
+                {isCopying ? "Copying…" : copied ? "Copied" : "Copy"}
               </button>
             </div>
 
