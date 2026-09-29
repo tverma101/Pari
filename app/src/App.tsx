@@ -158,7 +158,12 @@ function renderInlineEditorContent(
       grammarWarning && "inline-token-warning",
       activeTokenId === token.id && "inline-token-active"
     );
-    span.contentEditable = "true";
+    // Tokens are interactive spans inside the editor's single editing host.
+    // Marking each one contentEditable made every token its own editing host.
+    // Nested editing hosts are not supported in WebKit — the engine this app
+    // ships in — and in the browser the host swallowed Enter before it reached
+    // the popover, which left the word tools keyboard-inoperable.
+    span.contentEditable = "false";
     span.dataset.tokenState = grammarWarning ? "warning" : changed ? "changed" : clickable ? "candidate" : "text";
     if (grammarWarning) {
       span.dataset.grammarWarningToken = token.id;
@@ -248,6 +253,11 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
     element.querySelectorAll<HTMLElement>("[data-inline-token]").forEach((tokenElement) => {
       const tokenId = tokenElement.dataset.inlineToken;
       tokenElement.classList.toggle("inline-token-active", tokenId === activeTokenId);
+      // Opening the popover changes only activeTokenId, so the text-match fast
+      // path runs and aria-expanded was never refreshed: the word that opened it
+      // kept announcing false, and the previously opened one kept announcing
+      // true. Keep it in step here.
+      tokenElement.setAttribute("aria-expanded", String(tokenId === activeTokenId));
       tokenElement.classList.toggle("inline-token-changed", tokenId ? changedTokenIds.has(tokenId) : false);
       tokenElement.classList.toggle("inline-token-warning", tokenId ? grammarWarningTokenIds.has(tokenId) : false);
       if (tokenId && grammarWarningTokenIds.has(tokenId)) {
@@ -293,13 +303,23 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
       onPaste={onPaste}
       onClick={activateFromEvent}
       onKeyDown={(event) => {
-        const target = event.target instanceof HTMLElement
+        // Space must stay available: this is the primary editing surface and a
+        // textbox has to accept it. Enter activates the token.
+        if (event.key !== "Enter") return;
+        // Each token is its own contenteditable host, so the key event can land
+        // on the token or bubble from the parent. Resolve either way, and fall
+        // back to the focused element.
+        const fromEvent = event.target instanceof HTMLElement
           ? event.target.closest<HTMLElement>("[data-inline-token]")
           : null;
-        if (target && (event.key === "Enter" || event.key === " ")) {
-          event.preventDefault();
-          activateFromEvent(event);
-        }
+        const target =
+          fromEvent ??
+          (document.activeElement instanceof HTMLElement
+            ? document.activeElement.closest<HTMLElement>("[data-inline-token]")
+            : null);
+        if (!target?.dataset.inlineToken) return;
+        event.preventDefault();
+        onActivate(target.dataset.inlineToken, target);
       }}
       spellCheck
       suppressContentEditableWarning
@@ -671,8 +691,7 @@ export default function App() {
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setActiveTokenId(null);
-        activeAnchorRef.current = null;
+        closeTokenTools();
       }
     };
     document.addEventListener("mousedown", onDown);
@@ -860,9 +879,15 @@ export default function App() {
   );
 
   const closeTokenTools = useCallback(() => {
+    // Focus is the only positional cue a screen-reader user has, and the
+    // popover is portalled to the end of the document. Without this, every
+    // dismiss path (Close, Escape, choosing a synonym) unmounts the focused
+    // element and drops focus to <body>, so the next Tab restarts at the top.
+    const anchor = activeAnchorRef.current;
     setActiveTokenId(null);
     setAnchorRect(null);
     activeAnchorRef.current = null;
+    if (anchor?.isConnected) anchor.focus();
   }, []);
 
   const applyEditedText = useCallback(
@@ -906,7 +931,18 @@ export default function App() {
     setInput(value);
     setApprovalMessage(null);
     setApprovalError(null);
-    setGenerationNotice(null);
+    // Editing the source retires the draft, because the draft belongs to the
+    // text it was made from. It used to happen with no message at all, so a
+    // single stray keystroke silently destroyed the rewrite *and* every manual
+    // correction and synonym swap in it, with nothing to recover from. Say so
+    // explicitly, and say more when there was real editing to lose.
+    setGenerationNotice(
+      session && session.currentEditedText !== session.generatedText
+        ? "Source text changed, so the draft and your edits to it were discarded. Press Paraphrase to work on the new text."
+        : session
+        ? "Source text changed, so the previous draft was discarded. Press Paraphrase to work on the new text."
+        : null,
+    );
   };
 
   const handleOpenToken = (tokenId: string, element: HTMLElement) => {
@@ -1237,7 +1273,19 @@ export default function App() {
         </div>
       </header>
 
-      <main id="workspace" className="mx-auto max-w-[1240px] scroll-mt-20 px-3 py-4 sm:px-5 sm:py-5 lg:px-8">
+      <main id="workspace" tabIndex={-1} className="mx-auto max-w-[1240px] scroll-mt-20 px-3 py-4 outline-none sm:px-5 sm:py-5 lg:px-8">
+        {/* A live region only announces changes to an element already in the
+            accessibility tree. Every status message in the app was mounted
+            together with its own text, so the first message after an idle
+            period — including "Preparing the private on-device paraphraser…"
+            when Paraphrase is pressed — was never announced. These two regions
+            are always present; the visible notices stay presentational. */}
+        <div role="status" aria-live="polite" className="sr-only">
+          {generationNotice ?? approvalMessage ?? ""}
+        </div>
+        <div role="alert" aria-live="assertive" className="sr-only">
+          {approvalError ?? persistenceError ?? ""}
+        </div>
         <section className="intro-card mb-4 rounded-[18px] px-4 py-3.5 sm:px-5" aria-label="Rewrite settings">
           <RewriteControls
             mode={settings.mode}
