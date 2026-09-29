@@ -23,6 +23,11 @@ export interface ParaphraseSession {
     retrievedExampleCount: number;
     safe: boolean;
     notice?: string;
+    /** Style that produced this draft. Sessions restored from older builds may
+     *  omit it, so the UI treats a missing value as "unknown origin" rather
+     *  than assuming the currently selected style. */
+    mode?: string;
+    strength?: number;
   };
 }
 

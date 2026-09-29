@@ -432,6 +432,7 @@ function copyToClipboard(text: string): Promise<void> {
 function RewriteControls({
   mode,
   customStyles,
+  savedPreferenceCount,
   onModeChange,
   strength,
   onStrengthChange,
@@ -439,6 +440,7 @@ function RewriteControls({
 }: {
   mode: AppSettings["mode"];
   customStyles: CustomStyle[];
+  savedPreferenceCount: number;
   onModeChange: (mode: AppMode) => void;
   strength: number;
   onStrengthChange: (strength: number) => void;
@@ -461,7 +463,11 @@ function RewriteControls({
       <div className="rewrite-controls-top">
         <div className="min-w-0">
           <div className="control-label">Rewrite style</div>
-          <div className="control-hint">{selectedOption.hint}. Pari learns from the edits you approve.</div>
+          <div className="control-hint">
+            {selectedOption.hint}. {savedPreferenceCount > 0
+              ? `Pari has learned from ${savedPreferenceCount} approved edit${savedPreferenceCount === 1 ? "" : "s"} on this device.`
+              : "Pari learns from the edits you approve."}
+          </div>
           <div className="mode-picker mt-2" role="radiogroup" aria-label="Rewrite style">
             {options.map((option) => (
               <button
@@ -806,6 +812,53 @@ export default function App() {
     ? { value: settings.mode, label: activeCustomStyle.name, hint: activeCustomStyle.description || "Agent-created custom mode" }
     : MODE_OPTIONS.find((option) => option.value === settings.mode) ?? MODE_OPTIONS[0];
 
+  // The draft on screen was produced by the style that was selected at the
+  // time, not by whatever is selected now. Resolve the draft's own label so
+  // the output panel never claims a style it did not use, and surface a
+  // regeneration prompt when the controls have drifted away from the draft.
+  const styleOptions = useMemo(
+    () => [
+      ...MODE_OPTIONS,
+      ...customStyles.map((style) => ({
+        value: customModeForStyle(style),
+        label: style.name,
+        hint: style.description || "Agent-created custom mode",
+      })),
+    ],
+    [customStyles],
+  );
+  const labelForStyle = (value: string | undefined) =>
+    styleOptions.find((option) => option.value === value)?.label ?? null;
+  const draftStyle = session?.generationMetadata.mode;
+  const draftStyleLabel = labelForStyle(draftStyle);
+  const draftStrength = session?.generationMetadata.strength;
+  const styleDrifted = Boolean(session) && draftStyle !== undefined && draftStyle !== settings.mode;
+  const amountDrifted =
+    Boolean(session) && draftStrength !== undefined && draftStrength !== clamp(Math.round(settings.strength), 0, 100);
+  const draftDiffersFromControls = styleDrifted || amountDrifted;
+  // A draft restored from an older build has no recorded style. Say so rather
+  // than implying the current selection produced it.
+  const draftStyleUnknown = Boolean(session) && draftStyle === undefined;
+
+  // A fixed six-line placeholder misrepresents a one-line note and a long essay
+  // equally. Shape the placeholder from the sentence count of the real input so
+  // the wait looks like the work that is happening.
+  const skeletonLineCount = useMemo(
+    () => Math.min(10, Math.max(1, Math.ceil(inputSentenceCount / 2))),
+    [inputSentenceCount],
+  );
+  const skeletonLineWidths = useMemo(
+    () =>
+      Array.from({ length: skeletonLineCount }, (_, index) => {
+        // Deterministic taper: long lines with occasional short ones, so it does
+        // not read as a perfectly regular comb.
+        const base = 96 - index * 7;
+        const shorten = index % 3 === 2 ? 18 : index % 4 === 3 ? 9 : 0;
+        return `${Math.max(38, base - shorten)}%`;
+      }),
+    [skeletonLineCount],
+  );
+
   const closeTokenTools = useCallback(() => {
     setActiveTokenId(null);
     setAnchorRect(null);
@@ -959,6 +1012,8 @@ export default function App() {
           retrievedExampleCount: result.retrievedExampleCount,
           safe: result.safe,
           notice: result.notice,
+          mode: settings.mode,
+          strength: requestedStrength,
         },
       });
       setGenerationNotice(result.notice ?? `Ready in ${result.durationMs} ms. Review the wording, then save it to teach Pari.`);
@@ -1156,9 +1211,14 @@ export default function App() {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-[11px]">
-            <span className="status-badge"><span className="status-dot" aria-hidden="true" />Runs locally</span>
-            <span className="status-badge hidden md:inline-flex">{storageLabel}</span>
-            {isLoadingMemory && <span className="muted-text">Loading preferences…</span>}
+            {isLoadingMemory ? (
+              <span className="muted-text">Loading preferences…</span>
+            ) : (
+              <span className="status-badge" title={`${storageLabel}. Nothing leaves this Mac unless you explicitly choose an online route.`}>
+                <span className="status-dot" aria-hidden="true" />
+                {storageLabel}
+              </span>
+            )}
             <div className="theme-segmented" role="group" aria-label="Color theme">
               {(["light", "dark", "system"] as const).map((theme) => (
                 <button
@@ -1179,16 +1239,10 @@ export default function App() {
 
       <main id="workspace" className="mx-auto max-w-[1240px] scroll-mt-20 px-3 py-4 sm:px-5 sm:py-5 lg:px-8">
         <section className="intro-card mb-4 rounded-[18px] px-4 py-3.5 sm:px-5" aria-label="Rewrite settings">
-          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-            <div className="min-w-0">
-              <div className="eyebrow text-[11px] font-[700] uppercase tracking-[0.14em]">Current style · <span className="eyebrow-strong">{activeMode.label}</span></div>
-              <div className="muted-text mt-1 max-w-[72ch] text-[13px] leading-relaxed">{activeMode.hint}. Private by default, no remote requests.</div>
-            </div>
-            <div className="muted-text count-num flex-none text-[12px]">{approvedExamples.length} saved preference{approvedExamples.length === 1 ? "" : "s"}</div>
-          </div>
           <RewriteControls
             mode={settings.mode}
             customStyles={customStyles}
+            savedPreferenceCount={approvedExamples.length}
             onModeChange={(mode) => {
               const selectedStyle = customStyles.find((style) => customModeForStyle(style) === mode);
               setSettings((current) => ({
@@ -1205,8 +1259,8 @@ export default function App() {
           />
         </section>
 
-        <section className="grid items-start gap-4 lg:grid-cols-[minmax(320px,0.92fr)_minmax(460px,1.08fr)]" aria-label="Paraphrase workspace">
-          <div className="app-panel workspace-panel-a flex min-h-[520px] flex-col rounded-[18px]">
+        <section className="grid items-stretch gap-4 lg:grid-cols-[minmax(320px,0.92fr)_minmax(460px,1.08fr)]" aria-label="Paraphrase workspace">
+          <div className="app-panel workspace-panel-a flex min-h-[320px] flex-col rounded-[18px]">
             <div className="panel-header flex items-start justify-between gap-3 px-4 py-3 sm:px-5">
               <div className="min-w-0">
                 <div className="panel-title text-[13.5px] font-[650]">Original text</div>
@@ -1228,12 +1282,12 @@ export default function App() {
               onChange={(event) => handleInputChange(event.target.value)}
               placeholder="Paste text to paraphrase…"
               maxLength={10000}
-              className="input-editor min-h-[380px] flex-1 resize-none text-[15px] leading-[1.72] outline-none"
+              className="input-editor min-h-[220px] flex-1 resize-none text-[15px] leading-[1.72] outline-none"
               aria-label="Original text"
             />
 
             <div className="panel-footer flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
-              <div className="muted-text count-num text-[12px]">{inputWordCount} words · {inputSentenceCount} sentences · {input.length}/10,000</div>
+              <div className="muted-text count-num text-[12px]">{inputWordCount} words · {inputSentenceCount} sentences</div>
               <button
                 type="button"
                 onClick={isParaphrasing ? handleCancel : () => { void handleParaphrase(); }}
@@ -1246,30 +1300,61 @@ export default function App() {
           </div>
 
           <div
-            className="app-panel workspace-panel-b flex min-h-[520px] flex-col rounded-[18px]"
+            className="app-panel workspace-panel-b flex min-h-[320px] flex-col rounded-[18px]"
             data-generation-source={session?.generationMetadata.source ?? ""}
           >
             <div className="panel-header flex items-start justify-between gap-3 px-4 py-3 sm:px-5">
               <div className="min-w-0">
-                <div className="panel-title accent-text text-[13.5px] font-[650]">Your {activeMode.label} rewrite</div>
-                <div className="panel-sub mt-0.5 text-[12px] leading-relaxed">Edit directly, or select a highlighted word for local choices.</div>
-                <div className="mt-2 flex flex-wrap items-center gap-1.5" aria-live="polite">
-                  <span className={cn("quality-chip", grammarReviewCount > 0 && "quality-chip-warning")}>
-                    {harperStatus === "checking"
-                      ? "Checking grammar locally…"
-                      : grammarReviewCount > 0
-                      ? `${grammarReviewCount} grammar or flow note${grammarReviewCount === 1 ? "" : "s"}`
-                      : harperStatus === "unavailable" ? "Built-in grammar rules" : "Grammar checked"}
-                  </span>
-                  {grammarIssues.some((issue) => typeof issue.start === "number") && (
-                    <span className="muted-text text-[10.5px]">Underlined text has a review note.</span>
-                  )}
+                <div className="panel-title accent-text text-[13.5px] font-[650]">
+                  {draftStyleLabel ? `Your ${draftStyleLabel} rewrite` : "Your rewrite"}
                 </div>
+                <div className="panel-sub mt-0.5 text-[12px] leading-relaxed">Edit directly, or select a highlighted word for local choices.</div>
+                {draftDiffersFromControls && (
+                  <div className="draft-drift mt-2" role="status">
+                    <span className="draft-drift-text">
+                      {styleDrifted
+                        ? `Drafted in ${draftStyleLabel ?? "another style"}; ${activeMode.label} is now selected.`
+                        : `Drafted at ${strengthLabel(clamp(Math.round(draftStrength ?? 0), 0, 100))}; ${strengthLabel(clamp(Math.round(settings.strength), 0, 100))} is now selected.`}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void handleParaphrase()}
+                      disabled={isParaphrasing}
+                      className="draft-drift-action"
+                    >
+                      Rewrite with {activeMode.label}
+                    </button>
+                  </div>
+                )}
+                {draftStyleUnknown && !draftDiffersFromControls && (
+                  <div className="draft-drift-text mt-2">
+                    This draft was created before Pari recorded its style, so its origin is unknown.
+                  </div>
+                )}
+                {(session || isParaphrasing) && (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5" aria-live="polite">
+                    <span className={cn("quality-chip", grammarReviewCount > 0 && "quality-chip-warning")}>
+                      {harperStatus === "checking"
+                        ? "Checking grammar locally…"
+                        : grammarReviewCount > 0
+                        ? `${grammarReviewCount} grammar or flow note${grammarReviewCount === 1 ? "" : "s"}`
+                        : harperStatus === "unavailable" ? "Built-in grammar rules" : "Grammar checked"}
+                    </span>
+                    {grammarIssues.some((issue) => typeof issue.start === "number") && (
+                      <span className="muted-text text-[10.5px]">Underlined text has a review note.</span>
+                    )}
+                  </div>
+                )}
                 {hasOutput && (
                   <div className="quality-legend mt-2" data-testid="quality-legend" aria-label="Rewrite highlighting key">
                     <span className="legend-item"><span className="legend-swatch legend-swatch-changed" aria-hidden="true" /> Changed wording</span>
                     <span className="legend-item"><span className="legend-swatch legend-swatch-choice" aria-hidden="true" /> Local word choices</span>
                     <span className="legend-item"><span className="legend-swatch legend-swatch-warning" aria-hidden="true" /> Grammar or flow note</span>
+                  </div>
+                )}
+                {(generationNotice || approvalMessage || approvalError || persistenceError) && (
+                  <div className={cn("notice mt-2.5 rounded-[12px] border px-3 py-2 text-[12.5px] leading-relaxed", approvalError || persistenceError ? "notice-error" : "notice-success")} aria-live="polite">
+                    {approvalError ?? persistenceError ?? approvalMessage ?? generationNotice}
                   </div>
                 )}
               </div>
@@ -1281,15 +1366,30 @@ export default function App() {
             <div className="flex-1 overflow-auto px-4 py-4 sm:px-5">
               {!hasOutput && !isParaphrasing && (
                 <div className="empty-editor flex gap-3 rounded-[14px] px-4 py-5 text-[13px] leading-6">
-                  <span className="empty-icon" aria-hidden="true">✎</span>
+                  <span className="empty-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                      <path d="M2.5 4.5h11" />
+                      <path d="M2.5 8h7" />
+                      <path d="M2.5 11.5h9" />
+                      <path d="M11.6 7.2l1.9 1.9 2.6-2.9" strokeWidth="1.5" />
+                    </svg>
+                  </span>
                   <span>Your {activeMode.label} rewrite will appear here after you paraphrase. Select any highlighted word to see local alternatives.</span>
                 </div>
               )}
               {isParaphrasing && (
                 <div className="space-y-3 pr-4" aria-live="polite">
-                  {[...Array(6)].map((_, index) => (
-                    <div key={index} className="skeleton-line h-[14px] rounded-full" style={{ width: `${94 - index * 9}%` }} />
-                  ))}
+                  {skeletonLineCount > 0 ? (
+                    Array.from({ length: skeletonLineCount }, (_, index) => (
+                      <div
+                        key={index}
+                        className="skeleton-line h-[14px] rounded-full"
+                        style={{ width: skeletonLineWidths[index] }}
+                      />
+                    ))
+                  ) : (
+                    <div className="skeleton-line h-[14px] w-[62%] rounded-full" />
+                  )}
                   <div className="muted-text pt-2 text-[12px]">Keeping the editor responsive while the local draft is prepared…</div>
                 </div>
               )}
@@ -1318,38 +1418,34 @@ export default function App() {
             </div>
 
             <div className="panel-footer flex flex-wrap items-center justify-between gap-2 px-4 py-3 sm:px-5">
-              <div className="muted-text count-num text-[12px]">{hasOutput ? `${outputWordCount} words · ${outputSentenceCount} sentences` : "No draft yet"}</div>
+              <div className="flex min-w-0 flex-wrap items-center gap-2 text-[12px]">
+                <span className="muted-text count-num">{hasOutput ? `${outputWordCount} words · ${outputSentenceCount} sentences` : "No draft yet"}</span>
+                {session && <span className="status-badge">Links, names, and numbers stay protected</span>}
+              </div>
               <div className="flex items-center gap-2">
-                {session && <button type="button" onClick={handleRevertParagraph} disabled={!canRevertParagraph} className="secondary-button rounded-full px-3 py-[6px] text-[11.5px] disabled:cursor-not-allowed disabled:opacity-45">Revert edits</button>}
+                {session && (
+                  <button type="button" onClick={handleRevertParagraph} disabled={!canRevertParagraph} className="secondary-button rounded-full px-3 py-[6px] text-[11.5px] disabled:cursor-not-allowed disabled:opacity-45">Revert edits</button>
+                )}
+                {session && (
+                  <>
+                    <button type="button" onClick={handleDiscard} className="secondary-button rounded-full px-3.5 py-[7px] text-[12px]">Discard</button>
+                    <button type="button" onClick={() => void handleApprove()} disabled={isApproving} className="approve-button rounded-full px-4 py-[7px] text-[12px] font-[650] disabled:cursor-wait disabled:opacity-60">{isApproving ? "Saving…" : "Save & learn"}</button>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </section>
 
-        <section className="app-panel approval-bar mt-4 rounded-[18px] px-4 py-3.5 sm:px-5" aria-label="Review and save">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2 text-[11px]">
-              <span className="status-badge"><span className="status-dot" aria-hidden="true" />Learns from approved edits</span>
-              {session && <span className="status-badge">Links, names, and numbers stay protected</span>}
-            </div>
-            {session && (
-              <div className="flex items-center gap-2">
-                <button type="button" onClick={handleDiscard} className="secondary-button rounded-full px-3.5 py-[7px] text-[12px]">Discard</button>
-                <button type="button" onClick={() => void handleApprove()} disabled={isApproving} className="approve-button rounded-full px-4 py-[7px] text-[12px] font-[650] disabled:cursor-wait disabled:opacity-60">{isApproving ? "Saving…" : "Save & learn"}</button>
-              </div>
-            )}
-          </div>
-          {(generationNotice || approvalMessage || approvalError || persistenceError) && (
-            <div className={cn("notice mt-2.5 rounded-[12px] border px-3 py-2 text-[12.5px] leading-relaxed", approvalError || persistenceError ? "notice-error" : "notice-success")} aria-live="polite">
-              {approvalError ?? persistenceError ?? approvalMessage ?? generationNotice}
-            </div>
-          )}
-          {!session && !generationNotice && !approvalMessage && (
-            <div className="muted-text mt-2 text-[12px]">Nothing is saved until you press Save & learn. Discard at any time.</div>
-          )}
-        </section>
+        {!session && !generationNotice && !approvalMessage && !approvalError && !persistenceError && (
+          <p className="muted-text mt-4 text-center text-[12px]">
+            Nothing is saved until you press Save & learn. Discard at any time.
+          </p>
+        )}
 
-        <p className="muted-text mt-4 pb-6 text-center text-[11.5px]">Pari runs fully on this Mac. Approved wording improves future rewrites on this device only.</p>
+        <p className="muted-text mt-4 pb-6 text-center text-[11.5px]">
+          {storageLabel}. Nothing leaves this Mac unless you explicitly choose an online route.
+        </p>
       </main>
 
       {activeToken && anchorRect && typeof document !== "undefined"

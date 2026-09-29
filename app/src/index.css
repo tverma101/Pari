@@ -27,6 +27,7 @@
   --token-candidate-line: #ad5632;
   --token-changed-bg: #f2d7a4;
   --token-changed-text: #5a3e1c;
+  --token-changed-line: #c98f4e;
   --token-warning-bg: #ffefd2;
   --token-warning-line: #b2591f;
   --token-warning-text: #773a18;
@@ -76,6 +77,7 @@
   --token-candidate-line: #e09563;
   --token-changed-bg: #4a3320;
   --token-changed-text: #ffd9a8;
+  --token-changed-line: #b8813f;
   --token-warning-bg: #472c1c;
   --token-warning-line: #f0955a;
   --token-warning-text: #ffcf9f;
@@ -419,10 +421,6 @@ input:focus-visible {
   animation: rise 420ms ease 170ms both;
 }
 
-.approval-bar {
-  animation: rise 420ms ease 220ms both;
-}
-
 .panel-header {
   border-bottom: 1px solid var(--border-soft);
   background: var(--surface);
@@ -457,10 +455,13 @@ input:focus-visible {
 
 /* ---------- Rewrite controls ---------- */
 
+/* The control row used to sit under a separate "current style" summary and was
+   divided from it. That summary is gone, so the rule and its spacing would only
+   strand an empty band at the top of the card. */
 .rewrite-controls {
-  margin-top: 0.85rem;
-  border-top: 1px solid var(--border-soft);
-  padding-top: 0.85rem;
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 0;
 }
 
 .rewrite-controls-top {
@@ -659,11 +660,20 @@ input:focus-visible {
   outline: none;
 }
 
+/* A rewrite can touch most of a paragraph. Filling every changed token turns the
+   editor into a wall of colour and destroys the signal the highlight exists to
+   carry, so "changed" is encoded quietly as a low, soft underline in the ink
+   colour. The saturated fills are reserved for the states the reader is
+   actually acting on: hover, focus, and the open token. */
 .inline-token-changed {
-  background: var(--token-changed-bg);
   color: var(--token-changed-text);
   font-weight: 560;
-  text-decoration: none;
+  background: transparent;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-color: var(--token-changed-line);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 .inline-token-warning {
@@ -674,6 +684,18 @@ input:focus-visible {
   text-decoration-color: var(--token-warning-line);
   text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
+}
+
+/* Interactive affordance wins over the changed marker when they coincide, so
+   the clickable word still reads as the thing you can act on. */
+.inline-token-candidate.inline-token-changed {
+  text-decoration-style: solid;
+  text-decoration-color: var(--token-candidate-line);
+}
+
+.inline-token-changed:hover,
+.inline-token-candidate:hover {
+  background: var(--token-candidate-bg);
 }
 
 .inline-token-active {
@@ -707,8 +729,11 @@ input:focus-visible {
 }
 
 .legend-swatch-changed {
-  background: var(--token-changed-bg);
-  border-color: var(--accent-border);
+  background: transparent;
+  border-color: transparent;
+  border-bottom: 2px solid var(--token-changed-line);
+  height: 9px;
+  align-self: center;
 }
 
 .legend-swatch-choice {
@@ -725,6 +750,55 @@ input:focus-visible {
   border: 1px dashed var(--border);
   background: var(--surface-2);
   color: var(--muted);
+}
+
+/* Shown when the rewrite controls no longer match the draft on screen. Kept
+   quiet but unmissable, with the recovery action inline rather than in a
+   separate bar far from the draft. */
+.draft-drift {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-soft);
+  border-radius: 10px;
+  padding: 5px 8px 5px 10px;
+  color: var(--accent-strong);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+.draft-drift-text {
+  min-width: 0;
+}
+
+.draft-drift-action {
+  flex: none;
+  border: 1px solid var(--accent-border);
+  background: var(--surface);
+  color: var(--accent-strong);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.draft-drift-action:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.draft-drift-action:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.draft-drift-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .empty-icon {
@@ -955,10 +1029,14 @@ button:disabled {
   border: 1px solid var(--accent-border);
 }
 
+/* A filled peach box reads as a warning even when it carries good news. Keep
+   the success notice quiet: a neutral surface with an accent edge, clearly
+   distinct from both plain text and the error treatment. */
 .notice-success {
-  border-color: var(--accent-border);
-  background: var(--accent-soft);
-  color: var(--accent-strong);
+  border-color: var(--border);
+  border-left: 3px solid var(--accent);
+  background: var(--surface-2);
+  color: var(--text);
 }
 
 .notice-error {
