@@ -1292,7 +1292,7 @@ export default function App() {
                 type="button"
                 onClick={isParaphrasing ? handleCancel : () => { void handleParaphrase(); }}
                 disabled={!hasDraft && !isParaphrasing}
-                className="primary-button rounded-full px-5 py-[9px] text-[13px] font-[650] transition disabled:cursor-not-allowed disabled:opacity-50"
+                className="primary-button rounded-full px-5 py-[9px] text-[13px] font-[650] transition"
               >
                 {isParaphrasing ? "Cancel" : "Paraphrase"}
               </button>
@@ -1358,7 +1358,7 @@ export default function App() {
                   </div>
                 )}
               </div>
-              <button type="button" onClick={() => void handleCopy()} disabled={!hasOutput} className="text-action flex-none rounded-full px-2.5 py-1 text-[12px] disabled:opacity-40">
+              <button type="button" onClick={() => void handleCopy()} disabled={!hasOutput} className="text-action flex-none rounded-full px-2.5 py-1 text-[12px]">
                 {copied ? "Copied" : "Copy"}
               </button>
             </div>
@@ -1424,12 +1424,12 @@ export default function App() {
               </div>
               <div className="flex items-center gap-2">
                 {session && (
-                  <button type="button" onClick={handleRevertParagraph} disabled={!canRevertParagraph} className="secondary-button rounded-full px-3 py-[6px] text-[11.5px] disabled:cursor-not-allowed disabled:opacity-45">Revert edits</button>
+                  <button type="button" onClick={handleRevertParagraph} disabled={!canRevertParagraph} className="secondary-button rounded-full px-3 py-[6px] text-[11.5px]">Revert edits</button>
                 )}
                 {session && (
                   <>
                     <button type="button" onClick={handleDiscard} className="secondary-button rounded-full px-3.5 py-[7px] text-[12px]">Discard</button>
-                    <button type="button" onClick={() => void handleApprove()} disabled={isApproving} className="approve-button rounded-full px-4 py-[7px] text-[12px] font-[650] disabled:cursor-wait disabled:opacity-60">{isApproving ? "Saving…" : "Save & learn"}</button>
+                    <button type="button" onClick={() => void handleApprove()} disabled={isApproving} className="approve-button rounded-full px-4 py-[7px] text-[12px] font-[650]" aria-busy={isApproving}>{isApproving ? "Saving…" : "Save & learn"}</button>
                   </>
                 )}
               </div>
@@ -1437,14 +1437,14 @@ export default function App() {
           </div>
         </section>
 
-        {!session && !generationNotice && !approvalMessage && !approvalError && !persistenceError && (
-          <p className="muted-text mt-4 text-center text-[12px]">
-            Nothing is saved until you press Save & learn. Discard at any time.
-          </p>
-        )}
-
+        {/* One closing statement, not two. The save/discard reassurance only
+            matters before there is anything to save, and the privacy note
+            applies the whole time, so they are merged into a single line
+            instead of sitting stacked and saying adjacent things. */}
         <p className="muted-text mt-4 pb-6 text-center text-[11.5px]">
-          {storageLabel}. Nothing leaves this Mac unless you explicitly choose an online route.
+          {session
+            ? `${storageLabel}. Nothing leaves this Mac unless you explicitly choose an online route.`
+            : `${storageLabel}. Nothing leaves this Mac unless you explicitly choose an online route, and nothing is saved until you press Save & learn.`}
         </p>
       </main>
 

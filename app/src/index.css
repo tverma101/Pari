@@ -298,12 +298,55 @@ input:focus-visible {
   padding: 2px;
 }
 
+/* An unavailable control must not look like a broken one.
+   Fading a filled primary to 50% opacity drops its label to roughly 1.45:1
+   against its own fill, so the label stops reading as text and the control
+   looks like a rendering fault rather than something you cannot use yet.
+   (WCAG 1.4.3 does not require contrast for inactive components — this is a
+   legibility and affordance fix, not a conformance one.) Drop the fill to a
+   neutral surface, keep the label at full strength, and dim only the label. */
+.primary-button:disabled,
+.approve-button:disabled,
+.secondary-button:disabled,
+.text-action:disabled {
+  background: var(--surface-2);
+  color: var(--muted);
+  /* A neutral fill sits only ~1.14:1 against the panel, so without a border the
+     control all but disappears. Give it a real edge: clearly present, clearly
+     not actionable. */
+  border: 1px solid var(--border);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.primary-button:disabled:hover,
+.approve-button:disabled:hover,
+.secondary-button:disabled:hover,
+.text-action:disabled:hover {
+  background: var(--surface-2);
+}
+
+.text-action:disabled {
+  background: transparent;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+/* Busy, not unavailable: the label still has to be readable while it works. */
+.approve-button[aria-busy="true"],
+.primary-button[aria-busy="true"] {
+  cursor: progress;
+  opacity: 0.85;
+}
+
 .theme-seg-btn {
   border: 0;
   background: transparent;
   color: var(--muted);
   border-radius: 999px;
-  padding: 4px 10px;
+  /* 4px/10px left these at 24.5px tall: over the SC 2.5.8 floor, but with no
+     margin. 6px/12px gives a ~28px target without crowding the header. */
+  padding: 6px 12px;
   font-size: 11px;
   font-weight: 650;
   cursor: pointer;
@@ -577,12 +620,19 @@ input:focus-visible {
   background: linear-gradient(90deg, var(--accent), var(--accent-hover));
 }
 
+/* A native range input is only ~16px tall, which is below the 24x24 CSS px
+   floor in WCAG 2.2 SC 2.5.8 (Target Size (Minimum), AA). The thumb keeps the
+   native track; the padding is transparent, so the control grows to a
+   comfortable target without changing how it looks. */
 .strength-range {
   display: block;
   width: 100%;
-  margin-top: 0.35rem;
+  margin-top: 0.1rem;
+  padding: 6px 0;
+  min-height: 28px;
   accent-color: var(--accent);
   cursor: pointer;
+  background: transparent;
 }
 
 .strength-range:disabled {
