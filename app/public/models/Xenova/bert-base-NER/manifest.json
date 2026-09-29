@@ -1,0 +1,23 @@
+{
+  "modelId": "Xenova/bert-base-NER",
+  "task": "token-classification",
+  "role": "entity-guard",
+  "dtype": "q8",
+  "downloadedAt": "2026-08-09T19:25:55.474Z",
+  "files": [
+    "config.json",
+    "onnx/model_quantized.onnx",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "special_tokens_map.json",
+    "vocab.txt"
+  ],
+  "sha256": {
+    "config.json": "a73a2eccc921bbdea95a94b49a157d3694b5c2abbae7a6f3000e14404a9c31a8",
+    "onnx/model_quantized.onnx": "caaee70a5518ec7f9e46e5308fcc9263a8c227703a9ce46cf61c69a552349648",
+    "tokenizer.json": "343989712a36cd8b253efeaf8baf6a08b9d2583f78e395e83832e8ee9f8d8ee1",
+    "tokenizer_config.json": "5be1a180e9badb4811a6c31502d70fb35a085af5457982937419c42d7530bae6",
+    "special_tokens_map.json": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+    "vocab.txt": "eeaa9875b23b04b4c54ef759d03db9d1ba1554838f8fb26c5d96fa551df93d02"
+  }
+}

@@ -1,0 +1,64 @@
+{"id": "bw-01", "output": "I don't know what happened, but it looked like the meeting went badly.", "seconds": 0.88, "output_tokens": 16, "tokens_per_second": 18.2, "prompt_tokens": 226}
+{"id": "bw-02", "output": "I cannot make it tomorrow, sorry.", "seconds": 0.57, "output_tokens": 8, "tokens_per_second": 13.93, "prompt_tokens": 218}
+{"id": "bw-03", "output": "I will definitely be there at 8, don't worry about the rest.", "seconds": 0.72, "output_tokens": 16, "tokens_per_second": 22.1, "prompt_tokens": 220}
+{"id": "bw-04", "output": "The package arrived yesterday, but it was damaged, so I called customer service.", "seconds": 0.69, "output_tokens": 16, "tokens_per_second": 23.09, "prompt_tokens": 224}
+{"id": "bw-05", "output": "We should have left earlier because the traffic was terrible.", "seconds": 0.56, "output_tokens": 11, "tokens_per_second": 19.65, "prompt_tokens": 222}
+{"id": "bw-06", "output": "He has been working on the report all night, it is almost done.", "seconds": 0.61, "output_tokens": 15, "tokens_per_second": 24.55, "prompt_tokens": 220}
+{"id": "bw-07", "output": "I appreciate your help with this project.", "seconds": 0.52, "output_tokens": 8, "tokens_per_second": 15.39, "prompt_tokens": 217}
+{"id": "bw-08", "output": "The didn't tell me nothin about the schdule chnage.", "seconds": 0.59, "output_tokens": 13, "tokens_per_second": 22.22, "prompt_tokens": 218}
+{"id": "fr-01", "output": "Not sure. Maybe Friday. If that works. Otherwise next week sometime.", "seconds": 0.65, "output_tokens": 15, "tokens_per_second": 23.05, "prompt_tokens": 220}
+{"id": "fr-02", "output": "Because of the deadline situation.", "seconds": 0.47, "output_tokens": 6, "tokens_per_second": 12.89, "prompt_tokens": 211}
+{"id": "fr-03", "output": "Honestly? Best pizza in town. No contest.", "seconds": 0.54, "output_tokens": 11, "tokens_per_second": 20.31, "prompt_tokens": 215}
+{"id": "fr-04", "output": "Which explains the delay. And the extra cost. Sort of.", "seconds": 0.58, "output_tokens": 13, "tokens_per_second": 22.46, "prompt_tokens": 218}
+{"id": "fr-05", "output": "A difficult conversation. That nobody wanted to have. Especially on Monday.", "seconds": 0.61, "output_tokens": 14, "tokens_per_second": 22.91, "prompt_tokens": 219}
+{"id": "fr-06", "output": "Still waiting on the numbers. From finance. Again.", "seconds": 0.59, "output_tokens": 11, "tokens_per_second": 18.67, "prompt_tokens": 216}
+{"id": "fr-07", "output": "If the weather holds. Which it might not.", "seconds": 0.57, "output_tokens": 10, "tokens_per_second": 17.53, "prompt_tokens": 215}
+{"id": "fr-08", "output": "No idea where the file went. Probably the shared drive. Maybe.", "seconds": 0.64, "output_tokens": 14, "tokens_per_second": 21.89, "prompt_tokens": 219}
+{"id": "vg-01", "output": "The thing with the guy from before didn't really go how I wanted it to go honestly.", "seconds": 0.7, "output_tokens": 19, "tokens_per_second": 27.31, "prompt_tokens": 223}
+{"id": "vg-02", "output": "We should do something about the stuff soon before it becomes a bigger problem.", "seconds": 0.64, "output_tokens": 15, "tokens_per_second": 23.37, "prompt_tokens": 219}
+{"id": "vg-03", "output": "So basically the whole thing fell apart because reasons.", "seconds": 0.58, "output_tokens": 10, "tokens_per_second": 17.1, "prompt_tokens": 214}
+{"id": "vg-04", "output": "You were right about the thing with the guy.", "seconds": 0.61, "output_tokens": 10, "tokens_per_second": 16.36, "prompt_tokens": 214}
+{"id": "vg-05", "output": "That situation last week was not great, and we need to handle it somehow.", "seconds": 0.72, "output_tokens": 16, "tokens_per_second": 22.22, "prompt_tokens": 219}
+{"id": "vg-06", "output": "The meeting was fine, I guess. Some stuff came up, we'll see what happens.", "seconds": 0.71, "output_tokens": 19, "tokens_per_second": 26.94, "prompt_tokens": 222}
+{"id": "vg-07", "output": "There are concerns about how things are being handled lately, and people are saying things.", "seconds": 0.67, "output_tokens": 17, "tokens_per_second": 25.5, "prompt_tokens": 220}
+{"id": "vg-08", "output": "It kinda worked out in the end even though there were some issues along the way.", "seconds": 0.66, "output_tokens": 17, "tokens_per_second": 25.73, "prompt_tokens": 223}
+{"id": "ro-01", "output": "I woke up late and I missed the bus and then I forgot my laptop and the meeting started without me and nobody told me anything.", "seconds": 0.84, "output_tokens": 27, "tokens_per_second": 32.05, "prompt_tokens": 231}
+{"id": "ro-02", "output": "We met the team and the deadline was missed and nobody said anything and it kept happening.", "seconds": 0.69, "output_tokens": 18, "tokens_per_second": 26.03, "prompt_tokens": 223}
+{"id": "ro-03", "output": "The report was due Friday, I sent it Saturday, my manager noticed Monday, the client heard about it Tuesday.", "seconds": 0.83, "output_tokens": 23, "tokens_per_second": 27.7, "prompt_tokens": 228}
+{"id": "ro-04", "output": "She finished the slides he ordered the food we booked the room, and everyone arrived early. The demo still failed.", "seconds": 0.78, "output_tokens": 23, "tokens_per_second": 29.33, "prompt_tokens": 225}
+{"id": "ro-05", "output": "I called support twice, and they put me on hold both times. The issue is still open, and nobody has followed up.", "seconds": 0.83, "output_tokens": 26, "tokens_per_second": 31.3, "prompt_tokens": 226}
+{"id": "ro-06", "output": "The course covers grammar and also covers style. There are weekly assignments and the final project is a portfolio.", "seconds": 0.7, "output_tokens": 21, "tokens_per_second": 29.87, "prompt_tokens": 225}
+{"id": "ro-07", "output": "First we draft the outline, then we split the sections, then we merge everything, and finally someone proofreads the whole document.", "seconds": 0.84, "output_tokens": 26, "tokens_per_second": 31.05, "prompt_tokens": 229}
+{"id": "ro-08", "output": "The app runs offline, your notes never leave the laptop, updates are optional, and support is by email only.", "seconds": 0.75, "output_tokens": 23, "tokens_per_second": 30.52, "prompt_tokens": 225}
+{"id": "ws-01", "output": "The deadline moved because of late client feedback, which was the reason the project delay happened.", "seconds": 0.68, "output_tokens": 18, "tokens_per_second": 26.51, "prompt_tokens": 217}
+{"id": "ws-02", "output": "The decision implementation progress review is pending completion status.", "seconds": 0.56, "output_tokens": 10, "tokens_per_second": 17.75, "prompt_tokens": 215}
+{"id": "ws-03", "output": "Schedule conflict meeting room booking double the calendar invite problem exists.", "seconds": 0.59, "output_tokens": 12, "tokens_per_second": 20.44, "prompt_tokens": 217}
+{"id": "ws-04", "output": "Budget approval pending status update email thread reply waiting manager response needed.", "seconds": 0.6, "output_tokens": 13, "tokens_per_second": 21.72, "prompt_tokens": 218}
+{"id": "ws-05", "output": "The data analysis results interpretation confusion team discussion clarification requirement identified.", "seconds": 0.59, "output_tokens": 12, "tokens_per_second": 20.23, "prompt_tokens": 217}
+{"id": "ws-06", "output": "Client presentation feedback negative received version second revision requested scope change implication.", "seconds": 0.6, "output_tokens": 13, "tokens_per_second": 21.53, "prompt_tokens": 218}
+{"id": "ws-07", "output": "Training session attendance is low, and the improvement plan creation, responsibility assignment, and completion are pending.", "seconds": 0.78, "output_tokens": 20, "tokens_per_second": 25.72, "prompt_tokens": 217}
+{"id": "ws-08", "output": "System migration downtime window weekend notification user communication preparation checklist finalization ongoing.", "seconds": 0.68, "output_tokens": 14, "tokens_per_second": 20.5, "prompt_tokens": 219}
+{"id": "ta-01", "output": "Last week she says she will call me back but never does.", "seconds": 0.66, "output_tokens": 13, "tokens_per_second": 19.57, "prompt_tokens": 218}
+{"id": "ta-02", "output": "The results weren't good, and nobody was happy about it.", "seconds": 0.68, "output_tokens": 13, "tokens_per_second": 19.13, "prompt_tokens": 217}
+{"id": "ta-03", "output": "Yesterday they announced the new policy and everyone has complained immediately.", "seconds": 0.59, "output_tokens": 12, "tokens_per_second": 20.35, "prompt_tokens": 217}
+{"id": "ta-04", "output": "He doesn't think the numbers are right, but she believes they are.", "seconds": 0.65, "output_tokens": 15, "tokens_per_second": 23.05, "prompt_tokens": 220}
+{"id": "ta-05", "output": "We were planning to ship on time, but the bug kept delaying us.", "seconds": 0.7, "output_tokens": 15, "tokens_per_second": 21.54, "prompt_tokens": 220}
+{"id": "ta-06", "output": "When I arrived, she already left without saying goodbye.", "seconds": 0.59, "output_tokens": 11, "tokens_per_second": 18.74, "prompt_tokens": 216}
+{"id": "ta-07", "output": "The team have finished their part, but the vendor hasn't delivered theirs yet.", "seconds": 0.66, "output_tokens": 16, "tokens_per_second": 24.37, "prompt_tokens": 221}
+{"id": "ta-08", "output": "Next month we launch the feature we have been working on since January.", "seconds": 0.63, "output_tokens": 14, "tokens_per_second": 22.08, "prompt_tokens": 218}
+{"id": "rs-01", "output": "The results came back and they were kinda mixed but mostly fine, I think.", "seconds": 0.68, "output_tokens": 16, "tokens_per_second": 23.64, "prompt_tokens": 222}
+{"id": "rs-02", "output": "It's kind of over, tbh, like why bother anymore.", "seconds": 0.65, "output_tokens": 14, "tokens_per_second": 21.5, "prompt_tokens": 215}
+{"id": "rs-03", "output": "The demo crashed again, classic, anyway, I'm sure it will be fixed eventually.", "seconds": 0.75, "output_tokens": 18, "tokens_per_second": 24.07, "prompt_tokens": 220}
+{"id": "rs-04", "output": "The onboarding was confusing. It took me like 3 hours to figure out the basics.", "seconds": 0.69, "output_tokens": 19, "tokens_per_second": 27.35, "prompt_tokens": 225}
+{"id": "rs-05", "output": "The thing is we can't really afford the upgrade rn, maybe next quarter.", "seconds": 0.74, "output_tokens": 17, "tokens_per_second": 23.03, "prompt_tokens": 224}
+{"id": "rs-06", "output": "The whole process feels kinda rigged, like why do we even fill out these forms.", "seconds": 0.69, "output_tokens": 17, "tokens_per_second": 24.58, "prompt_tokens": 223}
+{"id": "rs-07", "output": "The update bricked my laptop. I spent all night fixing it. Super fun times.", "seconds": 0.73, "output_tokens": 18, "tokens_per_second": 24.54, "prompt_tokens": 223}
+{"id": "rs-08", "output": "The proposal is solid, but the budget part is kinda sketchy. We should double check it.", "seconds": 0.72, "output_tokens": 20, "tokens_per_second": 27.75, "prompt_tokens": 225}
+{"id": "cn-01", "output": "I never said the report was wrong, I said the numbers were not final.", "seconds": 0.64, "output_tokens": 16, "tokens_per_second": 24.82, "prompt_tokens": 221}
+{"id": "cn-02", "output": "Send the 42.5% summary to Maya Chen by 2026-08-25 or call +1-555-0142.", "seconds": 0.91, "output_tokens": 29, "tokens_per_second": 32.0, "prompt_tokens": 234}
+{"id": "cn-03", "output": "The doctor prescribed 50mg twice daily after meals.", "seconds": 0.59, "output_tokens": 11, "tokens_per_second": 18.71, "prompt_tokens": 216}
+{"id": "cn-04", "output": "Payment is due within 30 days of invoice receipt, or service is suspended.", "seconds": 0.65, "output_tokens": 16, "tokens_per_second": 24.79, "prompt_tokens": 218}
+{"id": "cn-05", "output": "I don't think we should ignore this feedback, even if it's hard to hear.", "seconds": 0.69, "output_tokens": 18, "tokens_per_second": 25.91, "prompt_tokens": 223}
+{"id": "cn-06", "output": "Neither the manager nor the team lead approved the refund of $1,240.50.", "seconds": 0.73, "output_tokens": 18, "tokens_per_second": 24.63, "prompt_tokens": 223}
+{"id": "cn-07", "output": "Do not share the draft outside the company until legal signs off on 12 August.", "seconds": 0.71, "output_tokens": 17, "tokens_per_second": 24.09, "prompt_tokens": 222}
+{"id": "cn-08", "output": "Without the permit, construction cannot legally begin before March 2027.", "seconds": 0.62, "output_tokens": 14, "tokens_per_second": 22.4, "prompt_tokens": 219}

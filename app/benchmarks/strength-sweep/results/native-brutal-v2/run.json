@@ -1,0 +1,78 @@
+{
+  "createdAt": "2026-09-22T21:15:54.595793+00:00",
+  "git": {
+    "head": "b1dd7b9a16a4c95e746d34c15179716b7a51ef61",
+    "branch": "feat/quality-judge-holdout",
+    "dirtyStatusEntries": 327
+  },
+  "pythonExecutable": "/opt/homebrew/bin/python3",
+  "runtime": {
+    "python": "3.14.7",
+    "mlx": "0.31.1",
+    "mlx_lm": "0.31.3"
+  },
+  "config": {
+    "benchmark": "pari-native-strength-sweep-brutal-v2",
+    "corpusPath": "/Users/tejas/Projects/Pari/app/benchmarks/strength-sweep/corpus.brutal.v2.json",
+    "corpusSha256": "1a4351cb49cc1010f2f8132fbade4aafb24591a08afed4f2f067293c5361142b",
+    "caseIds": [
+      "quantifiers-01",
+      "modal-scope-01",
+      "absence-01",
+      "condition-01",
+      "causality-01",
+      "chronology-01",
+      "attribution-01",
+      "coreference-01",
+      "anchors-01",
+      "anchors-02",
+      "quote-01",
+      "technical-01",
+      "instruction-01",
+      "contrast-01",
+      "counterfactual-01",
+      "causal-chain-01",
+      "quantifiers-02",
+      "attribution-02",
+      "safety-01",
+      "policy-01",
+      "fragment-01",
+      "runon-01",
+      "polished-01",
+      "voice-01",
+      "ambiguity-01",
+      "data-01",
+      "long-01",
+      "long-02",
+      "long-03",
+      "long-04",
+      "long-05"
+    ],
+    "strengths": [
+      0,
+      25,
+      50,
+      69,
+      75,
+      82,
+      100
+    ],
+    "modelPath": "/Users/tejas/Library/Application Support/Open Local Phraser/Models/native-models/Qwen/Qwen3-4B-MLX-4bit",
+    "draftModelPath": null,
+    "numDraftTokens": null,
+    "maxTokens": 768,
+    "candidates": 1,
+    "temperatureOverride": null,
+    "baseSeed": 260922,
+    "generationPath": "native-runtime/paraphrase_worker.py via resident mlx-lm worker",
+    "runtime": {
+      "python": "3.14.7",
+      "mlx": "0.31.1",
+      "mlx_lm": "0.31.3"
+    },
+    "nativeWorkerSha256": "5179fac25f7ac4c1427d16b8a05b90c5ad697e223237010dd906aca692a3763c",
+    "nativeServerSha256": "128fa713356f6d28fcce9e45f4ee574085da9d2d78935de83f79549daad3f7b5",
+    "protectedExtractorSha256": "8065c86fd08eb80b1193fa5988b53405ae6a04bfebf6af8afbe3b3d2dd567c95",
+    "protectedHelperSha256": "5b38387d95164654785be4115e03f40a515cfba41c3db611d6cb2ed144668068"
+  }
+}

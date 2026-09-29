@@ -1,0 +1,136 @@
+{
+  "requestedRows": 217,
+  "completedRows": 68,
+  "remainingRows": 149,
+  "allStrengthsComplete": false,
+  "changed": 56,
+  "changedRate": 0.8235,
+  "meanLexicalChangeRate": 0.136,
+  "hardGatePass": 68,
+  "hardGatePassRate": 1.0,
+  "anchorOrWorkerFailures": 0,
+  "meanDurationMs": 4333.1618,
+  "medianDurationMs": 4139.5,
+  "adjacentStrengthOutputChangeRate": 0.431,
+  "samePromptRegimeExactRepeatRate": 1.0,
+  "meanDistinctOutputsPerCaseAcrossRequestedStrengths": 3.4,
+  "sliderRegimeMap": [
+    {
+      "from": 0,
+      "to": 24,
+      "representative": 0,
+      "regime": "light"
+    },
+    {
+      "from": 25,
+      "to": 49,
+      "representative": 25,
+      "regime": "balanced"
+    },
+    {
+      "from": 50,
+      "to": 68,
+      "representative": 50,
+      "regime": "strong-wording"
+    },
+    {
+      "from": 69,
+      "to": 74,
+      "representative": 69,
+      "regime": "strong-structure"
+    },
+    {
+      "from": 75,
+      "to": 81,
+      "representative": 75,
+      "regime": "deep-wording"
+    },
+    {
+      "from": 82,
+      "to": 100,
+      "representative": 82,
+      "regime": "deep-structure"
+    }
+  ],
+  "perStrength": [
+    {
+      "strength": 0,
+      "promptRegime": "light",
+      "rows": 10,
+      "changed": 7,
+      "changedRate": 0.7,
+      "meanLexicalChangeRate": 0.0657,
+      "hardGatePass": 10,
+      "hardGatePassRate": 1.0,
+      "medianDurationMs": 3843.5
+    },
+    {
+      "strength": 25,
+      "promptRegime": "balanced",
+      "rows": 10,
+      "changed": 7,
+      "changedRate": 0.7,
+      "meanLexicalChangeRate": 0.0605,
+      "hardGatePass": 10,
+      "hardGatePassRate": 1.0,
+      "medianDurationMs": 3914.5
+    },
+    {
+      "strength": 50,
+      "promptRegime": "strong-wording",
+      "rows": 10,
+      "changed": 7,
+      "changedRate": 0.7,
+      "meanLexicalChangeRate": 0.0821,
+      "hardGatePass": 10,
+      "hardGatePassRate": 1.0,
+      "medianDurationMs": 3928.0
+    },
+    {
+      "strength": 69,
+      "promptRegime": "strong-structure",
+      "rows": 10,
+      "changed": 7,
+      "changedRate": 0.7,
+      "meanLexicalChangeRate": 0.0878,
+      "hardGatePass": 10,
+      "hardGatePassRate": 1.0,
+      "medianDurationMs": 3933.0
+    },
+    {
+      "strength": 75,
+      "promptRegime": "deep-wording",
+      "rows": 10,
+      "changed": 10,
+      "changedRate": 1.0,
+      "meanLexicalChangeRate": 0.1827,
+      "hardGatePass": 10,
+      "hardGatePassRate": 1.0,
+      "medianDurationMs": 4151.5
+    },
+    {
+      "strength": 82,
+      "promptRegime": "deep-structure",
+      "rows": 9,
+      "changed": 9,
+      "changedRate": 1.0,
+      "meanLexicalChangeRate": 0.2477,
+      "hardGatePass": 9,
+      "hardGatePassRate": 1.0,
+      "medianDurationMs": 4316
+    },
+    {
+      "strength": 100,
+      "promptRegime": "deep-structure",
+      "rows": 9,
+      "changed": 9,
+      "changedRate": 1.0,
+      "meanLexicalChangeRate": 0.2477,
+      "hardGatePass": 9,
+      "hardGatePassRate": 1.0,
+      "medianDurationMs": 4266
+    }
+  ],
+  "updatedAt": "2026-09-22T21:21:00.153920+00:00",
+  "outputDirectory": "/Users/tejas/Projects/Pari/app/benchmarks/strength-sweep/results/native-brutal-v2"
+}

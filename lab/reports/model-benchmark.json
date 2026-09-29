@@ -1,0 +1,112 @@
+{
+  "timestamp": "2026-07-08T00:28:21.827Z",
+  "benchmarkMetadata": {
+    "date": "2026-07-08T00:28:21.828Z",
+    "testEnvironment": "macOS Apple Silicon M4, 16GB",
+    "testSentences": [
+      "I think communication matters because it helps people understand each other better.",
+      "When someone listens carefully, the other person feels respected instead of ignored.",
+      "This is one reason I think small conversations can have a bigger effect than people expect.",
+      "I do not think social media always makes communication worse.",
+      "In 2026, the survey showed that 42% of students preferred online classes."
+    ],
+    "modelsTested": 5
+  },
+  "models": [
+    {
+      "modelId": "humarin/chatgpt_paraphraser_on_T5_base",
+      "modelName": "ChatGPT Paraphraser T5 Base",
+      "coldLoadTimeMs": 6784,
+      "warmGenerationTimeMs": 5039,
+      "averageSentenceLatencyMs": 5039,
+      "averageParagraphLatencyMs": 15118,
+      "candidatesPerSecond": 1,
+      "memoryEstimate": "~2 GB",
+      "outputRejectionRate": 0,
+      "quotePreservationRate": 0,
+      "entityPreservationRate": 1,
+      "numberPreservationRate": 1,
+      "averageSemanticSimilarity": 0.285,
+      "averageLexicalDifference": 0.665,
+      "averageProfessorPenalty": 0,
+      "manualNotes": "Seq2seq — good for sentence-level rewriting"
+    },
+    {
+      "modelId": "Vamsi/T5_Paraphrase_Paws",
+      "modelName": "T5 Paraphrase PAWS",
+      "coldLoadTimeMs": 5530,
+      "warmGenerationTimeMs": 4654,
+      "averageSentenceLatencyMs": 4654,
+      "averageParagraphLatencyMs": 13961,
+      "candidatesPerSecond": 1,
+      "memoryEstimate": "~2 GB",
+      "outputRejectionRate": 0,
+      "quotePreservationRate": 0,
+      "entityPreservationRate": 1,
+      "numberPreservationRate": 1,
+      "averageSemanticSimilarity": 0.802,
+      "averageLexicalDifference": 0.403,
+      "averageProfessorPenalty": 0,
+      "manualNotes": "Seq2seq — good for sentence-level rewriting"
+    },
+    {
+      "modelId": "eugenesiow/bart-paraphrase",
+      "modelName": "BART Paraphrase",
+      "coldLoadTimeMs": 6414,
+      "warmGenerationTimeMs": 5720,
+      "averageSentenceLatencyMs": 5720,
+      "averageParagraphLatencyMs": 17161,
+      "candidatesPerSecond": 1,
+      "memoryEstimate": "~3 GB",
+      "outputRejectionRate": 0,
+      "quotePreservationRate": 0,
+      "entityPreservationRate": 1,
+      "numberPreservationRate": 1,
+      "averageSemanticSimilarity": 0.863,
+      "averageLexicalDifference": 0.264,
+      "averageProfessorPenalty": 0,
+      "manualNotes": "Seq2seq — good for sentence-level rewriting"
+    },
+    {
+      "modelId": "google/flan-t5-base",
+      "modelName": "FLAN-T5 Base",
+      "coldLoadTimeMs": 5493,
+      "warmGenerationTimeMs": 5800,
+      "averageSentenceLatencyMs": 5800,
+      "averageParagraphLatencyMs": 17400,
+      "candidatesPerSecond": 1,
+      "memoryEstimate": "~2 GB",
+      "outputRejectionRate": 0,
+      "quotePreservationRate": 0,
+      "entityPreservationRate": 1,
+      "numberPreservationRate": 1,
+      "averageSemanticSimilarity": 0.543,
+      "averageLexicalDifference": 0.611,
+      "averageProfessorPenalty": 0,
+      "manualNotes": "Fallback model — limited capability"
+    },
+    {
+      "modelId": "synonym_bank_v1",
+      "modelName": "V1 Synonym Bank",
+      "coldLoadTimeMs": 0,
+      "warmGenerationTimeMs": 0,
+      "averageSentenceLatencyMs": 1,
+      "averageParagraphLatencyMs": 1,
+      "candidatesPerSecond": 100,
+      "memoryEstimate": "< 100 MB",
+      "outputRejectionRate": 0,
+      "quotePreservationRate": 1,
+      "entityPreservationRate": 1,
+      "numberPreservationRate": 1,
+      "averageSemanticSimilarity": 0.65,
+      "averageLexicalDifference": 0.25,
+      "averageProfessorPenalty": 0.05,
+      "manualNotes": "V1 synonym bank — fast but limited to single-word replacements, not true paraphrasing"
+    }
+  ],
+  "summary": {
+    "fastestModel": "V1 Synonym Bank",
+    "bestSimilarity": "BART Paraphrase",
+    "lowestRejection": "V1 Synonym Bank"
+  }
+}

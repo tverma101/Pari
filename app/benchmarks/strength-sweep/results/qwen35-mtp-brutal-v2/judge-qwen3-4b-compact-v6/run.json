@@ -1,0 +1,62 @@
+{
+  "createdAt": "2026-09-22T22:23:08.041115+00:00",
+  "runtime": {
+    "python": "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "mlx": "0.31.1",
+    "mlx_lm": "0.31.3"
+  },
+  "config": {
+    "sourceRun": "/Users/tejas/Projects/Pari/app/benchmarks/strength-sweep/results/qwen35-mtp-brutal-v2",
+    "sourceRawSha256": "51ed3bf2f2be0487b92f7b3884106ea016c794c515cd5c028d329107a8497271",
+    "sourceRunSha256": "5bd06c52c5ef1815037ac3a6c8d8fbddc18e95d5835a9267978b6fef5387df6f",
+    "mode": "mtp",
+    "strengths": [
+      0,
+      25,
+      50,
+      69,
+      75,
+      82,
+      100
+    ],
+    "caseIds": [
+      "quantifiers-01",
+      "modal-scope-01",
+      "absence-01",
+      "condition-01",
+      "causality-01",
+      "chronology-01",
+      "attribution-01",
+      "coreference-01",
+      "anchors-01",
+      "anchors-02",
+      "quote-01",
+      "technical-01",
+      "instruction-01",
+      "contrast-01",
+      "counterfactual-01",
+      "causal-chain-01",
+      "quantifiers-02",
+      "attribution-02",
+      "safety-01",
+      "policy-01",
+      "fragment-01",
+      "runon-01",
+      "polished-01",
+      "voice-01",
+      "ambiguity-01",
+      "data-01",
+      "long-01",
+      "long-02",
+      "long-03",
+      "long-04",
+      "long-05"
+    ],
+    "judgeModelPath": "/Users/tejas/Library/Application Support/Open Local Phraser/Models/native-models/Qwen/Qwen3-4B-MLX-4bit",
+    "judgeModelId": "Qwen3-4B-MLX-4bit",
+    "maxTokens": 768,
+    "seed": 260922,
+    "scorerSha256": "0b17815c362a49b7b1223c5ed2e27b5e68560092a33edcbd502ca24b9fc63dbe"
+  },
+  "caveat": "Local LLM ratings are evidence for review, not ground truth or automatic approval."
+}

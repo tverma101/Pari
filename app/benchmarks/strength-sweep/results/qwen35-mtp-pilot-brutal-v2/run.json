@@ -1,0 +1,64 @@
+{
+  "createdAt": "2026-09-22T21:36:40.171266+00:00",
+  "git": {
+    "head": "b1dd7b9a16a4c95e746d34c15179716b7a51ef61",
+    "branch": "feat/quality-judge-holdout",
+    "dirtyStatusEntries": 327
+  },
+  "pythonExecutable": "/private/tmp/pari-qwen-mtp-bench.LCmqOv/venv/bin/python",
+  "runtime": {
+    "python": "3.14.7",
+    "mlx": "0.32.2",
+    "mlx_vlm": "0.7.2",
+    "transformers": "5.17.0"
+  },
+  "config": {
+    "benchmark": "pari-qwen35-native-mtp-slider-brutal-v2",
+    "corpusPath": "/Users/tejas/Projects/Pari/app/benchmarks/strength-sweep/corpus.brutal.v2.json",
+    "corpusSha256": "1a4351cb49cc1010f2f8132fbade4aafb24591a08afed4f2f067293c5361142b",
+    "caseIds": [
+      "quantifiers-01",
+      "modal-scope-01",
+      "causality-01",
+      "technical-01",
+      "fragment-01",
+      "long-01"
+    ],
+    "strengths": [
+      0,
+      50,
+      75,
+      82,
+      100
+    ],
+    "repeats": 1,
+    "modes": [
+      "target-only",
+      "mtp"
+    ],
+    "targetModelPath": "/private/tmp/pari-qwen-mtp-bench.LCmqOv/target-qwen35-4b",
+    "targetRevision": "32f3e8ecf65426fc3306969496342d504bfa13f3",
+    "draftModelPath": "/private/tmp/pari-qwen-mtp-bench.LCmqOv/draft-qwen35-4b-mtp",
+    "draftRevision": "ab6f59bc6627196c611ab8851638651078170485",
+    "draftKind": "mtp",
+    "maxTokens": 768,
+    "baseSeed": 260922,
+    "warmupsPerMode": 1,
+    "generationPath": "Pari build_instruction/postprocess via MLX-VLM stream_generate",
+    "runtime": {
+      "python": "3.14.7",
+      "mlx": "0.32.2",
+      "mlx_vlm": "0.7.2",
+      "transformers": "5.17.0"
+    },
+    "hardware": {
+      "machine": "arm64",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "physicalMemoryBytes": 17179869184
+    },
+    "workerSha256": "5179fac25f7ac4c1427d16b8a05b90c5ad697e223237010dd906aca692a3763c",
+    "serverSha256": "03963a6591f0d702f8273b94adb5b438d28dc6124cf03195f9191b9a81c163ee",
+    "protectedExtractorSha256": "8065c86fd08eb80b1193fa5988b53405ae6a04bfebf6af8afbe3b3d2dd567c95",
+    "protectedHelperSha256": "5b38387d95164654785be4115e03f40a515cfba41c3db611d6cb2ed144668068"
+  }
+}

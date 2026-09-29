@@ -1,0 +1,1291 @@
+{
+  "engine": "qwen35-4b-routed-outputs.jsonl",
+  "generatedAt": "2026-08-21T16:16:57.996Z",
+  "byCategory": {
+    "broken_words": {
+      "total": 8,
+      "passed": 8
+    },
+    "fragment": {
+      "total": 8,
+      "passed": 4
+    },
+    "vague": {
+      "total": 8,
+      "passed": 4
+    },
+    "run_on": {
+      "total": 8,
+      "passed": 6
+    },
+    "word_salad": {
+      "total": 8,
+      "passed": 7
+    },
+    "tense_agreement": {
+      "total": 8,
+      "passed": 6
+    },
+    "register_shift": {
+      "total": 8,
+      "passed": 8
+    },
+    "canary": {
+      "total": 8,
+      "passed": 8
+    }
+  },
+  "overall": {
+    "passed": 51,
+    "total": 64
+  },
+  "results": [
+    {
+      "id": "bw-01",
+      "category": "broken_words",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.634,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.229,
+        "contentOverlap": 0.333,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I don't know what happened, but it looked like the meeting went badly."
+    },
+    {
+      "id": "bw-02",
+      "category": "broken_words",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.373,
+        "contentOverlap": 0.429,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I can't make it tomorrow; something came up. Sorry."
+    },
+    {
+      "id": "bw-03",
+      "category": "broken_words",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.988,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.15,
+        "contentOverlap": 0.4,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I will definitely be there at 8; don't worry about the rest."
+    },
+    {
+      "id": "bw-04",
+      "category": "broken_words",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.61,
+        "grammarGain": 23.08,
+        "errorsInPer100": 23.08,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.195,
+        "contentOverlap": 0.429,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The package arrived yesterday but was damaged, so I called customer service."
+    },
+    {
+      "id": "bw-05",
+      "category": "broken_words",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.213,
+        "contentOverlap": 0.6,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "We should have left earlier because the traffic was terrible."
+    },
+    {
+      "id": "bw-06",
+      "category": "broken_words",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.983,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.299,
+        "contentOverlap": 0.5,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "He has been working on the report all night, and it is almost done."
+    },
+    {
+      "id": "bw-07",
+      "category": "broken_words",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.652,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.149,
+        "contentOverlap": 0.5,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I appreciate your help a lot with this project."
+    },
+    {
+      "id": "bw-08",
+      "category": "broken_words",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.854,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.109,
+        "contentOverlap": 0.571,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "They didn't tell me anything about the schedule change."
+    },
+    {
+      "id": "fr-01",
+      "category": "fragment",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.704,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.569,
+        "contentOverlap": 0.75,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 2
+      },
+      "failedChecks": [
+        "meaningFloor",
+        "anchorSafe"
+      ],
+      "missingAnchors": [
+        "Maybe Friday"
+      ],
+      "output": "I'm not sure yet, but maybe Friday could work; if that doesn't work, we could meet sometime next week."
+    },
+    {
+      "id": "fr-02",
+      "category": "fragment",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "Because of the deadline situation."
+    },
+    {
+      "id": "fr-03",
+      "category": "fragment",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.944,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.383,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Honestly, it is the best pizza in town; there is no contest."
+    },
+    {
+      "id": "fr-04",
+      "category": "fragment",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.987,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.074,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "Which explains the delay and the extra cost, sort of."
+    },
+    {
+      "id": "fr-05",
+      "category": "fragment",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.932,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.101,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "A difficult conversation, one that nobody wanted to have, especially on Monday."
+    },
+    {
+      "id": "fr-06",
+      "category": "fragment",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.948,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.185,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I am still waiting on the numbers from finance, again."
+    },
+    {
+      "id": "fr-07",
+      "category": "fragment",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.985,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.049,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "If the weather holds, which it might not."
+    },
+    {
+      "id": "fr-08",
+      "category": "fragment",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.92,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.296,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I have no idea where the file went, but it's probably on the shared drive, maybe."
+    },
+    {
+      "id": "vg-01",
+      "category": "vague",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.507,
+        "grammarGain": 5.88,
+        "errorsInPer100": 5.88,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.667,
+        "contentOverlap": 0.111,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [
+        "meaningFloor"
+      ],
+      "missingAnchors": [],
+      "output": "The situation with the previous guy did not proceed as I had hoped."
+    },
+    {
+      "id": "vg-02",
+      "category": "vague",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.729,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.564,
+        "contentOverlap": 0.25,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "We should address the situation soon before it escalates into a larger issue."
+    },
+    {
+      "id": "vg-03",
+      "category": "vague",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.616,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.81,
+        "contentOverlap": 0,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [
+        "meaningFloor",
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "The entire situation collapsed due to unforeseen circumstances."
+    },
+    {
+      "id": "vg-04",
+      "category": "vague",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.73,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.271,
+        "contentOverlap": 0.4,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "You were right about the situation with the man."
+    },
+    {
+      "id": "vg-05",
+      "category": "vague",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.927,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.169,
+        "contentOverlap": 0.857,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The situation last week was not great, and we need to handle it."
+    },
+    {
+      "id": "vg-06",
+      "category": "vague",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.643,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.649,
+        "contentOverlap": 0.111,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [
+        "meaningFloor",
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "The meeting proceeded without major issues, though some unexpected matters arose, and we will observe the outcome."
+    },
+    {
+      "id": "vg-07",
+      "category": "vague",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.875,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.294,
+        "contentOverlap": 0.667,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "There are concerns about how the situation is being handled lately, and people are expressing their opinions."
+    },
+    {
+      "id": "vg-08",
+      "category": "vague",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.753,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.632,
+        "contentOverlap": 0.444,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "It ultimately worked out despite some issues occurring along the way."
+    },
+    {
+      "id": "ro-01",
+      "category": "run_on",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.957,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.151,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I woke up late, missed the bus, and forgot my laptop, so the meeting started without me and nobody told me anything."
+    },
+    {
+      "id": "ro-02",
+      "category": "run_on",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.977,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.066,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "We met the team, the deadline was missed, and nobody said anything, and it kept happening."
+    },
+    {
+      "id": "ro-03",
+      "category": "run_on",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.983,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.157,
+        "contentOverlap": 1,
+        "distinctBigram": 0.917,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The report was due on Friday; I sent it on Saturday, my manager noticed it on Monday, and the client heard about it on Tuesday."
+    },
+    {
+      "id": "ro-04",
+      "category": "run_on",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.969,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.071,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "She finished the slides. He ordered the food. We booked the room. Everyone arrived early. The demo still failed."
+    },
+    {
+      "id": "ro-05",
+      "category": "run_on",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.954,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.173,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I called support twice, and I was put on hold both times. The issue is still open, and nobody has followed up."
+    },
+    {
+      "id": "ro-06",
+      "category": "run_on",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.982,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.142,
+        "contentOverlap": 0.818,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The course covers grammar and style. There are weekly assignments, and the final project is a portfolio."
+    },
+    {
+      "id": "ro-07",
+      "category": "run_on",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.979,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.094,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "First, we draft the outline. Then, we split the sections. After that, we merge everything. Finally, someone proofreads the whole document."
+    },
+    {
+      "id": "ro-08",
+      "category": "run_on",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.968,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.133,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The app runs offline, so your notes never leave the laptop. Updates are optional, and support is provided by email only."
+    },
+    {
+      "id": "ws-01",
+      "category": "word_salad",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.917,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.643,
+        "contentOverlap": 0.7,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The deadline was moved because the project delay was caused by late client feedback."
+    },
+    {
+      "id": "ws-02",
+      "category": "word_salad",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "The decision implementation progress review is pending completion status."
+    },
+    {
+      "id": "ws-03",
+      "category": "word_salad",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.948,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.516,
+        "contentOverlap": 0.8,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "A schedule conflict exists regarding the meeting room booking for the double calendar invite."
+    },
+    {
+      "id": "ws-04",
+      "category": "word_salad",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.964,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.133,
+        "contentOverlap": 0.833,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Budget approval pending status update email thread reply waiting for manager response."
+    },
+    {
+      "id": "ws-05",
+      "category": "word_salad",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.995,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.097,
+        "contentOverlap": 0.8,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The data analysis results interpretation confusion team discussion clarification requirement has been identified."
+    },
+    {
+      "id": "ws-06",
+      "category": "word_salad",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.909,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.569,
+        "contentOverlap": 0.75,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Negative feedback was received on the client presentation, and a second revision was requested. A scope change was also requested."
+    },
+    {
+      "id": "ws-07",
+      "category": "word_salad",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.941,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.108,
+        "contentOverlap": 0.909,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Training session attendance is low; participation improvement plan creation and responsibility assignment are completed."
+    },
+    {
+      "id": "ws-08",
+      "category": "word_salad",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.865,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.274,
+        "contentOverlap": 0.75,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The system migration downtime window, weekend notification, user communication preparation, and finalization checklist are all ongoing."
+    },
+    {
+      "id": "ta-01",
+      "category": "tense_agreement",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.909,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.23,
+        "contentOverlap": 0.667,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Last week she said she would call me back, but she never did."
+    },
+    {
+      "id": "ta-02",
+      "category": "tense_agreement",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.979,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.105,
+        "contentOverlap": 0.833,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The results were not good, and nobody was happy about it."
+    },
+    {
+      "id": "ta-03",
+      "category": "tense_agreement",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.978,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.076,
+        "contentOverlap": 0.857,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "Yesterday they announced the new policy, and everyone complained immediately."
+    },
+    {
+      "id": "ta-04",
+      "category": "tense_agreement",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.986,
+        "grammarGain": 16.67,
+        "errorsInPer100": 16.67,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.091,
+        "contentOverlap": 0.6,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "He doesn't think the numbers are right, but she believes they are."
+    },
+    {
+      "id": "ta-05",
+      "category": "tense_agreement",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.992,
+        "grammarGain": 7.69,
+        "errorsInPer100": 7.69,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.063,
+        "contentOverlap": 0.833,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "We were planning to ship on time, but the bug keeps delaying us."
+    },
+    {
+      "id": "ta-06",
+      "category": "tense_agreement",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.928,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.133,
+        "contentOverlap": 0.833,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "When I arrived, she had already left without saying goodbye."
+    },
+    {
+      "id": "ta-07",
+      "category": "tense_agreement",
+      "passed": false,
+      "metrics": {
+        "cosineSim": 0.987,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.051,
+        "contentOverlap": 0.875,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [
+        "bandFit"
+      ],
+      "missingAnchors": [],
+      "output": "The team has finished their part, but the vendor has not delivered theirs yet."
+    },
+    {
+      "id": "ta-08",
+      "category": "tense_agreement",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.97,
+        "grammarGain": 8.33,
+        "errorsInPer100": 8.33,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.169,
+        "contentOverlap": 0.857,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Next month, we will launch the feature we have been working on since January."
+    },
+    {
+      "id": "rs-01",
+      "category": "register_shift",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.919,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.386,
+        "contentOverlap": 0.7,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The results came back and were somewhat mixed, but mostly fine, I think."
+    },
+    {
+      "id": "rs-02",
+      "category": "register_shift",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.827,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.184,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I'm kinda over it, tbh. Like, why bother anymore?"
+    },
+    {
+      "id": "rs-03",
+      "category": "register_shift",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.922,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.09,
+        "contentOverlap": 0.818,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "lol the demo crashed again, classic. Anyway, I'm sure we'll fix it eventually."
+    },
+    {
+      "id": "rs-04",
+      "category": "register_shift",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.882,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.289,
+        "contentOverlap": 0.556,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The onboarding was confusing, taking me about three hours to figure out the basics."
+    },
+    {
+      "id": "rs-05",
+      "category": "register_shift",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.845,
+        "grammarGain": 12.5,
+        "errorsInPer100": 12.5,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.248,
+        "contentOverlap": 0.636,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 2
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Okay, so the thing is we can't really afford the upgrade right now; maybe next quarter, I don't know."
+    },
+    {
+      "id": "rs-06",
+      "category": "register_shift",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.952,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.374,
+        "contentOverlap": 0.727,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "To be honest, the whole process feels a bit rigged; I'm wondering why we even have to fill out these forms."
+    },
+    {
+      "id": "rs-07",
+      "category": "register_shift",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.972,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.168,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Yeah, the update bricked my laptop lol; I spent all night fixing it, which was super fun times."
+    },
+    {
+      "id": "rs-08",
+      "category": "register_shift",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.975,
+        "grammarGain": 11.76,
+        "errorsInPer100": 11.76,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.141,
+        "contentOverlap": 0.667,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "IMO, the proposal is solid, but the budget part is a bit sketchy; we should double-check it."
+    },
+    {
+      "id": "cn-01",
+      "category": "canary",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.997,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.014,
+        "contentOverlap": 1,
+        "distinctBigram": 0.923,
+        "negationCuesIn": 2,
+        "negationCuesOut": 2
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I never said the report was wrong; I said the numbers were not final."
+    },
+    {
+      "id": "cn-02",
+      "category": "canary",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Send the 42.5% summary to Maya Chen by 2026-08-25 or call +1-555-0142."
+    },
+    {
+      "id": "cn-03",
+      "category": "canary",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.978,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.019,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "The doctor prescribed 50 mg twice daily after meals."
+    },
+    {
+      "id": "cn-04",
+      "category": "canary",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.925,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.23,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 0,
+        "negationCuesOut": 0
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Payment is due within 30 days of invoice receipt; otherwise, service will be suspended."
+    },
+    {
+      "id": "cn-05",
+      "category": "canary",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 0.995,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0.027,
+        "contentOverlap": 0.875,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "I don't think we should ignore this feedback, even if it is hard to hear."
+    },
+    {
+      "id": "cn-06",
+      "category": "canary",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 2,
+        "negationCuesOut": 2
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Neither the manager nor the team lead approved the refund of $1,240.50."
+    },
+    {
+      "id": "cn-07",
+      "category": "canary",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 1,
+        "negationCuesOut": 1
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Do not share the draft outside the company until legal signs off on 12 August."
+    },
+    {
+      "id": "cn-08",
+      "category": "canary",
+      "passed": true,
+      "metrics": {
+        "cosineSim": 1,
+        "grammarGain": 0,
+        "errorsInPer100": 0,
+        "errorsOutPer100": 0,
+        "editDistanceRatio": 0,
+        "contentOverlap": 1,
+        "distinctBigram": 1,
+        "negationCuesIn": 2,
+        "negationCuesOut": 2
+      },
+      "failedChecks": [],
+      "missingAnchors": [],
+      "output": "Without the permit, construction cannot legally begin before March 2027."
+    }
+  ]
+}

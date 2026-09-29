@@ -1,0 +1,85 @@
+{
+  "nativeModel": {
+    "id": "Qwen/Qwen3-4B-MLX-4bit",
+    "localPath": "native-models/Qwen/Qwen3-4B-MLX-4bit",
+    "runtime": "mlx-lm",
+    "license": "apache-2.0",
+    "requiredFiles": [
+      "README.md",
+      "LICENSE",
+      "config.json",
+      "merges.txt",
+      "model.safetensors",
+      "model.safetensors.index.json",
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "vocab.json"
+    ],
+    "incumbentUntilReplaced": true,
+    "comment": "Qwen3-4B is the production local incumbent. Qwen3.5-4B is the general-model benchmark control; MiniCPM5-2B and Ling-3.0-tiny are challengers. Promotion requires the hardened English-quality benchmark, safety gates, and installed native evidence. Override with PARI_NATIVE_MODEL_ID or PARI_NATIVE_MODEL_PATH."
+  },
+  "benchmarkControls": [
+    {
+      "id": "mlx-community/Qwen3.5-4B-MLX-4bit",
+      "runtime": "mlx-vlm",
+      "license": "apache-2.0",
+      "source": "https://huggingface.co/mlx-community/Qwen3.5-4B-MLX-4bit",
+      "role": "general-model-control",
+      "requiredFiles": [
+        "README.md",
+        "chat_template.jinja",
+        "config.json",
+        "model.safetensors",
+        "model.safetensors.index.json",
+        "preprocessor_config.json",
+        "processor_config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "video_preprocessor_config.json",
+        "vocab.json"
+      ],
+      "note": "Keep as the frozen general-model control for issue #10; do not silently promote it to production."
+    }
+  ],
+  "challengers": [
+    {
+      "id": "openbmb/MiniCPM5-2B-MLX",
+      "runtime": "mlx-lm",
+      "license": "apache-2.0",
+      "source": "https://huggingface.co/openbmb/MiniCPM5-2B-MLX",
+      "role": "paragraph-generation-challenger",
+      "requiredFiles": [
+        "README.md",
+        "chat_template.jinja",
+        "config.json",
+        "generation_config.json",
+        "model.safetensors",
+        "model.safetensors.index.json",
+        "tokenizer.json",
+        "tokenizer_config.json"
+      ],
+      "note": "Issue #10 challenger; benchmark with thinking disabled before any production change."
+    },
+    {
+      "id": "rapid-mlx/Ling-3.0-tiny-MLX-4bit",
+      "runtime": "rapid-mlx",
+      "license": "mit",
+      "source": "https://huggingface.co/rapid-mlx/Ling-3.0-tiny-MLX-4bit",
+      "upstream": "https://huggingface.co/inclusionAI/Ling-3.0-tiny",
+      "role": "paragraph-generation-challenger",
+      "requiredFiles": [
+        "README.md",
+        "chat_template.jinja",
+        "config.json",
+        "configuration_bailing_moe_v3.py",
+        "generation_config.json",
+        "model.safetensors",
+        "model.safetensors.index.json",
+        "modeling_bailing_moe_v3.py",
+        "tokenizer.json",
+        "tokenizer_config.json"
+      ],
+      "note": "Issue #6 challenger; bailing_hybrid requires rapid-mlx until mlx-lm upstream support lands."
+    }
+  ]
+}
