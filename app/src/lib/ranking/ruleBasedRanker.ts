@@ -141,7 +141,7 @@ function normalizedLabel(option: CandidateOption): string {
   return option.label?.trim().toLowerCase() ?? "";
 }
 
-</**
+/**
  * Automatic paragraph output uses a safer candidate set than the inline
  * chooser. Even the aggressive pass stays on the curated, low-risk bank;
  * deeper discovery candidates remain manual-only because they are not safe to
