@@ -81,6 +81,28 @@ function isSentenceStart(text: string, index: number): boolean {
   return /[.!?]$/.test(before);
 }
 
+/**
+ * Length of a leading title-style heading, or 0 when the text does not open
+ * with one.
+ *
+ * A heading capitalizes ordinary words for style ("Why Eyewitness Evidence Can
+ * Be Unreliable"), which the name patterns below would otherwise protect as a
+ * proper noun. That blocks any rewrite of the heading and trips the
+ * "protected name was changed" gate. Real names inside a heading are rare, so
+ * only a clearly title-shaped first line is treated this way: several words,
+ * mostly capitalized, and not terminated as a sentence.
+ */
+function headingLength(text: string): number {
+  const firstBreak = text.search(/\n/);
+  if (firstBreak === -1) return 0;
+  const line = text.slice(0, firstBreak);
+  const words = line.match(/[A-Za-z][A-Za-z'-]*/g);
+  if (!words || words.length < 3) return 0;
+  if (/[.!?]$/.test(line.trimEnd())) return 0;
+  const capitalized = words.filter((word) => /^[A-Z]/.test(word)).length;
+  return capitalized / words.length >= 0.6 ? firstBreak : 0;
+}
+
 function collectCandidates(text: string): CandidateSpan[] {
   const candidates: CandidateSpan[] = [];
   for (const { kind, pattern, priority } of PROTECTED_PATTERNS) {
@@ -92,21 +114,27 @@ function collectCandidates(text: string): CandidateSpan[] {
     }
   }
 
-  const namePattern = /\b[A-Z][a-z]{2,}(?:\s+[A-Z][a-z]{2,})+\b/g;
+  const headingEnd = headingLength(text);
+
+  // A space rather than \s+ so a name never spans a line or paragraph break.
+  const namePattern = /\b[A-Z][a-z]{2,}(?: +[A-Z][a-z]{2,})+\b/g;
   let nameMatch: RegExpExecArray | null;
   while ((nameMatch = namePattern.exec(text)) !== null) {
+    if (nameMatch.index < headingEnd) continue;
     candidates.push({ kind: "name", text: nameMatch[0], start: nameMatch.index, end: nameMatch.index + nameMatch[0].length, priority: 75 });
   }
 
   const technicalNamePattern = /\b(?:[A-Z]{2,}[A-Z0-9-]*|[A-Z][a-z]+[A-Z][A-Za-z0-9-]*|[A-Z][A-Za-z-]*\d[A-Za-z0-9-]*)\b/g;
   let technicalNameMatch: RegExpExecArray | null;
   while ((technicalNameMatch = technicalNamePattern.exec(text)) !== null) {
+    if (technicalNameMatch.index < headingEnd) continue;
     candidates.push({ kind: "name", text: technicalNameMatch[0], start: technicalNameMatch.index, end: technicalNameMatch.index + technicalNameMatch[0].length, priority: 76 });
   }
 
   const singleInternalNamePattern = /\b[A-Z][a-z]{2,}\b/g;
   let singleInternalNameMatch: RegExpExecArray | null;
   while ((singleInternalNameMatch = singleInternalNamePattern.exec(text)) !== null) {
+    if (singleInternalNameMatch.index < headingEnd) continue;
     if (isSentenceStart(text, singleInternalNameMatch.index)) continue;
     candidates.push({ kind: "name", text: singleInternalNameMatch[0], start: singleInternalNameMatch.index, end: singleInternalNameMatch.index + singleInternalNameMatch[0].length, priority: 73 });
   }

@@ -3,6 +3,7 @@ name: Deterministic QA
 on:
   push:
     branches:
+      - main
       - feat/quality-judge-holdout
   pull_request:
 
@@ -13,6 +14,10 @@ concurrency:
   group: deterministic-qa-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# The deterministic suites are the committed quality floor and are expected to
+# stay green. Known engine limitations tracked in app/docs/remaining-work.md
+# (P1.3 entailment/contradiction gate, note-fragment repair) are reported by
+# separate scripts and must not be masked by loosening these assertions.
 jobs:
   deterministic-qa:
     name: Rules and typecheck
