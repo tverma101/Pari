@@ -1,0 +1,18 @@
+{
+  "requestedRows": 12,
+  "completedRows": 12,
+  "remainingRows": 0,
+  "allRowsComplete": true,
+  "matchedPairs": 6,
+  "mtpFasterPairs": 5,
+  "mtpFasterRate": 0.8333,
+  "medianSpeedup": 1.14,
+  "medianWorkerWallMsTargetOnly": 9019.0,
+  "medianWorkerWallMsMtp": 7919.0,
+  "medianReadyWaitMsTargetOnly": 3485.5,
+  "medianReadyWaitMsMtp": 3649.0,
+  "byteIdenticalOutputs": 6,
+  "note": "Fresh subprocess per request; workerWallMs includes interpreter start, model load, prompt construction, and generation. It excludes app/UI work outside the worker.",
+  "updatedAt": "2026-09-22T22:43:24.390379+00:00",
+  "outputDirectory": "/Users/tejas/Projects/Pari/app/benchmarks/strength-sweep/results/qwen35-mtp-cold-pilot-v1"
+}

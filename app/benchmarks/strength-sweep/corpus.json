@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "name": "pari-strength-sweep",
+  "generated": "synthetic-hand-authored",
+  "purpose": "Stress the visible rewrite amount without treating distance as quality.",
+  "cases": [
+    {
+      "id": "daily-01",
+      "category": "ordinary-prose",
+      "input": "The team used simple tools to organize the notes and review difficult ideas before the meeting."
+    },
+    {
+      "id": "academic-01",
+      "category": "cause-and-evidence",
+      "input": "The researchers revised the proposal after reviewers identified two gaps in the evidence. The new version explains how each claim is supported."
+    },
+    {
+      "id": "work-01",
+      "category": "professional-tone",
+      "input": "I was frustrated when the deadline changed, but I asked for clarification before responding to the client."
+    },
+    {
+      "id": "technical-01",
+      "category": "technical-prose",
+      "input": "Because the service runs offline, the editor can keep private notes on the laptop instead of uploading them."
+    },
+    {
+      "id": "contrast-01",
+      "category": "contrast",
+      "input": "Although the method is simple, it may take time to understand how the parts work together."
+    },
+    {
+      "id": "condition-01",
+      "category": "condition",
+      "input": "If the first test fails, the team can restore the saved configuration and try the smaller change."
+    },
+    {
+      "id": "chronology-01",
+      "category": "chronology",
+      "input": "After the workshop ended, the volunteers compared their notes and then changed the plan for the next session."
+    },
+    {
+      "id": "modality-01",
+      "category": "modality",
+      "input": "The early results suggest that the approach could help, but the team should collect more evidence before making a firm claim."
+    },
+    {
+      "id": "negation-01",
+      "category": "negation",
+      "input": "The update did not remove the warning, so the editor kept the original setting and documented the limitation."
+    },
+    {
+      "id": "quantity-01",
+      "category": "quantity",
+      "input": "Most participants finished the survey, but only a few explained why they chose that answer."
+    },
+    {
+      "id": "anchors-01",
+      "category": "factual-anchors",
+      "input": "Maya Chen reported a 42.5% improvement on 2024-10-06 and linked the result to https://example.com/report."
+    },
+    {
+      "id": "quote-01",
+      "category": "quoted-text",
+      "input": "The manager said, \"Please send the final draft after you check the figures.\" I saved the request in the project notes."
+    },
+    {
+      "id": "money-01",
+      "category": "factual-anchors",
+      "input": "The invoice lists $1,250 for the annual plan, and the renewal date is March 14, 2027."
+    },
+    {
+      "id": "names-01",
+      "category": "factual-anchors",
+      "input": "Ava Lopez asked Jordan Kim to review the draft because Jordan had already checked the references."
+    },
+    {
+      "id": "cohesion-01",
+      "category": "cross-sentence-cohesion",
+      "input": "Our group met on Tuesday and divided the presentation into three parts. This plan made the work easier because everyone knew which section they owned."
+    },
+    {
+      "id": "fragment-01",
+      "category": "note-fragment",
+      "input": "Meeting notes: review the opening paragraph. Ask Priya about the missing chart. Send the revised outline before Friday."
+    },
+    {
+      "id": "runon-01",
+      "category": "sentence-boundary",
+      "input": "The draft was late, the reasons were unclear, and the team said they were waiting for one more source."
+    },
+    {
+      "id": "version-01",
+      "category": "technical-prose",
+      "input": "The client uses API v2.3.1, so the adapter must preserve the response format while the migration is tested."
+    },
+    {
+      "id": "emotion-01",
+      "category": "personal-voice",
+      "input": "I appreciate your help with this project, and I want to explain the one decision that still worries me."
+    },
+    {
+      "id": "culture-01",
+      "category": "social-context",
+      "input": "The class discussed whether silence communicates agreement, uncertainty, or respect in different settings."
+    },
+    {
+      "id": "voice-01",
+      "category": "personal-voice",
+      "input": "I think the plan is workable, but I do not want to promise a result that the current evidence cannot support."
+    },
+    {
+      "id": "long-01",
+      "category": "multi-sentence-flow",
+      "input": "The tool helps writers organize ideas without forcing every sentence into the same formal style. It keeps the original point of view and highlights places that need a human decision. The result should feel clearer, not like a different person wrote it."
+    },
+    {
+      "id": "parallel-01",
+      "category": "parallel-structure",
+      "input": "A clear explanation should define the problem, acknowledge its limits, and give readers a practical next step."
+    },
+    {
+      "id": "request-01",
+      "category": "professional-tone",
+      "input": "Please review the attached summary, mark any unsupported claim, and return your comments by Thursday afternoon."
+    },
+    {
+      "id": "reflection-01",
+      "category": "multi-sentence-reflection",
+      "input": "I expected the meeting to resolve the disagreement, but we left with two open questions. I am comfortable with the delay as long as the next review includes the original data."
+    },
+    {
+      "id": "explanation-01",
+      "category": "multi-sentence-explanation",
+      "input": "The first draft contains the right information, but readers have to search for the main point. Moving the explanation earlier could make the section easier to follow."
+    },
+    {
+      "id": "survey-01",
+      "category": "multi-sentence-quantity",
+      "input": "Out of 18 respondents, 11 chose the second option and 5 chose the first. The remaining two skipped the question."
+    },
+    {
+      "id": "delay-01",
+      "category": "multi-sentence-cause",
+      "input": "Our team missed the first deadline because two figures were incomplete. We sent the finished version the next morning and explained the delay."
+    },
+    {
+      "id": "privacy-01",
+      "category": "multi-sentence-negation",
+      "input": "The site works without an account, so visitors can read the guidance before sharing personal information. It does not save the page on their device."
+    },
+    {
+      "id": "argument-01",
+      "category": "multi-sentence-modality",
+      "input": "A larger sample may improve the estimate, but size alone does not guarantee a fair comparison. Researchers should also explain how participants were selected."
+    },
+    {
+      "id": "meeting-01",
+      "category": "multi-sentence-chronology",
+      "input": "On Monday, Jamal sent the draft to Priya. Priya returned it on Wednesday after checking the references."
+    },
+    {
+      "id": "instruction-01",
+      "category": "multi-sentence-instruction",
+      "input": "Before you publish the chart, check the labels against the source table. If a value is missing, leave the cell blank rather than guessing."
+    },
+    {
+      "id": "migration-01",
+      "category": "multi-sentence-technical-anchors",
+      "input": "Version 3.4 exports each note as a UTF-8 file and keeps the folder names unchanged. The migration has not been tested on iOS 17.6."
+    },
+    {
+      "id": "community-01",
+      "category": "multi-sentence-community",
+      "input": "Residents asked for a quieter route near the school. The proposal changes the bus schedule, but it does not remove the morning stop."
+    },
+    {
+      "id": "education-01",
+      "category": "multi-sentence-academic-instruction",
+      "input": "The instructor asked us to compare the two passages, not to choose a winner. I focused on how each author described the same event."
+    },
+    {
+      "id": "travel-01",
+      "category": "multi-sentence-everyday-prose",
+      "input": "I packed the charger, headphones, and notebook, but left the printed schedule at home. I checked the app before boarding and found the updated room number."
+    },
+    {
+      "id": "accessibility-01",
+      "category": "multi-sentence-qualification",
+      "input": "Captions can make the recording easier to follow when the room is noisy. They may still miss a speaker's name, so check the transcript before quoting it."
+    },
+    {
+      "id": "schedule-01",
+      "category": "multi-sentence-condition",
+      "input": "The review starts at 9:30 a.m. If the data export is late, we will move the discussion to the final 15 minutes."
+    },
+    {
+      "id": "comparison-01",
+      "category": "multi-sentence-contrast",
+      "input": "Both drafts include the same evidence, but the second one states its conclusion earlier. That order makes the recommendation easier to find without changing the claim."
+    },
+    {
+      "id": "revision-01",
+      "category": "multi-sentence-purpose",
+      "input": "The editor asked for a shorter introduction so the reader could reach the example sooner. We removed the repeated background, but kept the date and source note."
+    }
+  ]
+}

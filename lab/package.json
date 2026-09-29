@@ -1,0 +1,23 @@
+{
+  "name": "pari-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "benchmark:models": "tsx scripts/benchmarkModels.ts",
+    "test:rewrite": "tsx scripts/runRewriteStressTests.ts",
+    "test:alternatives": "tsx scripts/runAlternativeStressTests.ts",
+    "report": "tsx scripts/reportRewriteResults.ts",
+    "test:full": "npm run benchmark:models && npm run test:rewrite && npm run test:alternatives && npm run report",
+    "python:setup": "pip3 install -r python/requirements.txt",
+    "python:models": "python3 python/paraphrase_model.py --download-only",
+    "demo:rewrite": "tsx src/core/index.ts"
+  },
+  "dependencies": {
+    "typescript": "5.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.17",
+    "tsx": "4.19.3"
+  }
+}

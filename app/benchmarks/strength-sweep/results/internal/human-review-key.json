@@ -1,0 +1,1445 @@
+{
+  "generatedAt": "2026-09-22T19:27:58.864Z",
+  "pairs": [
+    {
+      "pairId": "pair-0001",
+      "caseId": "daily-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0002",
+      "caseId": "daily-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0003",
+      "caseId": "daily-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0004",
+      "caseId": "academic-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0005",
+      "caseId": "academic-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0006",
+      "caseId": "academic-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0007",
+      "caseId": "work-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0008",
+      "caseId": "work-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0009",
+      "caseId": "work-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0010",
+      "caseId": "technical-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0011",
+      "caseId": "technical-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0012",
+      "caseId": "technical-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0013",
+      "caseId": "contrast-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0014",
+      "caseId": "contrast-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0015",
+      "caseId": "contrast-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0016",
+      "caseId": "condition-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0017",
+      "caseId": "condition-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0018",
+      "caseId": "condition-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0019",
+      "caseId": "chronology-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0020",
+      "caseId": "chronology-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0021",
+      "caseId": "chronology-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0022",
+      "caseId": "modality-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0023",
+      "caseId": "modality-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0024",
+      "caseId": "modality-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0025",
+      "caseId": "negation-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0026",
+      "caseId": "negation-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0027",
+      "caseId": "negation-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0028",
+      "caseId": "quantity-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0029",
+      "caseId": "quantity-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0030",
+      "caseId": "quantity-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0031",
+      "caseId": "anchors-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0032",
+      "caseId": "anchors-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0033",
+      "caseId": "anchors-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0034",
+      "caseId": "quote-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0035",
+      "caseId": "quote-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0036",
+      "caseId": "quote-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0037",
+      "caseId": "money-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0038",
+      "caseId": "money-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0039",
+      "caseId": "money-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0040",
+      "caseId": "names-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0041",
+      "caseId": "names-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0042",
+      "caseId": "names-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0043",
+      "caseId": "cohesion-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0044",
+      "caseId": "cohesion-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0045",
+      "caseId": "cohesion-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0046",
+      "caseId": "fragment-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0047",
+      "caseId": "fragment-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0048",
+      "caseId": "fragment-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0049",
+      "caseId": "runon-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0050",
+      "caseId": "runon-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0051",
+      "caseId": "runon-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0052",
+      "caseId": "version-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0053",
+      "caseId": "version-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0054",
+      "caseId": "version-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0055",
+      "caseId": "emotion-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0056",
+      "caseId": "emotion-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0057",
+      "caseId": "emotion-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0058",
+      "caseId": "culture-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0059",
+      "caseId": "culture-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0060",
+      "caseId": "culture-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0061",
+      "caseId": "voice-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0062",
+      "caseId": "voice-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0063",
+      "caseId": "voice-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0064",
+      "caseId": "long-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0065",
+      "caseId": "long-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0066",
+      "caseId": "long-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0067",
+      "caseId": "parallel-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0068",
+      "caseId": "parallel-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0069",
+      "caseId": "parallel-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0070",
+      "caseId": "request-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0071",
+      "caseId": "request-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0072",
+      "caseId": "request-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0073",
+      "caseId": "reflection-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0074",
+      "caseId": "reflection-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0075",
+      "caseId": "reflection-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0076",
+      "caseId": "explanation-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0077",
+      "caseId": "explanation-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0078",
+      "caseId": "explanation-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0079",
+      "caseId": "survey-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0080",
+      "caseId": "survey-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0081",
+      "caseId": "survey-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0082",
+      "caseId": "delay-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0083",
+      "caseId": "delay-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0084",
+      "caseId": "delay-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0085",
+      "caseId": "privacy-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0086",
+      "caseId": "privacy-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0087",
+      "caseId": "privacy-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0088",
+      "caseId": "argument-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0089",
+      "caseId": "argument-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0090",
+      "caseId": "argument-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0091",
+      "caseId": "meeting-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0092",
+      "caseId": "meeting-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0093",
+      "caseId": "meeting-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0094",
+      "caseId": "instruction-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0095",
+      "caseId": "instruction-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0096",
+      "caseId": "instruction-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0097",
+      "caseId": "migration-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0098",
+      "caseId": "migration-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0099",
+      "caseId": "migration-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0100",
+      "caseId": "community-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0101",
+      "caseId": "community-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0102",
+      "caseId": "community-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0103",
+      "caseId": "education-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0104",
+      "caseId": "education-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0105",
+      "caseId": "education-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0106",
+      "caseId": "travel-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0107",
+      "caseId": "travel-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0108",
+      "caseId": "travel-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0109",
+      "caseId": "accessibility-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 16,
+        "band": "Light"
+      }
+    },
+    {
+      "pairId": "pair-0110",
+      "caseId": "accessibility-01",
+      "candidateA": {
+        "strength": 40,
+        "band": "Balanced"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0111",
+      "caseId": "accessibility-01",
+      "candidateA": {
+        "strength": 90,
+        "band": "Deep"
+      },
+      "candidateB": {
+        "strength": 60,
+        "band": "Strong"
+      }
+    },
+    {
+      "pairId": "pair-0112",
+      "caseId": "schedule-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0113",
+      "caseId": "schedule-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0114",
+      "caseId": "schedule-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0115",
+      "caseId": "comparison-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0116",
+      "caseId": "comparison-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0117",
+      "caseId": "comparison-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    },
+    {
+      "pairId": "pair-0118",
+      "caseId": "revision-01",
+      "candidateA": {
+        "strength": 16,
+        "band": "Light"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0119",
+      "caseId": "revision-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 40,
+        "band": "Balanced"
+      }
+    },
+    {
+      "pairId": "pair-0120",
+      "caseId": "revision-01",
+      "candidateA": {
+        "strength": 60,
+        "band": "Strong"
+      },
+      "candidateB": {
+        "strength": 90,
+        "band": "Deep"
+      }
+    }
+  ]
+}
