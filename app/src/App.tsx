@@ -158,12 +158,13 @@ function renderInlineEditorContent(
       grammarWarning && "inline-token-warning",
       activeTokenId === token.id && "inline-token-active"
     );
-    // Tokens are interactive spans inside the editor's single editing host.
-    // Marking each one contentEditable made every token its own editing host.
-    // Nested editing hosts are not supported in WebKit — the engine this app
-    // ships in — and in the browser the host swallowed Enter before it reached
-    // the popover, which left the word tools keyboard-inoperable.
-    span.contentEditable = "false";
+    // Tokens deliberately do not declare contentEditable at all, so they inherit
+    // the editor's editing host. Declaring it "true" made every token its own
+    // editing host, which WebKit does not support and which swallowed Enter
+    // before it could reach the popover. Declaring it "false" then made the
+    // tokens non-editable islands, so clicking one and typing silently did
+    // nothing. Inheriting is the only value that is both editable and part of
+    // the same host.
     span.dataset.tokenState = grammarWarning ? "warning" : changed ? "changed" : clickable ? "candidate" : "text";
     if (grammarWarning) {
       span.dataset.grammarWarningToken = token.id;
