@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "paraphrase:api": "node paraphrase-api/server.mjs",
-    "qa:paraphrase": "node scripts/qa-protected-times.mjs && node scripts/qa-morphology.mjs && node scripts/qa-paraphrase.mjs && node scripts/qa-native-ranker.mjs && node scripts/qa-rule-nli.mjs && node scripts/qa-rule-ranker.mjs && node scripts/qa-meaning-audit.mjs && node scripts/qa-protected-units.mjs && node scripts/qa-article-sound.mjs && node scripts/qa-meaning-agreement.mjs && node scripts/qa-meaning-bounds.mjs && node scripts/qa-protected-additions.mjs && node scripts/qa-meaning-certainty.mjs && node scripts/qa-benchmark-meaning-contract.mjs && node scripts/qa-meaning-degree.mjs && node scripts/qa-meaning-frequency.mjs && node scripts/qa-meaning-comparative.mjs && node scripts/qa-benchmark-provenance.mjs && node scripts/qa-benchmark-comparability.mjs",
+    "qa:paraphrase": "node scripts/qa-protected-times.mjs && node scripts/qa-morphology.mjs && node scripts/qa-paraphrase.mjs && node scripts/qa-native-ranker.mjs && node scripts/qa-rule-nli.mjs && node scripts/qa-rule-ranker.mjs && node scripts/qa-meaning-audit.mjs && node scripts/qa-protected-units.mjs && node scripts/qa-article-sound.mjs && node scripts/qa-meaning-agreement.mjs && node scripts/qa-meaning-bounds.mjs && node scripts/qa-protected-additions.mjs && node scripts/qa-meaning-certainty.mjs && node scripts/qa-benchmark-meaning-contract.mjs && node scripts/qa-meaning-degree.mjs && node scripts/qa-meaning-frequency.mjs && node scripts/qa-meaning-comparative.mjs && node scripts/qa-benchmark-provenance.mjs && node scripts/qa-benchmark-comparability.mjs && npm run qa:persistence-swift",
     "qa:approval": "node scripts/qa-paraphrase.mjs",
     "qa:grammar:harper": "node scripts/qa-harper.mjs",
     "qa:native:model": "node scripts/qa-native-model.mjs",
@@ -61,7 +61,8 @@
     "qa:installed:missing-model": "./scripts/build_and_run.sh --headless-missing-model",
     "run:ollama": "./scripts/build_and_run.sh ollama",
     "backend:styles": "./scripts/build_and_run.sh --agent-style-backend",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "qa:persistence-swift": "bash scripts/qa-persistence-swift.sh"
   },
   "dependencies": {
     "@huggingface/transformers": "4.2.0",

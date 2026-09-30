@@ -714,6 +714,16 @@ export default function App() {
   // of the notice sites reset it, so any single error turned every later success
   // message red until the next rewrite.
   const [noticeTone, setNoticeTone] = useState<"info" | "error">("info");
+  /**
+   * User-facing text for a persistence failure. The raw native/bridge message
+   * can name paths, model ids and bridge internals, so it goes to the console
+   * and the user gets a reason they can act on.
+   */
+  const describePersistenceFailure = useCallback((error: unknown, fallback: string): string => {
+    console.error("persistence failure", error);
+    return fallback;
+  }, []);
+
   const notify = useCallback((text: string | null, tone: "info" | "error" = "info") => {
     setNoticeTone(tone);
     setGenerationNotice(text);
@@ -814,7 +824,7 @@ export default function App() {
         // so mark it rather than letting a clean-looking empty state imply the
         // history is simply new.
         setApprovalsUnavailable(true);
-        setPersistenceError(error instanceof Error ? error.message : String(error));
+        setPersistenceError(describePersistenceFailure(error, "Your saved approvals could not be read on this device, so Pari is not using them."));
       })
       .finally(() => {
         if (mounted) setIsLoadingMemory(false);
@@ -1407,7 +1417,7 @@ export default function App() {
       notify(null);
       setApprovalError(null);
     } catch (error) {
-      setPersistenceError(error instanceof Error ? error.message : String(error));
+      setPersistenceError(describePersistenceFailure(error, "This rewrite could not be saved, so nothing was changed."));
       setApprovalError("Approval was not saved. Your draft is still here; try again.");
     } finally {
       setIsApproving(false);
