@@ -242,6 +242,13 @@ input:focus-visible {
 
 /* ---------- Badges, chips, buttons ---------- */
 
+/* A failed read must not wear the same neutral badge as a working private store. */
+.status-badge-warning {
+  border-color: var(--notice-error-border);
+  background: var(--notice-error-bg);
+  color: var(--notice-error-text);
+}
+
 .status-badge {
   display: inline-flex;
   align-items: center;

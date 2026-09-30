@@ -296,14 +296,34 @@ final class ApprovalPersistence {
     }
 
     func loadState() -> [String: Any] {
-        guard let data = try? Data(contentsOf: stateURL),
-              let object = try? JSONSerialization.jsonObject(with: data),
-              let state = object as? [String: Any]
-        else {
+        // An unreadable or corrupt file is not the same thing as an empty
+        // history. Returning defaultState() for both made the UI silently drop
+        // from "learned from N approved edits" to "learns from the edits you
+        // approve" while still claiming private storage, so a corrupt file looked
+        // exactly like a first run. Report the failure instead.
+        guard FileManager.default.fileExists(atPath: stateURL.path) else {
             return defaultState()
         }
 
-        return state
+        do {
+            let data = try Data(contentsOf: stateURL)
+            let object = try JSONSerialization.jsonObject(with: data)
+            guard let state = object as? [String: Any] else {
+                throw NSError(
+                    domain: "OpenLocalPhraser.Persistence",
+                    code: 4,
+                    userInfo: [NSLocalizedDescriptionKey: "The saved approval history is not in a readable format."]
+                )
+            }
+            return state
+        } catch {
+            return [
+                "ok": false,
+                "error": "Your saved approvals could not be read on this Mac, so Pari is not using them.",
+                "examples": [],
+                "memory": [:],
+            ]
+        }
     }
 
     func saveApproval(payload: [String: Any]) throws -> [String: Any] {

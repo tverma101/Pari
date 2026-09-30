@@ -10,10 +10,11 @@ applyTheme(loadSettings().theme);
 
 let startupGuardActive = true;
 
-function formatErrorDetails(error: unknown): string {
-  if (error instanceof Error) {
-    return error.stack || error.message;
-  }
+  /** Human-readable summary only — stacks and raw payloads go to the console. */
+  function formatErrorDetails(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
 
   if (error && typeof error === "object") {
     try {

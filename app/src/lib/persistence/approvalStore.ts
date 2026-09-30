@@ -97,18 +97,37 @@ async function saveToIndexedDB(record: ApprovedExample, memory: PreferenceMemory
 
 export async function loadApprovalState(): Promise<ApprovalState> {
   if (nativeBridgeAvailable()) {
+    let raw: unknown;
     try {
-      return normalizeState(await requestNativeBridge("loadState"));
-    } catch {
-      // The browser fallback keeps local development and QA usable when the
-      // WKWebView bridge is not present. The packaged app uses native storage.
+      raw = await requestNativeBridge("loadState");
+    } catch (error) {
+      // A missing bridge is expected in the browser and in QA, so fall through
+      // to IndexedDB there. A bridge that answers with an explicit failure is a
+      // real read error and must not be indistinguishable from an empty history.
+      if (!/bridge|unavailable|timed out/i.test(error instanceof Error ? error.message : String(error))) {
+        throw error;
+      }
+    }
+    if (raw !== undefined) {
+      const payload = raw as { ok?: boolean; error?: string };
+      if (payload.ok === false) {
+        throw new Error(payload.error ?? "Your saved approvals could not be read on this Mac.");
+      }
+      return normalizeState(raw);
     }
   }
 
   try {
     return await loadFromIndexedDB();
-  } catch {
-    return { schemaVersion: SCHEMA_VERSION, examples: [], memory: createEmptyPreferenceMemory() };
+  } catch (error) {
+    // loadFromIndexedDB resolves only when the transaction genuinely completed,
+    // so a rejection means the store could not be read -- not that it was empty.
+    // Returning an empty state here made the UI say "learns from the edits you
+    // approve" while the real history was still on disk and unreadable. Report it
+    // so the UI can withdraw its storage claim instead of asserting a clean slate.
+    const detail = error instanceof Error ? error.name : "unknown error";
+    console.error("approval store could not be read", error);
+    throw new Error(`Your saved approvals could not be read on this device, so Pari is not using them. (${detail})`);
   }
 }
 

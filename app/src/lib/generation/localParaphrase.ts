@@ -804,7 +804,7 @@ export async function generateLocalParaphrase(
               retryCount: 0,
               retrievedExampleCount: retrievedExamples.length,
               safe: true,
-              notice: `Generated ${nativeRouteLabel} with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
+              notice: `Generated ${nativeRouteLabel} on this device (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
             };
           }
           inspection = { text: ranked[0]?.text ?? native.text, safe: false, reason: `No candidate passed Pari's meaning and grammar checks (ranked=${ranked.length}, requested=${candidateList.length}).` };
@@ -832,7 +832,7 @@ export async function generateLocalParaphrase(
                 retryCount: 0,
                 retrievedExampleCount: retrievedExamples.length,
                 safe: true,
-                notice: `Generated ${nativeRouteLabel} with ${native.modelId} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
+                notice: `Generated ${nativeRouteLabel} on this device (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
               };
             }
             inspection = { ...inspection, reason: single.reason ?? inspection.reason };
@@ -848,7 +848,7 @@ export async function generateLocalParaphrase(
           retryCount: 0,
           retrievedExampleCount: retrievedExamples.length,
           safe: true,
-          notice: `Generated ${nativeRouteLabel} with ${native.modelId}. Review the wording, then save it to teach Pari.`,
+          notice: `Generated ${nativeRouteLabel} on this device. Review the wording, then save it to teach Pari.`,
         };
       }
 
@@ -910,7 +910,10 @@ export async function generateLocalParaphrase(
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") throw error;
-      nativeFailureNotice = error instanceof Error ? error.message : String(error);
+      // The raw bridge/model error can contain internal detail (paths, model ids,
+      // upstream text). It goes to the log; the user gets a short reason.
+      nativeFailureNotice = "The on-device model was not used for this rewrite.";
+      console.error("native paraphrase failure", error);
     }
   }
 

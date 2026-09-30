@@ -130,6 +130,47 @@ function getEditorText(element: HTMLDivElement): string {
   return (element.innerText || element.textContent || "").replace(/\u00a0/g, " ");
 }
 
+/** Character offset of the caret within the editor's text, or null if outside. */
+function getCaretTextOffset(element: HTMLDivElement): number | null {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return null;
+  const range = selection.getRangeAt(0);
+  if (!element.contains(range.startContainer)) return null;
+  const probe = range.cloneRange();
+  probe.selectNodeContents(element);
+  probe.setEnd(range.startContainer, range.startOffset);
+  return probe.toString().replace(/\u00a0/g, " ").length;
+}
+
+/** Put the caret back at a character offset after the subtree was replaced. */
+function setCaretTextOffset(element: HTMLDivElement, offset: number): boolean {
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  let remaining = Math.max(0, offset);
+  let last: Text | null = null;
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const length = node.textContent?.length ?? 0;
+    last = node as Text;
+    if (remaining <= length) {
+      const range = document.createRange();
+      range.setStart(node, remaining);
+      range.collapse(true);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      return true;
+    }
+    remaining -= length;
+  }
+  if (!last) return false;
+  const range = document.createRange();
+  range.setStart(last, last.textContent?.length ?? 0);
+  range.collapse(true);
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+  return true;
+}
+
 function renderInlineEditorContent(
   element: HTMLDivElement,
   result: RewriteResult,
@@ -192,6 +233,8 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
   originalText,
   grammarIssues,
   activeTokenId,
+  activeTokenWord,
+  onCloseTokenTools,
   onActivate,
   onAnchorChange,
   onChange,
@@ -203,6 +246,8 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
   originalText: string;
   grammarIssues: GrammarIssue[];
   activeTokenId: string | null;
+  activeTokenWord: string | null;
+  onCloseTokenTools: () => void;
   onActivate: (tokenId: string, element: HTMLElement) => void;
   onAnchorChange: (element: HTMLElement | null) => void;
   onChange: (value: string) => void;
@@ -246,10 +291,34 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
     );
     const warningMarkupMatches = renderedWarningIds.size === grammarWarningTokenIds.size &&
       [...renderedWarningIds].every((tokenId) => grammarWarningTokenIds.has(tokenId));
-    if (getEditorText(element) !== text || !warningMarkupMatches) {
-      renderInlineEditorContent(element, result, changedTokenIds, grammarWarningTokenIds, grammarWarningMessages, activeTokenId);
-      return;
-    }
+      if (getEditorText(element) !== text || !warningMarkupMatches) {
+        // A rebuild swaps every child node, which throws away the caret Range and
+        // any focused token. The keystroke that creates the very first grammar
+        // warning is therefore also the keystroke that used to lose the cursor
+        // and dump focus onto <body>, leaving the popover anchored to a node
+        // that no longer exists. Capture before, restore after.
+        const caretOffset = getCaretTextOffset(element);
+        const focusedTokenId =
+          activeTokenId ??
+          ((document.activeElement as HTMLElement | null)?.dataset?.inlineToken ?? null);
+        const hadFocus = document.activeElement === element || element.contains(document.activeElement);
+
+        renderInlineEditorContent(element, result, changedTokenIds, grammarWarningTokenIds, grammarWarningMessages, activeTokenId);
+
+        if (focusedTokenId) {
+          const token = element.querySelector<HTMLElement>(`[data-inline-token="${CSS.escape(focusedTokenId)}"]`);
+          if (token) {
+            token.focus({ preventScroll: true });
+            return;
+          }
+        }
+        if (hadFocus) {
+          if (caretOffset === null || !setCaretTextOffset(element, caretOffset)) {
+            element.focus({ preventScroll: true });
+          }
+        }
+        return;
+      }
 
     element.querySelectorAll<HTMLElement>("[data-inline-token]").forEach((tokenElement) => {
       const tokenId = tokenElement.dataset.inlineToken;
@@ -277,7 +346,19 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
     const activeElement = Array.from(element.querySelectorAll<HTMLElement>("[data-inline-token]"))
       .find((tokenElement) => tokenElement.dataset.inlineToken === activeTokenId) ?? null;
     onAnchorChange(activeElement);
-  }, [activeTokenId, editorRef, onAnchorChange, result, text]);
+
+    // Token ids are positional (`segment-<wordIndex>`), so an edit earlier in the
+    // paragraph renumbers every later word. A popover left open across such an
+    // edit kept its id and therefore re-anchored to a *different* word, offering
+    // replacements for a word the user was no longer looking at. If the anchored
+    // word is not the one that was opened, close instead of silently moving.
+    if (activeTokenId && activeElement && activeTokenWord) {
+      const currentWord = (activeElement.textContent ?? "").trim();
+      if (currentWord && currentWord !== activeTokenWord) {
+        onCloseTokenTools();
+      }
+    }
+  }, [activeTokenId, activeTokenWord, editorRef, onAnchorChange, onCloseTokenTools, result, text]);
 
   const handleInput = () => {
     const element = editorRef.current;
@@ -450,18 +531,20 @@ function copyToClipboard(text: string): Promise<void> {
   return writeClipboardText(text);
 }
 
-function RewriteControls({
-  mode,
-  customStyles,
-  savedPreferenceCount,
-  onModeChange,
-  strength,
-  onStrengthChange,
-  disabled,
-}: {
+  function RewriteControls({
+    mode,
+    customStyles,
+    savedPreferenceCount,
+    approvalsUnavailable,
+    onModeChange,
+    strength,
+    onStrengthChange,
+    disabled,
+  }: {
   mode: AppSettings["mode"];
   customStyles: CustomStyle[];
   savedPreferenceCount: number;
+  approvalsUnavailable: boolean;
   onModeChange: (mode: AppMode) => void;
   strength: number;
   onStrengthChange: (strength: number) => void;
@@ -485,7 +568,9 @@ function RewriteControls({
         <div className="min-w-0">
           <div className="control-label">Rewrite style</div>
           <div className="control-hint">
-            {selectedOption.hint}. {savedPreferenceCount > 0
+            {selectedOption.hint}. {approvalsUnavailable
+              ? "Your saved approvals could not be read, so Pari is not using them yet."
+              : savedPreferenceCount > 0
               ? `Pari has learned from ${savedPreferenceCount} approved edit${savedPreferenceCount === 1 ? "" : "s"} on this device.`
               : "Pari learns from the edits you approve."}
           </div>
@@ -606,6 +691,7 @@ export default function App() {
   const [customStyles, setCustomStyles] = useState<CustomStyle[]>([]);
   const [customStylesLoaded, setCustomStylesLoaded] = useState(false);
   const [isLoadingMemory, setIsLoadingMemory] = useState(true);
+  const [approvalsUnavailable, setApprovalsUnavailable] = useState(false);
   const [isParaphrasing, setIsParaphrasing] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [generationNotice, setGenerationNotice] = useState<string | null>(null);
@@ -625,6 +711,9 @@ export default function App() {
   const [isCopying, setIsCopying] = useState(false);
   const copiedTimerRef = useRef<number | null>(null);
   const [activeTokenId, setActiveTokenId] = useState<string | null>(null);
+  const [activeTokenWord, setActiveTokenWord] = useState<string | null>(null);
+  const [runStage, setRunStage] = useState<string | null>(null);
+  const [runElapsed, setRunElapsed] = useState(0);
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const [contextualAlternatives, setContextualAlternatives] = useState<Record<string, CandidateOption[]>>({});
   const [contextualLoadingTokenId, setContextualLoadingTokenId] = useState<string | null>(null);
@@ -635,6 +724,7 @@ export default function App() {
   const sessionRef = useRef<ParaphraseSession | null>(null);
   const requestIdRef = useRef(0);
   const controllerRef = useRef<AbortController | null>(null);
+  const runStageTimerRef = useRef<number | null>(null);
   const outputEditSourceRef = useRef<"typed" | "paste">("typed");
   const outputEditorRef = useRef<HTMLDivElement | null>(null);
   const contextualRequestRef = useRef(0);
@@ -691,7 +781,13 @@ export default function App() {
         setPreferenceMemory(state.memory);
       })
       .catch((error) => {
-        if (mounted) setPersistenceError(error instanceof Error ? error.message : String(error));
+        if (!mounted) return;
+        // The settings card and the storage badge both assert that Pari is using
+        // your saved edits. When the load genuinely failed that claim is false,
+        // so mark it rather than letting a clean-looking empty state imply the
+        // history is simply new.
+        setApprovalsUnavailable(true);
+        setPersistenceError(error instanceof Error ? error.message : String(error));
       })
       .finally(() => {
         if (mounted) setIsLoadingMemory(false);
@@ -902,6 +998,15 @@ export default function App() {
     [skeletonLineCount],
   );
 
+  const stopRunClock = useCallback(() => {
+    if (runStageTimerRef.current !== null) {
+      window.clearInterval(runStageTimerRef.current);
+      runStageTimerRef.current = null;
+    }
+    setRunElapsed(0);
+    setRunStage(null);
+  }, []);
+
   const closeTokenTools = useCallback(() => {
     // Focus is the only positional cue a screen-reader user has, and the
     // popover is portalled to the end of the document. Without this, every
@@ -960,7 +1065,8 @@ export default function App() {
       // The in-flight run's own `finally` skips its reset because the request id
       // moved on, so clear the busy flag here rather than leave the workspace
       // showing a permanent skeleton.
-      setIsParaphrasing(false);
+      stopRunClock();
+    setIsParaphrasing(false);
       closeTokenTools();
     }
     setInput(value);
@@ -990,6 +1096,7 @@ export default function App() {
     activeAnchorRef.current = element;
     setAnchorRect(element.getBoundingClientRect());
     setActiveTokenId(tokenId);
+    setActiveTokenWord(token.text.trim());
 
     if (token.alternatives.length >= SYNONYM_LIMIT || contextualAlternatives[tokenId]) return;
 
@@ -1019,8 +1126,8 @@ export default function App() {
           const firstFailure = modelFailures[0];
           notify(
             alternatives.length > 0
-              ? `${firstFailure.label} is unavailable. Built-in offline choices are still available. ${firstFailure.message}`
-              : `No additional safe local alternatives were found for this word. ${firstFailure.message}`
+              ? `${firstFailure.label} is unavailable. Built-in offline choices are still available.`
+              : "No additional safe local alternatives were found for this word."
           );
         } else {
           notify(alternatives.length > 0 ? "Local contextual alternatives are ready." : "No additional safe local alternatives were found.");
@@ -1054,6 +1161,14 @@ export default function App() {
       : requestedStrength;
 
     setIsParaphrasing(true);
+    // A multi-second run showing one static skeleton with no clock gave the user
+    // no way to tell a slow run from a hung one. Name the stage and count up.
+    setRunStage("Rewriting on this device");
+    const startedAt = Date.now();
+    if (runStageTimerRef.current !== null) window.clearInterval(runStageTimerRef.current);
+    runStageTimerRef.current = window.setInterval(() => {
+      setRunElapsed(Math.floor((Date.now() - startedAt) / 1000));
+    }, 1000);
     contextualRequestRef.current += 1;
     setContextualLoadingTokenId(null);
     setContextualAlternatives({});
@@ -1097,7 +1212,10 @@ export default function App() {
       notify(error instanceof Error ? error.message : String(error), "error");
       setSession(null);
     } finally {
-      if (requestId === requestIdRef.current) setIsParaphrasing(false);
+      if (requestId === requestIdRef.current) {
+        stopRunClock();
+    setIsParaphrasing(false);
+      }
     }
   };
 
@@ -1129,6 +1247,7 @@ export default function App() {
     clearStrengthRegeneration();
     controllerRef.current?.abort();
     requestIdRef.current += 1;
+    stopRunClock();
     setIsParaphrasing(false);
     notify("Paraphrase cancelled. Nothing was saved.");
   };
@@ -1268,6 +1387,7 @@ export default function App() {
     clearStrengthRegeneration();
     controllerRef.current?.abort();
     requestIdRef.current += 1;
+    stopRunClock();
     setIsParaphrasing(false);
     setSession(null);
     contextualRequestRef.current += 1;
@@ -1304,7 +1424,14 @@ export default function App() {
             {isLoadingMemory ? (
               <span className="muted-text">Loading preferences…</span>
             ) : (
-              <span className="status-badge" title={`${storageLabel}. Nothing leaves this Mac unless you explicitly choose an online route.`}>
+              <span
+                className={cn("status-badge", approvalsUnavailable && "status-badge-warning")}
+                title={
+                  approvalsUnavailable
+                    ? "Your saved approvals could not be read on this device, so Pari is not using them."
+                    : `${storageLabel}. Nothing leaves this Mac unless you explicitly choose an online route.`
+                }
+              >
                 <span className="status-dot" aria-hidden="true" />
                 {storageLabel}
               </span>
@@ -1345,6 +1472,7 @@ export default function App() {
             mode={settings.mode}
             customStyles={customStyles}
             savedPreferenceCount={approvedExamples.length}
+            approvalsUnavailable={approvalsUnavailable}
             onModeChange={(mode) => {
               // Every other mutator of the session/controls cancels a pending
               // debounced regeneration; the style buttons did not, so a slider
@@ -1513,7 +1641,16 @@ export default function App() {
                   ) : (
                     <div className="skeleton-line h-[14px] w-[62%] rounded-full" />
                   )}
-                  <div className="muted-text pt-2 text-[12px]">Keeping the editor responsive while the local draft is prepared…</div>
+                  <div className="muted-text flex items-center gap-2 pt-2 text-[12px]">
+                    <span>{runStage ?? "Working on your draft"}</span>
+                    {runElapsed > 0 && <span aria-hidden="true">·</span>}
+                    {runElapsed > 0 && (
+                      <span>
+                        <span className="sr-only">Elapsed time: </span>
+                        {runElapsed}s
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
               {!isParaphrasing && session && preview && (
@@ -1524,6 +1661,8 @@ export default function App() {
                   originalText={session.originalText}
                   grammarIssues={grammarIssues}
                   activeTokenId={activeTokenId}
+                  activeTokenWord={activeTokenWord}
+                  onCloseTokenTools={closeTokenTools}
                   onActivate={handleOpenToken}
                   onAnchorChange={(element) => {
                     if (activeAnchorRef.current === element) return;
