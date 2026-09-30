@@ -17,8 +17,11 @@ if ! command -v swiftc >/dev/null 2>&1; then
   exit 0
 fi
 
-out="$(mktemp -t pari-persistence).bin"
-trap 'rm -f "$out"' EXIT
+# `mktemp -t <prefix>` is BSD-only; GNU coreutils demands an XXXXXX template.
+# Using a temp directory plus a fixed name works on both, and CI runs ubuntu.
+workdir="$(mktemp -d)"
+out="$workdir/pari-persistence.bin"
+trap 'rm -rf "$workdir"' EXIT
 
 if ! swiftc -o "$out" \
   Sources/OpenLocalPhraser/ApprovalPersistence.swift \
