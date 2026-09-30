@@ -804,7 +804,7 @@ export async function generateLocalParaphrase(
               retryCount: 0,
               retrievedExampleCount: retrievedExamples.length,
               safe: true,
-              notice: `Generated ${nativeRouteLabel} on this device (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
+              notice: `Generated ${nativeRouteLabel} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
             };
           }
           inspection = { text: ranked[0]?.text ?? native.text, safe: false, reason: `No candidate passed Pari's meaning and grammar checks (ranked=${ranked.length}, requested=${candidateList.length}).` };
@@ -832,7 +832,7 @@ export async function generateLocalParaphrase(
                 retryCount: 0,
                 retrievedExampleCount: retrievedExamples.length,
                 safe: true,
-                notice: `Generated ${nativeRouteLabel} on this device (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
+                notice: `Generated ${nativeRouteLabel} (best of ${candidateList.length} candidates). Review the wording, then save it to teach Pari.`,
               };
             }
             inspection = { ...inspection, reason: single.reason ?? inspection.reason };
@@ -848,7 +848,7 @@ export async function generateLocalParaphrase(
           retryCount: 0,
           retrievedExampleCount: retrievedExamples.length,
           safe: true,
-          notice: `Generated ${nativeRouteLabel} on this device. Review the wording, then save it to teach Pari.`,
+          notice: `Generated ${nativeRouteLabel}. Review the wording, then save it to teach Pari.`,
         };
       }
 
@@ -900,7 +900,7 @@ export async function generateLocalParaphrase(
             retryCount: 1,
             retrievedExampleCount: retrievedExamples.length,
             safe: true,
-            notice: `Generated ${repairedRouteLabel} on this device after a quality repair pass. Review the wording, then save it to teach Pari.`,
+            notice: `Generated ${repairedRouteLabel} after a quality repair pass. Review the wording, then save it to teach Pari.`,
           };
         }
         nativeFailureNotice = `${nativeFailureNotice} The native repair pass also failed: ${retryInspection.reason ?? "its draft was unsafe."}`;

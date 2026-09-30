@@ -336,7 +336,17 @@ final class ApprovalPersistence {
             ])
         }
 
+        // loadState() reports an unreadable file as ok:false with empty
+        // examples. Merging into that silently discarded the entire prior
+        // history and wrote back a single record, so one save against a corrupt
+        // file destroyed every approval the user had. Refuse instead: losing
+        // history silently is far worse than refusing one save.
         let existing = loadState()
+        if existing["ok"] as? Bool == false {
+            throw NSError(domain: "OpenLocalPhraser.Persistence", code: 5, userInfo: [
+                NSLocalizedDescriptionKey: "Your saved approvals could not be read, so this rewrite was not saved. Nothing was changed."
+            ])
+        }
         var examples = existing["examples"] as? [[String: Any]] ?? []
         examples.removeAll { ($0["id"] as? String) == recordID }
         examples.append(record)

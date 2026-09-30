@@ -705,6 +705,7 @@ export default function App() {
   const [isLoadingMemory, setIsLoadingMemory] = useState(true);
   const [approvalsUnavailable, setApprovalsUnavailable] = useState(false);
   const [styleLoadError, setStyleLoadError] = useState<string | null>(null);
+  const [customStyleLoadFailed, setCustomStyleLoadFailed] = useState(false);
   const [isParaphrasing, setIsParaphrasing] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [generationNotice, setGenerationNotice] = useState<string | null>(null);
@@ -716,6 +717,14 @@ export default function App() {
   const notify = useCallback((text: string | null, tone: "info" | "error" = "info") => {
     setNoticeTone(tone);
     setGenerationNotice(text);
+    // Background read failures used to sit above generationNotice in the notice
+    // chain and, having no clearing path of their own, pinned the banner for the
+    // whole session -- silently swallowing every later message including
+    // "preparing", "finding alternatives" and "ready". Both remain visible where
+    // they belong (the storage badge, the control hint and their own line) and
+    // yield the single notice slot to whatever the app is doing right now.
+    setPersistenceError(null);
+    setStyleLoadError(null);
   }, []);
   const [approvalMessage, setApprovalMessage] = useState<string | null>(null);
   const [approvalError, setApprovalError] = useState<string | null>(null);
@@ -761,13 +770,17 @@ export default function App() {
   const refreshCustomStyles = useCallback(async () => {
     try {
       setCustomStyles(await loadCustomStyles());
-    // This is the *styles* load, so it must not clear the *approvals* error.
-    // Sharing one slot meant a styles load racing the approval read either hid
-    // the reason entirely, wiped it on the next window focus, or overwrote it
-    // with an unrelated message. Each gets its own notice.
-    setStyleLoadError(null);
+      // This is the *styles* load, so it must not clear the *approvals* error.
+      // Sharing one slot meant a styles load racing the approval read hid the
+      // reason, wiped it on the next window focus, or overwrote it.
+      setCustomStyleLoadFailed(false);
+      setStyleLoadError(null);
     } catch (error) {
-      setStyleLoadError(error instanceof Error ? error.message : String(error));
+      // Raw native text can carry paths and bridge internals. Log it, show a
+      // short reason instead.
+      console.error("custom styles could not be read", error);
+      setCustomStyleLoadFailed(true);
+      setStyleLoadError("Your saved rewrite styles could not be read on this device.");
     } finally {
       setCustomStylesLoaded(true);
     }
@@ -784,7 +797,7 @@ export default function App() {
     if (!customStyles.some((style) => customModeForStyle(style) === settings.mode)) {
       setSettings((current) => ({ ...current, mode: "personal" }));
     }
-  }, [customStyles, customStylesLoaded, settings.mode]);
+  }, [customStyles, customStylesLoaded, customStyleLoadFailed, settings.mode]);
 
   useEffect(() => {
     let mounted = true;
@@ -1450,8 +1463,8 @@ export default function App() {
                     : `${storageLabel}. Nothing leaves this Mac unless you explicitly choose an online route.`
                 }
               >
-                <span className="status-dot" aria-hidden="true" />
-                {storageLabel}
+                {!approvalsUnavailable && <span className="status-dot" aria-hidden="true" />}
+                {approvalsUnavailable ? "Storage unavailable" : storageLabel}
               </span>
             )}
             <div className="theme-segmented" role="group" aria-label="Color theme">
@@ -1646,8 +1659,14 @@ export default function App() {
                   <span>Your {activeMode.label} rewrite will appear here after you paraphrase. Select any highlighted word to see local alternatives.</span>
                 </div>
               )}
+              {/* Always mounted: a live region introduced together with its own
+                  text is never announced, so the skeleton below is not the
+                  live region. */}
+              <div className="sr-only" role="status" aria-live="polite">
+                {isParaphrasing ? (runStage ?? "Working on your draft") : ""}
+              </div>
               {isParaphrasing && (
-                <div className="space-y-3 pr-4" aria-live="polite">
+                <div className="space-y-3 pr-4">
                   {skeletonLineCount > 0 ? (
                     Array.from({ length: skeletonLineCount }, (_, index) => (
                       <div

@@ -256,12 +256,17 @@ input:focus-visible {
   white-space: nowrap;
 }
 
-/* A failed read must not wear the same neutral badge as a working private store. */
+/* A store that cannot be read must not look like a working one. */
 .status-badge-warning {
   border-color: var(--notice-error-border);
   background: var(--notice-error-bg);
   color: var(--notice-error-text);
 }
+
+.status-badge-warning .status-dot {
+  background: var(--notice-error-text);
+}
+
 
 .status-dot {
   width: 6px;
@@ -1005,6 +1010,15 @@ input:focus-visible {
 :root[data-theme="dark"] .quality-chip {
   background: #151312;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Same specificity as the rule above, so it must come after it. Otherwise the
+   healthy dark background wins and the unreadable-store badge is identical to
+   a working one in dark mode. */
+:root[data-theme="dark"] .status-badge-warning {
+  background: var(--notice-error-bg);
+  border-color: var(--notice-error-border);
+  color: var(--notice-error-text);
 }
 
 :root[data-theme="dark"] .theme-segmented {
