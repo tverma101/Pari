@@ -57,6 +57,21 @@ export function nativeBridgeAvailable(): boolean {
   return nativeHandler() !== null;
 }
 
+/**
+ * Distinguishes "this environment has no native bridge" (browser dev and QA,
+ * where falling back to IndexedDB is correct) from "the bridge was there and the
+ * read failed" (a real error that must be reported). Callers used to test the
+ * error *message*, which also swallowed real failures whose text happened to
+ * mention "unavailable".
+ */
+export function isNativeBridgeUnavailable(error: unknown): boolean {
+  return Boolean(
+    error &&
+      typeof error === "object" &&
+      (error as { code?: unknown }).code === "native-bridge-unavailable",
+  );
+}
+
 export function requestNativeBridge(
   action: NativeBridgeAction,
   payload?: unknown,
@@ -64,7 +79,9 @@ export function requestNativeBridge(
 ): Promise<unknown> {
   const handler = nativeHandler();
   if (!handler || typeof window === "undefined") {
-    return Promise.reject(new Error("The native bridge is unavailable in this environment."));
+    const error = new Error("The native bridge is unavailable in this environment.") as Error & { code?: string };
+    error.code = "native-bridge-unavailable";
+    return Promise.reject(error);
   }
 
   installResolver();

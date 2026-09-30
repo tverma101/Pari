@@ -298,9 +298,14 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
         // and dump focus onto <body>, leaving the popover anchored to a node
         // that no longer exists. Capture before, restore after.
         const caretOffset = getCaretTextOffset(element);
+        // Prefer where focus actually is over which token the popover is for.
+        // Using activeTokenId first meant an open popover stole the caret into
+        // its own word whenever focus had moved elsewhere in the text.
+        const activeElementTokenId =
+          (document.activeElement as HTMLElement | null)?.dataset?.inlineToken ?? null;
         const focusedTokenId =
-          activeTokenId ??
-          ((document.activeElement as HTMLElement | null)?.dataset?.inlineToken ?? null);
+          activeElementTokenId ??
+          (document.activeElement === element ? null : activeTokenId);
         const hadFocus = document.activeElement === element || element.contains(document.activeElement);
 
         renderInlineEditorContent(element, result, changedTokenIds, grammarWarningTokenIds, grammarWarningMessages, activeTokenId);
@@ -345,6 +350,19 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
 
     const activeElement = Array.from(element.querySelectorAll<HTMLElement>("[data-inline-token]"))
       .find((tokenElement) => tokenElement.dataset.inlineToken === activeTokenId) ?? null;
+
+    // If the anchored word is no longer the one that was opened, close the
+    // popover BEFORE publishing the element: closeTokenTools reads
+    // activeAnchorRef to restore focus, so handing it the mis-anchored element
+    // first would move focus to an unrelated word.
+    if (activeTokenId && activeElement && activeTokenWord) {
+      const currentWord = (activeElement.textContent ?? "").trim();
+      if (currentWord && currentWord !== activeTokenWord) {
+        onCloseTokenTools();
+        return;
+      }
+    }
+
     onAnchorChange(activeElement);
 
     // Token ids are positional (`segment-<wordIndex>`), so an edit earlier in the
@@ -352,12 +370,6 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
     // edit kept its id and therefore re-anchored to a *different* word, offering
     // replacements for a word the user was no longer looking at. If the anchored
     // word is not the one that was opened, close instead of silently moving.
-    if (activeTokenId && activeElement && activeTokenWord) {
-      const currentWord = (activeElement.textContent ?? "").trim();
-      if (currentWord && currentWord !== activeTokenWord) {
-        onCloseTokenTools();
-      }
-    }
   }, [activeTokenId, activeTokenWord, editorRef, onAnchorChange, onCloseTokenTools, result, text]);
 
   const handleInput = () => {
@@ -692,6 +704,7 @@ export default function App() {
   const [customStylesLoaded, setCustomStylesLoaded] = useState(false);
   const [isLoadingMemory, setIsLoadingMemory] = useState(true);
   const [approvalsUnavailable, setApprovalsUnavailable] = useState(false);
+  const [styleLoadError, setStyleLoadError] = useState<string | null>(null);
   const [isParaphrasing, setIsParaphrasing] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [generationNotice, setGenerationNotice] = useState<string | null>(null);
@@ -748,12 +761,13 @@ export default function App() {
   const refreshCustomStyles = useCallback(async () => {
     try {
       setCustomStyles(await loadCustomStyles());
-    // persistenceError has no clearing path outside a successful save, so a
-    // single startup hiccup pinned the notice box to that error for the rest of
-    // the session and masked every later message.
-    setPersistenceError(null);
+    // This is the *styles* load, so it must not clear the *approvals* error.
+    // Sharing one slot meant a styles load racing the approval read either hid
+    // the reason entirely, wiped it on the next window focus, or overwrote it
+    // with an unrelated message. Each gets its own notice.
+    setStyleLoadError(null);
     } catch (error) {
-      setPersistenceError(error instanceof Error ? error.message : String(error));
+      setStyleLoadError(error instanceof Error ? error.message : String(error));
     } finally {
       setCustomStylesLoaded(true);
     }
@@ -799,6 +813,7 @@ export default function App() {
 
   useEffect(() => () => {
     if (copiedTimerRef.current !== null) window.clearTimeout(copiedTimerRef.current);
+    if (runStageTimerRef.current !== null) window.clearInterval(runStageTimerRef.current);
     controllerRef.current?.abort();
   }, []);
 
@@ -1369,6 +1384,9 @@ export default function App() {
     try {
       const nextState = await persistApproval(record, nextMemory);
       setApprovedExamples(nextState.examples);
+      // The store is demonstrably readable and writable again, so withdraw the
+      // unreadable-storage claim instead of leaving it stuck for the session.
+      setApprovalsUnavailable(false);
       setPreferenceMemory(nextState.memory);
       setSession(null);
       closeTokenTools();
@@ -1597,9 +1615,9 @@ export default function App() {
                     <span className="legend-item"><span className="legend-swatch legend-swatch-warning" aria-hidden="true" /> Grammar or flow note</span>
                   </div>
                 )}
-                {(generationNotice || approvalMessage || approvalError || persistenceError) && (
-                  <div className={cn("notice mt-2.5 rounded-[12px] border px-3 py-2 text-[12.5px] leading-relaxed", approvalError || persistenceError || noticeTone === "error" ? "notice-error" : "notice-success")}>
-                    {approvalError ?? persistenceError ?? approvalMessage ?? generationNotice}
+                {(generationNotice || approvalMessage || approvalError || persistenceError || styleLoadError) && (
+                  <div className={cn("notice mt-2.5 rounded-[12px] border px-3 py-2 text-[12.5px] leading-relaxed", approvalError || persistenceError || styleLoadError || noticeTone === "error" ? "notice-error" : "notice-success")}>
+                    {approvalError ?? persistenceError ?? styleLoadError ?? approvalMessage ?? generationNotice}
                   </div>
                 )}
               </div>
@@ -1642,13 +1660,12 @@ export default function App() {
                     <div className="skeleton-line h-[14px] w-[62%] rounded-full" />
                   )}
                   <div className="muted-text flex items-center gap-2 pt-2 text-[12px]">
+                    {/* The stage is announced; the ticking clock is not. A
+                        once-per-second counter inside aria-live would make a
+                        screen reader read out the seconds for the whole run. */}
                     <span>{runStage ?? "Working on your draft"}</span>
-                    {runElapsed > 0 && <span aria-hidden="true">·</span>}
                     {runElapsed > 0 && (
-                      <span>
-                        <span className="sr-only">Elapsed time: </span>
-                        {runElapsed}s
-                      </span>
+                      <span aria-hidden="true">· {runElapsed}s</span>
                     )}
                   </div>
                 </div>

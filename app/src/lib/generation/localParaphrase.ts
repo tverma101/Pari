@@ -900,13 +900,16 @@ export async function generateLocalParaphrase(
             retryCount: 1,
             retrievedExampleCount: retrievedExamples.length,
             safe: true,
-            notice: `Generated ${repairedRouteLabel} with ${repairedNative.modelId} after a quality repair pass. Review the wording, then save it to teach Pari.`,
+            notice: `Generated ${repairedRouteLabel} on this device after a quality repair pass. Review the wording, then save it to teach Pari.`,
           };
         }
         nativeFailureNotice = `${nativeFailureNotice} The native repair pass also failed: ${retryInspection.reason ?? "its draft was unsafe."}`;
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") throw error;
-        nativeFailureNotice = `${nativeFailureNotice} The native repair pass was unavailable: ${error instanceof Error ? error.message : String(error)}`;
+        // Keep the raw reason out of the user-facing notice; it can carry paths,
+      // model ids and upstream text. It goes to the log instead.
+      console.error("native repair pass failed", error);
+      nativeFailureNotice = `${nativeFailureNotice} The on-device quality repair pass was unavailable, so the unrepaired draft was kept.`;
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") throw error;

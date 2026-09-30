@@ -86,6 +86,4 @@ export async function analyzeHarperGrammar(text: string): Promise<GrammarIssue[]
   });
 }
 
-export async function warmHarperGrammar(): Promise<void> {
-  await getLinter();
-}
+
