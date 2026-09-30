@@ -713,10 +713,13 @@ input:focus-visible {
   background: var(--token-candidate-bg);
 }
 
+/* The composited --ring measures 1.46:1 on the light editor and 2.83:1 on the
+   dark one, both under the 3:1 floor in SC 1.4.11, and the background shift on
+   its own is only 1.20:1. Use the accent outline, which passes in both themes. */
 .inline-token-candidate:focus-visible {
   background: var(--token-candidate-bg);
-  box-shadow: 0 0 0 2px var(--ring);
-  outline: none;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* A rewrite can touch most of a paragraph. Filling every changed token turns the
@@ -851,8 +854,8 @@ input:focus-visible {
 }
 
 .draft-drift-action:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--ring);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .draft-drift-action:disabled {

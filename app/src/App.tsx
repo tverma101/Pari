@@ -608,11 +608,15 @@ export default function App() {
   const [isParaphrasing, setIsParaphrasing] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [generationNotice, setGenerationNotice] = useState<string | null>(null);
-  // A generation failure writes into the same variable as a progress or success
-  // message, so the styling used to be inferred from which of the four variables
-  // happened to be set, and a failed rewrite rendered with the success box. Carry
-  // the tone explicitly instead.
+  // Tone is carried by the message itself rather than by a parallel flag. A
+  // separate tone state could drift out of step with the text — it did: only two
+  // of the notice sites reset it, so any single error turned every later success
+  // message red until the next rewrite.
   const [noticeTone, setNoticeTone] = useState<"info" | "error">("info");
+  const notify = useCallback((text: string | null, tone: "info" | "error" = "info") => {
+    setNoticeTone(tone);
+    setGenerationNotice(text);
+  }, []);
   const [approvalMessage, setApprovalMessage] = useState<string | null>(null);
   const [approvalError, setApprovalError] = useState<string | null>(null);
   const [persistenceError, setPersistenceError] = useState<string | null>(null);
@@ -658,7 +662,6 @@ export default function App() {
     // the session and masked every later message.
     setPersistenceError(null);
     } catch (error) {
-      setNoticeTone("error");
       setPersistenceError(error instanceof Error ? error.message : String(error));
     } finally {
       setCustomStylesLoaded(true);
@@ -932,7 +935,7 @@ export default function App() {
       });
       setApprovalMessage(null);
       setApprovalError(null);
-      setGenerationNotice(null);
+      notify(null);
     },
     []
   );
@@ -967,13 +970,15 @@ export default function App() {
     // single stray keystroke silently destroyed the rewrite *and* every manual
     // correction and synonym swap in it, with nothing to recover from. Say so
     // explicitly, and say more when there was real editing to lose.
-    setGenerationNotice(
+    notify(
       truncatedBy > 0
         ? `Input is limited to ${MAX_INPUT_CHARS.toLocaleString()} characters, so ${truncatedBy.toLocaleString()} characters were removed.`
         : session && session.currentEditedText !== session.generatedText
         ? "Source text changed, so the draft and your edits to it were discarded. Press Paraphrase to work on the new text."
         : session
-        ? "Source text changed, so the previous draft was discarded. Press Paraphrase to work on the new text."
+        ? !value.trim()
+        ? "Source text was cleared, so the draft and your edits to it were discarded."
+        : "Source text changed, so the previous draft was discarded. Press Paraphrase to work on the new text."
         : null,
     );
   };
@@ -990,7 +995,7 @@ export default function App() {
     const requestId = contextualRequestRef.current + 1;
     contextualRequestRef.current = requestId;
     setContextualLoadingTokenId(tokenId);
-    setGenerationNotice("Finding more local alternatives for this word…");
+    notify("Finding more local alternatives for this word…");
     const modelFailures: LocalModelFailure[] = [];
     void generateAdvancedAlternatives(
       token,
@@ -1011,20 +1016,19 @@ export default function App() {
         setContextualLoadingTokenId(null);
         if (modelFailures.length > 0) {
           const firstFailure = modelFailures[0];
-          setGenerationNotice(
+          notify(
             alternatives.length > 0
               ? `${firstFailure.label} is unavailable. Built-in offline choices are still available. ${firstFailure.message}`
               : `No additional safe local alternatives were found for this word. ${firstFailure.message}`
           );
         } else {
-          setGenerationNotice(alternatives.length > 0 ? "Local contextual alternatives are ready." : "No additional safe local alternatives were found.");
+          notify(alternatives.length > 0 ? "Local contextual alternatives are ready." : "No additional safe local alternatives were found.");
         }
       })
       .catch((error) => {
         if (contextualRequestRef.current !== requestId) return;
         setContextualLoadingTokenId(null);
-        setNoticeTone("error");
-      setGenerationNotice(error instanceof Error ? error.message : "Contextual alternatives were unavailable.");
+      notify(error instanceof Error ? error.message : "Contextual alternatives were unavailable.", "error");
       });
   };
 
@@ -1048,15 +1052,13 @@ export default function App() {
       ? effectiveStyleStrength(requestedStyle, requestedStrength)
       : requestedStrength;
 
-    setNoticeTone("info");
     setIsParaphrasing(true);
     contextualRequestRef.current += 1;
     setContextualLoadingTokenId(null);
     setContextualAlternatives({});
-    setGenerationNotice("Preparing the private on-device paraphraser…");
+    notify("Preparing the private on-device paraphraser…");
     setApprovalMessage(null);
     setApprovalError(null);
-    setNoticeTone("info");
     closeTokenTools();
 
     try {
@@ -1088,11 +1090,10 @@ export default function App() {
           strength: requestedStrength,
         },
       });
-      setGenerationNotice(result.notice ?? `Ready in ${result.durationMs} ms. Review the wording, then save it to teach Pari.`);
+      notify(result.notice ?? `Ready in ${result.durationMs} ms. Review the wording, then save it to teach Pari.`);
     } catch (error) {
       if (controller.signal.aborted || requestId !== requestIdRef.current) return;
-      setNoticeTone("error");
-      setGenerationNotice(error instanceof Error ? error.message : String(error));
+      notify(error instanceof Error ? error.message : String(error), "error");
       setSession(null);
     } finally {
       if (requestId === requestIdRef.current) setIsParaphrasing(false);
@@ -1104,19 +1105,19 @@ export default function App() {
     setSettings((current) => ({ ...current, strength: normalizedStrength }));
 
     if (!session || isParaphrasing) {
-      setGenerationNotice(null);
+      notify(null);
       return;
     }
 
     clearStrengthRegeneration();
     if (session.currentEditedText !== session.generatedText) {
-      setGenerationNotice(
-        `Rewrite amount set to ${strengthLabel(normalizedStrength)}. Press Paraphrase to apply it without replacing your manual edits.`
+      notify(
+        `Rewrite amount set to ${strengthLabel(normalizedStrength)}. Press Paraphrase to apply it — that starts a new draft, so your manual edits to this one are discarded. Revert edits first if you want to keep them.`
       );
       return;
     }
 
-    setGenerationNotice(`Rewriting at ${strengthLabel(normalizedStrength)}…`);
+    notify(`Rewriting at ${strengthLabel(normalizedStrength)}…`);
     strengthRegenerationTimerRef.current = window.setTimeout(() => {
       strengthRegenerationTimerRef.current = null;
       void handleParaphrase(normalizedStrength);
@@ -1128,12 +1129,11 @@ export default function App() {
     controllerRef.current?.abort();
     requestIdRef.current += 1;
     setIsParaphrasing(false);
-    setGenerationNotice("Paraphrase cancelled. Nothing was saved.");
+    notify("Paraphrase cancelled. Nothing was saved.");
   };
 
   const handleCopy = async (text = session?.currentEditedText ?? "") => {
     if (!text.trim()) {
-      setNoticeTone("error");
       setApprovalError("There is nothing to copy — the rewrite is empty.");
       return;
     }
@@ -1149,7 +1149,6 @@ export default function App() {
         setCopied(false);
       }, 1600);
     } catch (error) {
-      setNoticeTone("error");
       setApprovalError(
         `Copy is unavailable in this environment.${error instanceof Error ? ` ${error.message}` : ""}`,
       );
@@ -1254,7 +1253,7 @@ export default function App() {
       setSession(null);
       closeTokenTools();
       setApprovalMessage("Saved locally. Pari will use this preference in future rewrites.");
-      setGenerationNotice(null);
+      notify(null);
       setApprovalError(null);
     } catch (error) {
       setPersistenceError(error instanceof Error ? error.message : String(error));
@@ -1275,7 +1274,7 @@ export default function App() {
     setContextualAlternatives({});
     closeTokenTools();
     setApprovalError(null);
-    setGenerationNotice("Draft discarded. Nothing was saved or learned.");
+    notify("Draft discarded. Nothing was saved or learned.");
     setApprovalMessage(null);
   };
 
@@ -1346,6 +1345,12 @@ export default function App() {
             customStyles={customStyles}
             savedPreferenceCount={approvedExamples.length}
             onModeChange={(mode) => {
+              // Every other mutator of the session/controls cancels a pending
+              // debounced regeneration; the style buttons did not, so a slider
+              // nudge followed by a style change within 450ms rewrote in the
+              // previous style and recorded it as the draft's origin, leaving
+              // the drift banner with nothing to report.
+              clearStrengthRegeneration();
               const selectedStyle = customStyles.find((style) => customModeForStyle(style) === mode);
               setSettings((current) => ({
                 ...current,
@@ -1353,7 +1358,7 @@ export default function App() {
                 strength: selectedStyle?.strength ?? current.strength,
               }));
               setContextualAlternatives({});
-              setGenerationNotice(null);
+              notify(null);
             }}
             strength={settings.strength}
             onStrengthChange={handleStrengthChange}
@@ -1374,13 +1379,11 @@ export default function App() {
                     const text = await readClipboardText();
                     if (!text.trim()) {
                       // Previously a silent no-op: nothing pasted, nothing said.
-                      setNoticeTone("error");
                       setApprovalError("There is no text on the clipboard to paste.");
                       return;
                     }
                     handleInputChange(text);
                   } catch (error) {
-                    setNoticeTone("error");
                     setApprovalError(`Paste is unavailable in this environment.${error instanceof Error ? ` ${error.message}` : ""}`);
                   }
                 }} className="text-action px-2.5 py-1">Paste</button>
