@@ -124,6 +124,9 @@ def main() -> None:
             "sourceId": case_id,
             "task": kind,
             "strength": strength,
+            "requestedCount": 10,
+            "sourceText": text,
+            "selectedText": selected,
             "generative": True,
             "maxNewTokens": 1200,
             "prompt": build_prompt(text, strength, selected),
@@ -168,7 +171,7 @@ def main() -> None:
     task_bytes = ("\n".join(json.dumps(row, ensure_ascii=False) for row in tasks) + "\n").encode("utf-8")
     prompt_hash = sha256(json.dumps(PROMPT_CONTRACT, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))
     manifest = {
-        "version": 1,
+        "version": 2,
         "suite": "word_studio_v1_strength_private",
         "cases": len(tasks),
         "uniqueSources": len({row["sourceId"] for row in tasks}),
@@ -181,6 +184,7 @@ def main() -> None:
         "evidenceStatus": "synthetic_hand_authored_unvalidated; internal_interactive_seed; not published gold",
         "strengthInterpretation": PROMPT_CONTRACT["productChoice"],
         "humanReview": "Use the separate private review key. No LLM judge is run; counts and latency are not quality scores.",
+        "diagnosticMetadata": "sourceText/selectedText are non-gold fields already present in the prompt; they enable unchanged-copy diagnostics without opening the private review key.",
         "privacy": "Keep tasks, private review key, outputs, and this manifest in a private Kaggle notebook/workspace.",
     }
     review_path = args.private_review_key or args.output.with_name("word-studio-strength.private-review.json")
