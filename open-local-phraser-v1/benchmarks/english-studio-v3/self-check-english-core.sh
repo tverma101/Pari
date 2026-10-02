@@ -26,6 +26,7 @@ node test-english-core-choice-parser.mjs
 python3 test_english_core_choice_parser.py
 python3 test_kaggle_edge_cases.py
 python3 test_protocol_output_diagnostics.py
+python3 test_word_studio_transform_builder.py
 
 # Builders below require no model and verify that the model-visible task lanes can
 # be regenerated from the private seed without throwing or exposing gold labels.
