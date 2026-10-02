@@ -1,266 +1,314 @@
 # Kaggle 2×T4 execution protocol
 
-This is the operational companion to GitHub Issue #25. It is intentionally
-separate from the older Mac/MLX shootout. Candidate feasibility and quality are
-unmeasured until the pinned run completes.
+This is the canonical operational evidence contract for Pari Issue #25 / #28.
+For literal execution commands, `KAGGLE_AGENT_EXECUTION.md` is authoritative.
+Do not follow older Mac/MLX, source-build, nightly-runtime, or handwritten model
+commands from historical notes.
 
-## Safe setup and evidence boundary
+## Goal
 
-1. Keep the Kaggle notebook as a private draft. Leave GPU at `None` until the
-   fixed-screen task file, manifests, prompt contract, and runner smoke checks
-   are present and pass.
-2. Leave Internet on only for the pinned source/package/model fetches. Run
-   inference locally in the Kaggle runtime; do not send prompts to an inference
-   API or invoke an LLM judge.
-3. Use the official public upstream model repositories and immutable commits in
-   `kaggle-candidate-roster.json`. Do not duplicate public weight files as new
-   Kaggle model uploads. Keep generated answer keys, private review material,
-   prompts/outputs, and run artifacts inside the private notebook/workspace.
-4. Then select `GPU T4 x2`, record the GPU/driver/Python/CUDA/runtime versions,
-   and start with a bounded smoke run. A T4 reports CUDA compute capability
-   7.5, which meets vLLM's stated GPU minimum; this does **not** guarantee that
-   a particular model/runtime/quantization fits or works.
-5. Run the complete 1,943-case English Core screen only after smoke output and
-   provenance checks pass. Never substitute partial output for a full screen.
+Evaluate the frozen Pari LLM roster on a real private Kaggle **2× NVIDIA T4
+(16 GB each)** environment while keeping three questions separate:
 
-Kaggle UI checks: the notebook title should be `Pari Issue 25 — English Core +
-Word Studio`; keep the draft private and the accelerator at `None` until the
-preflight is complete. Do not use `Share`, `Publish`, or a public dataset/model
-visibility option for this evaluation.
+1. Can the exact model/runtime configuration execute on T4?
+2. Can the model follow the benchmark response protocol reliably?
+3. How strong is its English Core / Word Studio behavior once execution works?
 
-## Frozen benchmark build
+A runtime failure is never converted into an English score of zero.
 
-Use the exact benchmark Git commit saved in the result metadata. In a fresh
-Kaggle working directory:
+## Phase A — CPU/data preparation, accelerator OFF
+
+Keep Kaggle GPU/accelerator disabled while generating benchmark task files.
+From a fresh checkout:
 
 ```bash
 git clone --branch bench/english-studio-v3 https://github.com/tverma101/Pari.git pari
 cd pari/open-local-phraser-v1/benchmarks/english-studio-v3
-git checkout BENCHMARK_COMMIT
+export BENCHMARK_REVISION="$(git rev-parse HEAD)"
+
 bash self-check-english-core.sh
-python build-english-core-public-fast.py \
-  --blimp-revision 877fba0801ffb7cbd8c39c1ff314a46f053f6036 \
-  --super-glue-revision 3de24cf8022e94f4ee4b9d55a6f539891524d646 \
-  --glue-revision bcdcba79d07bc864c1c254ccfcedcce55bcc9a8c \
-  --paws-revision 161ece9501cf0a11f3e48bd356eaa82de46d6a09
-python build-semanticqa-lcc-english-core.py \
-  --semanticqa-checkout /kaggle/working/semanticqa \
-  --promotion
-python build-english-core-fixed-screen.py
+bash self-check-kaggle-runtime.sh
+python prepare-kaggle-benchmark.py
+python verify-kaggle-benchmark-preparation.py \
+  --benchmark-revision "$BENCHMARK_REVISION"
 ```
 
-The fixed screen is a mechanical concatenation in this order: 68 fresh shadow
-cases, 1,570 pinned public-fast cases, then 305 SemanticQA LCC cases. The
-builder checks count, unique IDs, and model-visible gold leakage; it never
-opens answer keys. Keep public-fast and SemanticQA evidence separate from the
-`author_labeled_unvalidated` shadow lane when scoring.
+`prepare-kaggle-benchmark.py` is deliberately CPU/data-only. It:
 
-## Runtime and candidate order
+- rebuilds the 68-case Pari English Core shadow lane;
+- creates an isolated binary-wheel-only Python environment for public datasets;
+- builds the deterministic 1,570-case public-fast screen at exact pinned commits;
+- creates/reuses a clean SemanticQA checkout at exact commit
+  `56c82a587f4a6cef609255cd10af372d8c76600a`;
+- builds the official 305-case SemanticQA LCC lane;
+- assembles the exact 1,943-case fixed English screen;
+- builds the 100-case cross-granularity Word Studio suite;
+- builds the 112-case strength/rewrite suite;
+- validates all task counts and hashes;
+- writes `/kaggle/working/results/benchmark-preparation.json`.
 
-Start ordinary decoding first. For Qwen3.5 dense models use a short context
-(`--max-model-len 8192`), text-only mode, and FP16 on T4 unless the runtime
-reports another measured precision. Use one GPU for models that fit; use TP=2
-only for the 35B GPTQ stretch candidate or where a measured latency comparison
-justifies it. The 35B GPTQ candidate is a feasibility experiment, not an
-assumption that two T4s suffice.
+Public-dataset Python packages live in a separate preparation venv and are
+installed with `--only-binary=:all:`. Missing wheels are a preparation failure;
+never compile dependencies to make preparation pass.
 
-The current source docs disagree on Qwen3.5 integration details: the Qwen model
-card says to use vLLM main/nightly and documents `qwen3_next_mtp`; the current
-vLLM 4B recipe documents vLLM 0.17.0+ and MTP method `mtp`. Start with the
-latest stable vLLM build that passes a smoke test, save its exact wheel/version,
-and test each documented MTP config explicitly. If stable fails, run a
-separately identified nightly attempt. Never call unsupported setup a speed
-result, and never silently fall back from MTP to normal decoding.
+Frozen public-fast dataset commits:
 
-Example complete-screen invocation (choose a fresh output filename per model
-and runtime configuration):
+| Source | Commit |
+| --- | --- |
+| BLiMP | `877fba0801ffb7cbd8c39c1ff314a46f053f6036` |
+| SuperGLUE / WiC | `3de24cf8022e94f4ee4b9d55a6f539891524d646` |
+| GLUE / CoLA | `bcdcba79d07bc864c1c254ccfcedcce55bcc9a8c` |
+| PAWS | `161ece9501cf0a11f3e48bd356eaa82de46d6a09` |
+
+## Phase B — enable T4×2 and qualify the environment
+
+Only after Phase A succeeds, enable Kaggle T4×2 and run:
 
 ```bash
-python run-english-core-vllm.py Qwen/Qwen3.5-2B \
-  /kaggle/working/results/qwen35-2b.vllm.json \
-  --tasks english-core-fixed-screen.jsonl \
-  --revision 15852e8c16360a2fea060d615a32b45270f8a8fc \
-  --benchmark-revision BENCHMARK_COMMIT \
-  --checkpoint-type instruct --quantization bf16_checkpoint_cast_to_fp16_on_T4 \
-  --prompt-mode chat --dtype half --language-model-only \
-  --max-model-len 8192 --tensor-parallel-size 1 --batch-size 32
+python kaggle-preflight.py \
+  --output /kaggle/working/results/preflight.json
 ```
 
-Run the documented MTP methods as separate runs after the normal baseline:
+Promotion-quality evidence requires a real Kaggle environment with exactly two
+visible NVIDIA T4s, CUDA available, compute capability 7.5 and adequate device
+memory. The preflight additionally records free VRAM, existing GPU processes,
+disk, libc, topology and peer access. P2P limitations are diagnostic and do not
+by themselves disqualify the preferred independent-replica strategy.
+
+## Phase C — execute the frozen roster
+
+One command:
 
 ```bash
-# One config per output file; do not overwrite the baseline.
-python run-english-core-vllm.py Qwen/Qwen3.5-2B /kaggle/working/results/qwen35-2b.mtp.json \
-  --revision 15852e8c16360a2fea060d615a32b45270f8a8fc \
-  --benchmark-revision BENCHMARK_COMMIT --checkpoint-type instruct \
-  --quantization bf16_checkpoint_cast_to_fp16_on_T4 --prompt-mode chat --dtype half \
-  --language-model-only --max-model-len 8192 --tensor-parallel-size 1 \
-  --speculative-method mtp --speculative-tokens 1
+python run-kaggle-roster.py \
+  --phase all \
+  --probe-mtp-smoke \
+  --benchmark-revision "$BENCHMARK_REVISION"
 ```
 
-The result runner writes atomically after each batch. A capped `--limit` run is
-explicitly `incomplete` and is only for setup/smoke validation. The artifact
-hash binds the pinned Hub file inventory and immutable blob IDs; it is not a
-second full bytewise hash of the downloaded tensor files. Keep runtime version,
-model revision, quantization, tokenizer/template hash, decoding config, exact
-task-file hash, and hardware metadata together.
+Before any candidate starts, the roster runner verifies the Phase A receipt,
+current Git revision, task counts and task-file hashes. It also requires the
+promotion-eligible T4 preflight.
 
-For Bonsai, use the official Q1_0 GGUF files and the vendor's pinned
-`PrismML-Eng/llama.cpp` commit `842b1880415d6f508f03b789e5ce70194def7bfd`;
-build flags and GPU offload are part of runtime identity. Build the local
-server at that commit, download the exact `file` in the candidate roster at its
-HF commit, and run `run-english-core-llamacpp.py` against the server's loopback
-OpenAI-compatible endpoint. Do not substitute stock llama.cpp or DSpark without
-a separately identified run. The model card reports its own hardware results;
-those do not predict Kaggle T4 latency. No MTP label is assigned to Bonsai
-unless the chosen checkpoint/runtime exposes a working draft path and the
-ordinary-vs-speculative pair is measured.
+For each roster candidate, ordinary decode runs first:
 
-### Pinned PrismML prebuilt ABI rerun
+1. 16-case unscored protocol smoke;
+2. 1,943-case English Core fixed screen;
+3. 100-case Word Studio cross-granularity transform suite;
+4. 112-case Word Studio strength/rewrite suite.
 
-The first private CLI attempt used upstream llama.cpp `b11179` and failed before
-inference because it requires `GLIBC_2.38` and `GLIBCXX_3.4.32`, while Kaggle
-provides glibc 2.35. CUDA libraries resolved; this is an OS ABI mismatch, not
-a T4 or Bonsai-model failure. Reject this exact binary for Kaggle.
+If a candidate fails a gate, its evidence remains on disk, later stages are
+skipped, and the next roster entry is attempted. The runner regenerates the
+candidate completeness matrix after each stage.
 
-The follow-up compatibility experiment uses an official pinned PrismML prebuilt;
-it does not change the candidate model or frozen tasks. The vendor's official
-release is `prism-b10735-842b188`, built from the exact candidate-roster commit
-`842b1880415d6f508f03b789e5ce70194def7bfd` and described as a PrismML fork
-prebuilt with Q1_0 support. Its CUDA 12.8 x64 asset is
-`llama-prism-b10735-842b188-bin-linux-cuda-12.8-x64.tar.gz` (168,052,249 bytes;
-published SHA-256
-`5cbac5269804e4eb63676aeaec1ee7d4cff6e22b87da91de9b05795bf635998e`). The
-[official release page](https://github.com/PrismML-Eng/llama.cpp/releases/tag/prism-b10735-842b188)
-and [pinned release workflow](https://github.com/PrismML-Eng/llama.cpp/blob/842b1880415d6f508f03b789e5ce70194def7bfd/.github/workflows/release-prism.yml)
-show the asset and an Ubuntu 22.04 / CUDA 12.8 build. That is a promising match
-for Kaggle's observed glibc 2.35, but compatibility remains a hypothesis until
-the runner's exact link and launch checks pass.
+The protocol smoke is intentionally not an English-quality score. It covers
+forced-choice output, JSON candidate lists, Unicode, negation, conditions,
+protected names/numbers, longer context, repeated warm requests, register,
+word↔phrase behavior and sentence→1–3-word semantic compression.
 
-The CLI runner verifies the release checksum, checks `ldd` for both
-`llama-server` and `libggml-cuda.so`, and invokes version/help checks **before**
-fetching the 3.8 GB model. It records Kaggle's libc and the exact source commit.
-Only after runtime checks pass does it fetch the pinned model and verify its
-known SHA-256. It then requires a 16-case smoke, explicit CUDA layer-offload
-evidence, the full frozen screen, and the separate 112-case Word Studio slider
-suite. The completed v4 result below establishes runtime compatibility and an
-initial quality/latency baseline, but not model selection. This is a prebuilt
-artifact of the pinned PrismML fork, not stock upstream and not a fresh source
-build. Bonsai Q1_0 has no validated MTP path,
-so this run does not claim speculative-decoding speedup. The
-[Bonsai runtime notes](https://github.com/PrismML-Eng/Bonsai-demo/blob/main/README.md)
-document support for the original Q1_0 model format; that does not establish
-compatibility for every Bonsai quantization or Bonsai 2's ternary Q2_0 path.
+## Pinned runtime policy — no source builds
 
-The first PrismML-prebuilt CLI run (kernel version 3, 2026-09-25) verified the
-published binary hash, resolved all shared libraries on Kaggle glibc 2.35, and
-downloaded the pinned 3,803,452,480-byte model with the expected hash. The
-server log said `model loaded`, but its default verbosity omitted the CUDA
-layer-allocation lines; the runner correctly stopped before sending any task
-because it could not prove GPU offload. This is **not** a Bonsai score, nor
-proof that the server ran on CPU. The pinned server README documents
-`--list-devices`, `--device`, and `--verbose` (log all messages):
-[pinned server CLI documentation](https://github.com/PrismML-Eng/llama.cpp/blob/842b1880415d6f508f03b789e5ce70194def7bfd/tools/server/README.md).
-The next bounded attempt enumerates CUDA before downloading weights, explicitly
-selects `CUDA0`, enables verbose startup evidence, and waits for that evidence
-before running the smoke or benchmark. The job ended with error; Kaggle's
-control plane was verified afterward with Draft Session off, accelerator
-`None`, and Internet off.
+Canonical Issue #25 execution may use only artifacts in
+`kaggle-prebuilt-runtimes.json`.
 
-### Version 4 execution and results
+### vLLM
 
-The fourth private CLI submission (kernel version 4; run ID
-`20260925T172959Z`) used Kaggle kernel slug
-`nirasushi/pari-issue-25-bonsai-27b-q1-0-upstream-prebuilt`; the slug retains a
-legacy `upstream-prebuilt` name, but version 4 used the PrismML runtime below.
-It passed preflight, the 16-case smoke, GPU-offload checks, the
-1,943-case fixed screen, and all 112 Word Studio cases at strengths 15, 40, 60,
-and 90. The private archive SHA-256 is
-`1d5cb9005d41ea1f6659b0bff49fa714ac9e77db398bbde7a188b496fe9bf6a9`. It
-contains outputs and summaries, not the private answer keys.
+Pinned runtime: **vLLM 0.30.0 CUDA 12.9 x86_64**
 
-The exact model was `prism-ml/Bonsai-27B-gguf` revision
-`f10afb355f104535e3e3e98cf7ab7795c72bd292`, file
-`Bonsai-27B-Q1_0.gguf` (3,803,452,480 bytes; SHA-256
-`17ef842e47450caeb8eaa3ebfbbab5d2f2278b62b79be107985fb69a2f819aa0`). The
-official PrismML CUDA 12.8 prebuilt hash matched the release. Kaggle exposed
-two T4s; this run used only `CUDA0`, and startup logs verified 65/65 layers
-offloaded to that T4. The server stopped before export. MTP was not used or
-claimed. Total run time was 3,748 seconds; the full screen's recorded wall time
-was about 1,749 seconds. First-token latency over the 1,943 screen outputs was
-0.676 seconds median / 1.385 seconds p95. For Word Studio, complete-output
-latency was 19.64 seconds median / 27.06 seconds p95; its first-token median
-was 1.216 seconds. Word Studio outputs still require human review and have no
-automated quality score.
+Official wheel:
+`https://github.com/vllm-project/vllm/releases/download/v0.30.0/vllm-0.30.0%2Bcu129-cp38-abi3-manylinux_2_28_x86_64.whl`
 
-The original public-fast score uses the strict parser and remains the frozen
-benchmark baseline. An offline parser replay against the exact same raw outputs
-does not change prompts, generations, or labels:
+SHA-256:
+`e98cb69659bfcfc849cf11ce0781a7161d40b02b51a6c3636924a5909f2aabcc`
 
-| Public-fast scoring view | Correct / cases | Accuracy (invalid as wrong) | Valid-output coverage |
-| --- | ---: | ---: | ---: |
-| Frozen run score, strict parser | 943 / 1,570 | 60.06% | 74.97% |
-| Offline replay, anchored-explanation parser | 1,225 / 1,570 | 78.03% | 99.81% |
+The dispatcher installs it with binary-only pip policy and verifies the runtime
+receipt plus installed version. A random Kaggle-preinstalled vLLM is not accepted
+as canonical evidence.
 
-The replay parsed 390 additional outputs; 282 were correct and 108 wrong, with
-three outputs still invalid. Typical previously rejected answers were
-`A. same`, `A. acceptable`, or `A. different`: the selected letter was
-explicit, but the scorer discarded it because explanatory text followed.
-Treat the accuracy increase as a parser/format-coverage result, not improved
-generation or a model-quality uplift. The separate SemanticQA LCC lane scored
-121/305 (39.67% accuracy; macro-F1 35.44%; 100% output coverage). The 68 shadow
-cases remain unvalidated and unscored. Do not combine these protocols into one
-number or select a model from this one candidate's screen.
+### Prism llama.cpp / Bonsai
 
-Kaggle reported the job complete. The control page showed the session off,
-accelerator `None`, and Internet off before results were downloaded. Local
-kernel metadata was also restored to GPU/network off. Results remain in a
-private temporary directory and were not added to Git or published.
+Pinned source commit:
+`842b1880415d6f508f03b789e5ce70194def7bfd`
 
-For repeatable submission, use the official [Kaggle CLI kernel guide](https://github.com/Kaggle/kaggle-cli/blob/main/docs/kernels.md)
-with account credentials already configured locally (never place a token in
-notebook code). Prefer a
-fresh, private script kernel for an isolated run: `kernels push` executes the
-uploaded code, so pushing this historical multi-run notebook would replay its
-prior cells. Keep the local metadata at `enable_gpu: false`,
-`enable_internet: false`, and an empty `machine_shape`; only temporarily enable
-the exact T4×2 accelerator and Internet for an explicitly authorized run and
-its public model/runtime downloads, then restore those local defaults. Use CLI
-status/output/logs for runs and fetch only the intended result artifact. The
-[Kaggle CLI v2.2.4 changelog](https://github.com/Kaggle/kaggle-cli/blob/v2.2.4/CHANGELOG.md)
-documents the SSE implementation for `kernels logs --follow`. In this run,
-installed Kaggle CLI 2.2.4 returned 404 when that command was given
-`owner/kernel/4`, but streamed live logs when called with `owner/kernel`
-(without the version suffix). This is an observed invocation-specific result,
-not a claim that all version-specific log requests fail. A 404, missing CLI
-status, or script error is not evidence that the provider session stopped.
-After completion or failure, verify the draft session is off, the
-accelerator is `None`, and Internet is off in Kaggle's control plane. The
-documented CLI commands do not provide a stop-and-disable operation.
+Allowed vendor-prebuilt compatibility ladder:
 
-## Word Studio slider suite
+1. CUDA 12.8 x86_64
+2. CUDA 12.4 x86_64
 
-Use `build-word-studio-strength-suite.py` with the hand-authored synthetic seed
-and the existing interactive V1 seed. It emits 112 model-visible tasks across
-four predeclared strengths (15, 40, 60, 90), plus a separate author-review file.
-The task file excludes expectations. Strength semantics are a Pari product
-choice, not a scale claimed by the literature: increasing the slider permits
-more wording/structure change, never stronger opinions or altered facts.
+Both are official PrismML release binaries from the same pinned source commit.
+Every attempt is logged. If neither binary works, the runtime configuration is
+`runtime_unqualified`. Do **not** compile llama.cpp.
 
-The prompt requests 10 distinct alternatives so the whole-completion duration
-approximates time-to-10 for this one-shot generation interface. The runner's
-first-token latency is only a first-token proxy—not time to the first
-human-approved option. Parse and inspect actual alternatives; report the count
-of valid unique options and latency separately. No LLM judge or automatically
-invented quality score is used. Human review must separately check semantic
-anchors, voice/register, naturalness, strength monotonicity, and harmful
-meaning flips. These cases remain synthetic/unvalidated until that review.
+CUDA 12.8 SHA-256:
+`5cbac5269804e4eb63676aeaec1ee7d4cff6e22b87da91de9b05795bf635998e`
 
-## Completion and archival
+CUDA 12.4 SHA-256:
+`b58caa10e38ea2d3af419bc1c908f785b5f8756b07c98cb1752d50e1e985d4c6`
 
-Score only with the lane-specific existing scorers and their answer files. Run
-paired/robustness and official/native finalist lanes after the fixed screen;
-keep Word Studio metrics separate from English Core dimensions. Save outputs
-as private Kaggle working artifacts, inspect status and hashes, and only then
-prepare a public-safe summary that contains results/provenance—not answer keys
-or rehosted benchmark examples whose upstream license is unclear.
+Forbidden during the canonical run include CMake, Ninja, Make, NVCC, Cargo,
+`setup.py build`, editable installs, source-distribution pip fallbacks,
+FlashAttention source compilation, and custom runtime patching.
+
+## Artifact/model preflight
+
+Before model weights are downloaded, runtime wrappers inspect the pinned Hub
+artifact metadata and available disk. They record expected artifact size and
+require enough headroom. Model access/auth, persistent Hub failures, unknown
+artifact size, revision mismatch, missing exact GGUF file or insufficient disk
+are structured runtime/preparation failures, not linguistic results.
+
+For GGUF candidates the exact downloaded file is SHA-256 checked. For
+Transformers/vLLM repositories, result identity binds the immutable Hub revision
+and canonical pinned file inventory.
+
+## T4 failure handling
+
+At minimum preserve these classes separately when they occur:
+
+- model/load OOM vs generation/KV-cache OOM;
+- unsupported model architecture;
+- unsupported sm75/T4 kernel;
+- FP8/BF16-only assumptions;
+- FlashAttention/FlashInfer/xFormers/Triton/PTX/custom-op incompatibility;
+- GPTQ/AWQ/Marlin/bitsandbytes implementation limits;
+- PyTorch/CUDA/cuDNN/driver mismatch;
+- GLIBC/GLIBCXX/Python ABI errors or illegal instruction;
+- tokenizer/chat-template/remote-code dependency errors;
+- CUDA graph/device-side assert;
+- NCCL/P2P/tensor-parallel failure;
+- MTP unsupported vs MTP runtime failure;
+- silent CPU fallback or unverified GPU offload;
+- timeout/crash;
+- Kaggle session/control-plane failure;
+- forbidden source-build attempt.
+
+The exact frozen configuration may reduce batch size only through the declared
+batch fallback. Changing checkpoint, quantization, dtype semantics, tokenizer,
+runtime family or model identity creates a new experiment.
+
+## Output/protocol evidence
+
+Raw model text is preserved. Do not clean away `<think>` blocks before protocol
+diagnostics.
+
+Forced-choice lanes report both:
+
+- strict letter-only compliance/accuracy;
+- conservative recoverable explicit-choice parsing.
+
+The recoverable parser never consults gold labels and never scans arbitrary
+prose to guess an answer.
+
+Word Studio outputs report, where applicable:
+
+- requested / parsed / unique option count;
+- exact duplicates;
+- unchanged-source copies;
+- malformed/commentary output;
+- finish reason / token-limit cutoff;
+- option length distribution;
+- first usable option / first 3 / first 10 latency for streaming finalist runs.
+
+A fluent paragraph is not counted as a successful request for ten alternatives.
+
+## Product benchmark contract
+
+`kaggle-execution-manifest.json` defines the normal-decode stage counts:
+
+| Stage | Cases | Role |
+| --- | ---: | --- |
+| protocol smoke | 16 | execution/format only, unscored |
+| English Core fixed screen | 1,943 | common linguistic screen |
+| Word Studio transform | 100 | arbitrary cross-granularity behavior |
+| Word Studio strength/rewrite | 112 | strength/register/rewrite behavior |
+
+Normal-decode executions including smoke: **2,171**.
+Quality/product tasks excluding smoke: **2,155**.
+
+The 100-case transform suite explicitly includes word→phrase, phrase→word,
+phrase→phrase, clause transformation, sentence rewriting, sentence→1–3-word
+gist compression, split/join, register/vocabulary control, collocation,
+protected context, expansion and compression.
+
+Intentional gist compression is not evaluated with ordinary full-paraphrase
+semantic-equivalence thresholds because detail loss is part of the requested
+operation.
+
+## Finalist speed measurement
+
+Do not choose a model from token/sec alone. After quality evidence identifies
+finalists, measure the interactive product path.
+
+For vLLM finalists:
+
+```bash
+python run-kaggle-vllm-streaming-latency.py CANDIDATE_ID \
+  --stage transform \
+  --benchmark-revision "$BENCHMARK_REVISION"
+```
+
+This uses the pinned local vLLM server, validates the CLI contract before model
+load, proves T4 VRAM use, streams candidate output and measures TTFT plus time to
+first / first 3 / first 10 complete parseable alternatives.
+
+MTP/speculative variants may be measured only after ordinary decode succeeds and
+only when the exact method appears in that candidate's frozen
+`mtpMethodsToProbe`. Unsupported MTP is a separate speed-path failure and does
+not invalidate ordinary generation.
+
+For models fitting one T4, prefer measuring a one-GPU baseline and independent
+second-GPU generation/replica behavior before assuming TP2 improves latency.
+TP2 is required only when the model needs it or measurement shows it helps.
+
+## Historical Bonsai 27B evidence
+
+A previous private Kaggle run established that the pinned PrismML CUDA 12.8
+prebuilt plus `prism-ml/Bonsai-27B-gguf` Q1_0 could run on Kaggle T4 CUDA0 with
+65/65 layers offloaded. That run completed the then-current 1,943 English screen
+and 112 Word Studio strength tasks.
+
+Its strict public-fast result was 943/1,570 (60.06%) with 74.97% valid-output
+coverage. A later offline conservative parser replay against the **same raw
+outputs** recovered explicit answers such as `A. same`, producing 1,225/1,570
+(78.03%) with 99.81% coverage. Treat that change only as parser/format evidence,
+not a generation or model-quality improvement. SemanticQA LCC was 121/305
+(39.67%). The 68 shadow cases were unvalidated and were not used as published
+gold. One candidate's historical run does not select the final model.
+
+The prior run also demonstrated why runtime provenance matters: an earlier
+upstream llama.cpp binary failed Kaggle's libc ABI before inference, while the
+pinned Prism vendor build worked. The canonical workflow therefore uses verified
+prebuilt receipts and never treats ABI failure as bad model quality.
+
+## Resume / interruption safety
+
+vLLM common-screen checkpoints are atomic. Resume is accepted only when existing
+outputs are the exact task-ID prefix and model revision, task hash, benchmark
+revision, prompt mode, decoding parameters and topology all match. Duplicates,
+gaps, reordered IDs or changed configuration are rejected. The contract is
+regression-tested by `test_resume_contract.py`.
+
+Do not splice results from different configurations.
+
+## Completion artifacts
+
+At minimum preserve privately:
+
+- `benchmark-preparation.json`;
+- `preflight.json`;
+- per-runtime install/verification receipts;
+- Hub artifact preflight receipts;
+- every attempted command/log;
+- raw model result JSON;
+- protocol diagnostics;
+- promotion validation for common full runs;
+- `candidate-matrix.json` / `.md`;
+- `roster-orchestration.json`;
+- finalist streaming latency artifacts.
+
+Do not publish private answer keys, author-review keys or benchmark outputs unless
+explicitly requested.
+
+After the run finishes or fails, terminate local servers and verify Kaggle's
+control plane shows the session stopped and accelerator off/None. Zero GPU
+utilization alone is not proof that the cloud session stopped.
