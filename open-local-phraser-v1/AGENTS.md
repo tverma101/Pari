@@ -18,6 +18,16 @@ For Issue #25 and the `bench/english-studio-v3` model-selection work, read and o
 - `benchmarks/english-studio-v3/KAGGLE_2XT4_RUN.md` — canonical operational evidence/runbook.
 - `benchmarks/english-studio-v3/KAGGLE_BENCHMARK_HARDENING.md` — qualification/failure contract.
 
+Before any GPU model run, execute both package checks:
+
+```bash
+cd benchmarks/english-studio-v3
+bash self-check-english-core.sh
+bash self-check-kaggle-runtime.sh
+```
+
+If either check fails, stop. That is a benchmark-package problem, not a model result.
+
 Promotion-quality runtime evidence must be produced on an actual private Kaggle **2× NVIDIA T4 (16 GB each)** run. Do not substitute another GPU/provider or a local run for the T4 qualification step.
 
 ### Prebuilt-only rule
@@ -36,7 +46,33 @@ Forced-choice evaluation must preserve both the frozen strict protocol result an
 
 Use the predeclared batch-size fallback sequence and retry policy from `KAGGLE_BENCHMARK_HARDENING.md`; never silently change checkpoint, quantization, dtype semantics, tokenizer/template, or runtime to make a candidate fit. Such changes create a new candidate configuration.
 
-For roster-driven vLLM candidates use `run-kaggle-vllm-candidate.py` rather than hand-constructing commands. It may reduce batch size only through the frozen ladder and must preserve every failed attempt/log. For Word Studio outputs use `word_studio_output_parser.py`; never regenerate merely because formatting is ugly.
+### Mechanical runner rule
+
+Use `run-kaggle-candidate.py` as the normal candidate entry point. Candidate ID decides whether vLLM or the pinned Prism llama.cpp runtime is used. Do not hand-construct equivalent commands unless repairing the benchmark itself.
+
+```bash
+python run-kaggle-candidate.py CANDIDATE_ID --stage smoke --benchmark-revision "$REV"
+python run-kaggle-candidate.py CANDIDATE_ID --stage full --benchmark-revision "$REV"
+python run-kaggle-candidate.py CANDIDATE_ID --stage transform --benchmark-revision "$REV"
+```
+
+For the product suite, build the cross-granularity task file from the tracked seed first:
+
+```bash
+python build-word-studio-transform-suite.py
+```
+
+For finalist interactive latency, use `run-kaggle-vllm-streaming-latency.py` for vLLM candidates. It launches the pinned prebuilt vLLM server locally, validates the exact CLI before model load, proves T4 VRAM use, streams output, measures first usable candidate / first 3 / first 10, and shuts the server down. Do not substitute TTFT for first-useful-candidate latency.
+
+After each candidate or interrupted batch of candidates, regenerate the explicit completeness matrix:
+
+```bash
+python build-kaggle-candidate-matrix.py
+```
+
+`not_run` and `runtime_unqualified` rows must remain visible. Never delete a failed candidate from the history to make the comparison cleaner.
+
+Resume may only continue an exact atomic task-ID prefix under the same model revision, task hash, prompt mode, decoding, topology, and benchmark revision. The resume contract is regression-tested by `test_resume_contract.py`. Never splice outputs from changed configurations.
 
 ## Architecture
 
