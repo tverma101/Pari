@@ -143,6 +143,8 @@ def main() -> None:
                 "operation": op["id"],
                 "semanticMode": op.get("semanticMode", "preserve_full_selected_meaning"),
                 "requestedCount": 10,
+                "sourceText": row["input"],
+                "selectedText": row["selection"],
                 "generative": True,
                 "maxNewTokens": 900,
                 "prompt": build_prompt(row, op),
@@ -164,7 +166,7 @@ def main() -> None:
 
     task_bytes = ("\n".join(json.dumps(x, ensure_ascii=False) for x in tasks) + "\n").encode("utf-8")
     manifest = {
-        "version": 1,
+        "version": 2,
         "suite": "word_studio_transform_v1",
         "cases": len(tasks),
         "uniqueSources": len(cases),
@@ -176,6 +178,7 @@ def main() -> None:
         },
         "evidenceStatus": "hand_authored_product_acceptance_seed; author expectations; not published human-validated gold",
         "scoringSeparation": "intentional_compression tasks must not use full-paraphrase semantic-equivalence thresholds",
+        "diagnosticMetadata": "sourceText/selectedText are non-gold fields already present in prompts and enable unchanged-copy diagnostics without private expectations.",
         "privacy": "Keep model outputs and private review key in the private Kaggle workspace.",
     }
     review_path = args.private_review_key or args.output.with_name("word-studio-transform.private-review.json")
