@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "purpose": "Canonical Issue #25 Kaggle T4 execution stages and expected task counts",
+  "normalDecodeStages": [
+    {
+      "id": "protocol-smoke",
+      "runnerStage": "smoke",
+      "taskFile": "kaggle-protocol-smoke.jsonl",
+      "expectedCases": 16,
+      "evidenceRole": "runtime_and_response_protocol_only",
+      "qualityScored": false,
+      "failureMeaning": "Harness/model-response observability problem; wrong linguistic choices alone do not fail qualification"
+    },
+    {
+      "id": "english-core-fixed",
+      "runnerStage": "full",
+      "taskFile": "english-core-fixed-screen.jsonl",
+      "expectedCases": 1943,
+      "evidenceRole": "common_linguistic_screen",
+      "qualityScored": true,
+      "composition": {
+        "pariShadow": 68,
+        "publicFast": 1570,
+        "semanticQaLcc": 305
+      }
+    },
+    {
+      "id": "word-studio-transform",
+      "runnerStage": "transform",
+      "taskFile": "word-studio-transform.jsonl",
+      "expectedCases": 100,
+      "evidenceRole": "cross_granularity_product_acceptance",
+      "qualityScored": true,
+      "generatedBy": "build-word-studio-transform-suite.py",
+      "notes": "Intentional sentence-to-gist compression is labeled separately from full paraphrase equivalence."
+    },
+    {
+      "id": "word-studio-strength",
+      "runnerStage": "word-studio",
+      "taskFile": "word-studio-strength.jsonl",
+      "expectedCases": 112,
+      "evidenceRole": "strength_register_and_rewrite_product_acceptance",
+      "qualityScored": true,
+      "generatedBy": "build-word-studio-strength-suite.py"
+    }
+  ],
+  "expectedNormalDecodeTaskExecutionsIncludingSmoke": 2171,
+  "expectedQualityOrProductTaskExecutionsExcludingSmoke": 2155,
+  "selectionRules": [
+    "Protocol smoke is never added to English quality scores.",
+    "Runtime-unqualified candidates do not receive an English score of zero.",
+    "English Core product-prior composite is separate from route-specific Word Studio acceptance evidence.",
+    "Product routing has no single aggregate winner score.",
+    "Full/native public anchors for finalists remain separate from the common 1,943-case screen."
+  ]
+}
