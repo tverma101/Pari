@@ -20,6 +20,7 @@ from pathlib import Path
 import requests
 
 from kaggle_failure_taxonomy import classify
+from kaggle_hub_artifact_preflight import inspect_hub_artifact
 
 HERE = Path(__file__).resolve().parent
 ROSTER = HERE / "kaggle-candidate-roster.json"
@@ -162,7 +163,7 @@ def main() -> None:
     summary_path = candidate_dir / "summary.json"
     server_log = candidate_dir / "llama-server.log.txt"
     summary = {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "candidate": c,
         "stage": args.stage,
         "benchmarkRevision": args.benchmark_revision,
@@ -183,6 +184,21 @@ def main() -> None:
         summary["reason"] = "pinned prebuilt did not enumerate a CUDA device"
         write_json(summary_path, summary)
         raise SystemExit(2)
+
+    artifact_preflight = inspect_hub_artifact(
+        c["repo"], c["revision"], filename=c["file"], disk_root=Path("/kaggle/working")
+    )
+    artifact_preflight_path = candidate_dir / "hub-artifact-preflight.json"
+    write_json(artifact_preflight_path, artifact_preflight)
+    summary["hubArtifactPreflight"] = str(artifact_preflight_path)
+    summary["expectedHubBytes"] = artifact_preflight.get("selectedBytes")
+    if artifact_preflight.get("status") != "qualified":
+        summary["status"] = "runtime_unqualified"
+        summary["terminalFailureCategories"] = [artifact_preflight.get("failureCategory") or "artifact_size_unknown"]
+        summary["reason"] = f"Hub artifact preflight failed: {artifact_preflight.get('status')}"
+        write_json(summary_path, summary)
+        raise SystemExit(2)
+    write_json(summary_path, summary)
 
     try:
         model_path, expected_lfs_sha, actual_sha = hub_file(c["repo"], c["revision"], c["file"])
