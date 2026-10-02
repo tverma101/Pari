@@ -18,6 +18,7 @@ HERE = Path(__file__).resolve().parent
 ROSTER = HERE / "kaggle-candidate-roster.json"
 DISPATCH = HERE / "run-kaggle-candidate.py"
 MATRIX = HERE / "build-kaggle-candidate-matrix.py"
+VERIFY_PREP = HERE / "verify-kaggle-benchmark-preparation.py"
 
 PHASE_STAGES = {
     "smoke": ("smoke",),
@@ -53,8 +54,31 @@ def main() -> None:
     ap.add_argument("--phase", choices=sorted(PHASE_STAGES), default="all")
     ap.add_argument("--candidate", action="append", default=[], help="optional exact candidate id; repeat to choose a subset")
     ap.add_argument("--results-dir", type=Path, default=Path("/kaggle/working/results"))
+    ap.add_argument("--preflight", type=Path, default=Path("/kaggle/working/results/preflight.json"))
+    ap.add_argument("--preparation-receipt", type=Path, default=Path("/kaggle/working/results/benchmark-preparation.json"))
     ap.add_argument("--probe-mtp-smoke", action="store_true", help="after ordinary smoke success, probe only roster-declared MTP methods")
     args = ap.parse_args()
+
+    args.results_dir.mkdir(parents=True, exist_ok=True)
+
+    # Fail once, before model/runtime downloads, if the task corpus is stale or partial.
+    prep_log = args.results_dir / "benchmark-preparation-verification.log.txt"
+    prep_rc = run(
+        [
+            sys.executable, str(VERIFY_PREP),
+            "--receipt", str(args.preparation_receipt),
+            "--benchmark-revision", args.benchmark_revision,
+        ],
+        prep_log,
+    )
+    if prep_rc != 0:
+        raise SystemExit("prepared benchmark verification failed; do not start model evaluation")
+
+    if not args.preflight.is_file():
+        raise SystemExit(f"missing real-Kaggle T4 preflight {args.preflight}; do not start model evaluation")
+    preflight = json.loads(args.preflight.read_text(encoding="utf-8"))
+    if not preflight.get("promotionEligibleEnvironment"):
+        raise SystemExit("Kaggle preflight is not promotion-eligible; do not start model evaluation")
 
     roster = json.loads(ROSTER.read_text(encoding="utf-8"))
     available = [row["id"] for row in roster["candidates"]]
@@ -63,10 +87,12 @@ def main() -> None:
     if unknown:
         raise SystemExit(f"unknown candidates: {unknown}; allowed={available}")
 
-    args.results_dir.mkdir(parents=True, exist_ok=True)
     orchestration = {
-        "version": 1,
+        "version": 2,
         "benchmarkRevision": args.benchmark_revision,
+        "preparationReceipt": str(args.preparation_receipt),
+        "preparationVerificationLog": str(prep_log),
+        "preflight": str(args.preflight),
         "phase": args.phase,
         "selectedCandidates": selected,
         "stages": list(PHASE_STAGES[args.phase]),
