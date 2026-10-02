@@ -17,6 +17,8 @@ components during the run.
 
 ## Canonical entry points
 
+- `prepare-kaggle-benchmark.py` — CPU/data preparation before GPU time.
+- `verify-kaggle-benchmark-preparation.py` — proves generated tasks still match their preparation receipt.
 - `run-kaggle-roster.py` — run the frozen roster mechanically.
 - `run-kaggle-candidate.py` — one candidate/stage; normally called by the roster runner.
 - `run-kaggle-vllm-streaming-latency.py` — finalist interactive latency only.
@@ -66,7 +68,9 @@ Both Prism binaries are vendor prebuilts from the same pinned source commit. No 
 
 # Literal run sequence
 
-## S0 — checkout
+## S0 — checkout, accelerator OFF
+
+Keep the Kaggle accelerator at `None` for S0–S1.
 
 ```bash
 git clone --branch bench/english-studio-v3 https://github.com/tverma101/Pari.git pari
@@ -76,7 +80,36 @@ export BENCHMARK_REVISION="$(git rev-parse HEAD)"
 
 Do not edit benchmark files in the Kaggle notebook.
 
-## S1 — prove the environment
+## S1 — prove and prepare the benchmark package, still accelerator OFF
+
+```bash
+bash self-check-english-core.sh
+bash self-check-kaggle-runtime.sh
+python prepare-kaggle-benchmark.py
+python verify-kaggle-benchmark-preparation.py \
+  --benchmark-revision "$BENCHMARK_REVISION"
+```
+
+This step builds and verifies every generated benchmark task **before GPU time**:
+
+- 68 shadow cases;
+- 1,570 pinned public-fast cases;
+- 305 pinned SemanticQA LCC cases;
+- combined 1,943-case English Core screen;
+- 100 cross-granularity Word Studio tasks;
+- 112 strength/rewrite Word Studio tasks;
+- 16 tracked protocol-smoke tasks.
+
+The public dataset builder runs inside an isolated binary-wheel-only venv, and the
+SemanticQA checkout is forced to the exact clean pinned commit. No model weights or
+GPU runtimes are downloaded by benchmark preparation.
+
+If any S1 command fails, STOP. That is a benchmark/data-preparation failure, not a
+model result. Do not turn the GPU on to debug it.
+
+## S2 — enable T4×2 and prove the environment
+
+Only after S1 succeeds, enable Kaggle `GPU T4 x2`, then run:
 
 ```bash
 python kaggle-preflight.py --output /kaggle/working/results/preflight.json
@@ -87,18 +120,6 @@ If this fails, STOP. Do not download a model. The environment is unqualified.
 The preflight records real Kaggle markers, exactly two T4s, compute capability 7.5,
 VRAM/free VRAM, existing GPU processes, CUDA/driver, disk, libc, topology and P2P.
 P2P warnings alone do not disqualify independent one-GPU replicas.
-
-## S2 — prove the benchmark package
-
-```bash
-bash self-check-english-core.sh
-bash self-check-kaggle-runtime.sh
-```
-
-If either fails, STOP. This is a benchmark-package failure, not a model result.
-
-Do not start debugging on GPU time. Fix the repository separately, commit the fix,
-and start a fresh benchmark checkout.
 
 ## S3 — run the roster
 
@@ -111,11 +132,13 @@ python run-kaggle-roster.py \
   --benchmark-revision "$BENCHMARK_REVISION"
 ```
 
-That command walks the frozen roster in order.
+The roster runner first re-verifies the preparation receipt, task hashes/counts,
+current Git revision, and T4 preflight. It refuses to start a model if any of those
+are stale or incomplete.
 
 For each candidate it attempts, in order:
 
-1. protocol smoke;
+1. shared 16-case protocol smoke;
 2. full 1,943-case English Core screen;
 3. 100-case cross-granularity Word Studio transform suite;
 4. 112-case strength/rewrite Word Studio suite.
@@ -123,11 +146,10 @@ For each candidate it attempts, in order:
 If a candidate fails a gate, later quality stages for that candidate are skipped and
 the next candidate is attempted. Failure evidence stays on disk.
 
-For vLLM candidates, the smoke stage uses `kaggle-protocol-smoke.jsonl`: a fixed
-16-case response-shape suite covering forced choice, JSON alternatives, Unicode,
-negation, conditions, protected names/numbers, longer context, repeated warm request,
-casual register, word↔phrase behavior and sentence→1–3-word compression. Smoke is
-not an English score.
+The same `kaggle-protocol-smoke.jsonl` is used for both vLLM and Prism/Bonsai. It
+covers forced choice, JSON alternatives, Unicode, negation, conditions, protected
+names/numbers, longer context, repeated warm request, casual register, word↔phrase
+behavior and sentence→1–3-word compression. Smoke is not an English score.
 
 `--probe-mtp-smoke` runs only MTP methods explicitly listed for that candidate and
 only after ordinary smoke succeeds. MTP failure does not invalidate ordinary decode.
