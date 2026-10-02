@@ -21,7 +21,7 @@ PRISM = HERE / "run-kaggle-prism-candidate.py"
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("candidate_id")
-    ap.add_argument("--stage", choices=["smoke", "full", "word-studio"], required=True)
+    ap.add_argument("--stage", choices=["smoke", "full", "word-studio", "transform"], required=True)
     ap.add_argument("--benchmark-revision", required=True)
     ap.add_argument("--decode", choices=["normal", "mtp", "qwen3_next_mtp"], default="normal")
     ap.add_argument("--speculative-tokens", type=int, default=1)
