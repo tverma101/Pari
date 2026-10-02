@@ -12,7 +12,8 @@ This file exists so an execution agent does **not** reason about how to run the 
 6. Do not retry because an answer is wrong, malformed, a refusal, or poor. Those are benchmark observations.
 7. Do not change a model configuration to make it pass. A different quantization/dtype/runtime/checkpoint is a separate candidate configuration.
 8. Never score a runtime failure as English = 0.
-9. Never merge from this execution task.
+9. Use `run-kaggle-candidate.py`; do not manually reconstruct candidate commands unless repairing the benchmark package itself.
+10. Never merge from this execution task.
 
 ## Canonical sources
 
@@ -22,8 +23,11 @@ This file exists so an execution agent does **not** reason about how to run the 
 - `kaggle-candidate-roster.json` — exact model revisions.
 - `kaggle-prebuilt-runtimes.json` — exact runtime builds.
 - `kaggle-preflight.py` — real 2×T4 gate.
+- `run-kaggle-candidate.py` — single candidate dispatcher.
+- `protocol_output_diagnostics.py` — format/protocol diagnostics without gold labels.
 - `word_studio_output_parser.py` — deterministic product-output parser.
 - `kaggle_failure_taxonomy.py` — runtime failure classifier.
+- `build-kaggle-candidate-matrix.py` — explicit completed/failed/not-run matrix.
 
 ## Actual prebuilt builds
 
@@ -63,14 +67,22 @@ The CUDA 12.8 Prism build already completed a real Kaggle Bonsai-27B Q1_0 run. P
 
 ## State machine
 
+Set these once:
+
+```bash
+export BENCHMARK_REVISION="$(git rev-parse HEAD)"
+export CANDIDATE="qwen35-4b"   # replace only with an exact id from kaggle-candidate-roster.json
+```
+
 ### S0 — checkout
 
 ```bash
 git clone --branch bench/english-studio-v3 https://github.com/tverma101/Pari.git pari
 cd pari/open-local-phraser-v1/benchmarks/english-studio-v3
+export BENCHMARK_REVISION="$(git rev-parse HEAD)"
 ```
 
-Record `git rev-parse HEAD`. Do not edit benchmark files in the run notebook.
+Do not edit benchmark files in the run notebook.
 
 ### S1 — environment gate
 
@@ -80,13 +92,23 @@ python kaggle-preflight.py --output /kaggle/working/results/preflight.json
 
 If exit != 0: archive the preflight artifact, classify the environment as unqualified, stop. Do not touch models.
 
-### S2 — self-check
+The preflight records T4 identity, compute capability, free VRAM, existing GPU processes, libc/ldd, disk space, topology and peer access. P2P warnings do not disqualify independent one-GPU replicas.
+
+### S2 — benchmark-package self-check and frozen product builds
 
 ```bash
 bash self-check-english-core.sh
+python build-word-studio-strength-suite.py \
+  --synthetic-seed word-studio-synthetic.seed.json
+python build-word-studio-transform-suite.py
 ```
 
-If this fails: this is a benchmark-package failure, not a model result. Stop model evaluation until the benchmark package itself is fixed in Git.
+Expected product files:
+
+- `word-studio-strength.jsonl` — 112 strength/rewrite tasks.
+- `word-studio-transform.jsonl` — exactly 100 arbitrary cross-granularity tasks.
+
+If any command fails: this is a benchmark-package failure, not a model result. Stop model evaluation until the package is fixed in Git.
 
 ### S3 — install runtime from a binary only
 
@@ -102,63 +124,79 @@ For Bonsai/Prism:
 python install-kaggle-prebuilt-runtime.py prism-llamacpp-b10735-cuda12.8-linux-x86_64
 ```
 
-If install/import/version smoke fails: save logs; classify with `kaggle_failure_taxonomy.py`; mark exact runtime config unqualified; DO NOT compile anything.
+If install/import/version smoke fails: save logs; mark exact runtime config unqualified; DO NOT compile anything.
 
 ### S4 — candidate protocol smoke
 
-Run only the predeclared 16-case smoke/fixed prefix using the candidate's exact roster configuration. Do not alter prompts after seeing output.
+Exactly one command:
 
-For vLLM use the existing `run-english-core-vllm.py` with `--limit 16` and the exact revision/config from the roster.
+```bash
+python run-kaggle-candidate.py "$CANDIDATE" \
+  --stage smoke \
+  --benchmark-revision "$BENCHMARK_REVISION"
+```
 
-Allowed batch fallback, and only this fallback:
-
-`32 -> 16 -> 8 -> 4 -> 1`
-
-If a batch fails because of OOM, retain its log and try the next batch. Any other failure stops the exact configuration and is classified.
-
-### S5 — validate smoke
-
-Require:
-
-- output/result artifact exists;
-- 16 unique expected IDs;
-- no output-count mismatch;
-- scorer/parser can read the file;
-- failure/format diagnostics are preserved;
-- no silent CPU fallback.
+The dispatcher chooses vLLM vs Prism from the frozen roster. It applies only the predeclared OOM batch fallback. It records protocol diagnostics automatically.
 
 Wrong answers do not fail the smoke. The smoke proves execution and observability.
 
-### S6 — full English Core
-
-Run all 1,943 fixed cases with the first stable predeclared batch size. Save raw result and all runtime metadata.
-
-Do not change settings halfway through. An interrupted run must retain a checkpoint; a resumed run must not duplicate or skip IDs.
-
-### S7 — format diagnostics
-
-Report strict output compliance and conservative recoverable parsing separately. Do not rewrite outputs.
-
-### S8 — Word Studio
-
-Run the frozen Word Studio suite on finalists. Then:
+### S5 — full English Core
 
 ```bash
-python word_studio_output_parser.py RAW_RESULT.json PARSED_RESULT.json --requested 10
+python run-kaggle-candidate.py "$CANDIDATE" \
+  --stage full \
+  --benchmark-revision "$BENCHMARK_REVISION"
 ```
 
-Do not regenerate malformed lists. Count malformed/too-few/duplicate candidates as product observations.
+Run all 1,943 fixed cases. Do not change settings halfway through.
+
+### S6 — Word Studio slider/rewrite suite
+
+```bash
+python run-kaggle-candidate.py "$CANDIDATE" \
+  --stage word-studio \
+  --benchmark-revision "$BENCHMARK_REVISION"
+```
+
+This is single-request/interactive oriented (`batch=1`). Malformed or too-short candidate lists are recorded; do not regenerate them.
+
+### S7 — cross-granularity transform suite
+
+```bash
+python run-kaggle-candidate.py "$CANDIDATE" \
+  --stage transform \
+  --benchmark-revision "$BENCHMARK_REVISION"
+```
+
+This runs 100 tasks covering word→phrase, phrase→word, phrase→phrase, clause transforms, sentence rewrites, sentence→1–3 word semantic compression, split/join, register/vocabulary constraints, collocations, protected context, and expansion/compression.
+
+Intentional semantic-compression cases are labeled separately and must not be judged with full-paraphrase equivalence thresholds.
+
+### S8 — status matrix
+
+After each candidate, always run:
+
+```bash
+python build-kaggle-candidate-matrix.py
+```
+
+The matrix must continue showing candidates/stages as `not_run`, `runtime_unqualified`, `benchmark_blocked`, or completed. Never delete failed/unrun rows.
 
 ### S9 — speed variants
 
-Only after ordinary decoding succeeds:
+Only after ordinary decoding succeeds, and only for methods listed in that candidate's `mtpMethodsToProbe`:
 
-- MTP/speculative config if officially supported by the exact model/runtime;
-- one T4 baseline;
-- TP2 only when required or measured;
-- independent two-GPU/replica path if it fits.
+```bash
+python run-kaggle-candidate.py "$CANDIDATE" \
+  --stage smoke \
+  --decode mtp \
+  --speculative-tokens 1 \
+  --benchmark-revision "$BENCHMARK_REVISION"
+```
 
-Never change the benchmark prompts for speed runs.
+Then repeat the needed full/product stage only if the smoke succeeds. Replace `mtp` with `qwen3_next_mtp` only when that exact method is listed in the roster.
+
+Never change benchmark prompts for speed runs. MTP unsupported/failure does not invalidate the ordinary-decode model run.
 
 ### S10 — cleanup
 
@@ -166,25 +204,30 @@ Save authorized result artifacts, terminate runtime/server processes, and verify
 
 ## STOP conditions — do not debug into a different experiment
 
-Stop the exact candidate configuration and record the failure if you see any of these after the allowed same-config retry:
+Stop the exact candidate configuration and preserve the failure if you see any of these after the allowed same-config retry:
 
-- unsupported T4 compute capability/kernel;
+- unsupported T4 compute capability/kernel or model architecture;
 - BF16/FP8-only kernel assumption;
-- FlashAttention/FlashInfer/Triton kernel unavailable on sm75;
-- GPTQ/AWQ/Marlin implementation requires newer architecture;
-- bitsandbytes kernel unsupported;
+- FlashAttention/FlashInfer/xFormers/Triton/PTX kernel unavailable on sm75;
+- missing custom CUDA op;
+- GPTQ/AWQ/Marlin/bitsandbytes implementation requires newer architecture;
+- PyTorch/CUDA/cuDNN binary mismatch;
 - CUDA driver/runtime mismatch;
-- GLIBC/GLIBCXX/ABI failure;
-- tokenizer/chat-template cannot initialize;
+- GLIBC/GLIBCXX/Python ABI failure or illegal instruction;
+- tokenizer/chat-template/remote-code dependency cannot initialize;
+- gated/auth model access, persistent Hub failure, or corrupted/hash-mismatched artifact;
+- insufficient disk space;
 - no binary wheel/distribution exists;
 - pip starts building a wheel/source package;
 - CMake/Ninja/Make/NVCC/Rust compilation begins;
 - model cannot fit at batch 1 under the frozen configuration;
+- CUDA device-side assert or persistent CUDA-graph failure;
 - silent CPU fallback;
 - GPU offload cannot be proven;
 - NCCL/P2P/TP failure;
 - MTP unsupported or crashes (ordinary decoding may remain separately qualified);
 - persistent generation timeout/runtime crash;
+- server port/bind failure not resolved by the predeclared runner setup;
 - output/request count mismatch that the runner cannot safely attribute by ID.
 
-Do not "fix" any of the above by silently changing model identity. Move on and preserve the evidence.
+Do not "fix" any of the above by silently changing model identity, quantization, runtime, tokenizer, prompt, dtype semantics, or checkpoint. Move on and preserve the evidence.
