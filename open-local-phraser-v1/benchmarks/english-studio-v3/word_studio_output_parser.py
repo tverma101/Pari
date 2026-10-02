@@ -10,6 +10,7 @@ from typing import Any
 
 BULLET_RE = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+(.+?)\s*$")
 COMMENTARY_PREFIX = re.compile(r"^(?:here(?:'s| are)|sure[,!:]|options?:|alternatives?:|note:)", re.I)
+OPTIONS_ARRAY_PREFIX = re.compile(r'"options"\s*:\s*\[', re.I)
 
 
 def normalize(text: str) -> str:
@@ -48,6 +49,54 @@ def parse_options(raw: str) -> tuple[list[str], str]:
     return [], "unparseable"
 
 
+def partial_candidate_count(raw: str) -> int:
+    """Count only fully completed candidates in an in-progress stream.
+
+    This is intentionally conservative. For JSON output it counts completed JSON
+    string elements only inside the `options` array. It never guesses from prose.
+    """
+    text = str(raw or "")
+    complete, _ = parse_options(text)
+    if complete:
+        return len(complete)
+
+    prefix = OPTIONS_ARRAY_PREFIX.search(text)
+    if prefix:
+        body = text[prefix.end():]
+        count = 0
+        in_string = False
+        escape = False
+        saw_nonspace = False
+        for ch in body:
+            if in_string:
+                if escape:
+                    escape = False
+                elif ch == "\\":
+                    escape = True
+                elif ch == '"':
+                    in_string = False
+                    count += 1
+                continue
+            if ch == '"':
+                in_string = True
+                saw_nonspace = True
+            elif ch == "]":
+                break
+            elif not ch.isspace() and ch not in {",", "["}:
+                saw_nonspace = True
+        if count or saw_nonspace:
+            return count
+
+    # For streamed numbered/bulleted output, count only lines already matching a
+    # full list item. A prose preamble intentionally yields zero.
+    lines = [line for line in text.splitlines() if line.strip()]
+    if lines:
+        matches = [BULLET_RE.match(line) for line in lines]
+        if all(matches):
+            return sum(1 for match in matches if match)
+    return 0
+
+
 def diagnose(raw: str, source: str | None = None, requested: int = 10) -> dict[str, Any]:
     options, parser = parse_options(raw)
     norms = [normalize(x) for x in options]
@@ -57,15 +106,22 @@ def diagnose(raw: str, source: str | None = None, requested: int = 10) -> dict[s
     unchanged = sum(1 for n in norms if source_norm and n == source_norm)
     commentary = sum(1 for x in options if COMMENTARY_PREFIX.match(x.strip()))
     statuses: list[str] = []
-    if not raw or not raw.strip(): statuses.append("empty_output")
-    if parser == "unparseable": statuses.append("word_studio_unparseable_list")
-    if len(options) < requested: statuses.append("word_studio_too_few_candidates")
-    if duplicates > max(1, requested // 5): statuses.append("word_studio_excessive_duplicates")
-    if unchanged: statuses.append("contains_unchanged_source")
-    if commentary: statuses.append("contains_commentary")
-    if not statuses: statuses.append("ok")
+    if not raw or not raw.strip():
+        statuses.append("empty_output")
+    if parser == "unparseable":
+        statuses.append("word_studio_unparseable_list")
+    if len(options) < requested:
+        statuses.append("word_studio_too_few_candidates")
+    if duplicates > max(1, requested // 5):
+        statuses.append("word_studio_excessive_duplicates")
+    if unchanged:
+        statuses.append("contains_unchanged_source")
+    if commentary:
+        statuses.append("contains_commentary")
+    if not statuses:
+        statuses.append("ok")
     return {
-        "parserVersion": 1,
+        "parserVersion": 2,
         "parserMode": parser,
         "statuses": statuses,
         "requestedCount": requested,
@@ -90,7 +146,7 @@ def main() -> None:
     for row in run.get("outputs", []):
         rows.append({"id": row.get("id"), "diagnostics": diagnose(str(row.get("output") or ""), requested=args.requested)})
     summary = {
-        "version": 1,
+        "version": 2,
         "sourceResult": str(args.input),
         "rows": rows,
         "counts": {
