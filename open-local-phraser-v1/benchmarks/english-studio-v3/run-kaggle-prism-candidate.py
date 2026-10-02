@@ -118,6 +118,7 @@ def main() -> None:
     ap.add_argument("--runtime-dir", type=Path, default=Path("/kaggle/working/pari-runtimes"))
     ap.add_argument("--preflight", type=Path, default=Path("/kaggle/working/results/preflight.json"))
     ap.add_argument("--results-dir", type=Path, default=Path("/kaggle/working/results"))
+    ap.add_argument("--tasks", type=Path, default=None, help="predeclared frozen task override; canonical dispatcher uses this for protocol smoke")
     ap.add_argument("--port", type=int, default=8080)
     ap.add_argument("--startup-timeout", type=float, default=180.0)
     ap.add_argument("--ctx-size", type=int, default=8192)
@@ -163,7 +164,7 @@ def main() -> None:
     summary_path = candidate_dir / "summary.json"
     server_log = candidate_dir / "llama-server.log.txt"
     summary = {
-        "schemaVersion": 3,
+        "schemaVersion": 4,
         "candidate": c,
         "stage": args.stage,
         "benchmarkRevision": args.benchmark_revision,
@@ -257,10 +258,15 @@ def main() -> None:
             write_json(summary_path, summary)
             raise SystemExit(2)
 
-        if args.stage == "word-studio":
+        if args.tasks is not None:
+            tasks = args.tasks.resolve()
+            max_tokens = 350 if args.stage == "smoke" else 1200
+            limit_args: list[str] = []
+            batch_ladder = BATCH_LADDER if args.stage == "smoke" else (1,)
+        elif args.stage == "word-studio":
             tasks = DEFAULT_WORD_STUDIO_TASKS
             max_tokens = 1200
-            limit_args: list[str] = []
+            limit_args = []
             batch_ladder = (1,)
         elif args.stage == "transform":
             tasks = DEFAULT_TRANSFORM_TASKS
@@ -274,6 +280,8 @@ def main() -> None:
             batch_ladder = BATCH_LADDER
         if not tasks.is_file():
             raise SystemExit(f"frozen task file missing: {tasks}")
+        summary["tasks"] = str(tasks)
+        write_json(summary_path, summary)
 
         stable_result = None
         for attempt_no, batch in enumerate(batch_ladder, start=1):
