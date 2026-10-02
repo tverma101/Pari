@@ -23,10 +23,13 @@ def test_word_studio_parser() -> None:
     options, mode = parse_options(prose)
     assert mode == "unparseable" and options == []
 
-    diag = diagnose('{"options":["same","same","different"]}', source="same", requested=10)
+    # requested=10 treats >2 duplicate entries as excessive. Make the fixture
+    # cross that declared threshold rather than expecting one duplicate to fail.
+    diag = diagnose('{"options":["same","same","same","same","different"]}', source="same", requested=10)
     assert "word_studio_too_few_candidates" in diag["statuses"]
     assert "word_studio_excessive_duplicates" in diag["statuses"]
     assert "contains_unchanged_source" in diag["statuses"]
+    assert diag["duplicateCount"] == 3
 
     assert partial_candidate_count('{"options":["one","two","thr') == 2
     assert partial_candidate_count('{"options":["one","two","three"]') == 3
