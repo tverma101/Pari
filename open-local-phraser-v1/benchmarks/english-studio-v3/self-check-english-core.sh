@@ -24,6 +24,7 @@ node validate-english-core.mjs
 node audit-english-core-shadow.mjs
 node test-english-core-choice-parser.mjs
 python3 test_english_core_choice_parser.py
+python3 test_kaggle_edge_cases.py
 
 # Builders below require no model and verify that the model-visible task lanes can
 # be regenerated from the private seed without throwing or exposing gold labels.
