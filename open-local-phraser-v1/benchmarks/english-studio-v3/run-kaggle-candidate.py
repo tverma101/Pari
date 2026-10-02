@@ -26,6 +26,7 @@ SELECT_PRISM_RUNTIME = HERE / "select-kaggle-prism-runtime.py"
 SYNTHETIC_SEED = HERE / "word-studio-synthetic.seed.json"
 STRENGTH_TASKS = HERE / "word-studio-strength.jsonl"
 TRANSFORM_TASKS = HERE / "word-studio-transform.jsonl"
+PROTOCOL_SMOKE_TASKS = HERE / "kaggle-protocol-smoke.jsonl"
 RUNTIME_DIR = Path("/kaggle/working/pari-runtimes")
 VLLM_RUNTIME = "vllm-0.30.0-cu129-linux-x86_64"
 
@@ -94,7 +95,7 @@ def ensure_runtime(artifact_id: str) -> None:
 
 def select_prism_runtime(results_dir: Path) -> str:
     selection = results_dir / "prism-runtime-selection.json"
-    stdout = run_checked(
+    run_checked(
         [
             sys.executable, str(SELECT_PRISM_RUNTIME),
             "--runtime-dir", str(RUNTIME_DIR),
@@ -144,6 +145,10 @@ def main() -> None:
             "--benchmark-revision", args.benchmark_revision,
             "--results-dir", str(args.results_dir),
         ]
+        if args.stage == "smoke":
+            if jsonl_count(PROTOCOL_SMOKE_TASKS) != 16:
+                raise SystemExit("kaggle-protocol-smoke.jsonl must contain exactly 16 unique tasks")
+            cmd += ["--tasks", str(PROTOCOL_SMOKE_TASKS)]
     elif runtime == "llama.cpp":
         if args.decode != "normal":
             raise SystemExit("this pinned Prism/Bonsai path has no validated speculative decode; use --decode normal")
