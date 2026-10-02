@@ -12,12 +12,17 @@ This directory is the canonical production app. Do not implement production beha
 
 ## Kaggle English Core / Word Studio benchmark (mandatory)
 
-For Issue #25 and the `bench/english-studio-v3` model-selection work, read and obey both:
+For Issue #25 and the `bench/english-studio-v3` model-selection work, read and obey all three:
 
-- `benchmarks/english-studio-v3/KAGGLE_2XT4_RUN.md`
-- `benchmarks/english-studio-v3/KAGGLE_BENCHMARK_HARDENING.md`
+- `benchmarks/english-studio-v3/KAGGLE_AGENT_EXECUTION.md` — literal execution state machine; do not improvise.
+- `benchmarks/english-studio-v3/KAGGLE_2XT4_RUN.md` — canonical operational evidence/runbook.
+- `benchmarks/english-studio-v3/KAGGLE_BENCHMARK_HARDENING.md` — qualification/failure contract.
 
 Promotion-quality runtime evidence must be produced on an actual private Kaggle **2× NVIDIA T4 (16 GB each)** run. Do not substitute another GPU/provider or a local run for the T4 qualification step.
+
+### Prebuilt-only rule
+
+Canonical Kaggle execution must use `benchmarks/english-studio-v3/kaggle-prebuilt-runtimes.json` and `install-kaggle-prebuilt-runtime.py`. Do **not** compile native runtimes or extensions during a benchmark run. In particular, do not run CMake, Ninja, Make, NVCC, Cargo builds, `setup.py build`, `pip install -e`, or source builds of vLLM / llama.cpp / FlashAttention / Triton extensions. If a compatible prebuilt wheel/vendor binary is unavailable or incompatible, record the exact runtime configuration as `runtime_unqualified` and move on. Source-build experiments require separate explicit authorization and are not part of Issue #25's normal execution path.
 
 Before any candidate enters English-quality ranking, separately establish:
 
@@ -25,11 +30,13 @@ Before any candidate enters English-quality ranking, separately establish:
 2. the benchmark protocol can observe and classify its responses;
 3. only then, its English Core / Word Studio quality.
 
-Do not convert model-load, CUDA OOM, unsupported architecture/quantization, MTP failure, ABI/library failure, timeout, Kaggle-session failure, or silent CPU fallback into an English score of zero. Preserve those as structured runtime-unqualified results.
+Do not convert model-load, CUDA OOM, unsupported architecture/quantization, unsupported sm75 kernel, BF16/FP8 assumptions, FlashAttention/FlashInfer/Triton failure, GPTQ/AWQ/Marlin kernel limits, bitsandbytes incompatibility, CUDA driver/runtime mismatch, MTP failure, ABI/library failure, NCCL/P2P/TP failure, timeout, Kaggle-session failure, GPU-offload uncertainty, or silent CPU fallback into an English score of zero. Preserve those as structured runtime-unqualified results.
 
 Forced-choice evaluation must preserve both the frozen strict protocol result and a separately labeled conservative recoverable parse where predeclared parser rules can recover an explicit answer such as `A. same`. Never infer answers from arbitrary prose or use the gold label to resolve ambiguity. Word Studio runs must preserve raw output plus parsed candidate count, unique count, duplicate rate, malformed-list status, and time to first/3/10 parsed candidates where measurable.
 
 Use the predeclared batch-size fallback sequence and retry policy from `KAGGLE_BENCHMARK_HARDENING.md`; never silently change checkpoint, quantization, dtype semantics, tokenizer/template, or runtime to make a candidate fit. Such changes create a new candidate configuration.
+
+For roster-driven vLLM candidates use `run-kaggle-vllm-candidate.py` rather than hand-constructing commands. It may reduce batch size only through the frozen ladder and must preserve every failed attempt/log. For Word Studio outputs use `word_studio_output_parser.py`; never regenerate merely because formatting is ugly.
 
 ## Architecture
 
