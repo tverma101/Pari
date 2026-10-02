@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "policy": {
+    "sourceBuildDefault": "forbidden",
+    "reason": "Kaggle benchmark runs must spend GPU time evaluating models, not compiling native runtimes.",
+    "onMissingCompatibleBinary": "record runtime_unqualified and stop; do not invoke cmake, ninja, make, cargo, nvcc, setup.py build, pip source distributions, or flash-attn source compilation",
+    "pipPolicy": "use --only-binary=:all: for native packages; never use --no-binary or --no-build-isolation to force a source build",
+    "sourceBuildException": "allowed only as a separately authorized runtime-development experiment; never as the canonical Issue #25 benchmark path"
+  },
+  "artifacts": [
+    {
+      "id": "vllm-0.30.0-cu129-linux-x86_64",
+      "kind": "python_wheel",
+      "runtime": "vllm",
+      "version": "0.30.0",
+      "platform": "manylinux_2_28_x86_64",
+      "pythonAbi": "cp38-abi3",
+      "cuda": "12.9",
+      "url": "https://github.com/vllm-project/vllm/releases/download/v0.30.0/vllm-0.30.0%2Bcu129-cp38-abi3-manylinux_2_28_x86_64.whl",
+      "sha256": "e98cb69659bfcfc849cf11ce0781a7161d40b02b51a6c3636924a5909f2aabcc",
+      "sourceRelease": "https://github.com/vllm-project/vllm/releases/tag/v0.30.0",
+      "notes": "Official vLLM release wheel. Driver/runtime compatibility must be proven by Kaggle preflight/import smoke; do not rebuild if incompatible."
+    },
+    {
+      "id": "prism-llamacpp-b10735-cuda12.4-linux-x86_64",
+      "kind": "tarball",
+      "runtime": "PrismML-Eng/llama.cpp",
+      "version": "prism-b10735-842b188",
+      "sourceCommit": "842b1880415d6f508f03b789e5ce70194def7bfd",
+      "platform": "linux-x86_64",
+      "cuda": "12.4",
+      "url": "https://github.com/PrismML-Eng/llama.cpp/releases/download/prism-b10735-842b188/llama-prism-b10735-842b188-bin-linux-cuda-12.4-x64.tar.gz",
+      "sha256": "b58caa10e38ea2d3af419bc1c908f785b5f8756b07c98cb1752d50e1e985d4c6",
+      "sourceRelease": "https://github.com/PrismML-Eng/llama.cpp/releases/tag/prism-b10735-842b188",
+      "notes": "Official vendor prebuilt; preferred compatibility probe when CUDA 12.4 is safer for the Kaggle driver."
+    },
+    {
+      "id": "prism-llamacpp-b10735-cuda12.8-linux-x86_64",
+      "kind": "tarball",
+      "runtime": "PrismML-Eng/llama.cpp",
+      "version": "prism-b10735-842b188",
+      "sourceCommit": "842b1880415d6f508f03b789e5ce70194def7bfd",
+      "platform": "linux-x86_64",
+      "cuda": "12.8",
+      "url": "https://github.com/PrismML-Eng/llama.cpp/releases/download/prism-b10735-842b188/llama-prism-b10735-842b188-bin-linux-cuda-12.8-x64.tar.gz",
+      "sha256": "5cbac5269804e4eb63676aeaec1ee7d4cff6e22b87da91de9b05795bf635998e",
+      "sourceRelease": "https://github.com/PrismML-Eng/llama.cpp/releases/tag/prism-b10735-842b188",
+      "notes": "Official vendor prebuilt already exercised successfully on Kaggle glibc 2.35 in the Bonsai 27B qualification run."
+    }
+  ],
+  "forbiddenBuildIndicators": [
+    "cmake",
+    "ninja",
+    "make -j",
+    "nvcc",
+    "setup.py build",
+    "bdist_wheel",
+    "Building wheel for",
+    "Building editable for",
+    "cargo build",
+    "pip install flash-attn --no-build-isolation",
+    "pip install -e"
+  ]
+}
