@@ -22,12 +22,12 @@ BUILD_STRENGTH = HERE / "build-word-studio-strength-suite.py"
 BUILD_TRANSFORM = HERE / "build-word-studio-transform-suite.py"
 INSTALL_RUNTIME = HERE / "install-kaggle-prebuilt-runtime.py"
 VERIFY_RUNTIME = HERE / "verify-kaggle-prebuilt-runtime.py"
+SELECT_PRISM_RUNTIME = HERE / "select-kaggle-prism-runtime.py"
 SYNTHETIC_SEED = HERE / "word-studio-synthetic.seed.json"
 STRENGTH_TASKS = HERE / "word-studio-strength.jsonl"
 TRANSFORM_TASKS = HERE / "word-studio-transform.jsonl"
 RUNTIME_DIR = Path("/kaggle/working/pari-runtimes")
 VLLM_RUNTIME = "vllm-0.30.0-cu129-linux-x86_64"
-PRISM_RUNTIME = "prism-llamacpp-b10735-cuda12.8-linux-x86_64"
 
 
 def jsonl_count(path: Path) -> int:
@@ -47,13 +47,14 @@ def jsonl_count(path: Path) -> int:
     return len(ids)
 
 
-def run_checked(cmd: list[str], label: str) -> None:
+def run_checked(cmd: list[str], label: str) -> str:
     print("+", " ".join(cmd), flush=True)
     proc = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     if proc.stdout:
         print(proc.stdout, end="" if proc.stdout.endswith("\n") else "\n", flush=True)
     if proc.returncode != 0:
         raise SystemExit(f"{label} failed rc={proc.returncode}; do not compile or improvise a fallback")
+    return proc.stdout
 
 
 def ensure_product_tasks(stage: str) -> None:
@@ -91,6 +92,24 @@ def ensure_runtime(artifact_id: str) -> None:
     )
 
 
+def select_prism_runtime(results_dir: Path) -> str:
+    selection = results_dir / "prism-runtime-selection.json"
+    stdout = run_checked(
+        [
+            sys.executable, str(SELECT_PRISM_RUNTIME),
+            "--runtime-dir", str(RUNTIME_DIR),
+            "--output", str(selection),
+        ],
+        "Prism prebuilt compatibility selection",
+    )
+    report = json.loads(selection.read_text(encoding="utf-8"))
+    selected = report.get("selectedArtifactId")
+    if not selected:
+        raise SystemExit(f"Prism runtime selector returned no compatible prebuilt; evidence={selection}")
+    print(f"selected Prism prebuilt: {selected}", flush=True)
+    return str(selected)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("candidate_id")
@@ -102,6 +121,7 @@ def main() -> None:
     ap.add_argument("--results-dir", type=Path, default=Path("/kaggle/working/results"))
     args = ap.parse_args()
 
+    args.results_dir.mkdir(parents=True, exist_ok=True)
     ensure_product_tasks(args.stage)
 
     roster = json.loads(ROSTER.read_text(encoding="utf-8"))
@@ -127,8 +147,11 @@ def main() -> None:
     elif runtime == "llama.cpp":
         if args.decode != "normal":
             raise SystemExit("this pinned Prism/Bonsai path has no validated speculative decode; use --decode normal")
-        runtime_artifact = args.runtime_artifact_id or PRISM_RUNTIME
-        ensure_runtime(runtime_artifact)
+        if args.runtime_artifact_id:
+            runtime_artifact = args.runtime_artifact_id
+            ensure_runtime(runtime_artifact)
+        else:
+            runtime_artifact = select_prism_runtime(args.results_dir)
         cmd = [
             sys.executable, str(PRISM), args.candidate_id,
             "--stage", args.stage,
