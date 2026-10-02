@@ -27,6 +27,7 @@ CLIENT = HERE / "run-english-core-llamacpp.py"
 DIAGNOSTICS = HERE / "protocol_output_diagnostics.py"
 DEFAULT_ENGLISH_TASKS = HERE / "english-core-fixed-screen.jsonl"
 DEFAULT_WORD_STUDIO_TASKS = HERE / "word-studio-strength.jsonl"
+DEFAULT_TRANSFORM_TASKS = HERE / "word-studio-transform.jsonl"
 DEFAULT_RUNTIME_ID = "prism-llamacpp-b10735-cuda12.8-linux-x86_64"
 BATCH_LADDER = (16, 8, 4, 1)
 
@@ -66,7 +67,7 @@ def gpu_memory_for_pid(pid: int) -> int:
     return total
 
 
-def wait_for_server(proc: subprocess.Popen, endpoint: str, log_path: Path, timeout: float) -> tuple[bool, str]:
+def wait_for_server(proc: subprocess.Popen, endpoint: str, timeout: float) -> tuple[bool, str]:
     deadline = time.time() + timeout
     last = ""
     while time.time() < deadline:
@@ -110,7 +111,7 @@ def hub_file(repo: str, revision: str, filename: str) -> tuple[Path, str | None,
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("candidate_id")
-    ap.add_argument("--stage", choices=["smoke", "full", "word-studio"], required=True)
+    ap.add_argument("--stage", choices=["smoke", "full", "word-studio", "transform"], required=True)
     ap.add_argument("--benchmark-revision", required=True)
     ap.add_argument("--runtime-artifact-id", default=DEFAULT_RUNTIME_ID)
     ap.add_argument("--runtime-dir", type=Path, default=Path("/kaggle/working/pari-runtimes"))
@@ -161,7 +162,7 @@ def main() -> None:
     summary_path = candidate_dir / "summary.json"
     server_log = candidate_dir / "llama-server.log.txt"
     summary = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "candidate": c,
         "stage": args.stage,
         "benchmarkRevision": args.benchmark_revision,
@@ -172,7 +173,6 @@ def main() -> None:
     }
     write_json(summary_path, summary)
 
-    # Prove this prebuilt can actually enumerate the Kaggle CUDA device before downloading weights.
     device_probe = subprocess.run(
         [str(server), "--list-devices"], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False
     )
@@ -204,7 +204,6 @@ def main() -> None:
 
     endpoint = f"http://127.0.0.1:{args.port}"
     env = os.environ.copy()
-    # Canonical Bonsai qualification uses one T4. The second remains free for the product's parallel lane.
     env["CUDA_VISIBLE_DEVICES"] = "0"
     server_cmd = [
         str(server), "-m", str(model_path),
@@ -218,7 +217,7 @@ def main() -> None:
     log_handle = server_log.open("w", encoding="utf-8")
     proc = subprocess.Popen(server_cmd, stdout=log_handle, stderr=subprocess.STDOUT, text=True, env=env)
     try:
-        healthy, health_detail = wait_for_server(proc, endpoint, server_log, args.startup_timeout)
+        healthy, health_detail = wait_for_server(proc, endpoint, args.startup_timeout)
         log_handle.flush()
         if not healthy:
             log_text = server_log.read_text(encoding="utf-8", errors="replace") if server_log.exists() else health_detail
@@ -244,14 +243,21 @@ def main() -> None:
 
         if args.stage == "word-studio":
             tasks = DEFAULT_WORD_STUDIO_TASKS
-            if not tasks.is_file():
-                raise SystemExit("word-studio-strength.jsonl missing; build the frozen Word Studio suite first")
+            max_tokens = 1200
             limit_args: list[str] = []
+            batch_ladder = (1,)
+        elif args.stage == "transform":
+            tasks = DEFAULT_TRANSFORM_TASKS
+            max_tokens = 900
+            limit_args = []
             batch_ladder = (1,)
         else:
             tasks = DEFAULT_ENGLISH_TASKS
+            max_tokens = 220
             limit_args = ["--limit", "16"] if args.stage == "smoke" else []
             batch_ladder = BATCH_LADDER
+        if not tasks.is_file():
+            raise SystemExit(f"frozen task file missing: {tasks}")
 
         stable_result = None
         for attempt_no, batch in enumerate(batch_ladder, start=1):
@@ -266,7 +272,7 @@ def main() -> None:
                 "--quantization", c.get("quantization", "unknown"),
                 "--checkpoint-type", c.get("checkpointType", "instruct"),
                 "--prompt-mode", "chat", "--endpoint", endpoint,
-                "--batch-size", str(batch),
+                "--batch-size", str(batch), "--max-tokens", str(max_tokens),
                 *limit_args,
             ]
             started = time.time()
