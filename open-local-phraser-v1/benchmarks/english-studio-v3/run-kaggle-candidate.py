@@ -3,8 +3,8 @@
 
 The candidate roster decides the runtime. This dispatcher contains no model
 selection logic and does not modify prompts, quantization, or runtime identity.
-Product task files are deterministically rebuilt when needed so execution agents
-do not need to remember separate build steps.
+Product task files and pinned binary runtimes are prepared mechanically so an
+execution agent only supplies a candidate ID and stage.
 """
 from __future__ import annotations
 
@@ -20,9 +20,14 @@ VLLM = HERE / "run-kaggle-vllm-candidate.py"
 PRISM = HERE / "run-kaggle-prism-candidate.py"
 BUILD_STRENGTH = HERE / "build-word-studio-strength-suite.py"
 BUILD_TRANSFORM = HERE / "build-word-studio-transform-suite.py"
+INSTALL_RUNTIME = HERE / "install-kaggle-prebuilt-runtime.py"
+VERIFY_RUNTIME = HERE / "verify-kaggle-prebuilt-runtime.py"
 SYNTHETIC_SEED = HERE / "word-studio-synthetic.seed.json"
 STRENGTH_TASKS = HERE / "word-studio-strength.jsonl"
 TRANSFORM_TASKS = HERE / "word-studio-transform.jsonl"
+RUNTIME_DIR = Path("/kaggle/working/pari-runtimes")
+VLLM_RUNTIME = "vllm-0.30.0-cu129-linux-x86_64"
+PRISM_RUNTIME = "prism-llamacpp-b10735-cuda12.8-linux-x86_64"
 
 
 def jsonl_count(path: Path) -> int:
@@ -42,6 +47,15 @@ def jsonl_count(path: Path) -> int:
     return len(ids)
 
 
+def run_checked(cmd: list[str], label: str) -> None:
+    print("+", " ".join(cmd), flush=True)
+    proc = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    if proc.stdout:
+        print(proc.stdout, end="" if proc.stdout.endswith("\n") else "\n", flush=True)
+    if proc.returncode != 0:
+        raise SystemExit(f"{label} failed rc={proc.returncode}; do not compile or improvise a fallback")
+
+
 def ensure_product_tasks(stage: str) -> None:
     if stage == "word-studio":
         cmd = [
@@ -57,16 +71,24 @@ def ensure_product_tasks(stage: str) -> None:
     else:
         return
 
-    print("+", " ".join(cmd), flush=True)
-    build = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    if build.stdout:
-        print(build.stdout, end="" if build.stdout.endswith("\n") else "\n", flush=True)
-    if build.returncode != 0:
-        raise SystemExit(f"product task build failed before GPU inference; rc={build.returncode}")
+    run_checked(cmd, "product task build")
     actual = jsonl_count(output)
     if actual != expected:
         raise SystemExit(f"product task build count mismatch for {output.name}: expected {expected}, got {actual}")
     print(f"verified product task build: {output.name} cases={actual}", flush=True)
+
+
+def ensure_runtime(artifact_id: str) -> None:
+    receipt = RUNTIME_DIR / f"{artifact_id}.receipt.json"
+    if not receipt.is_file():
+        run_checked(
+            [sys.executable, str(INSTALL_RUNTIME), artifact_id, "--dest", str(RUNTIME_DIR)],
+            "pinned prebuilt runtime install",
+        )
+    run_checked(
+        [sys.executable, str(VERIFY_RUNTIME), artifact_id, "--runtime-dir", str(RUNTIME_DIR)],
+        "pinned prebuilt runtime verification",
+    )
 
 
 def main() -> None:
@@ -90,6 +112,10 @@ def main() -> None:
 
     runtime = c.get("runtime")
     if runtime == "vllm":
+        runtime_artifact = args.runtime_artifact_id or VLLM_RUNTIME
+        if runtime_artifact != VLLM_RUNTIME:
+            raise SystemExit(f"canonical vLLM benchmark runtime is fixed to {VLLM_RUNTIME}; alternate builds are separate experiments")
+        ensure_runtime(runtime_artifact)
         cmd = [
             sys.executable, str(VLLM), args.candidate_id,
             "--stage", args.stage,
@@ -101,14 +127,15 @@ def main() -> None:
     elif runtime == "llama.cpp":
         if args.decode != "normal":
             raise SystemExit("this pinned Prism/Bonsai path has no validated speculative decode; use --decode normal")
+        runtime_artifact = args.runtime_artifact_id or PRISM_RUNTIME
+        ensure_runtime(runtime_artifact)
         cmd = [
             sys.executable, str(PRISM), args.candidate_id,
             "--stage", args.stage,
             "--benchmark-revision", args.benchmark_revision,
             "--results-dir", str(args.results_dir),
+            "--runtime-artifact-id", runtime_artifact,
         ]
-        if args.runtime_artifact_id:
-            cmd += ["--runtime-artifact-id", args.runtime_artifact_id]
     else:
         raise SystemExit(f"candidate {args.candidate_id} has unsupported canonical runtime {runtime!r}")
 
