@@ -6,7 +6,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import AsyncIterator, Protocol
 
-from .contracts import Candidate, CandidateBatch, CandidateLane, LanePlan, StudioRequest
+from .contracts import Candidate, CandidateBatch, CandidateLane, LanePlan, SemanticMode, StudioRequest
 from .progressive import CandidateAccumulator
 from .prompting import CompiledPrompt, compile_prompt
 from .router import build_execution_plan
@@ -33,16 +33,26 @@ class StudioEngine:
         self._fast = fast
         self._diversity = diversity or fast
         self._cancelled: set[str] = set()
+        self._active: dict[str, set[asyncio.Task[LaneResult]]] = {}
 
     async def cancel(self, request_id: str) -> None:
         self._cancelled.add(request_id)
+        for task in self._active.get(request_id, set()):
+            if not task.done():
+                task.cancel()
         await asyncio.gather(
             self._fast.cancel(request_id),
             self._diversity.cancel(request_id),
             return_exceptions=True,
         )
 
-    async def _run_lane(self, request: StudioRequest, lane_plan: LanePlan, adapter: LaneAdapter, semantic_mode) -> LaneResult:
+    async def _run_lane(
+        self,
+        request: StudioRequest,
+        lane_plan: LanePlan,
+        adapter: LaneAdapter,
+        semantic_mode: SemanticMode,
+    ) -> LaneResult:
         prompt = compile_prompt(request, lane_plan, semantic_mode)
         values = await adapter.generate(prompt, request_id=request.request_id)
         safe = filter_protected_candidates(request, values)
@@ -76,18 +86,22 @@ class StudioEngine:
                 self._run_lane(request, plan.diversity, self._diversity, plan.semantic_mode)
             )
             tasks[diversity_task] = CandidateLane.DIVERSITY
+        self._active[request.request_id] = set(tasks)
 
         try:
             while tasks:
                 if request.request_id in self._cancelled:
-                    for task in tasks:
-                        task.cancel()
                     yield accumulator.cancel()
                     return
 
                 done, _pending = await asyncio.wait(tasks.keys(), return_when=asyncio.FIRST_COMPLETED)
+                if request.request_id in self._cancelled:
+                    yield accumulator.cancel()
+                    return
+
                 for task in done:
                     tasks.pop(task, None)
+                    self._active.get(request.request_id, set()).discard(task)
                     if task.cancelled():
                         continue
                     result = task.result()
@@ -98,7 +112,6 @@ class StudioEngine:
                         if batch.final:
                             return
 
-            # Defensive fallback: both adapters may return no usable candidates.
             if not accumulator.cancelled:
                 for batch in accumulator.add((), all_finished=True):
                     yield batch
@@ -106,4 +119,5 @@ class StudioEngine:
             for task in tasks:
                 if not task.done():
                     task.cancel()
+            self._active.pop(request.request_id, None)
             self._cancelled.discard(request.request_id)
