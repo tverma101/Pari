@@ -6,10 +6,19 @@ external authenticated tunnel. vLLM/llama.cpp model servers remain loopback-only
 """
 from __future__ import annotations
 
+import asyncio
+import hmac
 import json
 import os
+import uuid
 from functools import lru_cache
 from typing import Any
+
+try:
+    from fastapi import FastAPI, Header, HTTPException, Request
+    from fastapi.responses import StreamingResponse
+except ImportError as exc:  # pragma: no cover - live serving environment only
+    raise RuntimeError("FastAPI is required only for the live Studio service environment") from exc
 
 from .contracts import Operation, ProtectedSpan, StudioRequest, TextRange
 from .engine import StudioEngine
@@ -33,7 +42,9 @@ def _authorized(authorization: str | None) -> bool:
     token = os.environ.get("PARI_STUDIO_TOKEN")
     if not token:
         return os.environ.get("PARI_ALLOW_UNAUTHENTICATED_LOOPBACK") == "1"
-    return authorization == f"Bearer {token}"
+    supplied = authorization or ""
+    expected = f"Bearer {token}"
+    return hmac.compare_digest(supplied.encode("utf-8"), expected.encode("utf-8"))
 
 
 def _request_from_wire(body: dict[str, Any]) -> StudioRequest:
@@ -48,7 +59,7 @@ def _request_from_wire(body: dict[str, Any]) -> StudioRequest:
         if isinstance(row, dict) and row.get("text")
     )
     request = StudioRequest(
-        request_id=str(body.get("requestId") or "").strip() or __import__("uuid").uuid4().hex,
+        request_id=str(body.get("requestId") or "").strip() or uuid.uuid4().hex,
         document_text=str(body.get("documentText") or ""),
         selection=TextRange(int(selection.get("start", -1)), int(selection.get("end", -1))),
         operation=Operation(str(body.get("operation") or "replace")),
@@ -84,13 +95,7 @@ def _batch_to_wire(batch) -> dict[str, Any]:
     }
 
 
-def create_app():
-    try:
-        from fastapi import FastAPI, Header, HTTPException, Request
-        from fastapi.responses import StreamingResponse
-    except ImportError as exc:
-        raise RuntimeError("FastAPI is required only for the live Studio service environment") from exc
-
+def create_app() -> FastAPI:
     app = FastAPI(title="Pari Word Studio", version="0.1.0")
 
     @app.get("/health")
@@ -101,6 +106,7 @@ def create_app():
             "diversityEndpoint": os.environ.get("PARI_DIVERSITY_ENDPOINT", "http://127.0.0.1:8001"),
             "fastModelConfigured": bool(os.environ.get("PARI_FAST_MODEL")),
             "diversityModelConfigured": bool(os.environ.get("PARI_DIVERSITY_MODEL") or os.environ.get("PARI_FAST_MODEL")),
+            "authenticationConfigured": bool(os.environ.get("PARI_STUDIO_TOKEN")),
         }
 
     @app.post("/v1/studio/transform")
@@ -108,7 +114,7 @@ def create_app():
         body: dict[str, Any],
         request: Request,
         authorization: str | None = Header(default=None),
-    ):
+    ) -> StreamingResponse:
         if not _authorized(authorization):
             raise HTTPException(status_code=401, detail="unauthorized")
         try:
@@ -125,6 +131,24 @@ def create_app():
                         return
                     payload = json.dumps(_batch_to_wire(batch), ensure_ascii=False, separators=(",", ":"))
                     yield f"event: candidates\ndata: {payload}\n\n"
+            except asyncio.CancelledError:
+                await engine.cancel(studio_request.request_id)
+                raise
+            except Exception as exc:
+                # Keep the event structured so the desktop can terminate the
+                # interaction without interpreting a broken stream as no options.
+                payload = json.dumps(
+                    {
+                        "version": 1,
+                        "requestId": studio_request.request_id,
+                        "type": "backend_error",
+                        "errorClass": type(exc).__name__,
+                        "message": str(exc)[:500],
+                    },
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                )
+                yield f"event: error\ndata: {payload}\n\n"
             finally:
                 if await request.is_disconnected():
                     await engine.cancel(studio_request.request_id)
@@ -132,10 +156,7 @@ def create_app():
         return StreamingResponse(
             event_stream(),
             media_type="text/event-stream",
-            headers={
-                "Cache-Control": "no-cache",
-                "X-Accel-Buffering": "no",
-            },
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
         )
 
     @app.post("/v1/studio/cancel/{request_id}")
@@ -148,5 +169,4 @@ def create_app():
     return app
 
 
-# Uvicorn entrypoint: `uvicorn studio_backend.service:app ...`
 app = create_app()
