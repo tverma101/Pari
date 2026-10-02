@@ -124,6 +124,11 @@ def main() -> None:
 
     args.results_dir.mkdir(parents=True, exist_ok=True)
     ensure_product_tasks(args.stage)
+    smoke_tasks: Path | None = None
+    if args.stage == "smoke":
+        if jsonl_count(PROTOCOL_SMOKE_TASKS) != 16:
+            raise SystemExit("kaggle-protocol-smoke.jsonl must contain exactly 16 unique tasks")
+        smoke_tasks = PROTOCOL_SMOKE_TASKS
 
     roster = json.loads(ROSTER.read_text(encoding="utf-8"))
     by_id = {row["id"]: row for row in roster["candidates"]}
@@ -145,10 +150,8 @@ def main() -> None:
             "--benchmark-revision", args.benchmark_revision,
             "--results-dir", str(args.results_dir),
         ]
-        if args.stage == "smoke":
-            if jsonl_count(PROTOCOL_SMOKE_TASKS) != 16:
-                raise SystemExit("kaggle-protocol-smoke.jsonl must contain exactly 16 unique tasks")
-            cmd += ["--tasks", str(PROTOCOL_SMOKE_TASKS)]
+        if smoke_tasks is not None:
+            cmd += ["--tasks", str(smoke_tasks)]
     elif runtime == "llama.cpp":
         if args.decode != "normal":
             raise SystemExit("this pinned Prism/Bonsai path has no validated speculative decode; use --decode normal")
@@ -164,6 +167,8 @@ def main() -> None:
             "--results-dir", str(args.results_dir),
             "--runtime-artifact-id", runtime_artifact,
         ]
+        if smoke_tasks is not None:
+            cmd += ["--tasks", str(smoke_tasks)]
     else:
         raise SystemExit(f"candidate {args.candidate_id} has unsupported canonical runtime {runtime!r}")
 
