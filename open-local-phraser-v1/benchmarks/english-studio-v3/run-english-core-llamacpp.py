@@ -24,6 +24,8 @@ from typing import Any
 
 import requests
 
+from word_studio_output_parser import partial_candidate_count
+
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
@@ -57,7 +59,13 @@ def atomic_write_json(path: Path, value: dict[str, Any]) -> None:
         raise
 
 
-def generate_one(endpoint: str, prompt: str, max_tokens: int, args: argparse.Namespace) -> dict[str, Any]:
+def generate_one(
+    endpoint: str,
+    prompt: str,
+    max_tokens: int,
+    args: argparse.Namespace,
+    track_word_studio: bool = False,
+) -> dict[str, Any]:
     started = time.monotonic()
     if args.prompt_mode == "chat":
         route = "/v1/chat/completions"
@@ -94,6 +102,9 @@ def generate_one(endpoint: str, prompt: str, max_tokens: int, args: argparse.Nam
     )
     response.raise_for_status()
     first_token_seconds = None
+    first_candidate_seconds = None
+    first_three_seconds = None
+    first_ten_seconds = None
     chunks: list[str] = []
     token_count = 0
     final_metrics: dict[str, Any] = {}
@@ -103,24 +114,41 @@ def generate_one(endpoint: str, prompt: str, max_tokens: int, args: argparse.Nam
         line = raw_line.decode("utf-8") if isinstance(raw_line, bytes) else raw_line
         if not line.startswith("data:"):
             continue
-        payload = line[len("data:") :].strip()
-        if payload == "[DONE]":
+        payload_text = line[len("data:") :].strip()
+        if payload_text == "[DONE]":
             break
         try:
-            piece = json.loads(payload)
+            piece = json.loads(payload_text)
         except json.JSONDecodeError:
             continue
         choices = piece.get("choices") or []
-        delta = choices[0].get("delta", {}) if choices else {}
+        choice0 = choices[0] if choices else {}
+        delta = choice0.get("delta", {}) if choices else {}
         content = delta.get("content") or piece.get("content") or piece.get("response") or ""
+        finish_reason = choice0.get("finish_reason") if isinstance(choice0, dict) else None
+        if finish_reason:
+            final_metrics["finish_reason"] = finish_reason
         if content:
+            now = time.monotonic()
             if first_token_seconds is None:
-                first_token_seconds = time.monotonic() - started
+                first_token_seconds = now - started
             chunks.append(content)
+            if track_word_studio:
+                count = partial_candidate_count("".join(chunks))
+                elapsed = now - started
+                if count >= 1 and first_candidate_seconds is None:
+                    first_candidate_seconds = elapsed
+                if count >= 3 and first_three_seconds is None:
+                    first_three_seconds = elapsed
+                if count >= 10 and first_ten_seconds is None:
+                    first_ten_seconds = elapsed
         tokens = piece.get("tokens")
         if isinstance(tokens, list):
             token_count += len(tokens)
-        for key in ("timings", "tokens_predicted", "tokens_evaluated", "stop", "usage"):
+        for key in (
+            "timings", "tokens_predicted", "tokens_evaluated", "stop", "usage",
+            "stopped_limit", "stopped_eos", "stop_type",
+        ):
             if key in piece:
                 final_metrics[key] = piece[key]
     response.close()
@@ -129,11 +157,20 @@ def generate_one(endpoint: str, prompt: str, max_tokens: int, args: argparse.Nam
         first_token_seconds = finished - started
     if token_count == 0:
         token_count = int(final_metrics.get("tokens_predicted") or 0)
+    finish_reason = final_metrics.get("finish_reason")
+    if not finish_reason and final_metrics.get("stopped_limit"):
+        finish_reason = "length"
+    elif not finish_reason and final_metrics.get("stop"):
+        finish_reason = "stop"
     return {
         "text": "".join(chunks).strip(),
         "latencySeconds": round(finished - started, 6),
         "firstTokenLatencySeconds": round(first_token_seconds, 6),
+        "firstCandidateLatencySeconds": round(first_candidate_seconds, 6) if first_candidate_seconds is not None else None,
+        "firstThreeCandidatesLatencySeconds": round(first_three_seconds, 6) if first_three_seconds is not None else None,
+        "firstTenCandidatesLatencySeconds": round(first_ten_seconds, 6) if first_ten_seconds is not None else None,
         "completionTokenCount": token_count,
+        "finishReason": finish_reason,
         "serverMetrics": final_metrics,
     }
 
@@ -263,7 +300,8 @@ def main() -> None:
                 "Exact GGUF file bytes are SHA-256 hashed locally.",
                 "The server must be built from a pinned llama.cpp commit; include the build commit and CUDA build flags when packaging this run.",
                 "Chat mode uses the GGUF-embedded template through the loopback OpenAI-compatible API; reasoning/thinking disable requests are recorded in the decoding contract.",
-                "Per-request first-token and completion times are measured by the loopback streaming client; first token is not a human-approved option.",
+                "Per-request first-token and completion times are measured by the loopback streaming client.",
+                "For Word Studio suites, time-to-first/3/10 parsed candidates is measured incrementally from completed candidate strings, not equated with TTFT.",
                 "A capped --limit run is marked incomplete and is not promotion-quality evidence.",
                 "No answer key is loaded and no model-as-judge is invoked.",
             ],
@@ -284,21 +322,30 @@ def main() -> None:
                     prompts[index],
                     args.max_tokens if task.get("generative") else args.choice_max_tokens,
                     args,
+                    str(task.get("suite") or "").startswith("word_studio_"),
                 )
                 for index, task in enumerate(batch, start)
             ]
             generated = [future.result() for future in futures]
         batch_seconds = time.monotonic() - batch_started
         for task, output in zip(batch, generated, strict=True):
-            run["outputs"].append({
+            row = {
                 "id": task["id"],
                 "output": output["text"],
                 "latencySeconds": output["latencySeconds"],
                 "firstTokenLatencySeconds": output["firstTokenLatencySeconds"],
                 "completionTokenCount": output["completionTokenCount"],
+                "finishReason": output["finishReason"],
                 "promptAdaptation": "llama.cpp_embedded_chat_template" if args.prompt_mode == "chat" else "plain",
                 "promptAdaptationDetail": "reasoning_effort=none;enable_thinking=false" if args.prompt_mode == "chat" else "none",
-            })
+            }
+            if str(task.get("suite") or "").startswith("word_studio_"):
+                row.update({
+                    "firstCandidateLatencySeconds": output["firstCandidateLatencySeconds"],
+                    "firstThreeCandidatesLatencySeconds": output["firstThreeCandidatesLatencySeconds"],
+                    "firstTenCandidatesLatencySeconds": output["firstTenCandidatesLatencySeconds"],
+                })
+            run["outputs"].append(row)
         run["completedCount"] = len(run["outputs"])
         run["runtime"]["lastBatchWallSeconds"] = round(batch_seconds, 6)
         run["runtime"]["wallSecondsSoFar"] = round(time.monotonic() - total_started, 6)
