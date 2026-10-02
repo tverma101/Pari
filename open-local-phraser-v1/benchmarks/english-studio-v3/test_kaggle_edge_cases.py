@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from kaggle_failure_taxonomy import classify
-from word_studio_output_parser import diagnose, parse_options
+from word_studio_output_parser import diagnose, parse_options, partial_candidate_count
 
 HERE = Path(__file__).resolve().parent
 
@@ -27,6 +27,11 @@ def test_word_studio_parser() -> None:
     assert "word_studio_too_few_candidates" in diag["statuses"]
     assert "word_studio_excessive_duplicates" in diag["statuses"]
     assert "contains_unchanged_source" in diag["statuses"]
+
+    assert partial_candidate_count('{"options":["one","two","thr') == 2
+    assert partial_candidate_count('{"options":["one","two","three"]') == 3
+    assert partial_candidate_count("1. one\n2. two\n3. three") == 3
+    assert partial_candidate_count("Here are options:\n1. one\n2. two") == 0
 
 
 def test_failure_classifier() -> None:
