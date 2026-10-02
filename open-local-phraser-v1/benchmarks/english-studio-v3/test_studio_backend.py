@@ -1,26 +1,32 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import asyncio
+
 from studio_backend import (
     Candidate,
     CandidateAccumulator,
     CandidateLane,
     Operation,
+    ProtectedSpan,
     SemanticMode,
+    StudioEngine,
     StudioRequest,
     TextRange,
     build_execution_plan,
+    candidate_preserves_protected_content,
     compile_prompt,
 )
 
 
-def request_for(text: str, selected: str, operation: Operation, count: int = 40) -> StudioRequest:
+def request_for(text: str, selected: str, operation: Operation, count: int = 40, **kwargs) -> StudioRequest:
     start = text.index(selected)
     return StudioRequest(
         document_text=text,
         selection=TextRange(start, start + len(selected)),
         operation=operation,
         requested_candidates=count,
+        **kwargs,
     )
 
 
@@ -87,7 +93,6 @@ def test_progressive_delivery_and_cancel() -> None:
     assert len(first[0].candidates) == 3
     assert not first[0].final
 
-    # Case/whitespace duplicates do not inflate progressive thresholds.
     assert acc.add([candidate("  MADE CLEARER  ", 3)]) == ()
     remaining = [candidate(f"option {i}", i, CandidateLane.DIVERSITY) for i in range(4, 11)]
     final = acc.add(remaining, all_finished=True)
@@ -112,11 +117,81 @@ def test_final_partial_snapshot() -> None:
     assert len(batches[0].candidates) == 2
 
 
+def test_protected_gate() -> None:
+    text = "Jordan uploaded report-v2.pdf before the deadline."
+    selected = "uploaded report-v2.pdf"
+    start = text.index(selected)
+    req = StudioRequest(
+        document_text=text,
+        selection=TextRange(start, start + len(selected)),
+        operation=Operation.REWRITE,
+        requested_candidates=10,
+        protected_spans=(ProtectedSpan("report-v2.pdf", text.index("report-v2.pdf"), text.index("report-v2.pdf") + len("report-v2.pdf")),),
+    )
+    assert candidate_preserves_protected_content(req, "sent report-v2.pdf")
+    assert not candidate_preserves_protected_content(req, "sent the report")
+
+
+class FakeAdapter:
+    def __init__(self, values: list[str], delay: float) -> None:
+        self.values = values
+        self.delay = delay
+        self.cancelled: set[str] = set()
+
+    async def generate(self, prompt, *, request_id: str) -> list[str]:
+        await asyncio.sleep(self.delay)
+        return list(self.values)
+
+    async def cancel(self, request_id: str) -> None:
+        self.cancelled.add(request_id)
+
+
+async def _engine_progressive_case() -> None:
+    req = request_for("The examples clarified the rule for me.", "clarified", Operation.REPLACE, 10)
+    fast = FakeAdapter(["made clearer", "helped explain", "cleared up", "explained", "made plain", "made easier", "clarified better"], 0.01)
+    diversity = FakeAdapter(["made easier to understand", "helped me understand", "made more understandable"], 0.03)
+    engine = StudioEngine(fast, diversity)
+    batches = [batch async for batch in engine.stream(req)]
+    assert len(batches) == 2
+    assert len(batches[0].candidates) == 3
+    assert not batches[0].final
+    assert len(batches[1].candidates) == 10
+    assert batches[1].final
+    assert batches[0].candidates[0].lane == CandidateLane.FAST
+    assert batches[1].candidates[-1].lane == CandidateLane.DIVERSITY
+
+
+async def _engine_cancel_case() -> None:
+    req = request_for("The explanation was hard to follow.", "hard to follow", Operation.REPLACE, 10)
+    fast = FakeAdapter(["confusing"] * 10, 5.0)
+    diversity = FakeAdapter(["unclear"] * 10, 5.0)
+    engine = StudioEngine(fast, diversity)
+
+    async def collect():
+        return [batch async for batch in engine.stream(req)]
+
+    task = asyncio.create_task(collect())
+    await asyncio.sleep(0.02)
+    await engine.cancel(req.request_id)
+    batches = await asyncio.wait_for(task, timeout=1.0)
+    assert len(batches) == 1
+    assert batches[0].cancelled and batches[0].final
+    assert req.request_id in fast.cancelled
+    assert req.request_id in diversity.cancelled
+
+
+def test_engine() -> None:
+    asyncio.run(_engine_progressive_case())
+    asyncio.run(_engine_cancel_case())
+
+
 def main() -> None:
     test_router()
     test_prompt_contract()
     test_progressive_delivery_and_cancel()
     test_final_partial_snapshot()
+    test_protected_gate()
+    test_engine()
     print("Studio backend contract tests passed.")
 
 
