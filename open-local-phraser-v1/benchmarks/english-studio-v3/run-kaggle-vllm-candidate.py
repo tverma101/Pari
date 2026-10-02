@@ -23,6 +23,7 @@ DIAGNOSTICS = HERE / "protocol_output_diagnostics.py"
 VALIDATOR = HERE / "validate-english-core-run.py"
 DEFAULT_ENGLISH_TASKS = HERE / "english-core-fixed-screen.jsonl"
 DEFAULT_WORD_STUDIO_TASKS = HERE / "word-studio-strength.jsonl"
+DEFAULT_TRANSFORM_TASKS = HERE / "word-studio-transform.jsonl"
 BATCH_LADDER = (32, 16, 8, 4, 1)
 
 
@@ -38,7 +39,7 @@ def write_json(path: Path, value) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("candidate_id")
-    ap.add_argument("--stage", choices=["smoke", "full", "word-studio"], required=True)
+    ap.add_argument("--stage", choices=["smoke", "full", "word-studio", "transform"], required=True)
     ap.add_argument("--decode", choices=["normal", "mtp", "qwen3_next_mtp"], default="normal")
     ap.add_argument("--speculative-tokens", type=int, default=1)
     ap.add_argument("--benchmark-revision", required=True)
@@ -78,6 +79,8 @@ def main() -> None:
         tasks = args.tasks.resolve()
     elif args.stage == "word-studio":
         tasks = DEFAULT_WORD_STUDIO_TASKS
+    elif args.stage == "transform":
+        tasks = DEFAULT_TRANSFORM_TASKS
     else:
         tasks = DEFAULT_ENGLISH_TASKS
     if not tasks.is_file():
@@ -86,7 +89,7 @@ def main() -> None:
     args.results_dir.mkdir(parents=True, exist_ok=True)
     candidate_dir = args.results_dir / args.candidate_id / args.stage / args.decode
     candidate_dir.mkdir(parents=True, exist_ok=True)
-    batch_ladder = (1,) if args.stage == "word-studio" else BATCH_LADDER
+    batch_ladder = (1,) if args.stage in {"word-studio", "transform"} else BATCH_LADDER
     summary = {
         "schemaVersion": 2,
         "candidate": c,
@@ -129,6 +132,8 @@ def main() -> None:
             cmd += ["--limit", "16"]
         if args.stage == "word-studio":
             cmd += ["--max-tokens", "1200"]
+        if args.stage == "transform":
+            cmd += ["--max-tokens", "900"]
         if args.decode != "normal":
             cmd += [
                 "--speculative-method", args.decode,
