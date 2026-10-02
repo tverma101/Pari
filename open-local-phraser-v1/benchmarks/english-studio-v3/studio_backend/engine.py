@@ -56,7 +56,11 @@ class StudioEngine:
         prompt = compile_prompt(request, lane_plan, semantic_mode)
         values = await adapter.generate(prompt, request_id=request.request_id)
         safe = filter_protected_candidates(request, values)
-        return LaneResult(lane=lane_plan.lane, plan=lane_plan, values=safe)
+        return LaneResult(
+            lane=lane_plan.lane,
+            plan=lane_plan,
+            values=safe[: lane_plan.candidate_budget],
+        )
 
     @staticmethod
     def _to_candidates(result: LaneResult, *, model_id: str | None = None) -> tuple[Candidate, ...]:
