@@ -16,7 +16,6 @@ import os
 import platform
 import re
 import subprocess
-import sys
 import tempfile
 import time
 import uuid
@@ -25,7 +24,6 @@ from typing import Any
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_TASKS = HERE / "english-core-fixed-screen.jsonl"
-SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -73,15 +71,6 @@ def atomic_write_json(path: Path, value: dict[str, Any]) -> None:
         raise
 
 
-def clean_generation(text: str) -> str:
-    text = text.strip()
-    if text.startswith("<think>"):
-        close = text.find("</think>")
-        if close >= 0:
-            text = text[close + len("</think>") :].strip()
-    return text
-
-
 def prompt_for_task(tokenizer: Any, text: str, mode: str) -> tuple[str, str, str]:
     if mode == "plain":
         return text, "plain", "none"
@@ -107,12 +96,7 @@ def prompt_for_task(tokenizer: Any, text: str, mode: str) -> tuple[str, str, str
 
 
 def hash_hub_artifact_manifest(model_id: str, revision: str) -> tuple[str, str, list[dict[str, Any]]]:
-    """Hash the pinned Hub file inventory and immutable blob identities.
-
-    This is a reproducible artifact-manifest hash, not a bytewise hash of every
-    model tensor. HF supplies immutable Git/LFS object identities for the pinned
-    commit; those identities and file sizes bind this digest to the exact tree.
-    """
+    """Hash the pinned Hub file inventory and immutable blob identities."""
     from huggingface_hub import HfApi
 
     info = HfApi().model_info(model_id, revision=revision, files_metadata=True)
@@ -182,6 +166,43 @@ def hardware_record() -> dict[str, Any]:
     return record
 
 
+def validate_resume(
+    existing: dict[str, Any],
+    *,
+    ids: list[str],
+    task_hash: str,
+    model_repo: str,
+    revision: str,
+    prompt_mode: str,
+    expected_decoding: dict[str, Any],
+    benchmark_revision: str,
+) -> int:
+    model = existing.get("model") or {}
+    decoding = existing.get("decoding") or {}
+    repro = existing.get("reproducibility") or {}
+    comparisons = {
+        "model.repoOrName": (model.get("repoOrName"), model_repo),
+        "model.revision": (model.get("revision"), revision),
+        "taskFileSha256": (existing.get("taskFileSha256"), task_hash),
+        "taskCount": (existing.get("taskCount"), len(ids)),
+        "promptModeRequested": (existing.get("promptModeRequested"), prompt_mode),
+        "benchmarkRevision": (repro.get("benchmarkRevision"), benchmark_revision),
+    }
+    for key, expected in expected_decoding.items():
+        comparisons[f"decoding.{key}"] = (decoding.get(key), expected)
+    mismatches = [f"{key}: existing={actual!r} expected={expected!r}" for key, (actual, expected) in comparisons.items() if actual != expected]
+    if mismatches:
+        raise SystemExit("Resume identity mismatch; refusing to mix configurations:\n" + "\n".join(mismatches))
+    outputs = existing.get("outputs")
+    if not isinstance(outputs, list):
+        raise SystemExit("Resume result outputs must be an array")
+    output_ids = [row.get("id") if isinstance(row, dict) else None for row in outputs]
+    expected_prefix = ids[: len(output_ids)]
+    if output_ids != expected_prefix:
+        raise SystemExit("Resume requires outputs to be the exact unique task-ID prefix; gaps/reordering/duplicates are forbidden")
+    return len(outputs)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("model", help="Hugging Face model repository ID")
@@ -209,9 +230,12 @@ def main() -> None:
     ap.add_argument("--language-model-only", action="store_true", help="Skip unused multimodal towers for supported models")
     ap.add_argument("--speculative-method", choices=["mtp", "qwen3_next_mtp"], default=None)
     ap.add_argument("--speculative-tokens", type=int, default=1)
+    ap.add_argument("--resume", action="store_true", help="continue an exact-prefix atomic checkpoint under the same configuration")
     ap.add_argument("--overwrite", action="store_true")
     args = ap.parse_args()
 
+    if args.resume and args.overwrite:
+        raise SystemExit("--resume and --overwrite are mutually exclusive")
     if not re.fullmatch(r"[0-9a-fA-F]{40}", args.revision):
         raise SystemExit("--revision must be an immutable 40-character Hugging Face commit SHA")
     if not re.fullmatch(r"[0-9a-fA-F]{7,40}", args.benchmark_revision):
@@ -226,12 +250,15 @@ def main() -> None:
         raise SystemExit("--limit must be >= 1")
 
     result_path = args.result_file.resolve()
-    if result_path.exists() and not args.overwrite:
-        raise SystemExit(f"Refusing to overwrite existing result {result_path}; choose a new path or pass --overwrite")
+    if result_path.exists() and not (args.overwrite or args.resume):
+        raise SystemExit(f"Refusing to overwrite existing result {result_path}; choose a new path, --resume, or --overwrite")
+    if args.resume and not result_path.is_file():
+        raise SystemExit(f"--resume requested but checkpoint does not exist: {result_path}")
     task_path = resolve_path(args.tasks)
     if not task_path.is_file():
         raise SystemExit(f"Missing task file: {task_path}. Build the requested task screen first.")
     task_bytes = task_path.read_bytes()
+    task_hash = sha256_bytes(task_bytes)
     tasks = [json.loads(line) for line in task_bytes.decode("utf-8").splitlines() if line.strip()]
     if args.limit is not None:
         tasks = tasks[: args.limit]
@@ -289,7 +316,21 @@ def main() -> None:
     if speculative_config is not None:
         llm_kwargs["speculative_config"] = speculative_config
 
-    print(f"task_file={task_path} task_count={len(tasks)} sha256={sha256_bytes(task_bytes)}", flush=True)
+    expected_decoding = {
+        "temperature": args.temperature,
+        "topP": args.top_p,
+        "topK": args.top_k,
+        "maxNewTokens": args.max_tokens,
+        "forcedChoiceMaxNewTokens": args.choice_max_tokens,
+        "seed": args.seed,
+        "batchSize": args.batch_size,
+        "tensorParallelSize": args.tensor_parallel_size,
+        "dtype": args.dtype,
+        "languageModelOnly": args.language_model_only,
+        "speculativeConfig": speculative_config,
+    }
+
+    print(f"task_file={task_path} task_count={len(tasks)} sha256={task_hash}", flush=True)
     print(f"loading model={args.model} revision={resolved_revision} tp={args.tensor_parallel_size} speculative={speculative_config}", flush=True)
     load_started = time.monotonic()
     llm = LLM(**llm_kwargs)
@@ -298,69 +339,92 @@ def main() -> None:
     model_name = args.model_name or args.model.rsplit("/", 1)[-1]
     chat_template = getattr(tokenizer, "chat_template", None)
     created_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    run = {
-        "runId": f"english-core-{model_name}-{uuid.uuid4().hex[:8]}",
-        "timestamp": created_at,
-        "status": "running",
-        "complete": False,
-        "model": {
-            "name": model_name,
-            "repoOrName": args.model,
-            "revision": resolved_revision,
-            "artifactSha256": artifact_hash,
-            "artifactIdentityType": "sha256_of_sorted_pinned_huggingface_blob_inventory",
-            "artifactFiles": len(artifact_files),
-            "quantization": args.quantization,
-            "checkpointType": args.checkpoint_type,
-            "runtime": "vllm",
-            "runtimeVersion": package_version("vllm"),
-            "tokenizerName": getattr(tokenizer, "name_or_path", args.model),
-            "chatTemplate": "tokenizer.apply_chat_template" if "chat_template" in adaptations else "none/plain",
-            "chatTemplateSha256": sha256_text(chat_template if isinstance(chat_template, str) else None),
-        },
-        "hardware": hardware_record(),
-        "taskFile": str(task_path),
-        "taskFileSha256": sha256_bytes(task_bytes),
-        "taskCount": len(tasks),
-        "sourceTaskCount": len([line for line in task_bytes.decode("utf-8").splitlines() if line.strip()]),
-        "promptModeRequested": args.prompt_mode,
-        "promptAdaptationModesObserved": sorted(adaptations),
-        "promptAdaptationDetailsObserved": sorted(adaptation_details),
-        "decoding": {
-            "temperature": args.temperature,
-            "topP": args.top_p,
-            "topK": args.top_k,
-            "maxNewTokens": args.max_tokens,
-            "forcedChoiceMaxNewTokens": args.choice_max_tokens,
-            "seed": args.seed,
-            "batchSize": args.batch_size,
-            "tensorParallelSize": args.tensor_parallel_size,
-            "dtype": args.dtype,
-            "languageModelOnly": args.language_model_only,
-            "speculativeConfig": speculative_config,
-        },
-        "runtime": {
-            "coldLoadSeconds": round(cold_load_seconds, 6),
-            "cudaVisibleDevices": os.environ.get("CUDA_VISIBLE_DEVICES"),
-        },
-        "outputs": [],
-        "reproducibility": {
-            "benchmarkRevision": args.benchmark_revision,
-            "rawOutputSha256": None,
-            "notes": [
-                "artifactSha256 hashes the canonical inventory of immutable Hub blobs and file sizes at the resolved commit; it is not a second bytewise hash of every downloaded weight tensor.",
-                "Run output contains no gold answers and this runner never opens answer-key files.",
-                "Per-request TTFT and completion latency are taken from vLLM RequestOutput metrics when exposed by the installed version; unavailable values remain null.",
-                "For a smoke run with --limit, taskCount is the attempted prefix and complete remains false; it cannot be promoted as the fixed screen.",
-                "MTP is opt-in. An unsupported method/configuration fails explicitly; there is no silent fallback to ordinary decoding.",
-            ],
-        },
-    }
-    atomic_write_json(result_path, run)
 
-    total_started = time.monotonic()
-    sampling_batches = []
-    for start in range(0, len(tasks), args.batch_size):
+    if args.resume:
+        run = json.loads(result_path.read_text(encoding="utf-8"))
+        start_index = validate_resume(
+            run,
+            ids=ids,
+            task_hash=task_hash,
+            model_repo=args.model,
+            revision=resolved_revision,
+            prompt_mode=args.prompt_mode,
+            expected_decoding=expected_decoding,
+            benchmark_revision=args.benchmark_revision,
+        )
+        if start_index == len(tasks):
+            print(f"resume checkpoint already contains all {len(tasks)} requested tasks; no generation needed", flush=True)
+            return
+        runtime = run.setdefault("runtime", {})
+        prior_wall = float(runtime.get("wallSecondsSoFar") or runtime.get("totalWallSeconds") or 0.0)
+        runtime.setdefault("resumeSegments", []).append({
+            "timestamp": created_at,
+            "startIndex": start_index,
+            "coldLoadSeconds": round(cold_load_seconds, 6),
+            "previousWallSeconds": round(prior_wall, 6),
+        })
+        run["status"] = "running"
+        run["complete"] = False
+        run["completedCount"] = start_index
+        run["reproducibility"]["rawOutputSha256"] = None
+        atomic_write_json(result_path, run)
+    else:
+        start_index = 0
+        prior_wall = 0.0
+        run = {
+            "runId": f"english-core-{model_name}-{uuid.uuid4().hex[:8]}",
+            "timestamp": created_at,
+            "status": "running",
+            "complete": False,
+            "model": {
+                "name": model_name,
+                "repoOrName": args.model,
+                "revision": resolved_revision,
+                "artifactSha256": artifact_hash,
+                "artifactIdentityType": "sha256_of_sorted_pinned_huggingface_blob_inventory",
+                "artifactFiles": len(artifact_files),
+                "quantization": args.quantization,
+                "checkpointType": args.checkpoint_type,
+                "runtime": "vllm",
+                "runtimeVersion": package_version("vllm"),
+                "tokenizerName": getattr(tokenizer, "name_or_path", args.model),
+                "chatTemplate": "tokenizer.apply_chat_template" if "chat_template" in adaptations else "none/plain",
+                "chatTemplateSha256": sha256_text(chat_template if isinstance(chat_template, str) else None),
+            },
+            "hardware": hardware_record(),
+            "taskFile": str(task_path),
+            "taskFileSha256": task_hash,
+            "taskCount": len(tasks),
+            "sourceTaskCount": len([line for line in task_bytes.decode("utf-8").splitlines() if line.strip()]),
+            "promptModeRequested": args.prompt_mode,
+            "promptAdaptationModesObserved": sorted(adaptations),
+            "promptAdaptationDetailsObserved": sorted(adaptation_details),
+            "decoding": expected_decoding,
+            "runtime": {
+                "coldLoadSeconds": round(cold_load_seconds, 6),
+                "cudaVisibleDevices": os.environ.get("CUDA_VISIBLE_DEVICES"),
+                "resumeSegments": [],
+            },
+            "outputs": [],
+            "reproducibility": {
+                "benchmarkRevision": args.benchmark_revision,
+                "rawOutputSha256": None,
+                "notes": [
+                    "artifactSha256 hashes the canonical inventory of immutable Hub blobs and file sizes at the resolved commit; it is not a second bytewise hash of every downloaded weight tensor.",
+                    "Run output contains no gold answers and this runner never opens answer-key files.",
+                    "Raw model text is preserved exactly; leading <think> blocks are NOT stripped because protocol leakage is a benchmark observation.",
+                    "Per-request TTFT and completion latency are taken from vLLM RequestOutput metrics when exposed by the installed version; unavailable values remain null.",
+                    "For a smoke run with --limit, taskCount is the attempted prefix and complete remains false; it cannot be promoted as the fixed screen.",
+                    "MTP is opt-in. An unsupported method/configuration fails explicitly; there is no silent fallback to ordinary decoding.",
+                    "Resume is permitted only for the exact task-ID prefix under identical model, task hash, prompt mode, decoding, runtime topology, and benchmark revision.",
+                ],
+            },
+        }
+        atomic_write_json(result_path, run)
+
+    segment_started = time.monotonic()
+    sampling_batches = list(run.get("runtime", {}).get("batchWallSeconds") or [])
+    for start in range(start_index, len(tasks), args.batch_size):
         stop = min(start + args.batch_size, len(tasks))
         batch_tasks = tasks[start:stop]
         batch_prompts = prompts[start:stop]
@@ -380,23 +444,28 @@ def main() -> None:
         if len(request_outputs) != len(batch_tasks):
             raise RuntimeError(f"vLLM returned {len(request_outputs)} outputs for {len(batch_tasks)} inputs")
         for task, request_output in zip(batch_tasks, request_outputs, strict=True):
-            generated = [clean_generation(choice.text) for choice in request_output.outputs]
+            choices = list(request_output.outputs)
+            raw_generated = [str(choice.text) for choice in choices]
             metrics = getattr(request_output, "metrics", None)
+            first_choice = choices[0] if choices else None
+            finish_reason = getattr(first_choice, "finish_reason", None) if first_choice is not None else None
             row = {
                 "id": task["id"],
-                "output": generated[0] if generated else "",
+                "output": raw_generated[0] if raw_generated else "",
                 "latencySeconds": elapsed_metric(metrics, "arrival_time", "finished_time"),
                 "firstTokenLatencySeconds": elapsed_metric(metrics, "arrival_time", "first_token_time"),
                 "promptAdaptation": "chat_template" if args.prompt_mode == "chat" else "plain",
                 "promptAdaptationDetail": next(iter(adaptation_details), "none"),
-                "completionTokenCount": len(request_output.outputs[0].token_ids) if generated else 0,
+                "completionTokenCount": len(first_choice.token_ids) if first_choice is not None else 0,
+                "finishReason": finish_reason,
             }
-            if len(generated) > 1:
-                row["alternatives"] = generated
+            if len(raw_generated) > 1:
+                row["alternatives"] = raw_generated
             run["outputs"].append(row)
         sampling_batches.append(round(batch_wall, 6))
         run["completedCount"] = len(run["outputs"])
-        run["runtime"]["wallSecondsSoFar"] = round(time.monotonic() - total_started, 6)
+        segment_wall = time.monotonic() - segment_started
+        run["runtime"]["wallSecondsSoFar"] = round(prior_wall + segment_wall, 6)
         run["runtime"]["lastBatchWallSeconds"] = round(batch_wall, 6)
         run["runtime"]["batchWallSeconds"] = sampling_batches
         atomic_write_json(result_path, run)
@@ -406,7 +475,8 @@ def main() -> None:
     run["status"] = "completed" if len(run["outputs"]) == len(tasks) and args.limit is None else "incomplete"
     run["complete"] = run["status"] == "completed"
     run["completedCount"] = len(run["outputs"])
-    run["runtime"]["totalWallSeconds"] = round(time.monotonic() - total_started, 6)
+    run["runtime"]["totalWallSeconds"] = round(prior_wall + (time.monotonic() - segment_started), 6)
+    run["runtime"]["wallSecondsSoFar"] = run["runtime"]["totalWallSeconds"]
     run["reproducibility"]["rawOutputSha256"] = sha256_bytes(outputs_canonical)
     atomic_write_json(result_path, run)
     print(f"done status={run['status']} result={result_path} output_sha256={run['reproducibility']['rawOutputSha256']}", flush=True)
