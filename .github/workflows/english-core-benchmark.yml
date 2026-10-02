@@ -1,0 +1,41 @@
+name: English Core Benchmark Self-Check
+
+on:
+  push:
+    branches:
+      - bench/english-studio-v3
+    paths:
+      - 'open-local-phraser-v1/benchmarks/english-studio-v3/**'
+      - 'open-local-phraser-v1/AGENTS.md'
+      - '.github/workflows/english-core-benchmark.yml'
+  pull_request:
+    paths:
+      - 'open-local-phraser-v1/benchmarks/english-studio-v3/**'
+      - 'open-local-phraser-v1/AGENTS.md'
+      - '.github/workflows/english-core-benchmark.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  instrument-self-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run benchmark structural, parser, builder, and integrity checks
+        working-directory: open-local-phraser-v1/benchmarks/english-studio-v3
+        run: bash self-check-english-core.sh
+      - name: Ensure benchmark worktree was not unexpectedly mutated
+        run: |
+          git status --short
+          if git status --porcelain | grep -Ev '^\?\? open-local-phraser-v1/benchmarks/english-studio-v3/(english-core-shadow|english-core-prompt-robustness|english-core-choice-order-robustness)'; then
+            echo 'Unexpected tracked/untracked mutation from benchmark self-check' >&2
+            exit 1
+          fi
