@@ -10,6 +10,27 @@ This directory is the canonical production app. Do not implement production beha
 - Before stopping, preserve only authorized outputs in the authorized location; never publish or expose private benchmark inputs/results unless explicitly requested. Do not stop unrelated user-owned sessions.
 - An exception to shutdown requires an explicit user override naming the exact resource and how long it may remain active. Stop and verify it when that window ends. If shutdown cannot be confirmed, report the exact uncertainty and do not claim it is off.
 
+## Kaggle English Core / Word Studio benchmark (mandatory)
+
+For Issue #25 and the `bench/english-studio-v3` model-selection work, read and obey both:
+
+- `benchmarks/english-studio-v3/KAGGLE_2XT4_RUN.md`
+- `benchmarks/english-studio-v3/KAGGLE_BENCHMARK_HARDENING.md`
+
+Promotion-quality runtime evidence must be produced on an actual private Kaggle **2× NVIDIA T4 (16 GB each)** run. Do not substitute another GPU/provider or a local run for the T4 qualification step.
+
+Before any candidate enters English-quality ranking, separately establish:
+
+1. the exact artifact/runtime loads and stays on the declared GPU(s);
+2. the benchmark protocol can observe and classify its responses;
+3. only then, its English Core / Word Studio quality.
+
+Do not convert model-load, CUDA OOM, unsupported architecture/quantization, MTP failure, ABI/library failure, timeout, Kaggle-session failure, or silent CPU fallback into an English score of zero. Preserve those as structured runtime-unqualified results.
+
+Forced-choice evaluation must preserve both the frozen strict protocol result and a separately labeled conservative recoverable parse where predeclared parser rules can recover an explicit answer such as `A. same`. Never infer answers from arbitrary prose or use the gold label to resolve ambiguity. Word Studio runs must preserve raw output plus parsed candidate count, unique count, duplicate rate, malformed-list status, and time to first/3/10 parsed candidates where measurable.
+
+Use the predeclared batch-size fallback sequence and retry policy from `KAGGLE_BENCHMARK_HARDENING.md`; never silently change checkpoint, quantization, dtype semantics, tokenizer/template, or runtime to make a candidate fit. Such changes create a new candidate configuration.
+
 ## Architecture
 
 - React 19 + TypeScript + Vite frontend.
