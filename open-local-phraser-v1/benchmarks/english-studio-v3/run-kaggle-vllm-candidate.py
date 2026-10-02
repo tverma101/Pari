@@ -15,6 +15,7 @@ import time
 from pathlib import Path
 
 from kaggle_failure_taxonomy import classify
+from kaggle_hub_artifact_preflight import inspect_hub_artifact
 
 HERE = Path(__file__).resolve().parent
 ROSTER = HERE / "kaggle-candidate-roster.json"
@@ -91,7 +92,7 @@ def main() -> None:
     candidate_dir.mkdir(parents=True, exist_ok=True)
     batch_ladder = (1,) if args.stage in {"word-studio", "transform"} else BATCH_LADDER
     summary = {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "candidate": c,
         "stage": args.stage,
         "decode": args.decode,
@@ -103,6 +104,20 @@ def main() -> None:
         "status": "running",
     }
     summary_path = candidate_dir / "summary.json"
+    write_json(summary_path, summary)
+
+    artifact_preflight = inspect_hub_artifact(c["repo"], c["revision"], disk_root=Path("/kaggle/working"))
+    artifact_preflight_path = candidate_dir / "hub-artifact-preflight.json"
+    write_json(artifact_preflight_path, artifact_preflight)
+    summary["hubArtifactPreflight"] = str(artifact_preflight_path)
+    summary["expectedHubBytes"] = artifact_preflight.get("selectedBytes")
+    if artifact_preflight.get("status") != "qualified":
+        summary["status"] = "runtime_unqualified"
+        summary["terminalFailureCategories"] = [artifact_preflight.get("failureCategory") or "artifact_size_unknown"]
+        summary["reason"] = f"Hub artifact preflight failed: {artifact_preflight.get('status')}"
+        write_json(summary_path, summary)
+        print(json.dumps({"status": summary["status"], "summary": str(summary_path)}, indent=2))
+        raise SystemExit(2)
     write_json(summary_path, summary)
 
     stable_result: Path | None = None
