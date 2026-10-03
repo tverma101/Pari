@@ -10,6 +10,10 @@ Everything here is CPU-only and fabricated: the fixtures score synthetic
 results through the real scorer CLIs against the in-tree benchmark snapshot.
 No model, GPU, Kaggle session, install, or network call is involved.
 
+The generated task lanes the scorers read are untracked build outputs, so this
+suite is self-contained in a clean checkout: it runs the real task builders for
+any missing lane, exercises the scorers, then removes exactly what it created.
+
 Run: python3 test_mjs_score_view_contract.py
 """
 
@@ -22,6 +26,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -43,6 +48,20 @@ PROMPT_SCORER = "score-english-core-prompt-robustness.mjs"
 CHOICE_ORDER_SCORER = "score-english-core-choice-order-robustness.mjs"
 SCORERS = (SHADOW_SCORER, PROMPT_SCORER, CHOICE_ORDER_SCORER)
 
+# The MJS scorers resolve their task inputs relative to their own module path
+# (``path.dirname(fileURLToPath(import.meta.url))``) and expose no task-file
+# override, so the contract suite cannot point them at a fixture elsewhere. The
+# generated task lanes are deliberately untracked build outputs, so a clean
+# checkout has none of them and every scorer aborts before it can publish a
+# scoreView. These builders are the real ones: each reads only the tracked
+# seed/config with node builtins (no network, no model) and writes the exact
+# bytes the production scorers hash, so running them keeps this suite a test of
+# the shipped scorers rather than of a hand-rolled second copy of the lane.
+SHADOW_BUILDER = "build-english-core.mjs"
+PROMPT_BUILDER = "build-english-core-prompt-robustness.mjs"
+CHOICE_ORDER_BUILDER = "build-english-core-choice-order-robustness.mjs"
+BUILDERS = (SHADOW_BUILDER, PROMPT_BUILDER, CHOICE_ORDER_BUILDER)
+
 # The MJS scorers hash the same two files the Python contract names.
 JS_CONTRACT_FILE = "english_core_choice_views.py"
 JS_PARSER_FILE = "english-core-choice-parser.mjs"
@@ -57,10 +76,26 @@ MANIFEST_BY_SCORER = {
     PROMPT_SCORER: "english-core-prompt-robustness.manifest.json",
     CHOICE_ORDER_SCORER: "english-core-choice-order-robustness.manifest.json",
 }
+BUILDER_OUTPUTS_BY_BUILDER = {
+    SHADOW_BUILDER: (
+        "english-core-shadow.jsonl",
+        "english-core-shadow.manifest.json",
+    ),
+    PROMPT_BUILDER: (
+        "english-core-prompt-robustness.jsonl",
+        "english-core-prompt-robustness.manifest.json",
+    ),
+    CHOICE_ORDER_BUILDER: (
+        "english-core-choice-order-robustness.jsonl",
+        "english-core-choice-order-robustness.answers.json",
+        "english-core-choice-order-robustness.manifest.json",
+    ),
+}
 EXPECTED_REPORT_VERSION = {SHADOW_SCORER: 9, PROMPT_SCORER: 4, CHOICE_ORDER_SCORER: 3}
 
 VALIDATOR = HERE / "validate-english-core-run.py"
 VALIDATOR_MODULE = None
+RESULTS_TMP: Path | None = None
 
 
 def _load_validator():
@@ -88,6 +123,49 @@ def sha256_file(path: Path) -> str:
 
 def read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+@contextmanager
+def generated_task_inputs():
+    """Guarantee the generated task lanes the MJS scorers insist on reading.
+
+    A builder is run only when all of its outputs are absent, so a developer
+    who keeps the real lanes never sees them rewritten. Partial lanes fail
+    closed rather than letting a builder overwrite files it did not create.
+    The scorers pin their task and manifest bytes by hash, so this also fails
+    closed rather than silently scoring the wrong bytes if a builder ever
+    stops being reproducible.
+    """
+    created: list[Path] = []
+    try:
+        for builder, outputs in BUILDER_OUTPUTS_BY_BUILDER.items():
+            output_paths = tuple(HERE / name for name in outputs)
+            present = tuple(path.is_file() for path in output_paths)
+            if all(present):
+                continue
+            if any(present):
+                missing = [path.name for path, exists in zip(output_paths, present) if not exists]
+                raise RuntimeError(
+                    f"incomplete generated task lane for {builder}; missing {', '.join(missing)}"
+                )
+            # Record absent paths before invoking the builder so partial output
+            # from a failed build is cleaned without touching preexisting files.
+            created.extend(output_paths)
+            completed = subprocess.run(
+                ["node", str(HERE / builder)],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if completed.returncode != 0:
+                raise RuntimeError(f"{builder} exited {completed.returncode}: {completed.stderr.strip()[:400]}")
+            for path in output_paths:
+                if not path.is_file():
+                    raise RuntimeError(f"{builder} did not produce {path.name}")
+        yield
+    finally:
+        for path in reversed(created):
+            path.unlink(missing_ok=True)
 
 
 def synthetic_output(row: dict, index: int) -> str:
@@ -169,7 +247,9 @@ def build_synthetic_result(task_file_name: str, run_overrides: dict | None = Non
     }
     for key, value in (run_overrides or {}).items():
         run[key] = value
-    path = Path(tempfile.mkdtemp()) / "result.json"
+    if RESULTS_TMP is None:
+        raise RuntimeError("build_synthetic_result requires the suite results directory")
+    path = RESULTS_TMP / f"{task_file_name}.result.json"
     path.write_text(json.dumps(run, ensure_ascii=False), encoding="utf-8")
     return path
 
@@ -540,9 +620,7 @@ def test_scorer_versions_advanced_with_the_contract() -> None:
             check(int(match.group(1)) == version, f"{scorer} report version is {match.group(1)}, expected {version}")
 
 
-def main() -> int:
-    global VALIDATOR_MODULE
-    VALIDATOR_MODULE = _load_validator()
+def run_checks() -> int:
     reports = score_all()
     test_every_mjs_scorer_publishes_the_frozen_score_view_block(reports)
     test_analysis_side_consumes_every_mjs_score_view(reports)
@@ -565,11 +643,24 @@ def main() -> int:
             f"strict={views.get('strictAccuracyFixedDenominator')} "
             f"recoverable={views.get('recoverableAccuracyFixedDenominator')}"
         )
+    return 1 if FAILURES else 0
+
+
+def main() -> int:
+    global VALIDATOR_MODULE, RESULTS_TMP
+    VALIDATOR_MODULE = _load_validator()
+    with generated_task_inputs():
+        with tempfile.TemporaryDirectory(prefix="mjs-score-view-contract-") as raw_results:
+            RESULTS_TMP = Path(raw_results)
+            try:
+                failed = run_checks()
+            finally:
+                RESULTS_TMP = None
     if FAILURES:
         for failure in FAILURES:
             print(f"FAIL {failure}")
         print(f"{len(FAILURES)} of {CHECKS} MJS score-view checks failed")
-        return 1
+        return failed
     print(f"OK: {CHECKS} MJS score-view checks passed")
     return 0
 
