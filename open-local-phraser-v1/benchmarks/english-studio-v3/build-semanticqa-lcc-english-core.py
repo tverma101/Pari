@@ -216,6 +216,15 @@ def main() -> None:
             "benchmark": "SemanticQA-LCC-8cat",
             "generative": False,
             "prompt": prompt,
+            # SemanticQA LCC is a native 8-category *label-name* protocol, not a
+            # letter protocol. The model answers with the taxonomy category name
+            # (e.g. "Magn"), so the frozen allowed set is the ordered category
+            # list rendered into the prompt by {{taxonomy}}. It is deliberately
+            # NOT "allowedChoices", because the letter-choice parser validates
+            # single ASCII A-Z labels and would reject these names. Gold is never
+            # consulted: the per-row label stays in the separate answers file.
+            "answerProtocol": "label",
+            "allowedAnswerLabels": list(LABELS),
         })
         answers.append({
             "id": task_id,

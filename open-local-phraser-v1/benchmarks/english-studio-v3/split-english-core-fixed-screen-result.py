@@ -12,13 +12,15 @@ import re
 import tempfile
 from pathlib import Path
 
+from english_core_result_contract import validate_result
+
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
 def output_hash(outputs: list[dict]) -> str:
-    canonical = json.dumps(outputs, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    canonical = json.dumps(outputs, ensure_ascii=False, sort_keys=True, allow_nan=False).encode("utf-8")
     return sha256_bytes(canonical)
 
 
@@ -44,8 +46,11 @@ def main() -> None:
     ap.add_argument("result", type=Path)
     ap.add_argument("--manifest", type=Path, required=True)
     ap.add_argument("--output-dir", type=Path, required=True)
+    ap.add_argument("--promotion", action="store_true")
+    ap.add_argument("--compat-legacy-v0", action="store_true")
     args = ap.parse_args()
 
+    validation = validate_result(args.result, promotion=args.promotion, compat_legacy_v0=args.compat_legacy_v0)
     run = json.loads(args.result.read_text(encoding="utf-8"))
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     if manifest.get("cases") != 1943 or run.get("taskCount") != 1943:
@@ -82,9 +87,9 @@ def main() -> None:
             f"Lane outputs split from complete fixed-screen parent {args.result.name}; lane task bytes/hash remain unchanged."
         )
         out_path = args.output_dir / f"{safe_name}.{lane['lane']}.json"
-        atomic_write(out_path, (json.dumps(split, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+        atomic_write(out_path, (json.dumps(split, ensure_ascii=False, indent=2, allow_nan=False) + "\n").encode("utf-8"))
         completed.append({"lane": lane["lane"], "path": str(out_path.resolve()), "cases": len(lane_ids), "rawOutputSha256": split["reproducibility"]["rawOutputSha256"]})
-    print(json.dumps({"parentResultSha256": sha256_bytes(args.result.read_bytes()), "lanes": completed}, indent=2))
+    print(json.dumps({"parentResultSha256": sha256_bytes(args.result.read_bytes()), "inputResultSchema": validation.get("schemaValidation"), "lanes": completed}, indent=2, allow_nan=False))
 
 
 if __name__ == "__main__":

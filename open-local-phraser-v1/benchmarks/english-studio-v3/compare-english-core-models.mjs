@@ -1,26 +1,115 @@
 #!/usr/bin/env node
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  bindBenchmarkSnapshot,
+  buildComparisonProvenance,
+  reconcileScoreStructure,
+  requireScoreViewContract,
+  selectScoreView,
+  verifyFrozenScoreHashes,
+} from "./english-core-snapshot-binding.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const aPath = process.argv[2];
-const bPath = process.argv[3];
-const iterations = Number(process.argv[4] ?? 10000);
+
+const USAGE = [
+  "Usage: node compare-english-core-models.mjs <score-A.json> <score-B.json> [bootstrap_iterations]",
+  "         [--benchmark-dir <dir>] [--source-score-manifest <file>] [--score-view <name>]",
+  "",
+  "  --benchmark-dir         Directory holding the exact benchmark snapshot named by both",
+  "                          score artifacts. Defaults to this script's own directory. Every",
+  "                          consumed input is hashed and compared with benchmarkInputs",
+  "                          before any comparison runs (issue #65).",
+  "  --source-score-manifest Optional frozen manifest of expected source score file hashes;",
+  "                          proves neither score was edited after its hash was recorded.",
+  "  --score-view            Explicit strict|recoverable view. Headline comparison requires both",
+  "                          scores to declare the same view (issue #64).",
+].join("\n");
+
+function parseCli(argv) {
+  const positional = [];
+  const options = { benchmarkDir: null, sourceScoreManifest: null, scoreView: null };
+  const optionNames = {
+    "--benchmark-dir": "benchmarkDir",
+    "--source-score-manifest": "sourceScoreManifest",
+    "--score-view": "scoreView",
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const token = argv[index];
+    if (Object.prototype.hasOwnProperty.call(optionNames, token)) {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) throw new Error(`${token} requires a value argument`);
+      options[optionNames[token]] = value;
+      index += 1;
+      continue;
+    }
+    if (token.startsWith("--")) throw new Error(`Unknown option: ${token}`);
+    positional.push(token);
+  }
+  return { positional, options };
+}
+
+const { positional, options } = parseCli(process.argv.slice(2));
+const aPath = positional[0];
+const bPath = positional[1];
+const iterations = Number(positional[2] ?? 10000);
+const benchmarkDir = path.resolve(options.benchmarkDir ?? here);
 if (!aPath || !bPath) {
-  console.error("Usage: node compare-english-core-models.mjs <score-A.json> <score-B.json> [bootstrap_iterations]");
+  console.error(USAGE);
   process.exit(2);
 }
 if (!Number.isInteger(iterations) || iterations < 1000) throw new Error("bootstrap_iterations must be an integer >= 1000");
 
-const A = JSON.parse(fs.readFileSync(aPath, "utf8"));
-const B = JSON.parse(fs.readFileSync(bPath, "utf8"));
-const config = JSON.parse(fs.readFileSync(path.join(here, "english-core-config.json"), "utf8"));
-const seed = JSON.parse(fs.readFileSync(path.join(here, "english-core-shadow.seed.json"), "utf8"));
+const sourceScoreFiles = [
+  { label: "Model A score", path: aPath },
+  { label: "Model B score", path: bPath },
+].map((entry) => ({
+  ...entry,
+  bytes: fs.readFileSync(entry.path),
+}));
+const sourceScoreFileSha256 = Object.fromEntries(
+  sourceScoreFiles.map((entry) => [entry.label, crypto.createHash("sha256").update(entry.bytes).digest("hex")]),
+);
+const A = JSON.parse(sourceScoreFiles[0].bytes.toString("utf8"));
+const B = JSON.parse(sourceScoreFiles[1].bytes.toString("utf8"));
+
+// Artifact identity is checked before any snapshot binding or statistic work,
+// so an unsupported or unversioned JSON fails with a stable message instead of
+// being reported as a missing benchmark snapshot.
+function requireScoreArtifactShape(a, b) {
+  for (const [label, score] of [["A", a], ["B", b]]) {
+    if (score?.schemaVersion !== 1 || score?.artifactType !== "pari.english-core.shadow-score") {
+      throw new Error(`Model ${label} score is not a supported versioned English Core shadow-score artifact`);
+    }
+  }
+}
+
+requireScoreArtifactShape(A, B);
+const snapshot = bindBenchmarkSnapshot({ score: A, benchmarkDir, label: "Model A score" });
+const snapshotB = bindBenchmarkSnapshot({ score: B, benchmarkDir, label: "Model B score" });
+const config = snapshot.config;
+const seed = snapshot.seed;
 const metadata = new Map(seed.cases.map((row) => [row.id, row]));
 
+const viewA = requireScoreViewContract(A, "Model A score", { benchmarkDir });
+const viewB = requireScoreViewContract(B, "Model B score", { benchmarkDir });
+const scoreView = selectScoreView({ scoreView: viewA.scoreView, requested: options.scoreView, label: "Model A score" });
+const scoreViewB = selectScoreView({ scoreView: viewB.scoreView, requested: options.scoreView, label: "Model B score" });
+if (JSON.stringify(viewA.resultSchema) !== JSON.stringify(viewB.resultSchema)) {
+  throw new Error("Cannot pair scores validated under different English Core result-schema provenance");
+}
+if (scoreView.selected !== scoreViewB.selected) {
+  throw new Error(
+    `Cannot form a headline comparison across score views: model A is ${JSON.stringify(scoreView.selected ?? "unspecified")} `
+    + `and model B is ${JSON.stringify(scoreViewB.selected ?? "unspecified")}`,
+  );
+}
+
 function requireSameBenchmarkInputs(a, b) {
+  requireScoreArtifactShape(a, b);
   const keys = [
     "configSha256",
     "shadowSeedSha256",
@@ -42,21 +131,40 @@ function requireSameBenchmarkInputs(a, b) {
   if (a.taskFileSha256 !== a.benchmarkInputs.shadowTaskSha256 || b.taskFileSha256 !== b.benchmarkInputs.shadowTaskSha256) {
     throw new Error("Score taskFileSha256 must match benchmarkInputs.shadowTaskSha256");
   }
+  const schemaA = a.inputResultSchema;
+  const schemaB = b.inputResultSchema;
+  if (schemaA?.resultSchemaVersion !== 1 || schemaB?.resultSchemaVersion !== 1 || !schemaA?.schemaSha256 || !schemaB?.schemaSha256) {
+    throw new Error("Both score files must carry current result-schema validation provenance");
+  }
+  if (schemaA.validationMode !== "promotion" || schemaB.validationMode !== "promotion") {
+    throw new Error("Paired model comparison requires both source runs to pass promotion-mode result validation");
+  }
+  if (schemaA.schemaSha256 !== schemaB.schemaSha256) {
+    throw new Error("Cannot pair scores validated against different English Core result schemas");
+  }
 }
 
 function validateScoreDetail(score, label) {
-  const detail = score.detail ?? [];
-  if (!Array.isArray(detail)) throw new Error(`${label} detail must be an array`);
-  const ids = detail.map((row) => row?.id);
-  if (ids.some((id) => !id)) throw new Error(`${label} detail contains a missing ID`);
-  if (new Set(ids).size !== ids.length) throw new Error(`${label} detail contains duplicate IDs`);
-  const unknown = ids.filter((id) => !metadata.has(id));
-  if (unknown.length) throw new Error(`${label} detail contains ${unknown.length} IDs absent from the current shadow seed`);
+  return reconcileScoreStructure({
+    score,
+    snapshot,
+    config,
+    label,
+    requirePromotionReady: true,
+  });
 }
 
 requireSameBenchmarkInputs(A, B);
-validateScoreDetail(A, "Model A score");
-validateScoreDetail(B, "Model B score");
+const structureA = validateScoreDetail(A, "Model A score");
+const structureB = validateScoreDetail(B, "Model B score");
+
+const frozenScoreManifest = options.sourceScoreManifest
+  ? verifyFrozenScoreHashes({
+    manifestPath: options.sourceScoreManifest,
+    entries: { [aPath]: sourceScoreFileSha256["Model A score"], [bPath]: sourceScoreFileSha256["Model B score"] },
+    label: "Frozen score manifest",
+  })
+  : null;
 
 const mapA = new Map((A.detail ?? []).filter((x) => typeof x.score === "number").map((x) => [x.id, x]));
 const mapB = new Map((B.detail ?? []).filter((x) => typeof x.score === "number").map((x) => [x.id, x]));
@@ -255,8 +363,30 @@ const equalItemConclusion = conclusionFrom(equalItemCI);
 const weightedHierarchicalConclusion = weightedHierarchicalCI ? conclusionFrom(weightedHierarchicalCI) : "insufficient_phenomenon_groups_for_sensitivity_lane";
 const equalHierarchicalConclusion = equalHierarchicalCI ? conclusionFrom(equalHierarchicalCI) : "insufficient_phenomenon_groups_for_sensitivity_lane";
 
+const provenance = buildComparisonProvenance({
+  label: "Paired comparison",
+  scores: [
+    { label: "Model A score", path: aPath, fileSha256: sourceScoreFileSha256["Model A score"], score: A },
+    { label: "Model B score", path: bPath, fileSha256: sourceScoreFileSha256["Model B score"], score: B },
+  ],
+  benchmarkDir,
+  analysisScriptName: "compare-english-core-models.mjs",
+  analysisScriptDir: here,
+  scorerName: "score-english-core.mjs",
+  frozenScoreManifest,
+  scoreViews: [
+    { view: viewA, selected: scoreView },
+    { view: viewB, selected: scoreViewB },
+  ],
+  bootstrapSeed: "0x70a1b00b",
+  iterations,
+});
+
 const report = {
+  schemaVersion: 1,
+  artifactType: "pari.english-core.paired-comparison",
   version: 3,
+  provenance,
   modelA: A.model ?? null,
   modelB: B.model ?? null,
   benchmarkInputs: A.benchmarkInputs,

@@ -1,0 +1,193 @@
+{
+  "$id": "https://pari.local/schemas/word-studio-human-eval-rating-schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Schema v1. Closed at every level. Reviewer identity is an anonymous rater id only; no personally identifying information is permitted.",
+  "properties": {
+    "candidateRatings": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "candidateId": {
+            "pattern": "^[0-9]+$",
+            "type": "string"
+          },
+          "label": {
+            "enum": [
+              "usable",
+              "not_usable",
+              "unclear"
+            ],
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pairId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "A",
+              "B"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "pairId",
+          "side",
+          "candidateId",
+          "label"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "packetId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "packetSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "pairRatings": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "criterion": {
+            "enum": [
+              "compression_quality",
+              "contextual_naturalness",
+              "edit_usefulness",
+              "meaning_preservation",
+              "protected_content_correctness",
+              "register_preservation",
+              "structural_lexical_diversity",
+              "unnecessary_inflation"
+            ],
+            "type": "string"
+          },
+          "label": {
+            "enum": [
+              "A",
+              "B",
+              "tie",
+              "both_unacceptable"
+            ],
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pairId": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "pairId",
+          "criterion",
+          "label"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "preregistrationSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "raterId": {
+      "pattern": "^r-[A-Za-z0-9_-]{1,64}$",
+      "type": "string"
+    },
+    "rubricSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "strengthRatings": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "edit_usefulness": {
+            "enum": [
+              "usable",
+              "not_usable",
+              "unclear"
+            ],
+            "type": "string"
+          },
+          "intensity_increased": {
+            "enum": [
+              "yes",
+              "no",
+              "unclear"
+            ],
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requestedStrength": {
+            "enum": [
+              15,
+              40,
+              60,
+              90
+            ],
+            "type": "integer"
+          },
+          "semantic_register_stable": {
+            "enum": [
+              "yes",
+              "no",
+              "unclear"
+            ],
+            "type": "string"
+          },
+          "sourceGroupId": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "sourceGroupId",
+          "requestedStrength",
+          "edit_usefulness",
+          "semantic_register_stable",
+          "intensity_increased"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "packetId",
+    "packetSha256",
+    "preregistrationSha256",
+    "rubricSha256",
+    "raterId",
+    "pairRatings",
+    "candidateRatings",
+    "strengthRatings"
+  ],
+  "title": "Pari Word Studio blinded human-evaluation rating document",
+  "type": "object"
+}

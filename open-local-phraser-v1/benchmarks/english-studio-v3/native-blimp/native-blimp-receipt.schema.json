@@ -1,0 +1,504 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "native-blimp-receipt-1",
+  "title": "Native BLiMP provenance-bound run receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "laneId",
+    "promotable",
+    "outcome",
+    "config",
+    "configSha256",
+    "protocol",
+    "harnessObserved",
+    "datasetObserved",
+    "outputs",
+    "coverage",
+    "gateResults",
+    "errors",
+    "notes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "native-blimp-receipt-1"
+    },
+    "laneId": {
+      "const": "native-blimp"
+    },
+    "promotable": {
+      "type": "boolean"
+    },
+    "outcome": {
+      "enum": [
+        "pass",
+        "fail",
+        "protocol_unavailable",
+        "not_run"
+      ],
+      "description": "protocol_unavailable means the runtime cannot provide native likelihood semantics. It is never replaced with a prompted score."
+    },
+    "failureReason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "config": {
+      "type": "object"
+    },
+    "exitCode": {
+      "type": ["integer", "null"],
+      "description": "The harness process exit code. Null means the run timed out. Anything other than 0 is a failed run, never a set of zero-accuracy subtasks."
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo", "revision", "tokenizer"],
+      "description": "The exact model/tokenizer artifact identity under test. artifactSha256 doubles as the cross-backend parity key.",
+      "properties": {
+        "repo": { "type": "string", "minLength": 1 },
+        "revision": { "type": "string", "pattern": "^[0-9a-fA-F]{7,40}$" },
+        "tokenizer": { "type": "string", "minLength": 1 },
+        "tokenizerRevision": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{7,40}$"
+        },
+        "ggufFile": { "type": "string" },
+        "ggufSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "artifactSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "configSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "harnessCommit",
+        "packageVersion",
+        "taskGroup",
+        "datasetPinnedRevision"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "harnessCommit": {
+          "type": "string"
+        },
+        "packageVersion": {
+          "type": "string"
+        },
+        "taskGroup": {
+          "type": "string"
+        },
+        "datasetPinnedRevision": {
+          "type": "string"
+        }
+      }
+    },
+    "harnessObserved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkout",
+        "headCommit",
+        "commitMatches",
+        "fileSha256",
+        "fileHashesMatch",
+        "treeHashes",
+        "allIdentitiesMatch"
+      ],
+      "properties": {
+        "checkout": {
+          "type": "string"
+        },
+        "headCommit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "commitMatches": {
+          "type": "boolean"
+        },
+        "fileSha256": {
+          "type": "object"
+        },
+        "fileHashesMatch": {
+          "type": "boolean"
+        },
+        "treeHashes": {
+          "type": "object"
+        },
+        "treeHashesMatch": {
+          "type": "boolean"
+        },
+        "allIdentitiesMatch": {
+          "type": "boolean"
+        },
+        "reportedGitHash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reportedLmEvalVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "versionMatches": {
+          "type": "boolean"
+        }
+      }
+    },
+    "datasetObserved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "datasetPath",
+        "pinnedRevision",
+        "resolvedRevision",
+        "revisionMatches"
+      ],
+      "properties": {
+        "datasetPath": {
+          "type": "string"
+        },
+        "pinnedRevision": {
+          "type": "string"
+        },
+        "resolvedRevision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "revisionMatches": {
+          "type": "boolean"
+        },
+        "configsObserved": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "cardsSha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cardsMatch": {
+          "type": "boolean"
+        }
+      }
+    },
+    "backend": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "enum": [
+            "vllm",
+            "gguf"
+          ]
+        },
+        "harnessModelArg": {
+          "type": "string"
+        },
+        "modelArgs": {
+          "type": "object"
+        },
+        "modelArgsRendered": {
+          "type": "string"
+        },
+        "vllmVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "llamaCppBuild": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "capabilityProbe": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Observed server capabilities for the gguf lane: endpoints reachable, logprobs shape, forced-token round trip, slot count."
+        }
+      }
+    },
+    "argv": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "adaptation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chatTemplate",
+        "likelihoodNormalization",
+        "numFewshot",
+        "bosHandling",
+        "eosHandling"
+      ],
+      "properties": {
+        "chatTemplate": {
+          "const": "disabled"
+        },
+        "likelihoodNormalization": {
+          "type": "string"
+        },
+        "numFewshot": {
+          "const": 0
+        },
+        "bosHandling": {
+          "type": "string"
+        },
+        "eosHandling": {
+          "type": "string"
+        },
+        "maxContextTokens": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "truncationObserved": {
+          "type": "boolean"
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resultsDir",
+        "files"
+      ],
+      "properties": {
+        "resultsDir": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "sha256",
+              "bytes"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "harnessResultsSha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "sha256 of the harness results JSON exactly as the harness wrote it."
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expectedSubtasks",
+        "observedSubtasks",
+        "missing",
+        "unexpected",
+        "complete"
+      ],
+      "properties": {
+        "expectedSubtasks": {
+          "type": "integer"
+        },
+        "observedSubtasks": {
+          "type": "integer"
+        },
+        "missing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unexpected": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "rowsPerSubtask": {
+          "type": "object"
+        },
+        "reducedEffectiveCountTasks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "aggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "harnessGroupAcc": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "recomputedUnweightedMeanAcc": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "absoluteDifference": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "matches": {
+          "type": "boolean"
+        },
+        "aggregation": {
+          "type": "string"
+        },
+        "weightBySize": {
+          "type": "boolean"
+        }
+      }
+    },
+    "perSubtaskAcc": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "gateResults": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "detail"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "pass",
+              "fail",
+              "not_applicable",
+              "not_evaluated"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "runtimeErrors": {
+      "type": "array",
+      "description": "Backend/runtime errors observed during the run. A non-empty list is a failed run, never a set of zero-accuracy subtasks.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "message"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "description": "Lane-level contract violations. A non-empty list forces outcome=fail and promotable=false.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "gate",
+          "code",
+          "detail"
+        ],
+        "properties": {
+          "gate": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "parity": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": true
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

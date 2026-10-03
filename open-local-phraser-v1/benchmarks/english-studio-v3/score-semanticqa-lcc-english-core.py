@@ -11,6 +11,15 @@ scorer is intentionally a format-tolerant diagnostic: it can recover one clear
 label from harmless wrappers such as ``Answer: Magn``. Promotion-quality reports
 must preserve the separate official strict score rather than relabel this tolerant
 diagnostic as the official SemanticQA result.
+
+Recovery boundaries are ASCII alphanumeric, not ASCII alphabetic. ``Oper1`` is
+mixed-case-with-a-digit and several categories are short prefixes of others, so an
+alphabetic-only boundary would silently turn an out-of-taxonomy token into a valid
+label (``Magn2`` -> ``Magn``, ``Oper10`` -> ``Oper1``) and inflate valid-output
+coverage. The sibling label-protocol diagnostics
+(``protocol_output_diagnostics.classify_label``) already classify those exact
+tokens as ``recoverable_invalid_option_label``; this scorer matches it so the two
+local views of a label row cannot disagree.
 """
 
 from __future__ import annotations
@@ -40,7 +49,14 @@ def load_json(path: Path):
 
 
 def parse_prediction(text: str) -> str | None:
-    """Conservatively recover exactly one SemanticQA LCC label from output."""
+    """Conservatively recover exactly one SemanticQA LCC label from output.
+
+    The tolerated wrappers are punctuation, whitespace, and case: ``Answer: Magn``
+    and ``Magn.`` are one clear label. A label adjacent to another letter or digit
+    is not a label at all, because it is part of a longer alphanumeric token
+    (``Magn2``, ``Oper10``, ``IncepOper1``, ``Magnita``). Two or more distinct
+    categories in the text are ambiguous and are refused rather than guessed.
+    """
     raw = str(text or "").strip()
     if not raw:
         return None
@@ -49,7 +65,7 @@ def parse_prediction(text: str) -> str | None:
             return label
     found = []
     for label in LABELS:
-        pattern = rf"(?<![A-Za-z]){re.escape(label)}(?![A-Za-z])"
+        pattern = rf"(?<![A-Za-z0-9]){re.escape(label)}(?![A-Za-z0-9])"
         if re.search(pattern, raw, flags=re.IGNORECASE):
             found.append(label)
     unique = list(dict.fromkeys(found))

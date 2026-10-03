@@ -17,6 +17,8 @@ from studio_backend import (
     candidate_preserves_protected_content,
     compile_prompt,
 )
+from studio_backend.engine import UNKNOWN_CANDIDATE_FAMILY
+from studio_backend.router import families_for
 
 
 def request_for(text: str, selected: str, operation: Operation, count: int = 40, **kwargs) -> StudioRequest:
@@ -75,6 +77,76 @@ def test_prompt_contract() -> None:
     gist_prompt = compile_prompt(gist_req, gist_plan.fast, gist_plan.semantic_mode)
     assert "Omission of secondary detail is intentional" in gist_prompt.user
     assert "do not introduce a new proposition" in gist_prompt.user
+
+
+# Families that silently request a register change. PRESERVE_REGISTER must never
+# select one of these for any source register.
+REGISTER_CHANGING_FAMILIES = {
+    "casual_variant",
+    "formal_variant",
+    "more_casual",
+    "more_formal",
+    "less_formal",
+    "informal_variant",
+}
+
+# Families whose names denote gist/detail loss. Only COMPRESS_GIST routes
+# (SemanticMode.INTENTIONAL_COMPRESSION) may request them; every other route is
+# FULL_PRESERVATION or CONTROLLED_EXPANSION and must not hint at proposition loss.
+INTENTIONAL_COMPRESSION_FAMILIES = {
+    "gist_label",
+    "compact_concept",
+    "one_word_gist",
+    "two_word_gist",
+    "three_word_gist",
+    "alternate_abstraction",
+}
+
+REGISTER_SOURCES = {
+    "formal": "The committee shall review the submission prior to the commencement of the hearing.",
+    "casual": "hey can you take a peek at this before friday when u get a sec",
+    "technical": "The async worker retries the idempotency key until the broker acknowledges the duplicate.",
+    "emotional": "I am absolutely furious that nobody bothered to warn us about the shutdown.",
+}
+
+
+def test_route_family_invariants() -> None:
+    for label, source in REGISTER_SOURCES.items():
+        req = request_for(source, source, Operation.PRESERVE_REGISTER, 10)
+        plan = build_execution_plan(req)
+        assert plan.semantic_mode == SemanticMode.FULL_PRESERVATION, label
+        for lane_plan in (plan.fast, plan.diversity):
+            assert lane_plan is not None, label
+            requested = set(lane_plan.families)
+            assert not (requested & REGISTER_CHANGING_FAMILIES), (
+                f"PRESERVE_REGISTER {lane_plan.lane.value} lane requests a register change for {label} source: "
+                f"{sorted(requested & REGISTER_CHANGING_FAMILIES)}"
+            )
+
+    assert "same_register_lexical_variant" in families_for(Operation.PRESERVE_REGISTER, CandidateLane.DIVERSITY)
+    assert "casual_variant" not in families_for(Operation.PRESERVE_REGISTER, CandidateLane.DIVERSITY)
+    assert "casual_variant" not in families_for(Operation.PRESERVE_REGISTER, CandidateLane.FAST)
+
+    # Intentional-compression families stay isolated to COMPRESS_GIST, the only
+    # operation whose semantic mode permits detail loss.
+    for operation in Operation:
+        for lane in CandidateLane:
+            families = set(families_for(operation, lane))
+            leaking = families & INTENTIONAL_COMPRESSION_FAMILIES
+            if operation == Operation.COMPRESS_GIST:
+                # The gist route is allowed (and expected) to request these.
+                continue
+            assert not leaking, (
+                f"{operation.value}/{lane.value} requests gist families {sorted(leaking)} "
+                "outside COMPRESS_GIST"
+            )
+
+    # Every gist family must actually be reachable, so the invariant above
+    # cannot pass by renaming the whole set away.
+    gist_families = set(families_for(Operation.COMPRESS_GIST, CandidateLane.FAST)) | set(
+        families_for(Operation.COMPRESS_GIST, CandidateLane.DIVERSITY)
+    )
+    assert INTENTIONAL_COMPRESSION_FAMILIES <= gist_families
 
 
 def candidate(text: str, index: int, lane: CandidateLane = CandidateLane.FAST) -> Candidate:
@@ -180,6 +252,34 @@ async def _engine_cancel_case() -> None:
     assert req.request_id in diversity.cancelled
 
 
+async def _engine_no_fabricated_family_provenance() -> None:
+    """The generator returns a flat options array, so no candidate may claim a family."""
+    source = "The committee shall review the submission before the hearing convenes."
+    req = request_for(source, source, Operation.PRESERVE_REGISTER, 10)
+    plan = build_execution_plan(req)
+    assert plan.diversity is not None
+    # A lane that requests several families is exactly the case that used to
+    # produce round-robin labels.
+    assert len(plan.diversity.families) >= 3
+
+    fast = FakeAdapter([f"fast option {i}" for i in range(5)], 0.01)
+    diversity = FakeAdapter([f"diverse option {i}" for i in range(5)], 0.02)
+    engine = StudioEngine(fast, diversity)
+    batches = [batch async for batch in engine.stream(req)]
+
+    streamed = [c for batch in batches for c in batch.candidates]
+    assert streamed, "expected streamed candidates"
+    for item in streamed:
+        assert item.family == UNKNOWN_CANDIDATE_FAMILY, (
+            f"candidate claimed unobserved family {item.family!r}"
+        )
+
+    # The requested search plan stays observable and separate from candidate metadata.
+    for lane_plan in (plan.fast, plan.diversity):
+        assert lane_plan.families and UNKNOWN_CANDIDATE_FAMILY not in lane_plan.families
+    assert {item.lane for item in streamed} == {CandidateLane.FAST, CandidateLane.DIVERSITY}
+
+
 def test_engine() -> None:
     asyncio.run(_engine_progressive_case())
     asyncio.run(_engine_cancel_case())
@@ -187,11 +287,13 @@ def test_engine() -> None:
 
 def main() -> None:
     test_router()
+    test_route_family_invariants()
     test_prompt_contract()
     test_progressive_delivery_and_cancel()
     test_final_partial_snapshot()
     test_protected_gate()
     test_engine()
+    asyncio.run(_engine_no_fabricated_family_provenance())
     print("Studio backend contract tests passed.")
 
 

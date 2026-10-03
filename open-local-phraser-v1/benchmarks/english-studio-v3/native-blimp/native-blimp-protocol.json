@@ -1,0 +1,350 @@
+{
+  "schema": "native-blimp-protocol-1",
+  "laneId": "native-blimp",
+  "construct": "minimal-pair causal-loglikelihood",
+  "laneSeparation": {
+    "promptedLane": "english-core-public-fast BLiMP (670 A/B prompted cases)",
+    "rule": "Native BLiMP is reported as its own evidence lane. Native and prompted scores are never averaged, and a ranking flip between them is reported as a protocol-sensitivity diagnostic."
+  },
+  "harness": {
+    "project": "EleutherAI/lm-evaluation-harness",
+    "repository": "https://github.com/EleutherAI/lm-evaluation-harness",
+    "packageName": "lm_eval",
+    "packageVersion": "0.4.14.dev0",
+    "pinnedCommit": "d6de81643928d653435c431bae19945d41d32520",
+    "pinnedCommitDate": "2026-09-14T10:51:05Z",
+    "pinnedCommitSubject": "fix(basqueglue): load the f1 metric with evaluate (#4076)",
+    "install": "git clone https://github.com/EleutherAI/lm-evaluation-harness.git && git -C lm-evaluation-harness checkout d6de81643928d653435c431bae19945d41d32520",
+    "note": "Never run whatever lm-eval happens to be installed globally. The checkout must be at pinnedCommit and its files must match pinnedFileSha256.",
+    "treeHashConvention": "subtaskTreeSha256 is sha256 over the concatenation, for every non-underscore *.yaml in lm_eval/tasks/blimp/ sorted by ascending byte order of filename, of:  NUL <lowercase sha256 hex of that file's bytes> LF.",
+    "pinnedFileSha256": {
+      "lm_eval/tasks/blimp/_blimp.yaml": "967349a443540d81bf70e73ee4049d2eb70f1e4812b684384f796de6bd4ba26f",
+      "lm_eval/tasks/blimp/_template_yaml": "c69805e3455a2904af0dac907c981331db08fd4bd6b16822113abdb74bcb528e",
+      "lm_eval/tasks/blimp/subtask-set/aggregated": "c7a836c00cd22f119888db54283dfc3dff18781a46a0a66c34cb1a45b93f9bfc",
+      "lm_eval/tasks/blimp/dir/all-files": "e018f8ca5e4b282372977a6e5d0bd39d8adc9eecedd96af432696e3368183a39",
+      "lm_eval/models/gguf.py": "71161c2b04e55699b0397e3f745da74a8c39e010f88371418a65bdcad3b8bc63",
+      "lm_eval/models/vllm_causallms.py": "a8552f4e522175f422ad2229813a8a725c0504ad7b8e758c504e3e09911e5c89",
+      "lm_eval/api/task.py": "4c25a4f1949488483b833ce4fcf91cfd3e066084a9ea00079c6879ae3ba95657",
+      "lm_eval/api/model.py": "b8b1db336e168b53d9ca808fe837d5bf8943d9dca76a14cf747e4f3a22d50545",
+      "lm_eval/evaluator.py": "581e7767820aaa8503e6b23682360a6dbcd0c0f8e5b50b53e3f282c64b5bc986",
+      "lm_eval/evaluator_utils.py": "876d9c60203ae899bd975a78e938befcd694dffe7c2e224cd8be77e1bf039ab1",
+      "lm_eval/_cli/run.py": "59245f533c514cf448f6f5614d8a7cb388d69acdae47e8fc3f8defc82dfa2746",
+      "lm_eval/__main__.py": "d35b8a2be8e89912e557a9833cd17ff087369071c6163fb65c7b0ce5b0c4f97f",
+      "lm_eval/loggers/utils.py": "ea55fcb2e8afc5a34278210af3ec503c928de1808138f50831e95f4b6f421816",
+      "pyproject.toml": "88b654cba602d6d1bd2ed8cd164f960ebfe325344430345d83e7be0c4a1e72e1"
+    },
+    "blimpTaskDir": {
+      "path": "lm_eval/tasks/blimp",
+      "fileCount": 71,
+      "subtaskYamlCount": 67,
+      "groupFile": "_blimp.yaml",
+      "templateFile": "_template_yaml",
+      "absentFiles": [
+        "blimp.yaml",
+        "default.yaml",
+        "blimp_group.yaml",
+        "_blimp_group.yaml",
+        "group.yaml"
+      ]
+    }
+  },
+  "task": {
+    "group": "blimp",
+    "requestedTask": "blimp",
+    "datasetPath": "nyu-mll/blimp",
+    "outputType": "multiple_choice",
+    "requestTypeUnderlying": "loglikelihood",
+    "validationSplit": "train",
+    "docToText": "",
+    "docToTarget": 0,
+    "docToChoice": "{{[sentence_good, sentence_bad]}}",
+    "numFewshot": 0,
+    "perSubtaskMetric": "acc",
+    "perSubtaskAggregation": "mean",
+    "subtaskCount": 67,
+    "expectedSubtasks": [
+      "blimp_adjunct_island",
+      "blimp_anaphor_gender_agreement",
+      "blimp_anaphor_number_agreement",
+      "blimp_animate_subject_passive",
+      "blimp_animate_subject_trans",
+      "blimp_causative",
+      "blimp_complex_NP_island",
+      "blimp_coordinate_structure_constraint_complex_left_branch",
+      "blimp_coordinate_structure_constraint_object_extraction",
+      "blimp_determiner_noun_agreement_1",
+      "blimp_determiner_noun_agreement_2",
+      "blimp_determiner_noun_agreement_irregular_1",
+      "blimp_determiner_noun_agreement_irregular_2",
+      "blimp_determiner_noun_agreement_with_adj_2",
+      "blimp_determiner_noun_agreement_with_adj_irregular_1",
+      "blimp_determiner_noun_agreement_with_adj_irregular_2",
+      "blimp_determiner_noun_agreement_with_adjective_1",
+      "blimp_distractor_agreement_relational_noun",
+      "blimp_distractor_agreement_relative_clause",
+      "blimp_drop_argument",
+      "blimp_ellipsis_n_bar_1",
+      "blimp_ellipsis_n_bar_2",
+      "blimp_existential_there_object_raising",
+      "blimp_existential_there_quantifiers_1",
+      "blimp_existential_there_quantifiers_2",
+      "blimp_existential_there_subject_raising",
+      "blimp_expletive_it_object_raising",
+      "blimp_inchoative",
+      "blimp_intransitive",
+      "blimp_irregular_past_participle_adjectives",
+      "blimp_irregular_past_participle_verbs",
+      "blimp_irregular_plural_subject_verb_agreement_1",
+      "blimp_irregular_plural_subject_verb_agreement_2",
+      "blimp_left_branch_island_echo_question",
+      "blimp_left_branch_island_simple_question",
+      "blimp_matrix_question_npi_licensor_present",
+      "blimp_npi_present_1",
+      "blimp_npi_present_2",
+      "blimp_only_npi_licensor_present",
+      "blimp_only_npi_scope",
+      "blimp_passive_1",
+      "blimp_passive_2",
+      "blimp_principle_A_c_command",
+      "blimp_principle_A_case_1",
+      "blimp_principle_A_case_2",
+      "blimp_principle_A_domain_1",
+      "blimp_principle_A_domain_2",
+      "blimp_principle_A_domain_3",
+      "blimp_principle_A_reconstruction",
+      "blimp_regular_plural_subject_verb_agreement_1",
+      "blimp_regular_plural_subject_verb_agreement_2",
+      "blimp_sentential_negation_npi_licensor_present",
+      "blimp_sentential_negation_npi_scope",
+      "blimp_sentential_subject_island",
+      "blimp_superlative_quantifiers_1",
+      "blimp_superlative_quantifiers_2",
+      "blimp_tough_vs_raising_1",
+      "blimp_tough_vs_raising_2",
+      "blimp_transitive",
+      "blimp_wh_island",
+      "blimp_wh_questions_object_gap",
+      "blimp_wh_questions_subject_gap",
+      "blimp_wh_questions_subject_gap_long_distance",
+      "blimp_wh_vs_that_no_gap",
+      "blimp_wh_vs_that_no_gap_long_distance",
+      "blimp_wh_vs_that_with_gap",
+      "blimp_wh_vs_that_with_gap_long_distance"
+    ],
+    "groupAggregate": {
+      "metric": "acc",
+      "aggregation": "mean",
+      "weightBySize": false,
+      "recomputationRule": "Plain unweighted arithmetic mean of the 67 per-subtask acc values. Implemented in validate_native_blimp.py as an independent cross-check of the harness-reported groups.blimp.acc."
+    },
+    "pinnedDatasetRevision": "877fba0801ffb7cbd8c39c1ff314a46f053f6036",
+    "datasetRevisionIsHarnessPinned": false,
+    "datasetRevisionNote": "The pinned harness BLiMP YAML carries no dataset revision key, so upstream resolves nyu-mll/blimp at whatever main points to. This lane therefore binds the dataset revision out-of-band and requires the resolved revision to equal datasetPinnedRevision; otherwise promotion is blocked with dataset_revision_mismatch.",
+    "datasetCardSha256": "7b534a3a2a8fcf5d7861534aa74ae53c1937fd0e559e5cfd7aa823f25b4e9f5d",
+    "datasetCardUrl": "https://huggingface.co/datasets/nyu-mll/blimp/raw/877fba0801ffb7cbd8c39c1ff314a46f053f6036/README.md",
+    "datasetConfigs": 67,
+    "rowsPerConfig": 1000,
+    "totalRows": 67000,
+    "license": "cc-by-4.0",
+    "licenseNote": "BLiMP is CC-BY-4.0. Preserve attribution when redistributing sample logs.",
+    "rowColumns": [
+      "sentence_good",
+      "sentence_bad",
+      "field",
+      "linguistics_term",
+      "UID",
+      "simple_LM_method",
+      "one_prefix_method",
+      "two_prefix_method",
+      "lexically_identical",
+      "pair_id"
+    ]
+  },
+  "backends": {
+    "vllm": {
+      "harnessModelArg": "vllm",
+      "backendFile": "lm_eval/models/vllm_causallms.py",
+      "loglikelihoodMechanism": "SamplingParams(temperature=0, prompt_logprobs=1, max_tokens=1, detokenize=False) in _model_generate; _loglikelihood_tokens sums outputs.prompt_logprobs over the continuation span and derives is_greedy from the per-position argmax.",
+      "requiredModelArgs": [
+        "pretrained",
+        "dtype",
+        "revision",
+        "tokenizer",
+        "tokenizer_revision",
+        "seed"
+      ],
+      "oneOfRequiredModelArgs": [
+        [
+          "max_model_len",
+          "max_length"
+        ]
+      ],
+      "oneOfRequiredNote": "Exactly one of max_model_len or max_length must be explicit. The pinned backend forbids both together and, when neither is given, resolves the context length from the model config, which would leave the no-hidden-truncation guarantee unbound.",
+      "recordedModelArgs": [
+        "quantization",
+        "tensor_parallel_size",
+        "max_num_seqs",
+        "gpu_memory_utilization",
+        "enforce_eager",
+        "add_bos_token",
+        "trust_remote_code",
+        "truncation_side",
+        "enable_thinking",
+        "max_model_len",
+        "max_length"
+      ],
+      "mutuallyExclusive": [
+        [
+          "max_length",
+          "max_model_len"
+        ]
+      ],
+      "chatTemplateDefault": "off",
+      "chatTemplateNote": "The backend implements apply_chat_template but it is only wired in when --apply_chat_template is passed. This lane forbids that flag outright so an instruction-tuned checkpoint cannot silently be scored through its chat format.",
+      "truncation": {
+        "behavior": "warn-and-left-truncate",
+        "limit": "max_length - 1",
+        "warningText": "Context length %s exceeds max length (%s). Truncating context.",
+        "gap": "The harness only logs this warning; it does not mark the affected document. This lane treats any occurrence of that warning in run output as a hard protocol failure."
+      }
+    },
+    "gguf": {
+      "harnessModelArg": "gguf",
+      "harnessModelAlias": "ggml",
+      "backendFile": "lm_eval/models/gguf.py",
+      "loglikelihoodMechanism": "Exact teacher forcing, one HTTP request per continuation token. The target token is forced with logit_bias=[[target_id, 100]] and the pre-sampling logprob is read back from choices[0].logprobs.content[0]; is_greedy comes from the top_logprobs argmax.",
+      "requiredModelArgs": [
+        "base_url"
+      ],
+      "recordedModelArgs": [
+        "model",
+        "parallel",
+        "timeout",
+        "temperature",
+        "max_gen_toks"
+      ],
+      "ignoredModelArgs": [
+        "max_length"
+      ],
+      "ignoredModelArgsNote": "gguf.py accepts max_length and stores it but never reads it. Passing it would look like a context control while changing nothing, so this lane records it and forbids it from the frozen model_args.",
+      "requiredServerEndpoints": [
+        "/v1/completions",
+        "/tokenize"
+      ],
+      "optionalServerEndpoints": [
+        "/props"
+      ],
+      "serverRequirements": [
+        "POST /tokenize accepts {content, add_special} and returns tokens[].",
+        "POST /v1/completions accepts prompt as a token-id array, logprobs=2, and logit_bias as a list of [token_id, bias] pairs (llama.cpp extension, not the OpenAI map form).",
+        "POST /v1/completions returns choices[0].logprobs.content[] entries carrying id, logprob and top_logprobs.",
+        "The server must sample the forced token id; a different sampled id is a protocol failure, not a low score."
+      ],
+      "chatTemplateDefault": "off",
+      "chatTemplateNote": "The gguf backend never calls apply_chat_template. The completion route is used directly with raw prompt text / token ids.",
+      "llamaCpp": {
+        "minimumServerCapability": "logprobs.content in the modern OpenAI shape",
+        "introducedBy": {
+          "repository": "ggml-org/llama.cpp",
+          "pullRequest": 10783,
+          "title": "server : fix logprobs, make it OAI-compatible",
+          "mergedAt": "2024-12-19T14:40:09Z",
+          "mergeCommit": "57bb2c40cd94c5a09f5210ed8264cc93b21c4b7e"
+        },
+        "legacyFormatRejected": [
+          "token_logprobs",
+          "text_offset"
+        ]
+      },
+      "chatOnlyServerSatisfiesBackend": false,
+      "chatOnlyServerNote": "A chat-completions-only server cannot satisfy this backend: there is no /tokenize, /v1/chat/completions is not used, and gguf.py raises rather than degrading when logprobs are absent. Such a runtime is marked protocol_unavailable, never scored through prompted accuracy.",
+      "unsupportedBackends": [
+        {
+          "harnessModelArg": "local-completions",
+          "backendFile": "lm_eval/models/openai_completions.py",
+          "reason": "Parses the legacy token_logprobs/text_offset echo schema that modern llama-server no longer returns, so it cannot evaluate a current llama-server either.",
+          "evidence": "openai_completions.py reads choice.logprobs.token_logprobs and text_offset."
+        }
+      ]
+    }
+  },
+  "adaptationPolicy": {
+    "rawCausalText": true,
+    "chatTemplate": "disabled",
+    "likelihoodNormalization": "summed over the continuation span, never length-normalized; acc comes from the is_greedy/argmax decision defined by the pinned harness task implementation",
+    "bosHandling": "vLLM: add_bos_token model arg, recorded and must be explicit in the frozen config. GGUF: /tokenize is always called with add_special=True and the backend exposes no way to change it, so BOS is always on for the GGUF lane.",
+    "eosHandling": "EOS is never appended to a scored continuation; the gguf backend uses EOS only as a generation stop string.",
+    "leadingSpaceConvention": "Trailing whitespace on the context is migrated onto the continuation, matching the HF and GGUF backends.",
+    "normalizationRuleSource": "Follow the pinned harness implementation. This lane introduces no Pari-specific normalization rule."
+  },
+  "forbiddenHarnessFlags": {
+    "flags": [
+      "--apply_chat_template",
+      "--fewshot_as_multiturn",
+      "--limit",
+      "--samples",
+      "--gen_kwargs",
+      "--system_instruction",
+      "--predict_only",
+      "--include_path",
+      "--num_fewshot"
+    ],
+    "reasons": {
+      "--apply_chat_template": "chat-template drift; would make an instruction-tuned checkpoint score through its chat format and stop being native BLiMP",
+      "--fewshot_as_multiturn": "chat-template drift by another route",
+      "--limit": "a limited run is debug-only and can never become full native evidence",
+      "--samples": "an explicit document subset is debug-only",
+      "--gen_kwargs": "generative overrides have no meaning on a loglikelihood lane and can smuggle decoding state in",
+      "--system_instruction": "prompt adaptation outside the native protocol",
+      "--predict_only": "skips metric computation, so no accuracy is produced",
+      "--include_path": "would let an on-disk task directory shadow the pinned blimp task definitions",
+      "--num_fewshot": "BLiMP is pinned to num_fewshot 0; any value is a protocol change"
+    }
+  },
+  "promotionGates": [
+    {
+      "id": "harness_identity",
+      "rule": "The harness checkout is at pinnedCommit and every pinnedFileSha256 matches."
+    },
+    {
+      "id": "task_identity",
+      "rule": "Subtask coverage is exactly the 67 pinned names, each with n-samples.original == 1000 and effective == 1000."
+    },
+    {
+      "id": "dataset_revision",
+      "rule": "The resolved nyu-mll/blimp revision equals datasetPinnedRevision."
+    },
+    {
+      "id": "no_subset",
+      "rule": "No --limit, no --samples, and no reduced effective sample count anywhere."
+    },
+    {
+      "id": "chat_template_off",
+      "rule": "No chat template was applied and enable_thinking is not set."
+    },
+    {
+      "id": "logprobs_present",
+      "rule": "The backend returned usable logprobs for every scored position; the run log contains no missing-logprobs or forced-token-mismatch error."
+    },
+    {
+      "id": "no_truncation",
+      "rule": "The run log contains no harness truncation warning."
+    },
+    {
+      "id": "no_runtime_error_as_zero",
+      "rule": "The harness process exited zero and recorded zero runtime errors. A genuinely low accuracy is a score; only a failed run is a failure, and the two are never conflated."
+    },
+    {
+      "id": "aggregate_recomputed",
+      "rule": "The harness-reported group acc independently reproduces as the unweighted mean of the 67 per-subtask acc values."
+    },
+    {
+      "id": "provenance_complete",
+      "rule": "Model revision, tokenizer revision, quantization, dtype, TP size, max context, seed, backend version/commit and harness output hashes are all recorded."
+    }
+  ],
+  "qualification": {
+    "oneNotebookRequirement": "Before this lane is attached to the multi-notebook Kaggle roster, it must be qualified end-to-end on exactly one T4 notebook per backend. Promotion evidence requires a real full 67-subtask run on Kaggle T4 hardware for at least one vLLM finalist and one GGUF/llama.cpp finalist, each with a complete receipt. A second notebook is not a substitute for fixing a failing first notebook.",
+    "smokeNotPromotable": "A --limit smoke run may prove that the lane executes and that logprobs are usable. It is never promotion evidence and its receipt is stamped promotable=false."
+  }
+}

@@ -36,7 +36,15 @@ def families_for(operation: Operation, lane: CandidateLane) -> tuple[str, ...]:
         Operation.JOIN: ("single_sentence_join", "subordinate_join", "coordination_join"),
         Operation.SIMPLIFY: ("common_vocabulary", "shorter_syntax", "direct_rephrase"),
         Operation.DIFFERENT_STRUCTURE: ("fronted_clause", "reordered_clause", "split_or_join", "different_subject_opening"),
-        Operation.PRESERVE_REGISTER: ("casual_variant", "same_intensity", "different_length_same_voice"),
+        # Register-preserving routes must never request a register change. A
+        # "casual_variant" family silently contradicts the PRESERVE_REGISTER
+        # operation prompt for formal/technical/emotional sources, so the
+        # diversity lane asks for same-register variation instead.
+        Operation.PRESERVE_REGISTER: (
+            "same_register_lexical_variant",
+            "same_intensity",
+            "different_length_same_voice",
+        ),
     }
     return (conservative if lane == CandidateLane.FAST else exploratory)[operation]
 

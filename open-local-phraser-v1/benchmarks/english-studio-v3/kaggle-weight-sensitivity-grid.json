@@ -1,0 +1,99 @@
+{
+  "gridVersion": 1,
+  "issue": "56",
+  "purpose": "Frozen, hashable weight-sensitivity grid for Pari English Core close-contender analysis. Predeclared BEFORE any robustness results are observed so no weight vector can be chosen after one model loses. Changing this file changes its recorded SHA-256 and invalidates any robustness plan that pinned the old hash.",
+  "dimensionOrder": [
+    "lexical_context",
+    "collocation_naturalness",
+    "grammar_syntax",
+    "paraphrase_semantics",
+    "fluency_register",
+    "generative_expression",
+    "discourse"
+  ],
+  "normalization": "Each vector is expressed in integer percent and must sum to exactly 100. Composite100 = sum over dimensions of (dimensionScore100 * weight/100).",
+  "vectors": {
+    "product": {
+      "kind": "product_prior",
+      "source": "english-core-config.json composite.weights (Pari product prior, not a literature constant)",
+      "weights": {
+        "lexical_context": 25,
+        "collocation_naturalness": 20,
+        "grammar_syntax": 15,
+        "paraphrase_semantics": 15,
+        "fluency_register": 10,
+        "generative_expression": 10,
+        "discourse": 5
+      }
+    },
+    "equal_weight": {
+      "kind": "equal_weight",
+      "source": "secondaryComposite in english-core-config.json (equal-weight dimension mean)",
+      "weights": {
+        "lexical_context": 14.285714285714286,
+        "collocation_naturalness": 14.285714285714286,
+        "grammar_syntax": 14.285714285714286,
+        "paraphrase_semantics": 14.285714285714286,
+        "fluency_register": 14.285714285714286,
+        "generative_expression": 14.285714285714286,
+        "discourse": 14.285714285714286
+      }
+    },
+    "paraphrase_first": {
+      "kind": "predeclared_alternative",
+      "rationale": "If the product's job is paraphrasing, semantics and collocation should dominate more than general grammar/fluency.",
+      "weights": {
+        "lexical_context": 15,
+        "collocation_naturalness": 20,
+        "grammar_syntax": 20,
+        "paraphrase_semantics": 25,
+        "fluency_register": 10,
+        "generative_expression": 5,
+        "discourse": 5
+      }
+    },
+    "fluency_first": {
+      "kind": "predeclared_alternative",
+      "rationale": "If the product's job is polished reader-facing prose, register/fluency/generation should dominate.",
+      "weights": {
+        "lexical_context": 15,
+        "collocation_naturalness": 12,
+        "grammar_syntax": 13,
+        "paraphrase_semantics": 5,
+        "fluency_register": 20,
+        "generative_expression": 20,
+        "discourse": 15
+      }
+    },
+    "structure_first": {
+      "kind": "predeclared_alternative",
+      "rationale": "If the product's job is grammatical control over a discourse arc, grammar/lexical/discourse should dominate.",
+      "weights": {
+        "lexical_context": 20,
+        "collocation_naturalness": 10,
+        "grammar_syntax": 25,
+        "paraphrase_semantics": 15,
+        "fluency_register": 10,
+        "generative_expression": 5,
+        "discourse": 15
+      }
+    }
+  },
+  "leaveOneOut": {
+    "enabled": true,
+    "sourceVector": "product",
+    "derivation": "For each dimension d, set weight[d]=0 and renormalize the remaining six weights so they sum back to 100. This is the leave-one-dimension-style check; it detects whether one dimension alone drives the product-weighted lead.",
+    "note": "Leave-one-out vectors are derived deterministically from the frozen product vector, not hand-edited, so they cannot drift from the base weighting."
+  },
+  "seeds": {
+    "bootstrapSeedHex": "0x70a1b00b",
+    "note": "Matches the paired-bootstrap seed convention already used by compare-english-core-models.mjs so the weight grid does not introduce a second, incompatible randomness convention."
+  },
+  "defaultBootstrapIterations": 10000,
+  "stoppingRules": [
+    "Compute every vector in this grid; never add, drop or reweight a vector after seeing contender results.",
+    "A ranking that changes across the frozen grid is reported as weight-dependent ordering, not as a winner.",
+    "A comparison whose paired bootstrap interval contains zero is reported as inconclusive, never as a forced winner.",
+    "If a candidate is missing any scored item required for paired comparison, the paired headline for that pair is withheld rather than computed on partial overlap."
+  ]
+}

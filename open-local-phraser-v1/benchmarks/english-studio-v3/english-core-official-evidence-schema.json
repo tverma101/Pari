@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pari.local/schemas/english-core-official-evidence-schema.json",
+  "title": "Semantic validation record for a recognized official evaluator artifact",
+  "description": "Describes how build-english-core-repro-manifest.py inspected one --official-evidence artifact. Unrecognized artifact kinds are byte-hashed only and are reported with semanticValidation.status = \"unrecognized\"; they are never semantically approved or rejected on guessed grounds.",
+  "type": "object",
+  "required": [
+    "version",
+    "kind",
+    "status",
+    "checks",
+    "summary"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "description": "Version of the semantic-validation contract that produced this record. Consumers must refuse to merge records from an unknown version.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "kind": {
+      "description": "Recognized official evaluator family, or null when the artifact shape matched no supported family.",
+      "type": ["string", "null"],
+      "enum": ["swords", "jfleg", "semanticqa_lcc", null]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["passed", "failed", "unrecognized"]
+    },
+    "checks": {
+      "description": "Deterministic check outcomes in evaluation order. Empty when status is unrecognized.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "ok"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Stable check suffix, appended to the artifact label to form a promotion blocker such as label:swords_missing_core_metric:strict_c_p@1.",
+            "type": "string",
+            "minLength": 1
+          },
+          "ok": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "summary": {
+      "description": "Family-specific extracted values used for the semantic decision. For issue #66, recognized families also record the verified Pari converter chain (converter protocol id/version/contract hash, converter source SHA-256, conversion identity, and coverage) so an official score is never promotion-comparable without a reconstructable conversion identity.",
+      "type": "object"
+    }
+  }
+}

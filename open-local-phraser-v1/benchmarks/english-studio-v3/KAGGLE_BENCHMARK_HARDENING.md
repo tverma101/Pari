@@ -263,11 +263,79 @@ Every attempt is retained. A retry uses the same frozen task, seed, prompt, deco
 
 ## 8. Predeclared OOM / compatibility fallback matrix
 
-The harness may reduce **batch size** to make the same model configuration executable, because batch size is a serving parameter rather than a different language model.
+Load feasibility and generation-batch feasibility are **separate states**. Batch
+size is a generation/serving parameter: it does not change model construction,
+so a batch number can never make a model load succeed.
 
-Recommended deterministic sequence:
+### 8.1 Load OOM (`cuda_oom_load`)
 
-`64 -> 32 -> 16 -> 8 -> 4 -> 1`
+If the exact frozen candidate/runtime configuration OOMs during model
+initialization or load:
+
+- classify `cuda_oom_load`;
+- **stop that exact configuration immediately** — do not walk the generation
+  ladder, because every rung would reload an identical failing model;
+- retain the load log and VRAM evidence as an attempt record;
+- do not score English;
+- only a **predeclared configuration-level fallback** may be tried next (for
+  example an explicitly roster-declared TP2 candidate), and it is reported as a
+  separate candidate with its own result identity.
+
+If a runtime ever introduces a load parameter genuinely derived from batch or
+concurrency, that dependency must be made explicit here rather than assumed.
+
+### 8.2 Generation OOM (`cuda_oom_generate`)
+
+Only a configuration that has already loaded qualifies may walk the
+deterministic generation ladder:
+
+- retain every failed batch attempt;
+- reduce batch only according to the frozen ladder below;
+- do not change checkpoint, quantization, dtype, tokenizer/template, TP size,
+  context policy, or runtime — those create a new candidate configuration;
+- the first stable batch is serving evidence for the *same* language model, not
+  a different candidate;
+- batch 1 generation OOM is a deterministic capacity failure
+  (`terminalFailureClass: generation_capacity`).
+
+### 8.3 Canonical generation ladder (frozen)
+
+`32 -> 16 -> 8 -> 4 -> 1`
+
+This is the single canonical English-screen ladder. The machine-readable source
+of truth is `CANONICAL_GENERATION_LADDER` in `run-kaggle-vllm-candidate.py`, and
+`test_kaggle_batch_policy.py` asserts that this document and that constant
+agree, so docs, code, receipts, and tests cannot drift apart.
+
+**64 is deliberately omitted**, decided before any candidate result was
+observed: batch size is vLLM `max_num_seqs`, so 64 concurrent sequences at the
+frozen 8192-token context bound exceed the 16 GB T4 KV-cache budget for every
+roster candidate. Attempting 64 first would spend one extra model load and
+generation cycle to learn nothing a 32-way attempt does not already show.
+Revisit this only as a documented contract change, never mid-sweep.
+
+Record every failed step and the first stable step.
+
+### 8.4 Product stages
+
+`word-studio` and `transform` use a separate frozen policy: a single batch
+(`PRODUCT_BATCH_POLICY = (1,)`). They do not traverse the English-screen ladder,
+and summaries report `batchPolicy: product-single-batch` so a product run is
+never mistaken for one that stepped down.
+
+### 8.5 Retry taxonomy
+
+These outcomes are distinct and must never be conflated:
+
+- **load OOM** — stop the configuration (§8.1);
+- **generation OOM** — walk the frozen ladder (§8.2);
+- **transient allocator/runtime failure** — one exact-config retry after
+  cleanup (`cuda_memory_fragmentation`, `runtime_crash`), keeping every frozen
+  setting identical. Both attempts are retained. This is *not* a batch
+  step-down;
+- **deterministic capacity failure** — generation OOM at batch 1;
+- **TP/configuration failure** — separate candidate identity, never an
+  overwrite of the failing one.
 
 Record every failed step and the first stable step.
 
@@ -284,7 +352,7 @@ Do not silently change any of the following to make a model fit:
 
 Those changes create a **new candidate configuration** and require a separate result identity.
 
-If TP1 fails but TP2 is an intended configuration, report TP1 failure and TP2 separately. Do not overwrite the TP1 evidence.
+If TP1 fails but TP2 is an intended configuration, report TP1 failure and TP2 separately. Do not overwrite the TP1 evidence. A TP1 load-OOM stop is recorded as `terminalFailureClass: load_capacity` on the TP1 candidate only.
 
 ---
 

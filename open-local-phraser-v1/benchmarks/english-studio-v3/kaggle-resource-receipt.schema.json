@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pari.local/schemas/kaggle-resource-receipt.schema.json",
+  "title": "Pari Kaggle per-GPU resource receipt (Issue #31)",
+  "description": "Machine-readable receipt of per-GPU snapshots, repeated warm-request distributions, VRAM/latency drift analysis and cleanup proof for a Kaggle finalist run. Per-GPU memory is always recorded as an array of gpu objects; no summed cross-GPU memory field is accepted as a substitute, so 2xT4 asymmetry cannot be hidden by one total. Numeric fields may be null when a value was genuinely not observed (for example an unmet first-10 useful-option threshold, or an nvidia-smi field the driver reported as [N/A]); absence of evidence must not be encoded as zero.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "runIdentity",
+    "gpuCount",
+    "tensorParallel",
+    "snapshots",
+    "requests"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": 1,
+      "description": "Receipt schema version owned by kaggle_telemetry.RECEIPT_SCHEMA_VERSION."
+    },
+    "runIdentity": {
+      "type": "object",
+      "description": "Candidate/stage/run identity attached to the receipt.",
+      "required": ["runId"],
+      "properties": {
+        "runId": {"type": "string", "minLength": 1},
+        "candidateId": {"type": "string"},
+        "stage": {"type": "string"},
+        "runtimeId": {"type": "string"},
+        "benchmarkRevision": {"type": "string"},
+        "candidateRevision": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "gpuCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of distinct visible GPU indices appearing anywhere in snapshots."
+    },
+    "tensorParallel": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Tensor-parallel degree of the runtime under test (1 for a one-T4 configuration, 2 for TP2). For TP2 both GPUs must be recorded."
+    },
+    "nvidiaSmiAvailable": {
+      "type": "boolean",
+      "description": "False when nvidia-smi was unavailable or unreadable on this host; partial samples are then expected."
+    },
+    "snapshots": {
+      "type": "array",
+      "description": "Per-GPU lifecycle snapshots, ordered by stage. Each element carries an array of gpu objects so per-GPU memory, utilization and owned processes stay individually addressable.",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/snapshot"}
+    },
+    "requests": {
+      "type": "array",
+      "description": "One entry per repeated warm request in the bounded stability loop.",
+      "items": {"$ref": "#/$defs/request"}
+    },
+    "runtimeCrashes": {
+      "type": "array",
+      "description": "Runtime crash/restart events observed during the run.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "at": {"type": "string"},
+          "reason": {"type": "string"},
+          "recovered": {"type": "boolean"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "requiredStages": {
+      "type": "array",
+      "description": "Lifecycle stages the issue requires a snapshot at.",
+      "items": {"$ref": "#/$defs/stage"}
+    },
+    "observedStages": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "missingStages": {
+      "type": "array",
+      "description": "Required lifecycle stages that have no snapshot in this receipt. A thin receipt stays visible instead of silently passing.",
+      "items": {"$ref": "#/$defs/stage"}
+    },
+    "notes": {"type": "string"}
+  },
+  "$defs": {
+    "stage": {
+      "type": "string",
+      "description": "Lifecycle point of a snapshot.",
+      "enum": [
+        "before_start",
+        "after_model_load",
+        "after_warmup",
+        "before_measured_loop",
+        "during_measured_loop",
+        "after_measured_loop",
+        "after_shutdown"
+      ]
+    },
+    "miB": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Memory in whole MiB, or null when the driver did not report this field."
+    },
+    "seconds": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Latency in seconds, or null when the event did not occur (for example an unmet useful-option threshold)."
+    },
+    "gpu": {
+      "type": "object",
+      "description": "One visible GPU at one instant. Memory is always this object's own field; there is deliberately no summed cross-GPU memory field here.",
+      "required": ["gpuIndex", "stage"],
+      "properties": {
+        "gpuIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Stable GPU index within this run. Used as the key for per-GPU series so asymmetry stays visible."
+        },
+        "uuid": {"type": ["string", "null"]},
+        "name": {"type": ["string", "null"]},
+        "usedMiB": {"$ref": "#/$defs/miB"},
+        "freeMiB": {"$ref": "#/$defs/miB"},
+        "totalMiB": {"$ref": "#/$defs/miB"},
+        "utilizationPercent": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "stage": {"$ref": "#/$defs/stage"},
+        "processes": {
+          "type": "array",
+          "description": "GPU compute processes observed at this instant. Retained after shutdown so a surviving owned process is provable.",
+          "items": {
+            "type": "object",
+            "required": ["pid"],
+            "properties": {
+              "pid": {"type": "integer", "minimum": 1},
+              "processName": {"type": ["string", "null"]},
+              "usedMiB": {"$ref": "#/$defs/miB"}
+            },
+            "additionalProperties": true
+          }
+        },
+        "ownedProcessIds": {
+          "type": "array",
+          "description": "Subset of processes this run owns. Used as cleanup evidence.",
+          "items": {"type": "integer", "minimum": 1}
+        }
+      },
+      "additionalProperties": true
+    },
+    "snapshot": {
+      "type": "object",
+      "required": ["stage", "gpus"],
+      "properties": {
+        "stage": {"$ref": "#/$defs/stage"},
+        "timestamp": {
+          "type": ["string", "null"],
+          "description": "ISO-8601 instant of this snapshot, or null when the host clock was unavailable."
+        },
+        "gpus": {
+          "type": "array",
+          "description": "Per-GPU rows for this instant. Two GPUs must appear as two entries, never merged.",
+          "items": {"$ref": "#/$defs/gpu"}
+        },
+        "runIdentity": {"type": "object"}
+      },
+      "additionalProperties": true
+    },
+    "request": {
+      "type": "object",
+      "description": "One repeated warm request. Latency field names match the Issue #29 progressive useful-option contract so receipts join to output rows without renaming.",
+      "properties": {
+        "id": {"type": "string"},
+        "requestClass": {
+          "type": "string",
+          "description": "Which frozen template this request exercised. Kept as a class so a slow class is not hidden inside an aggregate.",
+          "enum": [
+            "short_lexical",
+            "sentence_transform",
+            "word_studio_multi_option",
+            "long_rewrite",
+            "unclassified"
+          ]
+        },
+        "firstTokenLatencySeconds": {"$ref": "#/$defs/seconds"},
+        "firstCandidateLatencySeconds": {"$ref": "#/$defs/seconds"},
+        "firstThreeCandidatesLatencySeconds": {"$ref": "#/$defs/seconds"},
+        "firstTenCandidatesLatencySeconds": {"$ref": "#/$defs/seconds"},
+        "latencySeconds": {"$ref": "#/$defs/seconds"},
+        "prefillTokensPerSecond": {"type": ["number", "null"], "minimum": 0},
+        "decodeTokensPerSecond": {"type": ["number", "null"], "minimum": 0},
+        "failed": {"type": "boolean"},
+        "oom": {"type": "boolean"},
+        "parserOrProtocolFailure": {
+          "type": "boolean",
+          "description": "True when the request completed but the output failed the frozen parser/protocol contract. Counted separately from runtime failures."
+        },
+        "retries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "reason": {"type": "string"},
+              "attempt": {"type": "integer", "minimum": 1}
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

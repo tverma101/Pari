@@ -33,11 +33,35 @@ function options(choices) {
   return choices.map((x, i) => `${letters[i]}. ${x}`).join("\n");
 }
 
-function choose(prefix, choices, variant) {
-  if (variant === "canonical") return `${prefix}\n${options(choices)}\nAnswer only with the letter.`;
-  if (variant === "terse") return `${prefix}\n${options(choices)}\nChoose one option. Reply with its letter only.`;
-  return `${prefix}\n${options(choices)}\nWhich option is correct? Give only the option letter.`;
+// Freeze the allowed label set from the structured choice array, not from the
+// rendered prompt, so the protocol parser can reject out-of-domain labels
+// without scraping prose and without ever consulting the gold answer.
+function labelsFor(choices) {
+  if (!Array.isArray(choices) || choices.length < 2) {
+    throw new Error(`forced-choice task needs at least two options, got ${JSON.stringify(choices)}`);
+  }
+  if (choices.length > letters.length) {
+    throw new Error(`forced-choice task has ${choices.length} options, more than ${letters.length} labels`);
+  }
+  return letters.slice(0, choices.length).split("");
 }
+
+function choose(prefix, choices, variant) {
+  const labels = labelsFor(choices);
+  const prompt =
+    variant === "canonical"
+      ? `${prefix}\n${options(choices)}\nAnswer only with the letter.`
+      : variant === "terse"
+        ? `${prefix}\n${options(choices)}\nChoose one option. Reply with its letter only.`
+        : `${prefix}\n${options(choices)}\nWhich option is correct? Give only the option letter.`;
+  allowedChoicesByPrompt.set(prompt, labels);
+  return prompt;
+}
+
+// choose() is the only place that renders option lines, so recording the label
+// set it used keeps the frozen set tied to structured choice metadata instead
+// of being re-derived from the prompt text.
+const allowedChoicesByPrompt = new Map();
 
 function relationQuestion(row, variant) {
   const choices = shuffled(row, ["preserved", "changed"]);
@@ -143,6 +167,10 @@ for (const row of seed.cases) {
     const generative = row.dimension === "generative_expression";
     const prompt = generative ? renderGenerative(row, variant) : renderForced(row, variant);
     if (!prompt) throw new Error(`Unsupported task ${row.task} (${row.id})`);
+    const allowedChoices = generative ? null : allowedChoicesByPrompt.get(prompt);
+    if (!generative && (!allowedChoices || allowedChoices.length < 2)) {
+      throw new Error(`Missing frozen allowedChoices for ${row.id} (${variant})`);
+    }
     tasks.push({
       id: `${row.id}::p${i}`,
       baseId: row.id,
@@ -152,6 +180,7 @@ for (const row of seed.cases) {
       phenomenon: row.phenomenon ?? null,
       generative,
       prompt,
+      ...(allowedChoices ? { allowedChoices } : {}),
     });
   }
 }
@@ -163,6 +192,8 @@ fs.writeFileSync(path.join(here, "english-core-prompt-robustness.manifest.json")
   promptVariants: PROMPT_VARIANTS,
   baseCases: seed.cases.length,
   taskInstances: tasks.length,
+  allowedChoices:
+    "Every forced-choice task freezes allowedChoices as the first N letters for its N options, captured from the structured choice array at render time. It never comes from prompt prose or gold. Generative tasks carry no allowedChoices.",
   isolationRule: "Within a base case, item content, answer choices, and deterministic choice order stay fixed; only instruction wording changes.",
   interpretation: "Report mean, worst-prompt, prompt spread, answer consistency, and all-prompts-correct. Do not choose the best prompt after seeing model results.",
   researchBasis: [

@@ -11,6 +11,12 @@ Example:
       model.swords.lsr.json \
       model.swords.lsr.json.manifest.json \
       swords-official-result.json
+
+Issue #66: `parse_candidates()` is Pari-owned and score-affecting, so the conversion
+manifest must bind a registered conversion protocol
+(`pari-swords-candidate-parser` v1) whose contract hash, converter source hash,
+config, and benchmark Git identity verify. `promotionProvenanceReady: true` is not
+self-authenticating; a missing, unknown, or drifted converter identity fails here.
 """
 
 from __future__ import annotations
@@ -26,6 +32,13 @@ import tempfile
 import time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from english_core_converter_provenance import (  # noqa: E402
+    SWORDS_PROTOCOL_ID,
+    verify_converter_provenance,
+)
+
 CORE_METRICS = (
     "lenient_a_f@10",
     "lenient_c_f@10",
@@ -34,6 +47,7 @@ CORE_METRICS = (
     "strict_c_p@1",
 )
 GIT_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+CONVERTER_REL = "convert-swords-english-core-output.py"
 
 
 def sha256(path: Path) -> str:
@@ -127,6 +141,13 @@ def main() -> None:
         errors.append("conversion_manifest_not_promotion_ready")
     if manifest.get("outLsrSha256") != sha256(lsr):
         errors.append("lsr_hash_mismatch")
+
+    converter_path = Path(__file__).resolve().parent / CONVERTER_REL
+    errors.extend(
+        verify_converter_provenance(
+            manifest, benchmark="swords", converter_path=converter_path
+        )
+    )
 
     expected_revision = str(manifest.get("officialSwordsRepositoryRevision") or "").strip()
     actual_revision = git_head(repo)
@@ -223,6 +244,15 @@ def main() -> None:
         "lsrSha256": sha256(lsr),
         "conversionManifest": str(manifest_path),
         "conversionManifestSha256": sha256(manifest_path),
+        "conversionChain": {
+            "converterSource": (manifest.get("converterProvenance") or {}).get("converterSource"),
+            "converterProtocol": (manifest.get("converterProvenance") or {}).get("protocol"),
+            "conversionIdentity": (manifest.get("converterProvenance") or {}).get("identity"),
+            "benchmarkGit": (manifest.get("converterProvenance") or {}).get("benchmarkGit"),
+            "conversionConfig": (manifest.get("converterProvenance") or {}).get("conversionConfig"),
+            "coverage": manifest.get("coverage"),
+            "verifiedByWrapper": True,
+        },
         "command": command,
         "environment": evaluator_env,
         "elapsedSeconds": round(elapsed, 6),
@@ -240,6 +270,7 @@ def main() -> None:
             "The pinned SWORDS checkout must be clean, preventing uncommitted evaluator/data changes from masquerading as the recorded commit.",
             "The benchmark source used to build prompts must be byte-identical to assets/parsed/<officialDatasetId>.json.gz in the pinned checkout.",
             "The official SWORDS loader also verifies the parsed dataset's internal dataset ID against its registry before evaluation.",
+            "The conversion layer is Pari-owned and score-affecting: this wrapper re-hashes the converter script, verifies the registered protocol contract hash, and recomputes the conversion identity, so a changed parser or config cannot produce a promotion-ready official score.",
             "Core strict/lenient F@10 and strict conceivable P@1 metrics must be present; optional GAP/legacy metrics may depend on additional official assets."
         ],
     }

@@ -1,0 +1,383 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "native-blimp-config-1",
+  "title": "Native BLiMP frozen run config",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "laneId",
+    "candidateId",
+    "backend",
+    "mode",
+    "promotable",
+    "model",
+    "runtime",
+    "benchmarkRevision",
+    "outputs"
+  ],
+  "properties": {
+    "schema": {
+      "const": "native-blimp-config-1"
+    },
+    "laneId": {
+      "const": "native-blimp"
+    },
+    "candidateId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Must match a candidate id in kaggle-candidate-roster.json so finalist evidence stays tied to the frozen roster."
+    },
+    "backend": {
+      "enum": [
+        "vllm",
+        "gguf"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "smoke",
+        "full"
+      ],
+      "description": "smoke is a --limit debug run and is never promotable. full is the 67-subtask promotion lane."
+    },
+    "promotable": {
+      "type": "boolean",
+      "description": "Must be true only when mode == full. The runner rejects promotable=true with mode=smoke."
+    },
+    "note": {
+      "type": "string"
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "revision",
+        "tokenizer"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "$ref": "#/$defs/sha"
+        },
+        "tokenizer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tokenizerRevision": {
+          "$ref": "#/$defs/sha"
+        },
+        "ggufFile": {
+          "type": "string",
+          "description": "GGUF filename when backend == gguf."
+        },
+        "ggufSha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "modelArgs"
+      ],
+      "properties": {
+        "modelArgs": {
+          "type": "object",
+          "description": "Exact --model_args the harness receives. The runner validates the key set against the pinned backend contract and rejects keys the backend ignores.",
+          "additionalProperties": false,
+          "properties": {
+            "pretrained": {
+              "type": "string"
+            },
+            "dtype": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "string"
+            },
+            "tokenizer": {
+              "type": "string"
+            },
+            "tokenizer_revision": {
+              "type": "string"
+            },
+            "max_model_len": {
+              "type": "integer",
+              "minimum": 2,
+              "description": "Required explicitly. BLiMP items are short, so a generous value makes harness truncation a real bug rather than a silent no-op."
+            },
+            "max_length": {
+              "type": "integer",
+              "minimum": 2,
+              "description": "An accepted alternative to max_model_len. The two are mutually exclusive in the pinned vLLM backend."
+            },
+            "seed": {
+              "type": "integer"
+            },
+            "quantization": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "tensor_parallel_size": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_num_seqs": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "gpu_memory_utilization": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1
+            },
+            "enforce_eager": {
+              "type": "boolean"
+            },
+            "add_bos_token": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "trust_remote_code": {
+              "type": "boolean"
+            },
+            "truncation_side": {
+              "type": "string"
+            },
+            "enable_thinking": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "base_url": {
+              "type": "string",
+              "description": "Required for backend == gguf. Must be a root or /v1 URL, not a chat-completions route."
+            },
+            "model": {
+              "type": ["string", "null"],
+              "description": "llama-server router-mode model alias, when used."
+            },
+            "parallel": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "timeout": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "temperature": {
+              "type": "number"
+            },
+            "max_gen_toks": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "vllmVersion": {
+          "type": "string"
+        },
+        "llamaCppBuild": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "string"
+            },
+            "buildFlags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "serverArgs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Exact llama-server argv, including --parallel, so slot count and offload are bound to the receipt."
+            },
+            "serverBuild": {
+              "type": "string",
+              "description": "llama-server --version output at run time."
+            }
+          }
+        },
+        "server": {
+          "type": "object",
+          "description": "Owned llama-server identity for the gguf lane.",
+          "additionalProperties": false,
+          "properties": {
+            "baseUrl": {
+              "type": "string"
+            },
+            "pid": {
+              "type": ["integer", "null"],
+              "minimum": 1,
+              "description": "The owned server's pid, filled in at run time."
+            },
+            "port": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "totalSlots": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            },
+            "propsSha256": {
+              "type": ["string", "null"],
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "modelName": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "harness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "checkout": {
+          "type": "string",
+          "description": "Path to the harness checkout at the pinned commit."
+        },
+        "expectedCommit": {
+          "type": "string"
+        }
+      }
+    },
+    "benchmarkRevision": {
+      "type": "string",
+      "minLength": 7,
+      "description": "Git revision of this benchmark repository that produced the run."
+    },
+    "candidateReceipt": {
+      "type": "object",
+      "description": "Provenance receipt from the candidate/runtime run (#33/#41) that produced the artifact under test.",
+      "additionalProperties": true,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resultsDir"
+      ],
+      "properties": {
+        "resultsDir": {
+          "type": "string",
+          "minLength": 1
+        },
+        "receiptPath": {
+          "type": "string"
+        },
+        "logSamples": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "smokeLimit": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Required when mode == smoke. Translated into --limit for a debug run only."
+    },
+    "parityFixture": {
+      "type": "object",
+      "description": "Cross-backend parity fixture. Both sides must describe the same underlying model artifact.",
+      "additionalProperties": false,
+      "required": [
+        "laneId",
+        "modelArtifactSha256",
+        "leftReceipt",
+        "rightReceipt",
+        "loglikelihoodTolerance",
+        "decisionTolerance",
+        "subtaskAccuracyTolerance"
+      ],
+      "properties": {
+        "laneId": {
+          "const": "native-blimp-parity-1"
+        },
+        "modelArtifactSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "leftReceipt": {
+          "type": "string"
+        },
+        "rightReceipt": {
+          "type": "string"
+        },
+        "leftBackend": {
+          "enum": [
+            "vllm",
+            "gguf"
+          ]
+        },
+        "rightBackend": {
+          "enum": [
+            "vllm",
+            "gguf"
+          ]
+        },
+        "loglikelihoodTolerance": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum absolute per-item loglikelihood difference tolerated."
+        },
+        "decisionTolerance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fraction of items allowed to flip preferred-sentence decision."
+        },
+        "subtaskAccuracyTolerance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Maximum absolute per-subtask accuracy difference tolerated."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{7,40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

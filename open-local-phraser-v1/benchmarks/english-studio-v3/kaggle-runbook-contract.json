@@ -1,0 +1,813 @@
+{
+  "contractVersion": 1,
+  "issue": "59",
+  "purpose": "Machine-readable execution contract for the literal Kaggle agent runbook. KAGGLE_AGENT_EXECUTION.md is prose; this file is the authority it is mechanically checked against, so the runbook, the CLI stage model, and the mandatory self-checks cannot drift apart.",
+  "notAQualityClaim": "This contract records what the instrument will and will not run. It is not a benchmark result and implies nothing about model quality.",
+  "sources": {
+    "runbook": "KAGGLE_AGENT_EXECUTION.md",
+    "stageRegister": "kaggle-stage-manifest.json",
+    "executionManifest": "kaggle-execution-manifest.json",
+    "pinnedRuntimes": "kaggle-prebuilt-runtimes.json",
+    "rosterRunner": "run-kaggle-roster.py",
+    "candidateRunner": "run-kaggle-candidate.py",
+    "vllmCandidateRunner": "run-kaggle-vllm-candidate.py",
+    "stageIdentity": "kaggle_stage_identity.py",
+    "matrixBuilder": "build-kaggle-candidate-matrix.py",
+    "hardeningContract": "KAGGLE_BENCHMARK_HARDENING.md",
+    "selfCheck": "self-check-english-core.sh",
+    "runtimeSelfCheck": "self-check-kaggle-runtime.sh"
+  },
+  "selfCheckGates": {
+    "english-core": "self-check-english-core.sh",
+    "kaggle-runtime": "self-check-kaggle-runtime.sh",
+    "note": "Instrument-level contracts run in the benchmark self-check; runtime/server/product contracts run in the Kaggle runtime self-check. S1 runs both, so every required contract is still exercised before GPU time."
+  },
+  "phaseSequence": [
+    {
+      "id": "S0",
+      "title": "checkout with accelerator off",
+      "accelerator": "off",
+      "gate": null,
+      "blocking": [
+        "Every S0/S1 command must succeed before the accelerator is enabled."
+      ]
+    },
+    {
+      "id": "S1",
+      "title": "source/instrument self-check and deterministic preparation, still accelerator off",
+      "accelerator": "off",
+      "gate": null,
+      "blocking": [
+        "S1 fails closed when the mandatory self-check registry is incomplete or a registered contract is not invoked.",
+        "S1 fails closed when this runbook/contract consistency test fails.",
+        "S1 fails closed when tracked source identity is not clean and verified."
+      ]
+    },
+    {
+      "id": "Q0",
+      "title": "environment preflight",
+      "accelerator": "on",
+      "gate": "q0",
+      "blocking": [
+        "A run without real Kaggle 2xT4 evidence is environment_unqualified and cannot enter the quality comparison."
+      ]
+    },
+    {
+      "id": "Q1",
+      "title": "exact model/tokenizer/runtime load and placement",
+      "accelerator": "on",
+      "gate": "q1",
+      "blocking": [
+        "A silent CPU fallback or unprovable GPU placement stops the exact configuration before any scoring."
+      ]
+    },
+    {
+      "id": "Q2",
+      "title": "frozen response-protocol smoke",
+      "accelerator": "on",
+      "gate": "q2",
+      "stage": "smoke",
+      "blocking": [
+        "Q2 is protocol evidence only and is never added to an English quality score."
+      ]
+    },
+    {
+      "id": "Q3",
+      "title": "bounded frozen English benchmark smoke",
+      "accelerator": "on",
+      "gate": "q3",
+      "stage": "benchmark-smoke",
+      "blocking": [
+        "Q3 is a registered frozen prefix subset of the canonical full screen, never an ad-hoc task limit.",
+        "The full screen does not start until Q3 succeeds."
+      ]
+    },
+    {
+      "id": "Q4",
+      "title": "complete common English Core screen",
+      "accelerator": "on",
+      "gate": "q4",
+      "stage": "full",
+      "blocking": [
+        "Only Q0-Q3-qualified configurations may run and be reported in the common screen."
+      ]
+    },
+    {
+      "id": "F",
+      "title": "freeze the finalist set as an explicit artifact",
+      "accelerator": "on",
+      "gate": null,
+      "blocking": [
+        "Product work requires a validated finalist-set receipt; finalist membership is an explicit decision, never inferred from whichever candidate screened best."
+      ]
+    },
+    {
+      "id": "Q5",
+      "title": "finalist-only Word Studio product/runtime qualification",
+      "accelerator": "on",
+      "gate": "q5",
+      "stage": "word-studio",
+      "appliesTo": "finalists",
+      "requires": [
+        "F"
+      ],
+      "blocking": [
+        "Non-finalists record not_run_non_finalist for product stages; that is not a blank cell."
+      ]
+    },
+    {
+      "id": "Q6",
+      "title": "finalist-only transform product/runtime qualification",
+      "accelerator": "on",
+      "gate": "q6",
+      "stage": "transform",
+      "appliesTo": "finalists",
+      "requires": [
+        "F"
+      ],
+      "blocking": [
+        "Non-finalists record not_run_non_finalist for product stages; that is not a blank cell."
+      ]
+    },
+    {
+      "id": "Q7",
+      "title": "finalist-only interactive latency and supported MTP measurement",
+      "accelerator": "on",
+      "gate": null,
+      "appliesTo": "finalists",
+      "requires": [
+        "F"
+      ],
+      "blocking": [
+        "Only after ordinary streaming latency succeeds may an explicitly roster-declared speculative variant be measured.",
+        "Token/sec or bare TTFT is not a substitute for first-usable-option latency."
+      ]
+    },
+    {
+      "id": "Z",
+      "title": "cleanup and verified shutdown",
+      "accelerator": "off",
+      "gate": null,
+      "blocking": [
+        "Preserve only authorized result artifacts, then stop the session and set the accelerator off.",
+        "Idle GPU utilization, an idle notebook, or a closed tab is not proof the accelerator stopped."
+      ]
+    }
+  ],
+  "stageApplicability": {
+    "allCandidates": [
+      "smoke",
+      "benchmark-smoke",
+      "full"
+    ],
+    "finalistsOnly": [
+      "word-studio",
+      "transform"
+    ],
+    "finalistStagesRequireReceipt": "finalist-set",
+    "nonFinalistProductStatus": "not_run_non_finalist",
+    "note": "Every roster candidate must be attempted through the Q0-Q4 screening chain. Product suites run only for the frozen finalist set, so the canonical sequence never schedules product work for a non-finalist."
+  },
+  "canonicalCliPhases": {
+    "rosterFlag": "--phase",
+    "screeningPhase": "english",
+    "declaredChoices": [
+      "all",
+      "english",
+      "product",
+      "smoke"
+    ],
+    "forbiddenInCanonicalCommands": [
+      "--phase\\s+all"
+    ],
+    "forbiddenInCanonicalInstructions": [
+      "all"
+    ],
+    "forbiddenReason": "`--phase all` schedules transform + word-studio for every candidate, which contradicts finalist-only product work. It stays a declared CLI choice for debugging, but the canonical runbook must never issue it.",
+    "productPhaseRequiresFinalistReceipt": true
+  },
+  "gateChain": {
+    "registerFile": "kaggle-stage-manifest.json",
+    "minManifestVersion": 2,
+    "module": "kaggle_stage_identity.py",
+    "requiredOrder": [
+      "q0",
+      "q1",
+      "q2",
+      "q3",
+      "q4",
+      "q5",
+      "q6"
+    ],
+    "note": "The ladder in kaggle-stage-manifest.json is the authority. This contract only pins the expected order so a reordered or dropped gate fails the self-check."
+  },
+  "runtimePolicy": {
+    "registry": "kaggle-prebuilt-runtimes.json",
+    "requiredArtifactIds": [
+      "vllm-0.30.0-cu129-linux-x86_64",
+      "prism-llamacpp-b10735-cuda12.8-linux-x86_64",
+      "prism-llamacpp-b10735-cuda12.4-linux-x86_64"
+    ],
+    "sourceBuildDefault": "forbidden",
+    "generationLadderSource": "run-kaggle-vllm-candidate.py",
+    "productBatchPolicySource": "run-kaggle-vllm-candidate.py",
+    "prismSelector": "select-kaggle-prism-runtime.py",
+    "prismSelectionBasis": "actual-binary-compatibility-probe",
+    "prismSelectionNote": "Metadata verification is necessary but not sufficient. The selector must run each ladder entry's actual pinned binary before it can be selected; compatibility is never inferred from version-number ordering.",
+    "dependencyClosureDefault": "fail-closed",
+    "onDependencyLockPending": "dependency_lock_pending",
+    "lockPolicyNote": "A hash-bound 180-package CPython 3.11 candidate closure exists, but it is candidate-not-locked, promotionEligible=false, and not matched to the still-unknown Kaggle image Python ABI. The vLLM runtime is not installable and its candidates record runtime_unqualified until a target-image-matched serving dependency closure is reviewed; there is no unpinned-pip fallback."
+  },
+  "dataPreparationPolicy": {
+    "builder": "prepare-kaggle-benchmark.py",
+    "lockDir": "locks",
+    "qualifiedProfiles": [
+      "CPython 3.10 / Linux x86_64 (locks/kaggle-data-prep-cp310-linux-x86_64.txt)",
+      "CPython 3.11 / Linux x86_64 (locks/kaggle-data-prep-cp311-linux-x86_64.txt)"
+    ],
+    "failsClosed": [
+      "CPython 3.12",
+      "CPython 3.13",
+      "any non-CPython implementation",
+      "any non-Linux platform",
+      "any non-x86_64 architecture"
+    ],
+    "failsClosedReason": "No verified ABI-specific wheel lock exists for those profiles, so they are unsupported rather than approximated.",
+    "verification": [
+      "Verify the committed lock's SHA-256 pin against the lock bytes before installing.",
+      "Install with --require-hashes --only-binary=:all: --no-deps into an isolated venv.",
+      "Verify the installed package set against the lock, then run pip check."
+    ],
+    "receiptEvidence": [
+      "dependencyLock.state",
+      "dependencyLock.file",
+      "dependencyLock.sha256",
+      "dependencyLock.packageCount",
+      "dependencyLock.resolver",
+      "dependencyLock.installFlags",
+      "pythonImplementation",
+      "pythonVersion",
+      "pythonCacheTag",
+      "machine",
+      "system"
+    ],
+    "caveat": "Lock-verified is not image-ABI-proven. The actual Kaggle image ABI still needs confirmation from the private preparation kernel; until that run reports the same profile, treat the qualified profiles as lock-verified only."
+  },
+  "runbookRequiredFacts": [
+    {
+      "id": "product-is-finalist-only",
+      "anyOf": [
+        "finalist-only",
+        "finalists only",
+        "only finalists"
+      ],
+      "why": "Product suites must not read as work every candidate performs."
+    },
+    {
+      "id": "no-phase-all",
+      "mustMention": [
+        "--phase english"
+      ],
+      "commandRule": "forbidInCanonicalCommands",
+      "proseRule": "ifNotMentionedMustExplain",
+      "why": "The canonical sequence must not force product stages on non-finalists. Prose is allowed only when the runbook states that the broad phase is excluded from the canonical sequence."
+    },
+    {
+      "id": "explicit-qualification-ladder",
+      "mustMention": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4"
+      ],
+      "why": "Q1/Q2/Q3 are separate sequential gates; one broad smoke stage is not the qualification gate."
+    },
+    {
+      "id": "finalist-freeze-before-product",
+      "mustMention": [
+        "finalist-set.json",
+        "--finalist-set"
+      ],
+      "why": "The runbook must show finalist membership being frozen before any product stage runs."
+    },
+    {
+      "id": "real-kaggle-blocker",
+      "anyOf": [
+        "real Kaggle",
+        "environment_unqualified"
+      ],
+      "why": "Promotion-quality runtime evidence must come from an actual Kaggle 2xT4 job."
+    },
+    {
+      "id": "dependency-lock-blocker",
+      "anyOf": [
+        "dependency_lock_pending",
+        "dependency closure"
+      ],
+      "why": "The hash-bound vLLM candidate closure is not a target-image-matched promotion lock; the runbook must preserve that blocker rather than imply install always succeeds."
+    },
+    {
+      "id": "prism-actual-binary-basis",
+      "anyOf": [
+        "actual-binary",
+        "actual binary",
+        "actual pinned binary"
+      ],
+      "why": "The Prism selector now requires an actual-binary compatibility probe, not metadata ordering."
+    },
+    {
+      "id": "self-check-is-the-gate",
+      "anyOf": [
+        "self-check-english-core.sh"
+      ],
+      "why": "S1 must point agents at the mandatory aggregation gate."
+    },
+    {
+      "id": "resource-contamination-is-not-oom",
+      "mustMention": [
+        "infrastructure_blocked_resource_contamination",
+        "quarantine",
+        "never signalled",
+        "cuda_oom"
+      ],
+      "why": "Issue #57 exists so a contaminated required GPU cannot resurface as the next candidate's false OOM. The runbook must name the blocked category, the between-candidate quarantine, the never-kill-foreign-process rule, and the OOM contrast."
+    }
+  ],
+  "forbiddenRunbookContent": [
+    {
+      "id": "no-broad-phase-all-command",
+      "pattern": "--phase\\s+all",
+      "forbidIn": [
+        "canonicalCommands"
+      ],
+      "why": "The canonical sequence must not force product stages on every candidate.",
+      "note": "A prose sentence explaining that --phase all is forbidden is allowed and expected; only an issued command is rejected."
+    }
+  ],
+  "mandatoryContracts": [
+    {
+      "id": "resume-fault-injection",
+      "issue": "30",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_fault_injection.py",
+        "test_kaggle_roster_resume.py"
+      ],
+      "command": "python3 test_kaggle_fault_injection.py",
+      "assertion": "Resume safety, atomic summaries, terminal states, and owned-process cleanup are exercised before GPU time."
+    },
+    {
+      "id": "candidate-provenance",
+      "issue": "33",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_candidate_provenance.py"
+      ],
+      "command": "python3 test_kaggle_candidate_provenance.py",
+      "assertion": "Result provenance and derived-result collisions are detected in the candidate matrix."
+    },
+    {
+      "id": "finalist-set-lifecycle",
+      "issue": "39",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_candidate_provenance.py"
+      ],
+      "command": "python3 test_kaggle_candidate_provenance.py",
+      "assertion": "Product stages stay finalist-only and non-finalist cells read not_run_non_finalist rather than blank."
+    },
+    {
+      "id": "git-tree-identity",
+      "issue": "40",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_fault_injection.py"
+      ],
+      "command": "python3 test_kaggle_fault_injection.py",
+      "assertion": "A sweep is bound to a verified clean tracked-source identity before any model work."
+    },
+    {
+      "id": "runtime-dependency-lock",
+      "issue": "41",
+      "gate": "kaggle-runtime",
+      "modules": [
+        "test_kaggle_runtime_dependency_lock.py"
+      ],
+      "command": "python3 test_kaggle_runtime_dependency_lock.py",
+      "assertion": "The vLLM dependency closure is fail-closed; a pending lock yields dependency_lock_pending, never an unpinned install."
+    },
+    {
+      "id": "data-preparation-dependency-lock",
+      "issue": "52",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_data_preparation_lock.py"
+      ],
+      "command": "python3 test_kaggle_data_preparation_lock.py",
+      "assertion": "The CPU data-preparation dependency closure stays fail-closed on a bare base Python: the committed locks stay SHA-256 pin-verified and hash-complete, an edited lock is refused before any venv exists, unqualified profiles fail closed instead of approximating, host PYTHONPATH/PYTHONHOME/PIP_* policy is stripped from prep subprocesses, and the preparation receipt must carry the exact verified lock digest and Python ABI.",
+      "statusNote": "Required. The builder resolves its requirement parser from pip, so on an interpreter without pip this suite installs a narrow pin-only fallback parser that rejects extras, markers, ranges, and multi-specifier grammar rather than guessing; the run prints which parser executed, and both committed locks are asserted to stay inside that grammar.",
+      "kaggleOnlyResidual": "This CPU gate proves the lock bytes, pins, and fail-closed gates, not that a specific Kaggle image ABI satisfies them; the private preparation kernel's reported profile remains the authority for that, as recorded in dataPreparationPolicy.caveat."
+    },
+    {
+      "id": "server-ownership",
+      "issue": "42",
+      "gate": "kaggle-runtime",
+      "modules": [
+        "test_kaggle_server_identity.py"
+      ],
+      "command": "python3 test_kaggle_server_identity.py",
+      "assertion": "Loopback server ownership and served-model identity are proven before benchmark traffic is accepted."
+    },
+    {
+      "id": "word-studio-usable-contract",
+      "issue": "43",
+      "gate": "kaggle-runtime",
+      "modules": [
+        "test_word_studio_usable_contract.py"
+      ],
+      "command": "python3 test_word_studio_usable_contract.py",
+      "assertion": "Candidate parsing, dedupe, and protected-content diagnostics are first-class and deterministic."
+    },
+    {
+      "id": "allowed-choice-parser",
+      "issue": "44",
+      "gate": "english-core",
+      "modules": [
+        "test_english_core_choice_parser.py"
+      ],
+      "command": "python3 test_english_core_choice_parser.py",
+      "assertion": "Forced-choice parsing is task-aware, so an impossible option label is malformed rather than scored."
+    },
+    {
+      "id": "oom-ladder",
+      "issue": "47",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_batch_policy.py"
+      ],
+      "command": "python3 test_kaggle_batch_policy.py",
+      "assertion": "Load OOM stops the configuration; generation OOM walks one frozen ladder; product stages never walk it."
+    },
+    {
+      "id": "stage-identity",
+      "issue": "48",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_stage_ladder.py"
+      ],
+      "command": "python3 test_kaggle_stage_ladder.py",
+      "assertion": "Each stage resolves to exactly one frozen task identity; arbitrary task overrides are non-promotion."
+    },
+    {
+      "id": "qualification-ladder",
+      "issue": "49",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_stage_ladder.py"
+      ],
+      "command": "python3 test_kaggle_stage_ladder.py",
+      "assertion": "Q1->Q4 are explicit sequential gates and Q3 is a registered frozen subset, not a task limit."
+    },
+    {
+      "id": "context-budget",
+      "issue": "45",
+      "gate": "kaggle-runtime",
+      "modules": [
+        "test_kaggle_context_budget.py"
+      ],
+      "command": "python3 test_kaggle_context_budget.py",
+      "assertion": "Exact tokenizer/chat-template context budgets are preflighted and silent truncation is refused.",
+      "statusNote": "Runtime-lane contract: the budget probe runs against the model runtime, so it lives in the kaggle-runtime self-check."
+    },
+    {
+      "id": "failure-stage-attribution",
+      "issue": "53",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_candidate_stage_attribution.py"
+      ],
+      "command": "python3 test_kaggle_candidate_stage_attribution.py",
+      "assertion": "Candidate wrappers attribute a failure to an explicit stage instead of inferring it from log wording."
+    },
+    {
+      "id": "weight-sensitivity",
+      "issue": "56",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_weight_sensitivity.py"
+      ],
+      "command": "python3 test_kaggle_weight_sensitivity.py",
+      "assertion": "The close-contender weight-sensitivity lane fails closed on provenance mismatch, incomplete coverage, a ranking flip, or a withheld interval."
+    },
+    {
+      "id": "gpu-ownership-gate",
+      "issue": "57",
+      "gate": "kaggle-runtime",
+      "modules": [
+        "test_kaggle_gpu_resource_gate.py",
+        "test_kaggle_candidate_resource_gate.py"
+      ],
+      "command": "python3 test_kaggle_gpu_resource_gate.py",
+      "assertion": "GPU resource contamination is quarantined under a single-owner lease so foreign processes cannot cause a false OOM."
+    },
+    {
+      "id": "strict-result-schema",
+      "issue": "60",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_result_schema.py"
+      ],
+      "command": "python3 test_kaggle_result_schema.py",
+      "assertion": "A versioned strict result schema rejects NaN/Infinity and shape drift before promotion.",
+      "validator": "validate-english-core-run.py",
+      "schema": "english-core-result-schema.json",
+      "statusNote": "Required since the #60 implementation landed. The validator never infers a schema version, and promotion additionally requires reproducibility.resultSchemaSha256 to match the validated schema bytes; the promotion fixture in self-check-english-core.sh derives both from the validator so they cannot drift."
+    },
+    {
+      "id": "failure-taxonomy-evidence",
+      "issue": "53",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_edge_cases.py"
+      ],
+      "command": "python3 test_kaggle_edge_cases.py",
+      "assertion": "Failure classification is evidence-specific, including negative fixtures that must not match a category."
+    },
+    {
+      "id": "prism-binary-selection",
+      "issue": "54",
+      "gate": "kaggle-runtime",
+      "modules": [
+        "test_kaggle_prism_runtime_selection.py"
+      ],
+      "command": "python3 test_kaggle_prism_runtime_selection.py",
+      "assertion": "Prism CUDA 12.8->12.4 selection requires an actual-binary probe instead of metadata ordering."
+    },
+    {
+      "id": "official-evidence-semantics",
+      "issue": "32",
+      "gate": "english-core",
+      "modules": [
+        "test_official_evidence_semantic_validation.py"
+      ],
+      "command": "python3 test_official_evidence_semantic_validation.py",
+      "assertion": "Recognized official evaluator artifacts are semantically validated under a versioned contract; unknown types stay byte-hashable."
+    },
+    {
+      "id": "effective-prompt-mode",
+      "issue": "58",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_thinking_capability.py"
+      ],
+      "command": "python3 test_kaggle_thinking_capability.py",
+      "assertion": "Chat-template and non-thinking mode are proven effective on each runtime rather than requested and assumed.",
+      "producers": [
+        "run-english-core-vllm.py",
+        "run-english-core-llamacpp.py",
+        "run-kaggle-vllm-streaming-latency.py"
+      ],
+      "stateContract": "kaggle_context_budget.ThinkingCapability",
+      "validator": "validate-english-core-run.py",
+      "statusNote": "Required. test_kaggle_thinking_capability.py drives the real vLLM prompt_for_task against accepting and kwarg-rejecting tokenizers, runs the real llama.cpp and streaming-latency probe paths, checks all three producers import the shared ThinkingCapability, validates every emitted thinkingCapability payload, proves each emitted contextBudget block passes the real validator schema, and statically refuses an `applied` claim whose proof names no verification mechanism.",
+      "kaggleOnlyResidual": "CPU tests cannot prove that a specific pinned model's chat template on Kaggle honours enable_thinking=false, or that a specific llama.cpp / vLLM server build strips the thinking block. That per-model proof is the recorded thinkingCapability in a real candidate result; the CPU gate only proves the reporting is honest and cannot be laundered from request intent."
+    },
+    {
+      "id": "runtime-semantics-parity",
+      "issue": "63",
+      "gate": "english-core",
+      "modules": [
+        "test_english_core_runtime_semantics.py",
+        "english_core_runtime_semantics.py"
+      ],
+      "command": "python3 test_english_core_runtime_semantics.py",
+      "assertion": "One versioned runtime-neutral decoding/prompt-adaptation registry is consumed by the validator: vLLM topK=-1 and llama.cpp topK=0 are registered native disabled sentinels that keep their exact raw values while normalizing to the same logical mode, an active topK=40 stays distinct, unknown sentinels and unknown adaptation strings fail closed, and plain cannot masquerade as chat_template.",
+      "validator": "validate-english-core-run.py",
+      "schema": "english-core-result-schema.json",
+      "statusNote": "Required since the #63 registry landed. The registry supersedes the schema's decoding.topK minimum 0 bound only for registered native disabled sentinels; every other topK rejection still stands and the validator records the override it applied under runtimeSemantics.schemaOverrides. Stop/EOS and llama.cpp speculative decoding are reported as unrecorded, naming the runner fields that would be required, rather than normalized from values the outputs do not prove."
+    },
+    {
+      "id": "snapshot-analysis-provenance",
+      "issue": "65",
+      "gate": "english-core",
+      "modules": [
+        "test_english_core_snapshot_provenance.py"
+      ],
+      "command": "python3 test_english_core_snapshot_provenance.py",
+      "assertion": "Statistical and paired-comparison reports are computed only from the benchmark snapshot the source score names: the config/weights, private seed, model-visible shadow task file, shadow manifest, and generative metric contract are each hashed and compared to the score's benchmarkInputs before any statistic is computed, a legacy score with missing or partial input hashes fails closed, an edited source score is refused against a frozen manifest, and the #64 score-view identity (contract version, denominator policy, allowed-label contract, per-view metric keys, contract and parser bytes, task-file binding) is verified rather than assumed.",
+      "validator": "validate-english-core-run.py",
+      "schema": "english-core-result-schema.json",
+      "statusNote": "Required since #65 landed. Both derived report shapes bind the source score file hash, the scorer and analysis script hashes, the chosen strict/recoverable score view where the artifact declares one, the bootstrap seed and iteration count, and every consumed benchmark input hash. Re-analyzing a score under a rebuilt config, a regenerated seed, or renamed score-view metrics is refused rather than reported; no historical bytes are invented when a legacy artifact never recorded them.",
+      "kaggleOnlyResidual": "The CPU gate proves the analysis refuses mismatched snapshots and verifies the declared identities. It cannot prove that a specific historical snapshot directory still exists on disk; when it does not, the analysis stops and says so, and the score must be re-scored against the live snapshot to produce a re-comparable artifact."
+    },
+    {
+      "id": "strict-recoverable-score-views",
+      "issue": "64",
+      "gate": "english-core",
+      "modules": [
+        "test_english_core_choice_views.py",
+        "english_core_choice_views.py",
+        "english-core-choice-view-fixtures.json"
+      ],
+      "command": "python3 test_english_core_choice_views.py",
+      "assertion": "Prompted forced-choice lanes publish strict letter-only and recoverable anchored accuracy as two separate frozen views over one fixed denominator: an invalid protocol output is a zero that stays labelled a protocol failure, an allowed option chosen wrongly stays a linguistic/task miss, a correct recoverable answer never moves strict accuracy, a runtime-unqualified run is excluded from the denominator instead of becoming an English zero, and the published scoreView contract binds the strict/recoverable metric keys plus the contract and parser bytes so the JS analysis cannot silently substitute one view for the other.",
+      "validator": "validate-english-core-run.py",
+      "schema": "english-core-result-schema.json",
+      "statusNote": "Required since the #64 view module landed. Both Python scorers (public-fast and public full-distribution classification) publish the block; the shadow scorer and the MJS robustness scorers must publish the same block before the JS analysis can select their views."
+    },
+    {
+      "id": "finalist-source-identity",
+      "issue": "67",
+      "gate": "english-core",
+      "modules": [
+        "test_english_core_public_full_sources.py",
+        "test_english_core_public_full_promotion_gate.py"
+      ],
+      "command": "python3 test_english_core_public_full_sources.py",
+      "assertion": "The full-distribution WiC/CoLA/PAWS finalist lane resolves every requested Hub revision exactly once to a full 40-hex commit that lives in the canonical repository and loads only from that commit; promotion mode fails closed on omitted or mutable refs, a non-canonical or retired-alias repository, a wrong-repository commit, unresolved or non-full commits, drifted frozen pins, and missing fingerprints; the manifest records requested and resolved refs separately and stays visibly non-promotion for exploratory builds; PAWS is frozen to google-research-datasets/paws labeled_final/validation and cannot drift from the public-fast screen; and preparation binds task/answer/manifest hashes, the ordered task-ID digest, the locked data-prep lock, and the benchmark tree into a separate finalist receipt without extending the balanced common screen.",
+      "statusNote": "Required. The builder, the source-identity module, the frozen versioned source manifest, and the finalist preparation receipt all landed together. score-english-core-public-full-classification.py stays with #64; its promotion gate contract is documented in SCORER_SOURCE_GATE.md and is enforced by english_core_public_sources.source_manifest_gate_report, so the scorer only has to call that function. The suite is CPU-only, needs no network, no datasets install, and no GPU."
+    },
+    {
+      "id": "semanticqa-label-parser",
+      "issue": "44",
+      "gate": "english-core",
+      "modules": [
+        "test_semanticqa_lcc_label_parser.py"
+      ],
+      "command": "python3 test_semanticqa_lcc_label_parser.py",
+      "assertion": "The SemanticQA LCC tolerant label parser recovers at most one clear taxonomy category from harmless wrappers and never invents a category the model did not answer: because the frozen taxonomy mixes case and contains a digit (Oper1) and several categories are prefixes of longer words, the token boundary is ASCII alphanumeric, so Magn2 does not recover as Magn and Oper10 does not recover as Oper1 and an out-of-taxonomy token can never become a valid label or raise validOutputCoverage.",
+      "statusNote": "Required. The expected taxonomy is restated in the suite rather than imported from a sibling parser, so it pins the diagnostic scorer's own contract and cannot be broken by an unrelated parser refactor. A false recovery would turn an unparsed output into a scored hit, which is why this is a fail-closed contract rather than a convenience fixture.",
+      "kaggleOnlyResidual": "This suite pins the parser boundary on synthetic strings. It does not show that any finalist model answers SemanticQA inside the taxonomy; that remains a per-run validOutputCoverage observation in a real scored result."
+    },
+    {
+      "id": "runbook-registry-consistency",
+      "issue": "59",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_runbook_consistency.py"
+      ],
+      "command": "python3 test_kaggle_runbook_consistency.py",
+      "assertion": "The literal runbook, the CLI stage model, the pinned runtime registry, and the self-check scripts are one mechanically checked contract: phase order, finalist-only product work, the forbidden broad phase, the frozen batch ladder, required runtime artifact ids, runbook-required facts, the data-prep lock claim, and the mandatory-contract registry all fail closed on drift instead of on prose review.",
+      "statusNote": "Required. This suite is the mechanism for every other row in this file, so it runs itself at the top of the same gate and its command is registered here like any other contract."
+    },
+    {
+      "id": "allowed-choice-metadata",
+      "issue": "44",
+      "gate": "english-core",
+      "modules": [
+        "test_english_core_allowed_choices.py"
+      ],
+      "command": "python3 test_english_core_allowed_choices.py",
+      "assertion": "Every forced-choice task freezes exactly one model-visible answer set from build-time metadata rather than from gold: a letter-protocol task freezes the first N letters for its N rendered options, SemanticQA LCC freezes the ordered taxonomy names for its label-name protocol, and the rendered prompt must agree with the frozen set.",
+      "statusNote": "Required. It runs the real public-fast prompt/choice renderer with the dataset libraries stubbed, so it stays CPU-only with no datasets install and no network."
+    },
+    {
+      "id": "allowed-choice-parser-node",
+      "issue": "44",
+      "gate": "english-core",
+      "modules": [
+        "test-english-core-choice-parser.mjs"
+      ],
+      "command": "node test-english-core-choice-parser.mjs",
+      "assertion": "The Node-side choice parser is held to the same accepted-answer grammar as the Python parser, so the two language bindings cannot drift into scoring different sets of answers for the same output.",
+      "statusNote": "Registered as its own row because the JS half of the #44 allowed-choice contract is a separate executable surface. It is the only non-python3 command in the registry; the interpreter is still explicit so the gate stays unambiguous."
+    },
+    {
+      "id": "q1-load-and-lease-gate",
+      "issue": "49",
+      "gate": "kaggle-runtime",
+      "modules": [
+        "test_kaggle_q1_gate.py"
+      ],
+      "command": "python3 test_kaggle_q1_gate.py",
+      "assertion": "Q1 completion is earned from real probe evidence, never synthesized: the receipt completes only on measured GPU placement and a served trivial generation, a silent CPU fallback is rejected, receipt reuse is config-scoped, and the GPU lease is exclusive and released idempotently.",
+      "statusNote": "Distinct from the existing qualification-ladder row (#49, test_kaggle_stage_ladder.py), which pins the ladder order and task identity; this row pins the Q1 receipt and lease mechanics.",
+      "kaggleOnlyResidual": "The fixtures stub nvidia-smi and stand a stdlib fake OpenAI-compatible server in for the candidate runtime. They prove the receipt logic, not that any specific pinned model loads and places on the real Kaggle 2xT4 image; that remains Q0/Q1 evidence from a real run."
+    },
+    {
+      "id": "promotion-gate-parity",
+      "issue": "62",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_promotion_gate_parity.py"
+      ],
+      "command": "python3 test_kaggle_promotion_gate_parity.py",
+      "assertion": "The vLLM-shaped and Prism-shaped results reach the same terminal status through the same shared promotion gate for every scenario: a non-full stage is diagnostics-only on both runtimes, a missing or reportless validator is a tool failure rather than a pass, a malformed result cannot be marked completed, and neither wrapper keeps a private weaker validator branch.",
+      "statusNote": "Required since the #62 shared gate landed. The scenario matrix drives the real diagnostics and promotion validator as subprocesses over fabricated result artifacts; the implementation under test is kaggle_promotion_gate.py, which this row deliberately does not list as a test module because it is imported and exercised by the test itself."
+    },
+    {
+      "id": "official-converter-provenance",
+      "issue": "66",
+      "gate": "english-core",
+      "modules": [
+        "test_official_converter_provenance.py"
+      ],
+      "command": "python3 test_official_converter_provenance.py",
+      "assertion": "The Pari-owned conversion layer that builds official SWORDS/JFLEG/SemanticQA evaluator input is score-affecting and therefore fail-closed: a one-byte converter edit, an unregistered protocol, a config change without a new identity, a tampered manifest, or an unavailable benchmark Git identity are all rejected before a promotion-ready official score exists, and the SemanticQA postprocessor taxonomy stays pinned to the verified official semantics.",
+      "statusNote": "Required. The suite pins converter and config identity in english_core_converter_provenance.py; this row lists only the test module because the implementation is imported by the test rather than run as its own gate. No network, no GPU, and no official checkout are needed."
+    },
+    {
+      "id": "human-eval-pipeline",
+      "issue": "69",
+      "gate": "english-core",
+      "modules": [
+        "test_word_studio_human_eval.py"
+      ],
+      "command": "python3 test_word_studio_human_eval.py",
+      "assertion": "The blinded human/product evaluation chain is deterministic and honest about its own evidence: identical inputs and seed reproduce byte-identical packets and private mappings, reviewer-visible packets never carry model/runtime/latency metadata, the private review key never leaks, unknown and duplicate rating rows fail validation, analysis refuses to pair ratings across different rubric or preregistration bindings, and a post-hoc exclusion with no preregistered rule is surfaced as exploratory.",
+      "statusNote": "Required. word_studio_human_eval.py holds the whole frozen chain; this row lists only the test module because the implementation is imported by the test.",
+      "kaggleOnlyResidual": "The CPU suite proves the pipeline is correct and deterministic. It proves nothing about product quality: every number it has ever produced describes synthetic fixture ratings. No human ratings exist, independent raters have never been run, and the human-eval issue therefore stays open until real ratings are collected."
+    },
+    {
+      "id": "gpu-telemetry-receipt",
+      "issue": "31",
+      "gate": "english-core",
+      "modules": [
+        "test_kaggle_telemetry.py"
+      ],
+      "command": "python3 test_kaggle_telemetry.py",
+      "assertion": "Every finalist is judged by one written telemetry rule: a per-GPU receipt with a versioned schema, and a deterministic warm-stability drift analysis that distinguishes stable memory, monotonic leak-like growth, a spike that recovers, a clean process exit, a surviving owned process, a missing nvidia-smi field, and two GPUs with asymmetric usage instead of leaving those to ad-hoc reading.",
+      "statusNote": "Required. This row covers the reusable receipt and analysis half in kaggle_telemetry.py, which is pure CPU and stdlib-only; the row lists only the test module because the implementation is imported by the test.",
+      "kaggleOnlyResidual": "The fixtures are hand-built snapshots. Acquire-then-record is owned by the runners on Kaggle, so no live nvidia-smi capture, real per-GPU leak, or real asymmetric-2xT4 reading is demonstrated here; a real run still has to record the receipt it promises."
+    },
+    {
+      "id": "progressive-option-timing",
+      "issue": "29",
+      "gate": "english-core",
+      "modules": [
+        "test_progressive_option_timing.py"
+      ],
+      "command": "python3 test_progressive_option_timing.py",
+      "assertion": "First-usable-option latency is measured on the shared progressive contract rather than approximated by bare TTFT or token rate: the first usable candidate is found even when it straddles a chunk boundary, the depth-3 and depth-10 thresholds cross at the correct chunk, duplicate normalized candidates and commentary wrappers do not advance unique depth, a response that ends at seven candidates leaves first-10 null, final diagnostics equal a one-shot parse of the same completed text, and the streaming row builder emits the real progressive fields for forced-choice and Word Studio lanes alike.",
+      "statusNote": "Required. The suite drives the real tracker and the real async streaming row builder out of run-english-core-vllm.py over synthetic chunked streams, so it stays CPU-only with no model and no server.",
+      "kaggleOnlyResidual": "Synthetic chunks prove the timing arithmetic and the emitted schema, not any candidate server's real cadence. Bare TTFT remains insufficient evidence; the per-option timings have to be recorded from a real streaming run before Q7 can report them."
+    },
+    {
+      "id": "native-blimp-likelihood-lane",
+      "issue": "68",
+      "gate": "english-core",
+      "modules": [
+        "native-blimp/test_native_blimp.py"
+      ],
+      "command": "python3 native-blimp/test_native_blimp.py",
+      "assertion": "The native minimal-pair likelihood lane is a separate evidence lane from the prompted BLiMP screen and never mixes the two: every pinned harness commit, package version, task group, dataset revision, and backend format is hashed into the protocol manifest and into each receipt; the vLLM and GGUF/llama.cpp argument builders refuse conflicting length arguments, enable_thinking, and an implicit max_model_len; a smoke receipt stays visibly non-promotable; and runtime failures are classified into a named taxonomy.",
+      "statusNote": "Required. The lane is registered against its real suite path rather than copied into the benchmark root, and the pinned identities live in native-blimp/native-blimp-protocol.json.",
+      "kaggleOnlyResidual": "The CPU suite proves the pinned config/receipt/taxonomy contracts only. Real likelihood scoring needs the pinned lm-evaluation-harness, the pinned nyu-mll/blimp revision, and a real runtime on Kaggle; a smoke receipt is non-promotable precisely so no fixture can stand in for that."
+    },
+    {
+      "id": "repro-manifest-conversion-gate",
+      "issue": "66",
+      "gate": "english-core",
+      "modules": [
+        "test_repro_manifest_semanticqa_conversion_gate.py"
+      ],
+      "command": "python3 test_repro_manifest_semanticqa_conversion_gate.py",
+      "assertion": "A reproduction manifest cannot promote an official SemanticQA score on the strength of a self-described policy string: promotion requires the current converter manifest version plus a conversion chain the builder re-derives from the registered protocol registry, an official pinned postprocessor import bound to the evaluator checkout, and an empty provenanceErrors list from the wrapper that actually ran the official metric, with a tampered contract hash, tampered conversion identity, mismatched postprocessor config, or unresolvable benchmark Git identity all refused.",
+      "statusNote": "Required. The fixtures build their hashes with the same helpers the converter uses, so a passing artifact here is a genuinely re-derivable chain rather than a pile of well-formed constants. Distinct from the official-converter-provenance row: that row pins converter code and config identity, and this row pins what the repro manifest is allowed to *claim* about a completed conversion.",
+      "kaggleOnlyResidual": "The chain is proved re-derivable on CPU. It does not prove a specific Kaggle run's official evaluator checkout was present, which is why the gate additionally requires the benchmark Git identity to resolve rather than inventing one."
+    },
+    {
+      "id": "mjs-score-view-publication",
+      "issue": "64",
+      "gate": "english-core",
+      "modules": [
+        "test_mjs_score_view_contract.py"
+      ],
+      "command": "python3 test_mjs_score_view_contract.py",
+      "assertion": "Every MJS English Core score producer publishes the same frozen scoreView identity the JS analysis reads, derived from the contract constants frozen in english_core_choice_views.py: the main scorer, the prompt-robustness scorer, and the choice-order-robustness scorer must all emit a scoreView block with one identical contract hash and one denominator policy, so the JavaScript analysis cannot silently substitute the strict view for the recoverable one or vice versa.",
+      "statusNote": "Required. The suite drives the three real scorer CLIs over synthetic results against the in-tree benchmark snapshot, so it is the JS half of the #64 strict/recoverable row above, which pins the Python scorers. Registered separately because a fourth producer appearing without a scoreView block would otherwise be invisible to #59.",
+      "kaggleOnlyResidual": "CPU fixtures prove the published view identity, not any finalist's scores under it; the per-view numbers still come from real scored runs."
+    }
+  ],
+  "selfCheckCoverage": {
+    "note": "Every test module a self-check gate actually executes is either the command of a registered mandatoryContracts row in that gate, or is exempted here with the reason it is not an issue contract. This is what stops a green test from sitting outside the registry where #59 cannot see it.",
+    "exemptions": [
+      {
+        "invocation": "test_protocol_output_diagnostics.py",
+        "reason": "Pre-#59 structural test of the shared strict/recoverable output classifier. It runs in both gates and backs the #43 usable-contract row and the #64 score views, but it is not itself an issue contract."
+      },
+      {
+        "invocation": "test_resume_contract.py",
+        "reason": "Pre-#59 structural test of interrupted-run resume identity. The #30 registry row is carried by test_kaggle_fault_injection.py and test_kaggle_roster_resume.py."
+      },
+      {
+        "invocation": "test_studio_backend.py",
+        "reason": "Pre-#59 structural test of the local Studio engine primitives. It is a product-surface unit test with no issue contract of its own."
+      },
+      {
+        "invocation": "test_word_studio_transform_builder.py",
+        "reason": "Pre-#59 structural test of the transform-suite builder contract, which the kaggle-runtime gate also rebuilds and verifies end to end."
+      }
+    ]
+  },
+  "registryRules": [
+    "Every mandatoryContracts entry with a non-empty modules list must have all of its modules present on disk.",
+    "Every mandatoryContracts entry with a non-empty command must appear in the self-check named by its gate, so a landed contract cannot be left unexecuted while its file stays green.",
+    "A pending entry (empty modules, status pending) must not appear in the self-check; it becomes required the moment its modules are declared.",
+    "Every required contract module must be CPU-only: it must not import vLLM or torch.cuda, must not reach the network, and must not need an accelerator.",
+    "Every required contract must be invoked through an explicit interpreter (python3 or node) with no ambiguity about which file ran.",
+    "Every test module a gate executes must be a registered contract command in that gate or an exemption carrying a reason.",
+    "Issue numbers are documentation labels only. The gate is the machine-observable receipt, contract, and test, never the issue number."
+  ]
+}

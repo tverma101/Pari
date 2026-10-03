@@ -77,11 +77,13 @@ by themselves disqualify the preferred independent-replica strategy.
 
 ## Phase C — execute the frozen roster
 
-One command:
+Run the ordinary screening phases for every roster candidate. Product stages
+remain finalist-only and are dispatched separately after the finalist set is
+frozen and validated.
 
 ```bash
 python run-kaggle-roster.py \
-  --phase all \
+  --phase english \
   --probe-mtp-smoke \
   --benchmark-revision "$BENCHMARK_REVISION"
 ```
@@ -90,16 +92,29 @@ Before any candidate starts, the roster runner verifies the Phase A receipt,
 current Git revision, task counts and task-file hashes. It also requires the
 promotion-eligible T4 preflight.
 
-For each roster candidate, ordinary decode runs first:
+For each roster candidate, the screening run performs:
 
-1. 16-case unscored protocol smoke;
-2. 1,943-case English Core fixed screen;
-3. 100-case Word Studio cross-granularity transform suite;
-4. 112-case Word Studio strength/rewrite suite.
+1. the qualification ladder's 16-case unscored protocol smoke;
+2. the bounded benchmark smoke;
+3. the 1,943-case English Core fixed screen, if earlier gates pass.
 
 If a candidate fails a gate, its evidence remains on disk, later stages are
 skipped, and the next roster entry is attempted. The runner regenerates the
 candidate completeness matrix after each stage.
+
+After screening, freeze and validate `finalist-set.json` from the completed
+candidate matrix. Only then run the product stages for those finalists:
+
+```bash
+python run-kaggle-roster.py \
+  --phase product \
+  --benchmark-revision "$BENCHMARK_REVISION" \
+  --finalist-set /kaggle/working/results/finalist-set.json
+```
+
+That finalist-only phase runs the 100-case Word Studio cross-granularity
+transform suite and 112-case strength/rewrite suite. Non-finalists remain
+explicitly `not_run_non_finalist` for product stages.
 
 The protocol smoke is intentionally not an English-quality score. It covers
 forced-choice output, JSON candidate lists, Unicode, negation, conditions,
@@ -124,6 +139,14 @@ SHA-256:
 The dispatcher installs it with binary-only pip policy and verifies the runtime
 receipt plus installed version. A random Kaggle-preinstalled vLLM is not accepted
 as canonical evidence.
+
+The repository currently has a hash-bound 180-package candidate closure for
+CPython 3.11, but it is explicitly `candidate-not-locked` and
+`promotionEligible: false`. The Kaggle image's Python minor version is still
+unknown, so the serving dependency lock remains `pending-target-image-lock` and
+the installer must refuse vLLM qualification until the real target-image ABI is
+resolved and locked. Do not install from the candidate closure or fall back to
+floating pip resolution. The pinned Prism path remains available independently.
 
 ### Prism llama.cpp / Bonsai
 

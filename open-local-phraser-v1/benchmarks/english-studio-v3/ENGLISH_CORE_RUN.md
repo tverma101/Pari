@@ -92,6 +92,8 @@ python validate-english-core-run.py shadow-result.json --promotion
 
 Promotion validation rejects ambiguous adaptation, unknown model revision/quantization/checkpoint type, missing artifact/task hashes, incomplete decoding provenance, mixed prompt adaptation, and other reproducibility failures.
 
+Decoding and prompt adaptation are interpreted through one versioned runtime-neutral registry (`english_core_runtime_semantics.py`, documented in `ENGLISH_CORE_RUNTIME_SEMANTICS.md`). A run's native values are preserved exactly and compared only in their logical form, so vLLM `topK=-1` and llama.cpp `topK=0` both mean top-k disabled without either backend falsifying what it sent, and a registered chat-template implementation (`tokenizer.apply_chat_template` or the llama.cpp embedded template) satisfies the logical `chat_template` contract. Unknown sentinels and unknown adaptation strings fail closed. The validator report records the registry version, the normalized decoding view with raw values intact, and any schema bound it superseded.
+
 ---
 
 ## 3. Score the fresh shadow set
@@ -115,6 +117,16 @@ A general-purpose LLM judge is secondary evidence and cannot by itself fill the 
 ```bash
 node analyze-english-core-statistics.mjs shadow-score.json > shadow-stats.json
 ```
+
+The analyzer refuses to compute anything until the benchmark snapshot it is about to read is the exact snapshot the score was computed against. Before any statistic runs it hashes the config/weights, the private seed, the model-visible shadow task file, the shadow manifest, and the generative metric contract, and compares each hash to the `benchmarkInputs` block the scorer recorded. A mismatch, or a legacy score that names none of those hashes, is a hard failure — re-running under today's weights or seed would silently change the meaning of the result, so the analysis stops instead.
+
+Useful flags:
+
+- `--benchmark-dir <dir>` — the directory holding the snapshot the score names. Defaults to the analyzer's own directory, which is correct only when the score was produced from that same checkout.
+- `--source-score-manifest <file>` — a manifest of expected source score file hashes. Pass this when the score artifact must be provably unedited since scoring; an edited score is refused even if it is otherwise internally consistent.
+- `--score-view strict|recoverable_anchored` — analyze a specific issue #64 score view. Only views the score artifact actually declares are accepted, and substituting the primary `recoverable_anchored` view is recorded explicitly in the report rather than done silently.
+
+Every derived report carries a `provenance` block binding the source score file hash, the scorer and analyzer script hashes, the chosen score view, the bootstrap seed and iteration count, and the verified hash of every consumed benchmark input. A derived report can be re-checked or deliberately re-analyzed only against the same bytes it was derived from.
 
 Inspect both:
 
@@ -255,20 +267,130 @@ python score-english-core-public-fast.py public-fast-result.json > public-fast-s
 
 This is a balanced **common prompted screen**, not an official benchmark-native score. Source/dimension/phenomenon results matter more than the convenience overall accuracy.
 
+### Strict and recoverable forced-choice score views
+
+The prompted forced-choice lanes (public-fast, full-distribution classification, and the
+Pari shadow lane) report **two parallel frozen views** of the same preserved raw outputs,
+per item and per group:
+
+- **strict** (`strictAccuracyFixedDenominator`, `strictValidOutputCoverage`): the output
+  must be the bare allowed option label (`A`, `A.`, `A)`, `A:`, `A-`) inside the task's
+  frozen `allowedChoices`;
+- **recoverable anchored** (`recoverableAccuracyFixedDenominator`,
+  `recoverableValidOutputCoverage`): the already-declared answer wrappers
+  (`Answer: A`, `The answer is A`, `Option A`, `I choose A`) and an anchored label followed
+  by an explanation are tolerated, still subject to the same frozen allowed set.
+
+Both views come from one parse of the preserved raw output. The gold label is compared
+after parsing and is never used to select, accept, or repair a parse, so a correct
+recoverable answer can never move strict accuracy and a format-recovery gain is never
+reported as a model-generation gain.
+
+Fixed denominator policy `fixed-screening-denominator-v1`: every task instance in the
+lane is exactly one unit of the denominator. A protocol failure (invalid label, ambiguity,
+non-answer, truncated or missing output) is a zero for its view and stays separately
+labelled in the per-item `outcome` and the aggregate `outcomes` counts, so "allowed option
+selected incorrectly" (a linguistic/task miss) never collapses into "invalid protocol
+output". A runtime-unqualified or short run is excluded from the denominator entirely and
+reported under `runtimeQualification`, so infrastructure failure never becomes an English
+zero.
+
+The pre-#64 keys `accuracyInvalidAsWrong` and `validOutputCoverage` are kept for existing
+consumers and now carry `accuracyInvalidAsWrongScoreView` /
+`validOutputCoverageScoreView: "recoverable_anchored"` so they are no longer read as strict
+letter-only accuracy. Each score artifact also publishes a `scoreView` block
+(`strict-recoverable-choice-views-v1`) binding the contract version, denominator policy,
+allowed-label contract version, both metric keys, the selected/primary view, and the
+SHA-256 of the contract and parser bytes. `analyze-english-core-statistics.mjs` and
+`compare-english-core-models.mjs` read that block and refuse a comparison whose two sides
+name different views.
+
+Native/official benchmark lanes (for example SemanticQA LCC with its `answerProtocol:
+"label"` rows) keep their own official evaluator contract and are not routed through these
+letter-protocol views.
+
 ---
 
 ## 8. Run full-distribution prompted WiC / CoLA / PAWS
 
 This lane keeps the locally scoreable public validation distributions instead of the fast screen's balancing.
 
-For promotion-quality runs, pin the same immutable dataset revisions:
+This is a **finalist preparation lane**, separate from the balanced 1,943-case
+common screen. Its full-distribution rows are never added to that screen, and
+`prepare-kaggle-benchmark.py` does not build it.
+
+### 8.1 Source identity is frozen, not remembered
+
+`english_core_public_sources.py` owns one canonical Hub repository ID, config,
+and split per source, and both public lanes read that table, so the screen and
+this lane cannot name different repositories for the same source. In particular
+PAWS is `google-research-datasets/paws`, config `labeled_final`, split
+`validation`. The bare `paws` name is an HTTP 307 redirect to that repository,
+so it has no independent commit history and is never loaded.
+
+Every requested revision — including an omitted default, a branch, or a tag —
+is resolved **once** through `HfApi.dataset_info(repo_id, revision=ref).sha` to
+a full 40-hex commit, that commit is proved to live in the named repository, and
+the load then uses the commit rather than the moving ref. A source that moves
+after resolution cannot change an in-flight build. The manifest records
+`requestedRevision` and `resolvedRevision` separately, plus the `datasets`
+fingerprint and the data-prep environment identity.
+
+The frozen revisions live in a versioned file,
+`english-core-public-full-sources.json`, rather than in CLI memory:
+
+| Source | Hub repo | Config | Split | Frozen commit | Validation rows |
+| --- | --- | --- | --- | --- | --- |
+| WiC | `aps/super_glue` | `wic` | `validation` | `3de24cf8022e94f4ee4b9d55a6f539891524d646` | 638 |
+| CoLA | `nyu-mll/glue` | `cola` | `validation` | `bcdcba79d07bc864c1c254ccfcedcce55bcc9a8c` | 1043 |
+| PAWS | `google-research-datasets/paws` | `labeled_final` | `validation` | `161ece9501cf0a11f3e48bd356eaa82de46d6a09` | 8000 |
+
+The WiC, CoLA, and PAWS commits are the same ones the common screen already
+uses, so a pinned public-fast run and a pinned finalist run read the same bytes.
+
+### 8.2 Prepare the lane and freeze its receipt
+
+Run preparation in the locked data-preparation environment (#52). It builds the
+lane with `--promotion --lock-sources-to-config`, hashes the task, answer, and
+manifest files, freezes the ordered task-ID digest, binds the checkout through
+the runner's git identity contract (#40), and writes a receipt:
+
+```bash
+python prepare-english-core-public-full.py \
+  --benchmark-revision BENCHMARK_GIT_COMMIT
+```
+
+Verify an existing receipt without rebuilding:
+
+```bash
+python prepare-english-core-public-full.py --verify-only \
+  --receipt english-core-public-full-classification.preparation.json \
+  --benchmark-revision BENCHMARK_GIT_COMMIT
+```
+
+The receipt refuses to be promotion-eligible when the locked data-prep hash
+lock cannot be verified for the current profile or the benchmark tree is not
+clean. Off the qualified Kaggle profile, `--allow-unlocked-environment` and
+`--allow-dirty-tree` produce a working receipt that is explicitly **not**
+promotion evidence.
+
+For a promotion build with explicit commits:
 
 ```bash
 python build-english-core-public-full-classification.py \
   --super-glue-revision SUPER_GLUE_DATASET_COMMIT \
   --glue-revision GLUE_DATASET_COMMIT \
-  --paws-revision PAWS_DATASET_COMMIT
+  --paws-revision PAWS_DATASET_COMMIT \
+  --promotion
 ```
+
+`--promotion` fails closed **before loading anything** if a revision is omitted,
+is a moving ref, is non-canonical, does not resolve to a full commit, or belongs
+to another repository. Omitting `--promotion` still builds, but the manifest is
+marked `promotionEligible: false` and names its own reasons; a matching
+task-file hash alone never upgrades it.
+
+### 8.3 Run and score
 
 Run and score:
 
@@ -284,6 +406,16 @@ python run-english-core-mlx.py /path/to/model public-full-result.json \
 
 python score-english-core-public-full-classification.py public-full-result.json > public-full-score.json
 ```
+
+For finalist evidence, score with `--promotion` so a mutable or ambiguous
+source manifest is refused:
+
+```bash
+python score-english-core-public-full-classification.py public-full-result.json \
+  --promotion > public-full-score.json
+```
+
+The exact gate the scorer must apply is specified in `SCORER_SOURCE_GATE.md`.
 
 Report:
 
@@ -414,7 +546,9 @@ node compare-english-core-models.mjs \
   > A-vs-B.json
 ```
 
-The comparator reports per-dimension and composite paired bootstrap differences. If the paired interval includes zero, the result is **inconclusive**. It will not manufacture a headline comparison from a partial intersection.
+The comparator binds both source score files to the benchmark snapshot before it pairs anything, and accepts the same `--benchmark-dir`, `--source-score-manifest`, and `--score-view` flags as the analyzer. A headline comparison also requires both models to declare the *same* score view: pairing a strict-view score against a `recoverable_anchored`-view score is refused, because the difference would partly measure protocol strictness rather than model quality.
+
+The comparator reports per-dimension and composite paired bootstrap differences. If the paired interval includes zero, the result is **inconclusive**. It will not manufacture a headline comparison from a partial intersection. The report's `provenance` block records both score file hashes, the scorer and comparator hashes, the shared score view, the bootstrap seed/iterations, and the consumed benchmark input hashes.
 
 ---
 

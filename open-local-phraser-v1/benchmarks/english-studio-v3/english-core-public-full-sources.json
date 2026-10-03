@@ -1,0 +1,67 @@
+{
+  "schema": "pari.english-core.public-full-source-manifest",
+  "sourceContractVersion": 1,
+  "issue": "67",
+  "purpose": "Frozen canonical Hub identities and immutable commits for the full-distribution prompted WiC/CoLA/PAWS finalist lane. This is a separate lane from the balanced 1,943-case common screen; none of these rows may be added to that screen.",
+  "lane": "public-full-classification",
+  "dataPrepEnvironment": {
+    "lockDirectory": "locks",
+    "profiles": ["cp310-linux-x86_64", "cp311-linux-x86_64"],
+    "source": "locks/kaggle-data-prep.in",
+    "requiredDatasetsVersion": "5.0.1",
+    "note": "The finalist lane must be prepared in the same locked binary-only data environment as the common screen, so task/answer regeneration is byte-identical across preparations."
+  },
+  "resolution": {
+    "policy": "Each requested ref is resolved exactly once through HfApi.dataset_info(repo_id, revision=ref).sha to a full 40-hex commit, and the commit is proved to live in that repository before any load. All load_dataset calls use the resolved commit, never the requested ref.",
+    "grounding": {
+      "loadDatasetRevisionParameter": "https://huggingface.co/docs/datasets/package_reference/loading_methods",
+      "datasetInfoSha": "https://huggingface.co/docs/huggingface_hub/package_reference/hf_api",
+      "rowCounts": "https://datasets-server.huggingface.co/size?dataset=<repo>"
+    }
+  },
+  "sources": {
+    "WiC": {
+      "dataset": "aps/super_glue",
+      "config": "wic",
+      "split": "validation",
+      "resolvedRevision": "3de24cf8022e94f4ee4b9d55a6f539891524d646",
+      "expectedValidationRows": 638,
+      "headlineMetric": "accuracy",
+      "sharedWithCommonScreen": true,
+      "reference": "https://aclanthology.org/N19-1128/"
+    },
+    "CoLA": {
+      "dataset": "nyu-mll/glue",
+      "config": "cola",
+      "split": "validation",
+      "resolvedRevision": "bcdcba79d07bc864c1c254ccfcedcce55bcc9a8c",
+      "expectedValidationRows": 1043,
+      "headlineMetric": "Matthews correlation coefficient",
+      "sharedWithCommonScreen": true,
+      "reference": "https://aclanthology.org/Q19-1040/"
+    },
+    "PAWS": {
+      "dataset": "google-research-datasets/paws",
+      "config": "labeled_final",
+      "split": "validation",
+      "resolvedRevision": "161ece9501cf0a11f3e48bd356eaa82de46d6a09",
+      "expectedValidationRows": 8000,
+      "headlineMetric": "accuracy",
+      "sharedWithCommonScreen": true,
+      "canonicalIdentity": "google-research-datasets/paws is the canonical Hub ID; the bare name `paws` answers HTTP 307 to it and has no independent commit history, so it is never loaded.",
+      "reference": "https://aclanthology.org/N19-1131/"
+    }
+  },
+  "expectedTotalCases": 9681,
+  "commonScreenBoundary": {
+    "lane": "public-fast",
+    "screenArtifact": "english-core-fixed-screen.jsonl",
+    "screenCases": 1943,
+    "rule": "The full-distribution lane is prepared and receipted separately. prepare-kaggle-benchmark.py does not build this lane, and these rows must never be merged into the 1,943-case common screen."
+  },
+  "retiredAliases": {
+    "paws": "google-research-datasets/paws"
+  },
+  "protocolOverrides": {},
+  "protocolOverridesPolicy": "A reviewed non-canonical repository may only be used when an entry names the source, the exact non-canonical dataset ID, and a reviewedIn reference (issue or PR). An override never allows a retired alias, and never allows a non-full or wrong-repository commit."
+}

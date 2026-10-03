@@ -1,0 +1,11 @@
+{
+  "laneId": "native-blimp-parity-1",
+  "modelArtifactSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "leftReceipt": "/kaggle/working/results/native-blimp/bonsai-8b-q1_0-vllm/native-blimp-receipt.json",
+  "rightReceipt": "/kaggle/working/results/native-blimp/bonsai-8b-q1_0-full/native-blimp-receipt.json",
+  "leftBackend": "vllm",
+  "rightBackend": "gguf",
+  "loglikelihoodTolerance": 0.05,
+  "decisionTolerance": 0.0,
+  "subtaskAccuracyTolerance": 0.02
+}

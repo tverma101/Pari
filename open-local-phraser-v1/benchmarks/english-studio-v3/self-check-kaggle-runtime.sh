@@ -12,8 +12,16 @@ for path in sorted(Path('studio_backend').glob('*.py')):
 PY
 
 python3 test_kaggle_edge_cases.py
+python3 test_kaggle_runtime_dependency_lock.py
+python3 test_kaggle_prism_runtime_selection.py
+python3 test_kaggle_server_identity.py
+python3 test_kaggle_gpu_resource_gate.py
+python3 test_kaggle_candidate_resource_gate.py
+python3 test_kaggle_q1_gate.py     # #49 Q1 load/placement receipt and the exclusive GPU lease
+python3 test_word_studio_usable_contract.py
 python3 test_protocol_output_diagnostics.py
 python3 test_resume_contract.py
+python3 test_kaggle_context_budget.py
 python3 test_studio_backend.py
 
 TMP_DIR="$(mktemp -d)"

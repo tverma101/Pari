@@ -30,6 +30,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_TASKS = HERE / "english-core-shadow.jsonl"
+RESULT_SCHEMA = HERE / "english-core-result-schema.json"
+RESULT_SCHEMA_VERSION = 1
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
@@ -200,10 +202,12 @@ def main() -> None:
         })
         print(f"[{i:04d}/{len(tasks):04d}] {task['id']} {latency:.2f}s  {text[:100]}", flush=True)
 
-    outputs_bytes = json.dumps(outputs, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    outputs_bytes = json.dumps(outputs, ensure_ascii=False, sort_keys=True, allow_nan=False).encode("utf-8")
+    schema_sha256 = sha256_bytes(RESULT_SCHEMA.read_bytes())
     chat_template = getattr(tokenizer, "chat_template", None)
     tokenizer_name = getattr(tokenizer, "name_or_path", None) or getattr(tokenizer, "name", None) or "unknown"
     result = {
+        "schemaVersion": RESULT_SCHEMA_VERSION,
         "runId": f"english-core-{int(time.time())}",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "model": {
@@ -247,6 +251,8 @@ def main() -> None:
         "reproducibility": {
             "benchmarkRevision": args.benchmark_revision,
             "rawOutputSha256": sha256_bytes(outputs_bytes),
+            "resultSchemaVersion": RESULT_SCHEMA_VERSION,
+            "resultSchemaSha256": schema_sha256,
             "notes": [
                 "artifactSha256 is caller-supplied because hashing an arbitrary model directory safely/portably is outside this runner; promotion validation requires an exact artifact/build identity.",
                 "Checkpoint type, revision, artifact hash and quantization are caller-supplied metadata and must match the evaluated artifact.",
@@ -257,7 +263,7 @@ def main() -> None:
         },
     }
 
-    Path(args.result_file).write_text(json.dumps(result, indent=2) + "\n")
+    Path(args.result_file).write_text(json.dumps(result, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     print(f"done -> {args.result_file}")
 
 

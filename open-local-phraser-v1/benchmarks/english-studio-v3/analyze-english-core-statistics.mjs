@@ -1,21 +1,106 @@
 #!/usr/bin/env node
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  buildProvenance,
+  reconcileScoreStructure,
+  selectScoreView,
+} from "./english-core-snapshot-binding.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const scorePath = process.argv[2];
-const iterations = Number(process.argv[3] ?? 10000);
+
+const USAGE = [
+  "Usage: node analyze-english-core-statistics.mjs <score.json> [bootstrap_iterations]",
+  "         [--benchmark-dir <dir>] [--source-score-manifest <file>] [--score-view <name>]",
+  "",
+  "  --benchmark-dir         Directory holding the exact benchmark snapshot named by the",
+  "                          source score artifact. Defaults to this script's own directory.",
+  "                          Every consumed file is hashed and compared with the score's",
+  "                          benchmarkInputs before any statistic is computed (issue #65).",
+  "  --source-score-manifest Optional frozen manifest of expected source score file hashes;",
+  "                          use it to prove a score artifact was not edited after recording.",
+  "  --score-view            Explicit strict|recoverable score view to analyze. Only valid when",
+  "                          the source score artifact declares that view (issue #64).",
+].join("\n");
+
+function parseCli(argv) {
+  const positional = [];
+  const options = { benchmarkDir: null, sourceScoreManifest: null, scoreView: null };
+  const optionNames = {
+    "--benchmark-dir": "benchmarkDir",
+    "--source-score-manifest": "sourceScoreManifest",
+    "--score-view": "scoreView",
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const token = argv[index];
+    if (Object.prototype.hasOwnProperty.call(optionNames, token)) {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) throw new Error(`${token} requires a path argument`);
+      options[optionNames[token]] = value;
+      index += 1;
+      continue;
+    }
+    if (token.startsWith("--")) throw new Error(`Unknown option: ${token}`);
+    positional.push(token);
+  }
+  return { positional, options };
+}
+
+const { positional, options } = parseCli(process.argv.slice(2));
+const scorePath = positional[0];
+const iterations = Number(positional[1] ?? 10000);
+const benchmarkDir = path.resolve(options.benchmarkDir ?? here);
 if (!scorePath) {
-  console.error("Usage: node analyze-english-core-statistics.mjs <score.json> [bootstrap_iterations]");
+  console.error(USAGE);
   process.exit(2);
 }
 if (!Number.isInteger(iterations) || iterations < 1000) throw new Error("bootstrap_iterations must be an integer >= 1000");
 
-const score = JSON.parse(fs.readFileSync(scorePath, "utf8"));
-const config = JSON.parse(fs.readFileSync(path.join(here, "english-core-config.json"), "utf8"));
-const seed = JSON.parse(fs.readFileSync(path.join(here, "english-core-shadow.seed.json"), "utf8"));
+const sourceScoreBytes = fs.readFileSync(scorePath);
+const sourceScoreFileSha256 = crypto.createHash("sha256").update(sourceScoreBytes).digest("hex");
+const score = JSON.parse(sourceScoreBytes.toString("utf8"));
+if (score.schemaVersion !== 1 || score.artifactType !== "pari.english-core.shadow-score") {
+  throw new Error("Input is not a supported versioned English Core shadow-score artifact");
+}
+const inputResultSchema = score.inputResultSchema;
+if (inputResultSchema?.resultSchemaVersion !== 1 || !/^[0-9a-f]{64}$/.test(inputResultSchema?.schemaSha256 ?? "")) {
+  throw new Error("Score report lacks current English Core result-schema validation provenance");
+}
+if (!Number.isInteger(score.version)) {
+  throw new Error(`Score report carries no integer scorer version (got ${JSON.stringify(score.version)})`);
+}
+
+const provenance = buildProvenance({
+  label: "Source score",
+  scorePath,
+  sourceScoreFileSha256,
+  score,
+  benchmarkDir,
+  analysisScriptName: "analyze-english-core-statistics.mjs",
+  analysisScriptDir: here,
+  scorerName: "score-english-core.mjs",
+  sourceScoreManifest: options.sourceScoreManifest,
+  bootstrapSeed: "0x45c0a11d",
+  iterations,
+});
+
+const config = provenance.snapshot.config;
+const seed = provenance.snapshot.seed;
+const structure = reconcileScoreStructure({
+  score,
+  snapshot: provenance.snapshot,
+  config,
+  label: "Source score",
+  requirePromotionReady: false,
+});
+const scoreView = selectScoreView({
+  scoreView: provenance.scoreView,
+  requested: options.scoreView,
+  label: "Source score",
+});
 const metadata = new Map(seed.cases.map((x) => [x.id, x]));
 const seedCountByDimension = Object.fromEntries(
   Object.keys(config.composite.weights).map((dimension) => [
@@ -98,9 +183,12 @@ const byDimension = Object.fromEntries(dimensions.map((d) => [d, scored.filter((
 const dimensionReport = {};
 for (const dimension of dimensions) {
   const rows = byDimension[dimension];
-  const declared = score.dimensionScores?.[dimension] ?? {};
-  const expectedCases = Number(declared.cases ?? seedCountByDimension[dimension] ?? 0);
-  const complete = declared.complete === true && rows.length === expectedCases && expectedCases > 0;
+  // ReconcileScoreStructure already proved declared.cases === observed rows ===
+  // bound-seed rows, so the denominator is the bound snapshot's, not a
+  // per-dimension fallback chosen at analysis time.
+  const expectedCases = structure.seedCountByDimension[dimension];
+  const complete = rows.length === expectedCases && expectedCases > 0
+    && score.dimensionScores?.[dimension]?.complete === true;
   const boot = [];
   if (complete) {
     for (let b = 0; b < iterations; b += 1) boot.push(mean(sampleWithReplacement(rows).map((x) => x.score)) * 100);
@@ -127,7 +215,8 @@ for (const dimension of dimensions) {
   };
 }
 
-const allDimensionsComplete = score.complete === true && dimensions.every((d) => dimensionReport[d].complete);
+const allDimensionsComplete = structure.reconciledComplete
+  && dimensions.every((d) => dimensionReport[d].complete);
 const weightedBoot = [];
 const equalBoot = [];
 if (allDimensionsComplete) {
@@ -141,6 +230,17 @@ if (allDimensionsComplete) {
 
 const report = {
   version: 5,
+  schemaVersion: 1,
+  artifactType: "pari.english-core.uncertainty-report",
+  inputResultSchema,
+  provenance,
+  scoreView,
+  structureReconciliation: {
+    reconciledComplete: structure.reconciledComplete,
+    dimensionsComplete: structure.dimensionsComplete,
+    detailComplete: structure.detailComplete,
+    note: "Score detail rows, per-dimension counts and the bound seed snapshot were reconciled independently before any resampling; declared complete/cases fields are treated as claims, not truth.",
+  },
   runId: score.runId ?? null,
   model: score.model ?? null,
   benchmarkInputs: score.benchmarkInputs ?? null,
@@ -161,7 +261,7 @@ const report = {
     "No universal minimum number of phenomenon groups is asserted. Small group counts should be shown directly and interpreted cautiously rather than converted into an invented adequacy threshold.",
     "Neither uncertainty lane implies that the handcrafted shadow set is an i.i.d. sample from a universal distribution of English.",
     "A dimension must be fully scored before uncertainty is reported; missing generative judgments are not silently ignored.",
-    "Expected per-dimension case counts come from the scored report when present, otherwise from the current seed's true per-dimension counts; the full seed size is never used as a dimension fallback.",
+    "Expected per-dimension case counts come from the bound benchmark snapshot after it matched the source score artifact's benchmarkInputs hashes; the full seed size is never used as a dimension fallback.",
     "Composite uncertainty is reported only when the score report itself is complete and all seven dimensions have full item coverage.",
     "Very wide or materially different item-vs-hierarchical intervals are evidence against fine-grained winner claims.",
     "Per-phenomenon descriptive values remain visible and exploratory because many phenomena contain very few items.",

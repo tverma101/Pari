@@ -1,0 +1,144 @@
+{
+  "manifestVersion": 2,
+  "issue": "48/49",
+  "description": "Canonical frozen stage/task identity register and qualification ladder. Single source of truth: kaggle_stage_identity.py loads this file and every wrapper/validator resolves its task identity through it, so no script restates these constants.",
+  "qualificationLadder": [
+    {
+      "gate": "q0",
+      "receiptKey": "q0-preflight",
+      "stage": null,
+      "requires": [],
+      "meaning": "environment preflight: topology, VRAM, runtime availability"
+    },
+    {
+      "gate": "q1",
+      "receiptKey": "q1-load",
+      "stage": null,
+      "requires": ["q0"],
+      "meaning": "exact model/tokenizer/runtime load, GPU placement, no silent CPU fallback, one trivial generation, runtime still alive"
+    },
+    {
+      "gate": "q2",
+      "receiptKey": "q2-protocol",
+      "stage": "smoke",
+      "requires": ["q1"],
+      "meaning": "dedicated frozen response-protocol smoke over kaggle-protocol-smoke.jsonl"
+    },
+    {
+      "gate": "q3",
+      "receiptKey": "q3-benchmark-smoke",
+      "stage": "benchmark-smoke",
+      "requires": ["q2"],
+      "meaning": "bounded frozen English benchmark smoke: a registered frozen prefix subset of the canonical full screen"
+    },
+    {
+      "gate": "q4",
+      "receiptKey": "q4-full",
+      "stage": "full",
+      "requires": ["q3"],
+      "meaning": "complete 1943-case English Core screen; promotion-quality English evidence"
+    },
+    {
+      "gate": "q5",
+      "receiptKey": "q5-product",
+      "stage": "word-studio",
+      "requires": ["q4"],
+      "meaning": "finalist product/runtime qualification, strength suite"
+    },
+    {
+      "gate": "q6",
+      "receiptKey": "q6-transform",
+      "stage": "transform",
+      "requires": ["q4"],
+      "meaning": "finalist product/runtime qualification, transform suite"
+    }
+  ],
+  "stages": {
+    "smoke": {
+      "gate": "q2",
+      "path": "kaggle-protocol-smoke.jsonl",
+      "expectedCount": 16,
+      "artifactSha256": "f5c6f3833b7a22241e986c722ea26962b786c7991f5fd12463464fe54b75ca4e",
+      "orderedTaskIdsSha256": "0327d854e128a6ee9e4ceda966b977c32d1b4edac9c77c88e9cd22574fe283fe",
+      "subsetRule": "frozen standalone protocol-smoke artifact; explicitly NOT derived from --limit over the full screen",
+      "parserContract": "protocol-diagnostics-v1",
+      "batchPolicy": "generation-ladder",
+      "comparable": true,
+      "note": "This is the already-wired Q2 protocol smoke. Routing is preserved, not rebuilt."
+    },
+    "benchmark-smoke": {
+      "gate": "q3",
+      "path": "english-core-fixed-screen.jsonl",
+      "expectedCount": 1943,
+      "artifactSha256": null,
+      "orderedTaskIdsSha256": null,
+      "identitySource": "prepared-register",
+      "artifactGeneratedByPreparation": true,
+      "subsetRule": "registered frozen prefix of the canonical full screen; subsetPrefixCount is part of the frozen identity, so `--limit N` is NOT the definition",
+      "subsetOf": "full",
+      "subsetPrefixCount": 64,
+      "parserContract": "english-core-promotion-v1",
+      "batchPolicy": "generation-ladder",
+      "comparable": true,
+      "preparedIdentityKeys": [
+        "artifactSha256",
+        "taskCount",
+        "orderedTaskIdsSha256",
+        "subsetPrefixCount",
+        "subsetOrderedTaskIdsSha256"
+      ],
+      "note": "Q3 is bounded English evidence and pipeline qualification, not the complete comparison."
+    },
+    "full": {
+      "gate": "q4",
+      "path": "english-core-fixed-screen.jsonl",
+      "expectedCount": 1943,
+      "artifactSha256": null,
+      "orderedTaskIdsSha256": null,
+      "identitySource": "prepared-register",
+      "artifactGeneratedByPreparation": true,
+      "subsetRule": null,
+      "parserContract": "english-core-promotion-v1",
+      "batchPolicy": "generation-ladder",
+      "comparable": true,
+      "preparedIdentityKeys": [
+        "artifactSha256",
+        "taskCount",
+        "orderedTaskIdsSha256"
+      ],
+      "note": "Promotion-quality. Requires the complete canonical bytes/count/ordered-ID set: no filtering, dropping, or reordering."
+    },
+    "word-studio": {
+      "gate": "q5",
+      "path": "word-studio-strength.jsonl",
+      "expectedCount": 112,
+      "artifactSha256": "950b06c8aa4ee332e35b3d2e04fc479dc83c878c61012c4e5b6af686d7b16d1d",
+      "orderedTaskIdsSha256": "f72a8083d92ca45a0b7b59516945b305a29c39c39bd47b8bdc85b2673d36bb2b",
+      "subsetRule": null,
+      "parserContract": "word-studio-v1",
+      "batchPolicy": "single-batch",
+      "comparable": true,
+      "generatedBy": "build-word-studio-strength-suite.py --synthetic-seed word-studio-synthetic.seed.json",
+      "note": "Frozen from a deterministic rebuild of the tracked synthetic seed. The private review key stays out of the tree."
+    },
+    "transform": {
+      "gate": "q6",
+      "path": "word-studio-transform.jsonl",
+      "expectedCount": 100,
+      "artifactSha256": "42cae7153041288eea05c0da056078383b1652a9c53022af1491e5d8a2f90a72",
+      "orderedTaskIdsSha256": "1bda945650ca72fb0c40d617fc6e5565879423f2e0f0770cf0c5fab73b5b225a",
+      "subsetRule": null,
+      "parserContract": "word-studio-v1",
+      "batchPolicy": "single-batch",
+      "comparable": true,
+      "generatedBy": "build-word-studio-transform-suite.py --seed interactive.seed.json",
+      "note": "Frozen from a deterministic rebuild of the tracked interactive seed. The private review key stays out of the tree."
+    }
+  },
+  "hashPolicy": "artifactSha256 and orderedTaskIdsSha256 are frozen in this register once the artifact is present in the tree. A stage whose hashes are null here is a generated artifact: its identity is frozen instead by prepare-kaggle-benchmark.py into the prepared stage register carried in the preparation receipt, and stage resolution for that stage accepts ONLY a prepared register bound to this file's own SHA-256. A null value with no matching prepared register fails closed rather than accepting unknown bytes.",
+  "preparedRegisterPolicy": "prepare-kaggle-benchmark.py freezes the generated stages after deterministic preparation and records artifact SHA-256, task count, ordered task-ID SHA-256, and the registered Q3 prefix ordered-ID SHA-256 in receipt.preparedStageRegister. The block is bound to stageManifestSha256 (this file) and benchmarkRevision. A frozen screen is model-visible only: no gold answer is read, hashed, or emitted by preparation or by stage resolution.",
+  "unresolvedStages": {
+    "benchmark-smoke": "english-core-fixed-screen.jsonl is generated during preparation and is not committed. Its frozen identity lives in receipt.preparedStageRegister.stages['benchmark-smoke'], written by prepare-kaggle-benchmark.py after the deterministic build; until preparation has run and that register is present, this stage fails closed.",
+    "full": "Same as benchmark-smoke: the 1,943-case canonical screen is generated during preparation, so its frozen identity lives in receipt.preparedStageRegister.stages['full'] rather than in this checked-in file."
+  }
+}

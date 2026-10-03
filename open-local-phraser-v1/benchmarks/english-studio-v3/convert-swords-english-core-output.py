@@ -14,6 +14,14 @@ prompt manifest, for example:
 Prefer the official repository's documented Docker/CLI environment for numbers
 that will be compared to published SWORDS results. This converter never replaces
 the official evaluator.
+
+Issue #66: the candidate parser below is score-affecting Pari code, not official
+SWORDS code. It is therefore frozen as an explicit, versioned conversion protocol
+(`pari-swords-candidate-parser` v1, registered in
+english_core_converter_provenance.py) and the manifest binds the protocol contract
+hash, this script's SHA-256, the full conversion config, and the Pari benchmark
+commit/tree that defined the policy. Per-result conversion diagnostics are emitted
+so a parser change is auditable rather than silent.
 """
 
 from __future__ import annotations
@@ -23,9 +31,25 @@ import gzip
 import hashlib
 import json
 import re
+import sys
+from collections import Counter
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from english_core_converter_provenance import (  # noqa: E402
+    SWORDS_PROTOCOL_ID,
+    build_converter_provenance,
+    registered_protocol,
+)
+
 GIT_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+PROTOCOL_VERSION = 1
+
+#: Markers whose presence/absence is scored, so the contract stays auditable.
+LIST_PREFIX_RE = re.compile(r"^\s*(?:[-*•]+|\d+[.)]|[A-Za-z][.)])\s*")
+QUOTE_CHARS = "`\"' "
+META_PREFIXES = ("here are", "substitutes:", "alternatives:", "the best")
 
 
 def read_json(path: Path) -> dict:
@@ -43,29 +67,72 @@ def immutable_git_revision(value: object) -> bool:
     return bool(GIT_COMMIT_RE.fullmatch(str(value or "").strip()))
 
 
-def parse_candidates(text: str) -> list[str]:
+def parse_candidates_with_diagnostics(text: str) -> tuple[list[str], dict]:
+    """Frozen `pari-swords-candidate-parser` v1 plus the audit trail it applied.
+
+    Returns the retained candidates in model order together with per-call counters
+    for the issue's required diagnostics: raw line count, empty lines dropped,
+    quote/bullet stripping changes, filtered meta-prose lines with reasons,
+    casefold-duplicate drops, and the resulting retained list.
+    """
     candidates: list[str] = []
     seen: set[str] = set()
+    raw_lines: list[str] = []
+    empty_lines = 0
+    list_prefix_stripped = 0
+    quote_strip_changed = 0
+    empty_after_strip = 0
+    filtered_meta: Counter = Counter()
+    deduplicated = 0
+
     for raw in str(text or "").splitlines():
+        raw_lines.append(raw)
         line = raw.strip()
         if not line:
+            empty_lines += 1
             continue
-        line = re.sub(r"^\s*(?:[-*•]+|\d+[.)]|[A-Za-z][.)])\s*", "", line).strip()
-        line = line.strip("`\"' ")
+        stripped = LIST_PREFIX_RE.sub("", line).strip()
+        if stripped != line:
+            list_prefix_stripped += 1
+        line = stripped
+        unquoted = line.strip(QUOTE_CHARS)
+        if unquoted != line:
+            quote_strip_changed += 1
+        line = unquoted
         if not line:
+            empty_after_strip += 1
             continue
         # Reject obvious meta prose rather than turning an explanation into a substitute.
         lower = line.lower()
-        if lower.startswith(("here are", "substitutes:", "alternatives:", "the best")):
+        meta_hit = next((prefix for prefix in META_PREFIXES if lower.startswith(prefix)), None)
+        if meta_hit is not None:
+            filtered_meta[meta_hit] += 1
             continue
         key = line.casefold()
         if key in seen:
+            deduplicated += 1
             continue
         seen.add(key)
         candidates.append(line)
-    return candidates
+
+    diagnostics = {
+        "rawCandidateLines": raw_lines,
+        "rawLineCount": len(raw_lines),
+        "emptyLinesDropped": empty_lines,
+        "listPrefixStripped": list_prefix_stripped,
+        "quoteOrBulletStripChangedText": quote_strip_changed,
+        "emptyAfterStripping": empty_after_strip,
+        "filteredMetaReasons": dict(sorted(filtered_meta.items())),
+        "filteredMetaCount": int(sum(filtered_meta.values())),
+        "normalizedDeduplicatedCount": deduplicated,
+        "retainedCandidates": list(candidates),
+    }
+    return candidates, diagnostics
 
 
+def parse_candidates(text: str) -> list[str]:
+    """Frozen `pari-swords-candidate-parser` v1 (candidates only, model order)."""
+    return parse_candidates_with_diagnostics(text)[0]
 def infer_prompt_manifest(run: dict) -> Path | None:
     task_file = run.get("taskFile")
     if not task_file:
@@ -84,6 +151,7 @@ def main() -> None:
     ap.add_argument("--lemmatized", action="store_true", help="Set only if model outputs lemmas rather than context-fitting wordforms")
     ap.add_argument("--max-candidates", type=int, default=40)
     ap.add_argument("--require-promotion-provenance", action="store_true", help="Fail unless benchmark/prompt/run/evaluator provenance is fully cross-checked and every target has a run output record")
+    ap.add_argument("--per-target-diagnostics", type=Path, default=None, help="Optional path for the full per-target conversion audit (raw lines, retained order, filter reasons, truncation)")
     args = ap.parse_args()
 
     if args.max_candidates < 1:
@@ -155,18 +223,47 @@ def main() -> None:
 
     converted: dict[str, list[list[object]]] = {}
     empty = []
+    truncated = []
+    per_target: dict[str, dict] = {}
     for target_id in targets:
         if target_id not in outputs:
             converted[target_id] = []
+            per_target[target_id] = {
+                "rawCandidateLines": [],
+                "retainedCandidates": [],
+                "retainedOrder": [],
+                "missingOutput": True,
+                "filteredMetaReasons": {},
+                "normalizedDeduplicatedCount": 0,
+                "truncatedAtMaxCandidates": False,
+                "truncationDropped": 0,
+                "quoteOrBulletStripChangedText": 0,
+            }
             continue
-        candidates = parse_candidates(outputs[target_id])[: args.max_candidates]
+        parsed, diagnostics = parse_candidates_with_diagnostics(outputs[target_id])
+        dropped_by_truncation = max(0, len(parsed) - args.max_candidates)
+        candidates = parsed[: args.max_candidates]
         if not candidates:
             empty.append(target_id)
+        if dropped_by_truncation:
+            truncated.append(target_id)
         n = len(candidates)
         # The official SWORDS format accepts ranked candidate/score pairs. Scores
         # encode only the model's rank order; candidate quality is determined by
         # the official SWORDS evaluator after its documented preprocessing.
         converted[target_id] = [[candidate, float(n - i)] for i, candidate in enumerate(candidates)]
+        per_target[target_id] = {
+            "rawCandidateLines": diagnostics["rawCandidateLines"],
+            "retainedCandidates": diagnostics["retainedCandidates"],
+            "retainedOrder": list(candidates),
+            "missingOutput": False,
+            "filteredMetaReasons": diagnostics["filteredMetaReasons"],
+            "filteredMetaCount": diagnostics["filteredMetaCount"],
+            "normalizedDeduplicatedCount": diagnostics["normalizedDeduplicatedCount"],
+            "truncatedAtMaxCandidates": bool(dropped_by_truncation),
+            "truncationDropped": dropped_by_truncation,
+            "quoteOrBulletStripChangedText": diagnostics["quoteOrBulletStripChangedText"],
+        }
 
     result = {
         "substitutes_lemmatized": bool(args.lemmatized),
@@ -175,9 +272,52 @@ def main() -> None:
     out_path = Path(args.out_lsr_json).resolve()
     out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
 
+    coverage = {
+        "targets": len(targets),
+        "convertedTargets": len(targets) - len(missing),
+        "missingOutputs": len(missing),
+        "extraOutputs": len(extra),
+        "emptyCandidateOutputs": len(empty),
+        "truncatedTargets": len(truncated),
+        "retainedCandidateTotal": sum(len(v["retainedOrder"]) for v in per_target.values()),
+    }
+    conversion_config = {
+        "maxCandidates": int(args.max_candidates),
+        "substitutesLemmatized": bool(args.lemmatized),
+    }
+    converter_provenance = build_converter_provenance(
+        benchmark="swords",
+        protocol_id=SWORDS_PROTOCOL_ID,
+        protocol_version=PROTOCOL_VERSION,
+        converter_path=Path(__file__),
+        conversion_config=conversion_config,
+    )
+    if not converter_provenance["benchmarkGit"]["available"]:
+        provenance_errors.append("benchmark_git_identity_unavailable")
+
+    if args.per_target_diagnostics is not None:
+        diag_path = Path(args.per_target_diagnostics)
+        diag_path.parent.mkdir(parents=True, exist_ok=True)
+        diag_path.write_text(
+            json.dumps(
+                {
+                    "version": 1,
+                    "benchmark": "SWORDS conversion diagnostics",
+                    "converterIdentity": converter_provenance["identity"],
+                    "maxCandidates": int(args.max_candidates),
+                    "substitutesLemmatized": bool(args.lemmatized),
+                    "targets": per_target,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
     conversion_manifest = out_path.with_suffix(out_path.suffix + ".manifest.json")
     conversion_manifest.write_text(json.dumps({
-        "version": 4,
+        "version": 5,
         "benchmarkFile": str(benchmark_path),
         "benchmarkSha256": benchmark_hash,
         "officialDatasetId": dataset_id,
@@ -190,12 +330,18 @@ def main() -> None:
         "officialSwordsRepositoryRevision": prompt_manifest.get("officialRepositoryRevision") if prompt_manifest else None,
         "outLsrFile": str(out_path),
         "outLsrSha256": sha256(out_path),
+        "coverage": coverage,
         "targets": len(targets),
         "missingOutputs": len(missing),
         "extraOutputs": len(extra),
         "emptyCandidateOutputs": len(empty),
+        "truncatedTargets": len(truncated),
         "maxCandidates": args.max_candidates,
         "substitutesLemmatized": bool(args.lemmatized),
+        "conversionStatus": "completed" if not provenance_errors else "completed_with_provenance_errors",
+        "terminalStatus": "completed",
+        "converterProvenance": converter_provenance,
+        "conversionContract": registered_protocol("swords", SWORDS_PROTOCOL_ID, PROTOCOL_VERSION)["contract"],
         "promotionProvenanceErrors": provenance_errors,
         "promotionProvenanceReady": not provenance_errors,
         "officialEvaluatorRequired": True,
@@ -204,18 +350,23 @@ def main() -> None:
         "notes": [
             "Missing run records and genuinely empty model candidate lists are distinct: missing records are a provenance/completeness error, while an empty candidate list is a model behavior that the official evaluator may score poorly.",
             "Pari rank scores preserve model ordering only; official SWORDS preprocessing/evaluation determines lexical quality.",
+            "parse_candidates() is Pari-owned and score-affecting; it is frozen as conversion protocol pari-swords-candidate-parser v1. Changing it requires a new protocol identity and a replay of every compared candidate from preserved raw outputs.",
             "Promotion provenance requires the official SWORDS repository's full 40-hex commit SHA and an official dataset ID bound to the prompt source.",
-            "The official evaluator runner cross-checks this dataset ID and benchmark bytes against the pinned checkout before scoring."
+            "The official evaluator runner cross-checks this dataset ID and benchmark bytes against the pinned checkout before scoring.",
+            "Pass --per-target-diagnostics to archive raw candidate lines, retained order, meta-prose filter reasons, dedup counts, and truncation for every target."
         ]
     }, indent=2) + "\n")
 
     print(json.dumps({
+        "converterIdentity": converter_provenance["identity"],
+        "converterProtocol": f"{SWORDS_PROTOCOL_ID}@{PROTOCOL_VERSION}",
         "targets": len(targets),
         "officialDatasetId": dataset_id,
         "convertedOutputRecords": len(targets) - len(missing),
         "missingOutputs": len(missing),
         "extraOutputs": len(extra),
         "emptyCandidateOutputs": len(empty),
+        "truncatedTargets": len(truncated),
         "promotionProvenanceReady": not provenance_errors,
         "promotionProvenanceErrors": provenance_errors,
         "out": str(out_path),

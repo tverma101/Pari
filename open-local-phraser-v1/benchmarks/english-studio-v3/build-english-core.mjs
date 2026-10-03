@@ -49,50 +49,65 @@ function choicePrompt(prefix, choices) {
   return `${prefix}\n${choices.map((choice, i) => `${letters[i]}. ${choice}`).join("\n")}\nAnswer only with the letter.`;
 }
 
+// Every forced-choice task freezes its own allowed label set so the protocol
+// parser never has to scrape prompt prose (or guess a 2-vs-N option count) to
+// decide whether a letter is in-domain. The set is derived from the same
+// structured choice array that renders the prompt, never from the gold answer,
+// so it is available to the model-side protocol independently of correctness.
+function labelsFor(choices) {
+  if (!Array.isArray(choices) || choices.length < 2) {
+    throw new Error(`forced-choice task needs at least two options, got ${JSON.stringify(choices)}`);
+  }
+  if (choices.length > letters.length) {
+    throw new Error(`forced-choice task has ${choices.length} options, more than ${letters.length} labels`);
+  }
+  return letters.slice(0, choices.length).split("");
+}
+
 function render(row) {
   switch (row.task) {
     case "same_sense":
-      return choicePrompt(
+      return renderChoice(
         `Target word: ${row.target}\nSentence 1: ${row.sentenceA}\nSentence 2: ${row.sentenceB}\nDoes the target have the same meaning in both sentences?`,
         shuffledChoices(row, ["same", "different"]),
       );
     case "best_substitute":
-      return choicePrompt(
+      return renderChoice(
         `Sentence: ${row.sentence}\nTarget text: ${row.target}\nWhich replacement best preserves the target meaning and sounds natural in this exact sentence?`,
         shuffledChoices(row, row.choices),
       );
     case "minimal_pair":
-      return choicePrompt(
+      return renderChoice(
         `Choose the word that makes the most natural standard-English expression.\nSentence: ${row.sentence}`,
         shuffledChoices(row, row.choices),
       );
     case "acceptability_pair":
-      return choicePrompt(
+      return renderChoice(
         "Which sentence is more acceptable in standard written English?",
         shuffledChoices(row, [row.sentenceA, row.sentenceB]),
       );
     case "same_meaning":
-      return choicePrompt(
+      return renderChoice(
         `Sentence 1: ${row.sentenceA}\nSentence 2: ${row.sentenceB}\nDo these sentences preserve the same meaning?`,
         shuffledChoices(row, ["same", "different"]),
       );
     case "closer_register":
     case "closer_meaning_and_register":
-      return choicePrompt(
+      return renderChoice(
         `Source: ${row.source}\nWhich option best preserves the source meaning, intensity, and register?`,
         shuffledChoices(row, row.choices),
       );
     case "more_natural":
-      return choicePrompt("Which option is more natural standard English?", shuffledChoices(row, row.choices));
+      return renderChoice("Which option is more natural standard English?", shuffledChoices(row, row.choices));
     case "relation_preservation":
-      return choicePrompt(
+      return renderChoice(
         `Source: ${row.source}\nCandidate: ${row.candidate}\nDoes the candidate preserve the source relation/meaning?`,
         shuffledChoices(row, ["preserved", "changed"]),
       );
     case "relation_label":
-      return choicePrompt(`Sentence: ${row.sentence}\nWhich discourse relation is expressed?`, shuffledChoices(row, row.choices));
+      return renderChoice(`Sentence: ${row.sentence}\nWhich discourse relation is expressed?`, shuffledChoices(row, row.choices));
     case "sentence_order":
-      return choicePrompt(
+      return renderChoice(
         `Sentences:\n${row.sentences.map((s, i) => `${i + 1}. ${s}`).join("\n")}\nWhich ordering is most coherent?`,
         shuffledChoices(row, row.choices.map((x) => x.map((n) => n + 1).join("-"))),
       );
@@ -109,14 +124,39 @@ function render(row) {
   }
 }
 
-const tasks = seed.cases.map((row) => ({
-  id: row.id,
-  dimension: row.dimension,
-  task: row.task,
-  phenomenon: row.phenomenon ?? null,
-  prompt: render(row),
-  generative: row.dimension === "generative_expression",
-}));
+function renderChoice(prefix, choices) {
+  return { prompt: choicePrompt(prefix, choices), allowedChoices: labelsFor(choices) };
+}
+
+function buildTask(row) {
+  const generative = row.dimension === "generative_expression";
+  const rendered = render(row);
+  if (generative) {
+    if (typeof rendered !== "string") throw new Error(`Generative task ${row.task} (${row.id}) must render a prompt`);
+    return {
+      id: row.id,
+      dimension: row.dimension,
+      task: row.task,
+      phenomenon: row.phenomenon ?? null,
+      generative: true,
+      prompt: rendered,
+    };
+  }
+  if (!rendered || typeof rendered !== "object" || !Array.isArray(rendered.allowedChoices)) {
+    throw new Error(`Unsupported forced-choice task ${row.task} (${row.id})`);
+  }
+  return {
+    id: row.id,
+    dimension: row.dimension,
+    task: row.task,
+    phenomenon: row.phenomenon ?? null,
+    generative: false,
+    prompt: rendered.prompt,
+    allowedChoices: rendered.allowedChoices,
+  };
+}
+
+const tasks = seed.cases.map(buildTask);
 
 const countsByDimension = {};
 for (const row of tasks) countsByDimension[row.dimension] = (countsByDimension[row.dimension] ?? 0) + 1;
@@ -130,6 +170,8 @@ fs.writeFileSync(
     cases: tasks.length,
     countsByDimension,
     optionOrder: "deterministic SHA-256 permutation per case ID for every forced-choice task",
+    allowedChoices:
+      "Every forced-choice task freezes allowedChoices as the first N letters for its N rendered options, derived from the same structured choice array that renders the prompt. It never comes from gold and never from prompt prose. Generative tasks carry no allowedChoices. The protocol parser rejects any label outside this set as invalid_option_label.",
     answerLeakageRule: "Generated task JSONL contains prompts but never gold answers. Scoring reads gold only from the seed file and reconstructs the same option permutation.",
     compositeRule: config.composite.rule,
   }, null, 2) + "\n",

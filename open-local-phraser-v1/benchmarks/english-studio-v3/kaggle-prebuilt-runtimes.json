@@ -1,11 +1,17 @@
 {
-  "version": 1,
+  "version": 2,
   "policy": {
     "sourceBuildDefault": "forbidden",
     "reason": "Kaggle benchmark runs must spend GPU time evaluating models, not compiling native runtimes.",
     "onMissingCompatibleBinary": "record runtime_unqualified and stop; do not invoke cmake, ninja, make, cargo, nvcc, setup.py build, pip source distributions, or flash-attn source compilation",
     "pipPolicy": "use --only-binary=:all: for native packages; never use --no-binary or --no-build-isolation to force a source build",
-    "sourceBuildException": "allowed only as a separately authorized runtime-development experiment; never as the canonical Issue #25 benchmark path"
+    "sourceBuildException": "allowed only as a separately authorized runtime-development experiment; never as the canonical Issue #25 benchmark path",
+    "dependencyClosureDefault": "fail-closed",
+    "dependencyClosureReason": "Issue #41: a pinned vLLM wheel still imports differently as Kaggle's mutable global torch/torchvision/transformers packages change. The complete serving environment is part of the runtime identity, so a Python wheel artifact may only be installed when every runtime-critical dependency is version+hash bound in a reviewed lock.",
+    "isolationDefault": "dedicated_venv",
+    "isolationReason": "Issue #41: the canonical path must not import or mutate arbitrary Kaggle global site-packages. Python wheel artifacts install into a dedicated virtual environment created under --dest and every runtime probe runs with that interpreter under isolated mode.",
+    "onDependencyLockPending": "record runtime_unqualified with classification dependency_lock_pending and stop; do not fall back to unpinned pip resolution",
+    "onInstalledPackageDrift": "record runtime_unqualified and stop; do not silently upgrade, downgrade, or reinstall to make an import pass"
   },
   "artifacts": [
     {
@@ -46,6 +52,267 @@
       "sha256": "5cbac5269804e4eb63676aeaec1ee7d4cff6e22b87da91de9b05795bf635998e",
       "sourceRelease": "https://github.com/PrismML-Eng/llama.cpp/releases/tag/prism-b10735-842b188",
       "notes": "Official vendor prebuilt already exercised successfully on Kaggle glibc 2.35 in the Bonsai 27B qualification run."
+    }
+  ],
+  "dependencyLockSchema": {
+    "schema": "kaggle-runtime-dependency-lock-1",
+    "description": "Machine-readable freeze of the runtime-critical Python dependency closure for one python_wheel artifact. Produced on the real Kaggle image, reviewed, then committed together with its sha256 in environments[].dependencyLock.",
+    "requiredTopLevelFields": [
+      "schema",
+      "artifactId",
+      "python",
+      "packages",
+      "resolutionReport",
+      "evidenceGaps"
+    ],
+    "packageFields": [
+      "name",
+      "version",
+      "sha256",
+      "wheel",
+      "requiredBy",
+      "optional"
+    ],
+    "rules": [
+      "every package has exactly one version and at least one sha256 of an upstream wheel actually installed by pip",
+      "optional=true is permitted only for candidate-specific extras such as quantization backends; the canonical default profile requires optional=false",
+      "resolutionReport carries the sha256 of the machine-readable `pip install --report` capture that produced these pins",
+      "evidenceGaps must be empty before dependencyLock.state may be set to locked"
+    ]
+  },
+  "resolutionReportSchema": {
+    "schema": "kaggle-runtime-resolution-report-1",
+    "description": "Verbatim capture of `pip install --report` JSON plus the installer's captured stdout/stderr, retained next to the runtime receipt.",
+    "requiredTopLevelFields": [
+      "schema",
+      "artifactId",
+      "pipReport",
+      "pipStdout",
+      "pipStderr",
+      "pipExitCode",
+      "environment"
+    ]
+  },
+  "environments": [
+    {
+      "id": "vllm-0.30.0-cu129-linux-x86_64",
+      "artifactId": "vllm-0.30.0-cu129-linux-x86_64",
+      "runtime": "vllm",
+      "isolation": "dedicated_venv",
+      "venvPathTemplate": "{dest}/{artifactId}/venv",
+      "python": {
+        "requiresPython": ">=3.10,<3.15",
+        "abiTag": "cp38-abi3",
+        "platformTag": "manylinux_2_28_x86_64",
+        "wheelTag": "cp38-abi3-linux_x86_64",
+        "note": "stable-ABI (cp38-abi3) build, so one wheel covers CPython 3.10-3.14; verified from the pinned wheel's own METADATA and WHEEL members"
+      },
+      "dependencyLock": {
+        "state": "pending-target-image-lock",
+        "file": "kaggle-runtime-locks/vllm-0.30.0-cu129-linux-x86_64.requirements.lock.json",
+        "sha256": null,
+        "requiredPackages": [
+          "torch",
+          "torchvision",
+          "torchaudio",
+          "triton",
+          "flashinfer-python",
+          "torchcodec",
+          "numba",
+          "transformers",
+          "tokenizers",
+          "safetensors",
+          "huggingface_hub",
+          "numpy",
+          "msgspec",
+          "xgrammar",
+          "llguidance",
+          "outlines_core",
+          "compressed-tensors",
+          "depyf",
+          "einops",
+          "fastapi",
+          "uvicorn",
+          "openai",
+          "pydantic",
+          "prometheus_client",
+          "aiohttp",
+          "pyzmq",
+          "mistral-common",
+          "partial-json-parser",
+          "cloudpickle",
+          "watchfiles",
+          "python-json-logger",
+          "ninja",
+          "pybase64",
+          "cbor2",
+          "ijson",
+          "setproctitle",
+          "regex",
+          "cachetools",
+          "psutil",
+          "sentencepiece",
+          "requests",
+          "tqdm",
+          "blake3",
+          "py-cpuinfo",
+          "protobuf",
+          "starlette",
+          "pillow",
+          "prometheus-fastapi-instrumentator",
+          "tiktoken",
+          "typing_extensions",
+          "filelock",
+          "jsonschema",
+          "opencv-python-headless",
+          "pyyaml",
+          "apache-tvm-ffi",
+          "tilelang",
+          "nvidia-cudnn-frontend",
+          "nvtx",
+          "fastsafetensors",
+          "instanttensor",
+          "nvidia-cutlass-dsl",
+          "quack-kernels",
+          "lm-format-enforcer",
+          "humming-kernels",
+          "tokenspeed-mla",
+          "anthropic",
+          "model-hosting-container-standards",
+          "mcp",
+          "opentelemetry-sdk",
+          "opentelemetry-api",
+          "opentelemetry-exporter-otlp",
+          "opentelemetry-semantic-conventions-ai",
+          "PyNvVideoCodec"
+        ],
+        "optionalPackages": [
+          "bitsandbytes",
+          "cupy",
+          "ray"
+        ],
+        "evidenceGaps": [
+          "NOT a promotion lock. kaggle-runtime-locks/vllm-0.30.0-cu129-linux-x86_64.candidate-lock.json was produced by resolving this exact cu129 wheel with pip install --dry-run --report on a macOS arm64 host (python3.12 pip 26.1) using explicit --platform manylinux_2_17/2_28/2_31_x86_64, manylinux2014_x86_64, linux_x86_64 and --python-version 3.11 --abi cp311 --abi abi3. That resolution completed with 180 packages, all 180 hash-bound (178 hashes straight from the pip report; torchvision and Jinja2 hashed locally because the pytorch index publishes those two without a #sha256 fragment).",
+          "The candidate lock is NOT promotion evidence: it was resolved for CPython 3.11 only. The Kaggle base image Python minor version is still unpinned in this repository, and torch 2.13.0+cu129, torchvision 0.28.0+cu129 and torchaudio 2.11.0+cu129 publish a DIFFERENT wheel per CPython tag (cp310..cp315), so the hashes recorded here are only valid for a cp311 image. Read python.version from the real Kaggle preflight receipt before locking.",
+          "torchvision 0.28.0+cu129 wheel hashes were computed locally by downloading each exact URL (cp310..cp314 x86_64) and hashing it; the cu129 index publishes a data-dist-info-metadata hash for torchvision, which is a different file and must not be used as a wheel hash. Verify these against the target image resolution before promotion.",
+          "The cu129 wheel requires llguidance>=1.7.0,<1.8.0, whose 1.7.x releases publish ONLY cp39-abi3 manylinux_2_31+ (or per-CPython CPython-version-specific wheels); the cp311 dry-run had to add --abi abi3 and --platform manylinux_2_31_x86_64 to resolve it. A cp310 image may fail to resolve llguidance from binary wheels alone, which would be a genuine runtime_unqualified rather than a source-build trigger.",
+          "flashinfer-cubin 0.6.18.post1 is not on PyPI (it exists only at https://flashinfer.ai/whl/) and did not appear in the dry-run resolution; whether the frozen runtime needs it remains undecided from the wheel metadata alone.",
+          "torchaudio 2.11.0 declares NO torch dependency even though its C extension links libtorch internals, so torchaudio/torch skew is only detectable by import inside the venv. No target-image import smoke has run, so this closure is unproven on T4.",
+          "The dry-run resolution also surfaced nvidia-cutlass-dsl-libs-cu12 AND nvidia-cutlass-dsl-libs-cu13 together, which is consistent with the cu129 wheel metadata carrying both; whether both are needed is unverified and any installed table must be compared against this closure on the target image."
+        ],
+        "candidateLock": {
+          "file": "kaggle-runtime-locks/vllm-0.30.0-cu129-linux-x86_64.candidate-lock.json",
+          "sha256": "04a0bbba4eafb90d91639e68faaac8b15e9ece710534963172b32c71e229208e",
+          "state": "candidate-not-locked",
+          "resolvedForPython": "3.11",
+          "targetImagePython": "unknown",
+          "packageCount": 180,
+          "hashComplete": true,
+          "promotionEligible": false,
+          "note": "Off-image candidate closure only. Bound into the registry by sha256 so it cannot be edited silently, but NOT usable for installation: the install gate reads dependencyLock.state and refuses anything but 'locked'. Promote only by re-resolving on the real Kaggle image and committing the closure as a locked lock with its own sha256."
+        }
+      },
+      "upstreamEvidence": {
+        "verifiedAt": "2026-10-02",
+        "artifactVerification": {
+          "claim": "the pinned vllm-0.30.0+cu129-cp38-abi3-manylinux_2_28_x86_64.whl exists upstream and its digest matches the registry pin",
+          "source": "https://api.github.com/repos/vllm-project/vllm/releases/tags/v0.30.0 (assets[].digest)",
+          "observed": "sha256:e98cb69659bfcfc849cf11ce0781a7161d40b02b51a6c3636924a5909f2aabcc",
+          "matchesRegistryPin": true,
+          "caveat": "digest restated from GitHub's published asset digest; the 545 MB wheel body was not re-hashed locally"
+        },
+        "release": {
+          "publishedAt": "2026-09-22T05:20:54Z",
+          "tagCommit": "ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+          "source": "https://api.github.com/repos/vllm-project/vllm/git/refs/tags/v0.30.0"
+        },
+        "metadataSources": [
+          "vllm-0.30.0+cu129.dist-info/METADATA extracted from the pinned release wheel via HTTP range requests",
+          "https://raw.githubusercontent.com/vllm-project/vllm/v0.30.0/requirements/cuda.txt",
+          "https://raw.githubusercontent.com/vllm-project/vllm/v0.30.0/requirements/common.txt",
+          "https://pypi.org/pypi/<pkg>/json",
+          "https://download.pytorch.org/whl/cu129/"
+        ],
+        "torchStack": {
+          "torch": "==2.13.0 (resolves to torch-2.13.0+cu129 from the cu129 index)",
+          "torchvision": "==0.28.0 (Requires-Dist: torch (==2.13.0), so pip enforces the pairing)",
+          "torchaudio": "==2.11.0 (declares no torch dependency; skew only shows up at import)",
+          "triton": "==3.7.1 (transitive, from torch 2.13.0+cu129 METADATA)",
+          "cudaRuntimePinsFromTorch": [
+            "cuda-toolkit[...]==12.9.1",
+            "nvidia-cudnn-cu12==9.20.0.48",
+            "nvidia-nccl-cu12==2.29.7"
+          ],
+          "warning": "plain PyPI torch==2.13.0 is the CUDA 13 build (cuda-toolkit 13.0.3, nvidia-*-cu13); the lock MUST come from the cu129 index or the whole CUDA runtime silently moves from 12.9 to 13.0."
+        },
+        "notInClosure": [
+          "xformers",
+          "cupy",
+          "ray",
+          "bitsandbytes",
+          "vllm-flash-attn",
+          "flashinfer-cubin"
+        ],
+        "notInClosureNote": "None of these appear in the cu129 wheel's Requires-Dist. vLLM 0.30.0 reaches FlashAttention/FlashInfer through its own bundled kernels plus flashinfer-python, not through xformers. They must not be pinned unless a specific candidate actually imports them."
+      },
+      "importSmoke": [
+        {
+          "module": "torch",
+          "required": true,
+          "probe": "torch_identity",
+          "reason": "CUDA tag, driver version, and visible compute capability decide T4 qualification"
+        },
+        {
+          "module": "torchvision",
+          "required": true,
+          "probe": "torchvision_nms",
+          "reason": "Issue #41 cites real upstream import-time torch/torchvision operator mismatches; a compiled-op call catches ABI skew that a bare import misses"
+        },
+        {
+          "module": "transformers",
+          "required": true,
+          "probe": "module_identity",
+          "reason": "tokenizer/config stack is version-bound in the lock"
+        },
+        {
+          "module": "vllm",
+          "required": true,
+          "probe": "vllm_identity",
+          "reason": "proves the pinned wheel is importable from the isolated venv and not a stale global package"
+        },
+        {
+          "module": "vllm_entrypoint",
+          "required": true,
+          "probe": "vllm_serve_help",
+          "reason": "exercises console-script entrypoint imports before any multi-GB model download"
+        }
+      ],
+      "cuda": {
+        "required": true,
+        "expectedComputeCapability": [
+          "7.5"
+        ],
+        "expectedDevices": 2,
+        "evidence": [
+          "driverVersion",
+          "torchCudaVersion",
+          "deviceCount",
+          "computeCapability",
+          "deviceName"
+        ],
+        "onUnavailable": "record runtime_unqualified with classification environment_cuda_unavailable; a successful import alone never qualifies a candidate"
+      },
+      "quantizationProfile": {
+        "default": {
+          "requires": []
+        },
+        "bitsandbytes": {
+          "requires": [
+            "bitsandbytes"
+          ],
+          "reason": "quantization-only dependency; required only by candidates that select this profile"
+        }
+      }
     }
   ],
   "forbiddenBuildIndicators": [

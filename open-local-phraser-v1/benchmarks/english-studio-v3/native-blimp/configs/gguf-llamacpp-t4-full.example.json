@@ -1,0 +1,57 @@
+{
+  "schema": "native-blimp-config-1",
+  "laneId": "native-blimp",
+  "candidateId": "bonsai-27b-q1_0",
+  "backend": "gguf",
+  "mode": "full",
+  "promotable": true,
+  "note": "The 67-subtask promotion lane through the owned Prism llama-server. ggufSha256 is the artifact identity and the cross-backend parity key.",
+  "model": {
+    "repo": "prism-ml/Bonsai-27B-gguf",
+    "revision": "f10afb355f104535e3e3e98cf7ab7795c72bd292",
+    "tokenizer": "prism-ml/Bonsai-27B-gguf",
+    "ggufFile": "Bonsai-27B-Q1_0.gguf",
+    "ggufSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "runtime": {
+    "modelArgs": {
+      "base_url": "http://127.0.0.1:8080",
+      "model": null,
+      "parallel": 4,
+      "timeout": 600,
+      "temperature": 0.0
+    },
+    "llamaCppBuild": {
+      "repository": "https://github.com/PrismML-Eng/llama.cpp.git",
+      "revision": "842b1880415d6f508f03b789e5ce70194def7bfd",
+      "buildFlags": ["-DGGML_CUDA=ON"],
+      "serverArgs": [
+        "--model", "/kaggle/working/Bonsai-27B-Q1_0.gguf",
+        "--host", "127.0.0.1",
+        "--port", "8080",
+        "--parallel", "4",
+        "--n-gpu-layers", "99",
+        "--jinja"
+      ],
+      "serverBuild": "REPLACE_WITH_llama-server_VERSION_OUTPUT"
+    },
+    "server": {
+      "baseUrl": "http://127.0.0.1:8080",
+      "pid": null,
+      "port": 8080,
+      "totalSlots": 4,
+      "propsSha256": null,
+      "modelName": null
+    }
+  },
+  "harness": {
+    "checkout": "/kaggle/working/lm-evaluation-harness",
+    "expectedCommit": "d6de81643928d653435c431bae19945d41d32520"
+  },
+  "benchmarkRevision": "REPLACE_WITH_THIS_BENCHMARKS_GIT_REV",
+  "outputs": {
+    "resultsDir": "/kaggle/working/results/native-blimp/bonsai-27b-q1_0-full",
+    "receiptPath": "/kaggle/working/results/native-blimp/bonsai-27b-q1_0-full/native-blimp-receipt.json",
+    "logSamples": true
+  }
+}

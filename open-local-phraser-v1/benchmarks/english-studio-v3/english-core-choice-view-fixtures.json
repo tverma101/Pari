@@ -1,0 +1,330 @@
+{
+  "fixtureVersion": "english-core-choice-view-fixtures-v1",
+  "issue": 64,
+  "viewContractVersion": "strict-recoverable-choice-views-v1",
+  "denominatorPolicy": "fixed-screening-denominator-v1",
+  "allowedLabelContractVersion": "allowed-choices-frozen-v1",
+  "note": "Shared strict-vs-recoverable forced-choice fixtures. The Python and JavaScript parsers must produce identical status/letter/anchoredLabel/invalidOptionLabel for every case, and the strict/recoverable projections below must equal both.",
+  "cases": [
+    {
+      "id": "bare-letter-allowed",
+      "issueTest": 1,
+      "raw": "A",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "strict_allowed_choice",
+      "letter": "A",
+      "anchoredLabel": "A",
+      "invalidOptionLabel": null,
+      "strictParsedChoice": "A",
+      "recoverableParsedChoice": "A",
+      "strictProtocolValid": true,
+      "recoverableProtocolValid": true,
+      "strictCorrect": true,
+      "recoverableCorrect": true,
+      "viewsDisagree": false,
+      "outcome": "strict_and_recoverable_correct"
+    },
+    {
+      "id": "bare-letter-with-period-allowed",
+      "issueTest": 2,
+      "raw": "A.",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "strict_allowed_choice",
+      "letter": "A",
+      "anchoredLabel": "A",
+      "invalidOptionLabel": null,
+      "strictParsedChoice": "A",
+      "recoverableParsedChoice": "A",
+      "strictProtocolValid": true,
+      "recoverableProtocolValid": true,
+      "strictCorrect": true,
+      "recoverableCorrect": true,
+      "viewsDisagree": false,
+      "outcome": "strict_and_recoverable_correct"
+    },
+    {
+      "id": "answer-wrapper-recoverable-only",
+      "issueTest": 3,
+      "raw": "Answer: A",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "recoverable_allowed_choice",
+      "letter": "A",
+      "anchoredLabel": "A",
+      "invalidOptionLabel": null,
+      "strictParsedChoice": null,
+      "recoverableParsedChoice": "A",
+      "strictProtocolValid": false,
+      "recoverableProtocolValid": true,
+      "strictCorrect": false,
+      "recoverableCorrect": true,
+      "viewsDisagree": true,
+      "outcome": "recoverable_only_correct_format_recovery"
+    },
+    {
+      "id": "explained-anchored-label-recoverable-only",
+      "issueTest": 4,
+      "raw": "A because it sounds better",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "recoverable_allowed_choice",
+      "letter": "A",
+      "anchoredLabel": "A",
+      "invalidOptionLabel": null,
+      "strictParsedChoice": null,
+      "recoverableParsedChoice": "A",
+      "strictProtocolValid": false,
+      "recoverableProtocolValid": true,
+      "strictCorrect": false,
+      "recoverableCorrect": true,
+      "viewsDisagree": true,
+      "outcome": "recoverable_only_correct_format_recovery"
+    },
+    {
+      "id": "ambiguous-two-labels",
+      "issueTest": 5,
+      "raw": "A or B",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "no_anchored_answer",
+      "letter": null,
+      "anchoredLabel": null,
+      "invalidOptionLabel": null,
+      "strictParsedChoice": null,
+      "recoverableParsedChoice": null,
+      "strictProtocolValid": false,
+      "recoverableProtocolValid": false,
+      "strictCorrect": false,
+      "recoverableCorrect": false,
+      "viewsDisagree": false,
+      "outcome": "non_answer_no_anchored_label"
+    },
+    {
+      "id": "ambiguous-two-labels-including-gold",
+      "issueTest": 5,
+      "raw": "A. or B",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "no_anchored_answer",
+      "pythonStatus": "ambiguous_multiple_choices",
+      "jsStatus": "no_anchored_answer",
+      "knownParserStatusDivergence": true,
+      "letter": null,
+      "anchoredLabel": "A",
+      "invalidOptionLabel": null,
+      "strictParsedChoice": null,
+      "recoverableParsedChoice": null,
+      "strictProtocolValid": false,
+      "recoverableProtocolValid": false,
+      "strictCorrect": false,
+      "recoverableCorrect": false,
+      "viewsDisagree": false,
+      "outcome": "ambiguous_multiple_choices"
+    },
+    {
+      "id": "impossible-label-both-views-invalid",
+      "issueTest": 6,
+      "raw": "Z",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "strict_invalid_option_label",
+      "letter": null,
+      "anchoredLabel": "Z",
+      "invalidOptionLabel": "Z",
+      "strictParsedChoice": null,
+      "recoverableParsedChoice": null,
+      "strictProtocolValid": false,
+      "recoverableProtocolValid": false,
+      "strictCorrect": false,
+      "recoverableCorrect": false,
+      "viewsDisagree": false,
+      "outcome": "invalid_protocol_output"
+    },
+    {
+      "id": "impossible-label-inside-wrapper-invalid",
+      "issueTest": 6,
+      "raw": "Answer: Z",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "recoverable_invalid_option_label",
+      "letter": null,
+      "anchoredLabel": "Z",
+      "invalidOptionLabel": "Z",
+      "strictParsedChoice": null,
+      "recoverableParsedChoice": null,
+      "strictProtocolValid": false,
+      "recoverableProtocolValid": false,
+      "strictCorrect": false,
+      "recoverableCorrect": false,
+      "viewsDisagree": false,
+      "outcome": "invalid_protocol_output"
+    },
+    {
+      "id": "allowed-choice-selected-wrongly",
+      "issueTest": "invalid-vs-wrong",
+      "raw": "B",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "strict_allowed_choice",
+      "letter": "B",
+      "anchoredLabel": "B",
+      "invalidOptionLabel": null,
+      "strictParsedChoice": "B",
+      "recoverableParsedChoice": "B",
+      "strictProtocolValid": true,
+      "recoverableProtocolValid": true,
+      "strictCorrect": false,
+      "recoverableCorrect": false,
+      "viewsDisagree": false,
+      "outcome": "strict_and_recoverable_wrong_allowed_choice"
+    },
+    {
+      "id": "wrong-choice-wrapped-recoverable-only-miss",
+      "issueTest": "invalid-vs-wrong",
+      "raw": "Answer: B",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "recoverable_allowed_choice",
+      "letter": "B",
+      "anchoredLabel": "B",
+      "invalidOptionLabel": null,
+      "strictParsedChoice": null,
+      "recoverableParsedChoice": "B",
+      "strictProtocolValid": false,
+      "recoverableProtocolValid": true,
+      "strictCorrect": false,
+      "recoverableCorrect": false,
+      "viewsDisagree": true,
+      "outcome": "invalid_protocol_output"
+    },
+    {
+      "id": "prose-only-non-answer",
+      "issueTest": "non-answer",
+      "raw": "Probably A",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "no_anchored_answer",
+      "letter": null,
+      "anchoredLabel": null,
+      "invalidOptionLabel": null,
+      "strictParsedChoice": null,
+      "recoverableParsedChoice": null,
+      "strictProtocolValid": false,
+      "recoverableProtocolValid": false,
+      "strictCorrect": false,
+      "recoverableCorrect": false,
+      "viewsDisagree": false,
+      "outcome": "non_answer_no_anchored_label"
+    },
+    {
+      "id": "empty-output",
+      "issueTest": "non-answer",
+      "raw": "",
+      "allowedChoices": [
+        "A",
+        "B"
+      ],
+      "gold": "A",
+      "status": "empty_output",
+      "letter": null,
+      "anchoredLabel": null,
+      "invalidOptionLabel": null,
+      "strictParsedChoice": null,
+      "recoverableParsedChoice": null,
+      "strictProtocolValid": false,
+      "recoverableProtocolValid": false,
+      "strictCorrect": false,
+      "recoverableCorrect": false,
+      "viewsDisagree": false,
+      "outcome": "non_answer_no_anchored_label"
+    }
+  ],
+  "aggregateCases": [
+    {
+      "id": "fixed-denominator-includes-every-item",
+      "issueTest": 8,
+      "note": "The four-item lane is the denominator for both views. An invalid protocol output is a zero for both views and is still labelled a protocol failure. A recoverable-only correct item never moves the strict view.",
+      "caseIds": [
+        "bare-letter-allowed",
+        "answer-wrapper-recoverable-only",
+        "impossible-label-both-views-invalid",
+        "allowed-choice-selected-wrongly"
+      ],
+      "fixedDenominator": 4,
+      "excludedRuntimeUnqualified": 0,
+      "strictValidOutputCount": 2,
+      "strictCorrectCount": 1,
+      "strictAccuracyFixedDenominator": 0.25,
+      "strictValidOutputCoverage": 0.5,
+      "recoverableValidOutputCount": 3,
+      "recoverableCorrectCount": 2,
+      "recoverableAccuracyFixedDenominator": 0.5,
+      "recoverableValidOutputCoverage": 0.75,
+      "strictRecoverableDisagreementCount": 1,
+      "recoverableOnlyCount": 1,
+      "invalidOptionLabelCount": 1,
+      "outcomes": {
+        "strict_and_recoverable_correct": 1,
+        "recoverable_only_correct_format_recovery": 1,
+        "strict_and_recoverable_wrong_allowed_choice": 1,
+        "invalid_protocol_output": 1,
+        "missing_output": 0,
+        "ambiguous_multiple_choices": 0,
+        "non_answer_no_anchored_label": 0,
+        "truncated_output": 0,
+        "runtime_unqualified_excluded_from_denominator": 0
+      }
+    }
+  ],
+  "bonsaiRecoveryDelta": {
+    "issueTest": 7,
+    "note": "The previously observed Bonsai format-recovery delta, kept as a first-class regression fixture: the recoverable view improves while the strict view stays unchanged. No gold-guided repair is involved; the same raw outputs simply parse differently under each frozen view.",
+    "caseIds": [
+      "bare-letter-allowed",
+      "answer-wrapper-recoverable-only",
+      "explained-anchored-label-recoverable-only",
+      "impossible-label-both-views-invalid"
+    ],
+    "fixedDenominator": 4,
+    "strictAccuracyFixedDenominator": 0.25,
+    "recoverableAccuracyFixedDenominator": 0.75,
+    "strictAccuracyUnchangedByRecovery": true,
+    "recoverableOnlyCount": 2,
+    "recoverableOnlyRate": 0.5
+  }
+}

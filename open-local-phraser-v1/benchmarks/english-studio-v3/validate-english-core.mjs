@@ -337,6 +337,10 @@ for (const requiredImplementation of [
   "score-english-core-public-fast.py",
   "build-english-core-public-full-classification.py",
   "score-english-core-public-full-classification.py",
+  "english_core_public_sources.py",
+  "english-core-public-full-sources.json",
+  "prepare-english-core-public-full.py",
+  "test_english_core_public_full_sources.py",
   "build-semanticqa-lcc-english-core.py",
   "score-semanticqa-lcc-english-core.py",
   "convert-semanticqa-lcc-official-output.py",
@@ -347,6 +351,8 @@ for (const requiredImplementation of [
   "build-jfleg-english-core-prompts.py",
   "convert-jfleg-english-core-output.py",
   "run-jfleg-official-eval.py",
+  "english_core_converter_provenance.py",
+  "test_official_converter_provenance.py",
   "self-check-english-core.sh"
 ]) {
   if (!fs.existsSync(path.join(here, requiredImplementation))) errors.push(`missing required implementation file: ${requiredImplementation}`);

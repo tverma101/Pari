@@ -27,6 +27,10 @@ from pathlib import Path
 import datasets
 import huggingface_hub
 from datasets import get_dataset_config_names, load_dataset
+from english_core_public_sources import (
+    PUBLIC_SOURCE_IDENTITIES,
+    resolve_source_commit,
+)
 from huggingface_hub import HfApi
 
 HERE = Path(__file__).resolve().parent
@@ -82,15 +86,21 @@ def choice_prompt(prefix: str, choices: list[str]) -> str:
 
 
 def resolve_dataset_revision(api: HfApi, repo_id: str, requested: str | None) -> dict[str, str]:
-    requested_revision = requested or "main"
-    info = api.dataset_info(repo_id, revision=requested_revision)
-    resolved = str(info.sha or "")
-    if not GIT_SHA_RE.fullmatch(resolved):
-        raise RuntimeError(f"Could not resolve {repo_id}@{requested_revision} to a full 40-hex Hub commit SHA: {resolved!r}")
-    return {
-        "requestedRevision": requested_revision,
-        "resolvedRevision": resolved,
-    }
+    """Delegate to the shared #67 resolver so both public lanes cannot drift.
+
+    The canonical repo ID, config, and split live in
+    `english_core_public_sources.PUBLIC_SOURCE_IDENTITIES`. One-shot resolution
+    and full-SHA validation are the same code path the full-distribution
+    finalist builder uses, so the two lanes cannot diverge semantically.
+    """
+    identity = next(
+        (entry for entry in PUBLIC_SOURCE_IDENTITIES.values() if entry.repo_id == repo_id),
+        None,
+    )
+    if identity is None:
+        raise RuntimeError(f"{repo_id!r} is not a canonical Pari public source identity")
+    record = resolve_source_commit(api, identity, requested)
+    return {"requestedRevision": record["requestedRevision"], "resolvedRevision": record["resolvedRevision"]}
 
 
 def main() -> None:
@@ -103,10 +113,16 @@ def main() -> None:
 
     api = HfApi()
     source_revisions = {
-        "BLiMP": resolve_dataset_revision(api, "nyu-mll/blimp", args.blimp_revision),
-        "WiC": resolve_dataset_revision(api, "aps/super_glue", args.super_glue_revision),
-        "CoLA": resolve_dataset_revision(api, "nyu-mll/glue", args.glue_revision),
-        "PAWS": resolve_dataset_revision(api, "google-research-datasets/paws", args.paws_revision),
+        # Issue #67: the canonical repo IDs come from the shared source-identity
+        # table, so this screen and the full-distribution finalist lane cannot
+        # silently name different repositories for the same source.
+        name: resolve_dataset_revision(api, identity.repo_id, getattr(args, flag))
+        for name, identity, flag in (
+            ("BLiMP", PUBLIC_SOURCE_IDENTITIES["BLiMP"], "blimp_revision"),
+            ("WiC", PUBLIC_SOURCE_IDENTITIES["WiC"], "super_glue_revision"),
+            ("CoLA", PUBLIC_SOURCE_IDENTITIES["CoLA"], "glue_revision"),
+            ("PAWS", PUBLIC_SOURCE_IDENTITIES["PAWS"], "paws_revision"),
+        )
     }
 
     tasks: list[dict] = []
@@ -123,6 +139,11 @@ def main() -> None:
             "phenomenon": phenomenon,
             "prompt": choice_prompt(prefix, shuffled),
             "generative": False,
+            # Model-visible frozen choice set, derived from the same structured
+            # choice array that renders the prompt's "A. .." lines. It never
+            # comes from gold and never from prompt prose.
+            "allowedChoices": list(LETTERS[: len(shuffled)]),
+            "answerProtocol": "letter",
         })
         answers[task_id] = answer_letter
         counts[source] = counts.get(source, 0) + 1
@@ -131,7 +152,9 @@ def main() -> None:
     blimp_configs = get_dataset_config_names("nyu-mll/blimp", revision=blimp_revision)
     blimp_fingerprints = {}
     for config in sorted(blimp_configs):
-        ds = load_dataset("nyu-mll/blimp", config, split="train", revision=blimp_revision)
+        ds = load_dataset(
+            PUBLIC_SOURCE_IDENTITIES["BLiMP"].repo_id, config, split="train", revision=blimp_revision
+        )
         blimp_fingerprints[config] = getattr(ds, "_fingerprint", None)
         rows = list(ds)
         for i, row in enumerate(stable_take(rows, BLIMP_PER_CONFIG, f"blimp:{config}")):
@@ -147,7 +170,12 @@ def main() -> None:
             )
     fingerprints["BLiMP"] = blimp_fingerprints
 
-    wic_ds = load_dataset("aps/super_glue", "wic", split="validation", revision=source_revisions["WiC"]["resolvedRevision"])
+    wic_ds = load_dataset(
+        PUBLIC_SOURCE_IDENTITIES["WiC"].repo_id,
+        PUBLIC_SOURCE_IDENTITIES["WiC"].config,
+        split=PUBLIC_SOURCE_IDENTITIES["WiC"].split,
+        revision=source_revisions["WiC"]["resolvedRevision"],
+    )
     fingerprints["WiC"] = getattr(wic_ds, "_fingerprint", None)
     wic_rows = list(wic_ds)
     for i, row in enumerate(stable_take_binary_balanced(wic_rows, WIC_COUNT, "wic:validation")):
@@ -162,7 +190,12 @@ def main() -> None:
             "word_sense_discrimination",
         )
 
-    cola_ds = load_dataset("nyu-mll/glue", "cola", split="validation", revision=source_revisions["CoLA"]["resolvedRevision"])
+    cola_ds = load_dataset(
+        PUBLIC_SOURCE_IDENTITIES["CoLA"].repo_id,
+        PUBLIC_SOURCE_IDENTITIES["CoLA"].config,
+        split=PUBLIC_SOURCE_IDENTITIES["CoLA"].split,
+        revision=source_revisions["CoLA"]["resolvedRevision"],
+    )
     fingerprints["CoLA"] = getattr(cola_ds, "_fingerprint", None)
     cola_rows = list(cola_ds)
     for i, row in enumerate(stable_take_binary_balanced(cola_rows, COLA_COUNT, "cola:validation")):
@@ -178,9 +211,9 @@ def main() -> None:
         )
 
     paws_ds = load_dataset(
-        "google-research-datasets/paws",
-        "labeled_final",
-        split="validation",
+        PUBLIC_SOURCE_IDENTITIES["PAWS"].repo_id,
+        PUBLIC_SOURCE_IDENTITIES["PAWS"].config,
+        split=PUBLIC_SOURCE_IDENTITIES["PAWS"].split,
         revision=source_revisions["PAWS"]["resolvedRevision"],
     )
     fingerprints["PAWS"] = getattr(paws_ds, "_fingerprint", None)
@@ -204,10 +237,10 @@ def main() -> None:
     answer_path.write_text(json.dumps({"version": 4, "answers": answers}, indent=2) + "\n")
 
     sources = {
-        "BLiMP": {"dataset": "nyu-mll/blimp", "split": "train-by-dataset-convention", "perConfig": BLIMP_PER_CONFIG, **source_revisions["BLiMP"]},
-        "WiC": {"dataset": "aps/super_glue", "config": "wic", "split": "validation", "count": WIC_COUNT, "balanced": True, **source_revisions["WiC"]},
-        "CoLA": {"dataset": "nyu-mll/glue", "config": "cola", "split": "validation", "count": COLA_COUNT, "balanced": True, **source_revisions["CoLA"]},
-        "PAWS": {"dataset": "google-research-datasets/paws", "config": "labeled_final", "split": "validation", "count": PAWS_COUNT, "balanced": True, **source_revisions["PAWS"]},
+        "BLiMP": {"dataset": PUBLIC_SOURCE_IDENTITIES["BLiMP"].repo_id, "split": "train-by-dataset-convention", "perConfig": BLIMP_PER_CONFIG, **source_revisions["BLiMP"]},
+        "WiC": {"dataset": PUBLIC_SOURCE_IDENTITIES["WiC"].repo_id, "config": PUBLIC_SOURCE_IDENTITIES["WiC"].config, "split": PUBLIC_SOURCE_IDENTITIES["WiC"].split, "count": WIC_COUNT, "balanced": True, **source_revisions["WiC"]},
+        "CoLA": {"dataset": PUBLIC_SOURCE_IDENTITIES["CoLA"].repo_id, "config": PUBLIC_SOURCE_IDENTITIES["CoLA"].config, "split": PUBLIC_SOURCE_IDENTITIES["CoLA"].split, "count": COLA_COUNT, "balanced": True, **source_revisions["CoLA"]},
+        "PAWS": {"dataset": PUBLIC_SOURCE_IDENTITIES["PAWS"].repo_id, "config": PUBLIC_SOURCE_IDENTITIES["PAWS"].config, "split": PUBLIC_SOURCE_IDENTITIES["PAWS"].split, "count": PAWS_COUNT, "balanced": True, **source_revisions["PAWS"]},
     }
     manifest_path.write_text(
         json.dumps(

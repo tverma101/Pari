@@ -28,6 +28,13 @@ class LaneResult:
     values: tuple[str, ...]
 
 
+# The generator is asked for a plain JSON ``options`` array with no
+# candidate -> family mapping, so there is no observed evidence linking any
+# option to any requested family. Candidate-level family stays explicitly
+# unknown; the requested search families live on ``LanePlan.families``.
+UNKNOWN_CANDIDATE_FAMILY = "unknown"
+
+
 class StudioEngine:
     def __init__(self, fast: LaneAdapter, diversity: LaneAdapter | None = None) -> None:
         self._fast = fast
@@ -64,12 +71,11 @@ class StudioEngine:
 
     @staticmethod
     def _to_candidates(result: LaneResult, *, model_id: str | None = None) -> tuple[Candidate, ...]:
-        families = result.plan.families or ("unspecified",)
         return tuple(
             Candidate(
                 text=value,
                 lane=result.lane,
-                family=families[index % len(families)],
+                family=UNKNOWN_CANDIDATE_FAMILY,
                 generation_index=index,
                 model_id=model_id,
             )

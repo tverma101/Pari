@@ -2,81 +2,399 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://pari.local/schemas/english-core-result-schema.json",
   "title": "Pari English Core model result",
+  "description": "Schema v1. Closed at the run, model, decoding, output-row, and reproducibility levels. Runtime/hardware fields are diagnostics and may evolve; promotion consumers must not interpret unknown diagnostics without a schema revision.",
   "type": "object",
-  "required": ["runId", "model", "outputs"],
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "runId",
+    "model",
+    "outputs"
+  ],
   "properties": {
-    "runId": {"type": "string", "minLength": 1},
-    "timestamp": {"type": "string"},
-    "taskFile": {"type": "string"},
-    "taskFileSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
-    "taskCount": {"type": "integer", "minimum": 1},
-    "promptModeRequested": {"type": "string", "enum": ["auto", "chat", "plain"]},
-    "promptAdaptationModesObserved": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "promptAdaptationDetailsObserved": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "schemaVersion": {
+      "const": 1,
+      "type": "integer"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "running",
+        "completed",
+        "incomplete",
+        "failed"
+      ]
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "completedCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sourceTaskCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "taskFile": {
+      "type": "string"
+    },
+    "taskFileSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
+    "taskCount": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "promptModeRequested": {
+      "type": "string",
+      "enum": [
+        "auto",
+        "chat",
+        "plain"
+      ]
+    },
+    "promptAdaptationModesObserved": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "promptAdaptationDetailsObserved": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
     "model": {
       "type": "object",
-      "required": ["name"],
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
       "properties": {
-        "name": {"type": "string", "minLength": 1},
-        "repoOrName": {"type": "string"},
-        "revision": {"type": "string"},
-        "artifactSha256": {"type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$"},
-        "quantization": {"type": "string"},
-        "checkpointType": {"type": "string", "enum": ["base", "instruct", "chat", "specialized", "unknown"]},
-        "runtime": {"type": "string"},
-        "runtimeVersion": {"type": "string"},
-        "tokenizerName": {"type": "string"},
-        "chatTemplate": {"type": "string"},
-        "chatTemplateSha256": {"type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$"}
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repoOrName": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        },
+        "artifactSha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-fA-F]{64}$"
+        },
+        "artifactIdentityType": {
+          "type": "string"
+        },
+        "artifactFiles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "quantization": {
+          "type": "string"
+        },
+        "checkpointType": {
+          "type": "string",
+          "enum": [
+            "base",
+            "instruct",
+            "chat",
+            "specialized",
+            "unknown"
+          ]
+        },
+        "runtime": {
+          "type": "string"
+        },
+        "runtimeVersion": {
+          "type": "string"
+        },
+        "tokenizerName": {
+          "type": "string"
+        },
+        "chatTemplate": {
+          "type": "string"
+        },
+        "chatTemplateSha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-fA-F]{64}$"
+        },
+        "serverModelIdentity": {
+          "type": "object"
+        }
       }
     },
     "hardware": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "machine": {"type": "string"},
-        "chip": {"type": "string"},
-        "memoryGB": {"type": ["number", "null"], "minimum": 0},
-        "os": {"type": "string"},
-        "python": {"type": "string"}
+        "machine": {
+          "type": "string"
+        },
+        "chip": {
+          "type": "string"
+        },
+        "memoryGB": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "os": {
+          "type": "string"
+        },
+        "python": {
+          "type": "string"
+        },
+        "gpu": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "name": {
+                "type": "string"
+              },
+              "totalMemoryBytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "computeCapability": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "torchVersion": {
+          "type": "string"
+        },
+        "cudaVersion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nvidiaSmi": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gpuInspectionError": {
+          "type": "string"
+        },
+        "nvidiaSmiError": {
+          "type": "string"
+        }
       }
     },
     "decoding": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "temperature": {"type": "number", "minimum": 0},
-        "topP": {"type": "number", "minimum": 0, "maximum": 1},
-        "topK": {"type": "integer", "minimum": 0},
-        "maxNewTokens": {"type": "integer", "minimum": 1},
-        "forcedChoiceMaxNewTokens": {"type": "integer", "minimum": 1},
-        "seed": {"type": ["integer", "null"]}
+        "temperature": {
+          "type": "number",
+          "minimum": 0
+        },
+        "topP": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "topK": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxNewTokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "forcedChoiceMaxNewTokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "seed": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "batchSize": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "serverEndpoint": {
+          "type": "string"
+        },
+        "maxModelLen": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tensorParallelSize": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dtype": {
+          "type": "string"
+        },
+        "languageModelOnly": {
+          "type": "boolean"
+        },
+        "speculativeConfig": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
       }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "coldLoadSeconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cudaVisibleDevices": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resumeSegments": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "streamingMode": {
+          "type": "string"
+        },
+        "progressiveOptionTiming": {
+          "type": "object"
+        },
+        "llamaCppProps": {
+          "type": "object"
+        },
+        "serverIdentity": {
+          "type": "object"
+        },
+        "serverIdentityProven": {
+          "type": "boolean"
+        },
+        "lastBatchWallSeconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "wallSecondsSoFar": {
+          "type": "number",
+          "minimum": 0
+        },
+        "totalWallSeconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "batchWallSeconds": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "progressiveOptionTimingSummary": {
+          "type": "object"
+        },
+        "extensions": {
+          "type": "object"
+        }
+      }
+    },
+    "contextBudget": {
+      "type": "object",
+      "additionalProperties": true
     },
     "outputs": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "output"],
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "output",
+          "latencySeconds"
+        ],
         "properties": {
-          "id": {"type": "string", "minLength": 1},
-          "output": {"type": "string"},
-          "latencySeconds": {"type": "number", "minimum": 0},
-          "promptAdaptation": {"type": "string"},
-          "promptAdaptationDetail": {"type": "string"},
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "output": {
+            "type": "string"
+          },
+          "latencySeconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "promptAdaptation": {
+            "type": "string"
+          },
+          "promptAdaptationDetail": {
+            "type": "string"
+          },
           "probabilities": {
             "type": "object",
-            "description": "Optional diagnostic probabilities/logits. Text-output scoring remains the cross-runtime primary prompted measure.",
-            "additionalProperties": {"type": "number"}
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Optional diagnostic probabilities/logits."
           },
           "metricScores": {
-            "description": "For generative-expression cases only. Values are normalized observations in [0,1] under the recorded protocol, not automatically assumed to be higher-is-better utilities. Directionality is defined by english-core-generative-metric-contract.json and converted by score-english-core.mjs.",
             "type": "object",
-            "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
+            "additionalProperties": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
           },
           "metricProvenance": {
-            "description": "Structured provenance for generative metricScores. The protocol field must define the scoring/normalization procedure. A free-form source name alone is insufficient for official English Core scoring.",
             "type": "object",
-            "required": ["kind", "name", "protocol", "candidateSelfGrade"],
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "name",
+              "protocol",
+              "candidateSelfGrade"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
@@ -89,34 +407,209 @@
                   "general_llm_diagnostic"
                 ]
               },
-              "name": {"type": "string", "minLength": 1},
-              "version": {"type": "string"},
-              "reference": {"type": "string"},
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "type": "string"
+              },
+              "reference": {
+                "type": "string"
+              },
               "protocol": {
                 "type": "string",
-                "minLength": 1,
-                "description": "Predeclared procedure that maps raw evaluator judgments/measurements into the normalized 0..1 observations in metricScores."
+                "minLength": 1
               },
-              "validatedAgainstHumans": {"type": "boolean"},
-              "validationReference": {"type": "string"},
-              "candidateSelfGrade": {"const": false},
-              "notes": {"type": "string"}
+              "validatedAgainstHumans": {
+                "type": "boolean"
+              },
+              "validationReference": {
+                "type": "string"
+              },
+              "candidateSelfGrade": {
+                "const": false
+              },
+              "notes": {
+                "type": "string"
+              }
             }
           },
           "metricSource": {
-            "description": "Legacy informational field only. It no longer qualifies generative scores for the official composite without metricProvenance.",
             "type": "string"
+          },
+          "diagnostics": {
+            "type": "object"
+          },
+          "progressiveOptionTiming": {
+            "type": "object"
+          },
+          "firstUsefulOptionLatencySeconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "firstThreeCandidatesLatencySeconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "firstTenCandidatesLatencySeconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "completionLatencySeconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "timeToFirstTokenSeconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "finishReason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "outputTokens": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "promptTokens": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "streamChunkCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "streamDeltaSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{64}$"
+          },
+          "latencySource": {
+            "type": "string"
+          },
+          "firstTokenLatencySeconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "completionTokenCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "requestedMaxNewTokens": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "silentTruncation": {
+            "type": "object"
+          },
+          "outputBudget": {
+            "type": "object"
+          },
+          "firstCandidateLatencySeconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "serverMetrics": {
+            "type": "object"
+          },
+          "promptTokensEvaluated": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "serverTruncated": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "latencyPercentiles": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "p50Seconds": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "p50UnavailableReason": {
+                "type": "string"
+              },
+              "p90Seconds": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "p90UnavailableReason": {
+                "type": "string"
+              }
+            }
           }
         }
       }
     },
     "reproducibility": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "benchmarkRevision": {"type": "string"},
-        "scorerRevision": {"type": "string"},
-        "rawOutputSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
-        "notes": {"type": "array", "items": {"type": "string"}}
+        "benchmarkRevision": {
+          "type": "string"
+        },
+        "scorerRevision": {
+          "type": "string"
+        },
+        "rawOutputSha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-fA-F]{64}$"
+        },
+        "resultSchemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "resultSchemaSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{64}$"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     }
   }

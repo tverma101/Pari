@@ -119,6 +119,8 @@ for (const row of seed.cases) {
       phenomenon: row.phenomenon ?? null,
       generative: false,
       prompt: render(row, order),
+      // Frozen from the structured choice array length, never the gold index.
+      allowedChoices: letters.slice(0, order.length).split(""),
     });
     answers[id] = {
       expectedLetter: letters[goldDisplayedIndex],
@@ -144,6 +146,8 @@ fs.writeFileSync(
     baseCases,
     taskInstances: tasks.length,
     presentationsPerCase: 2,
+    allowedChoices:
+      "Every task freezes allowedChoices as the first N letters for its N rendered options, derived from the structured choice array length and independent of goldBaseChoiceIndex.",
     orderPolicy: "presentation 0 uses deterministic SHA-256 order; presentation 1 swaps binary options or cyclically rotates multi-option choices so the gold position changes",
     purpose: "measure choice-order robustness separately from English competence score",
     researchBasis: [

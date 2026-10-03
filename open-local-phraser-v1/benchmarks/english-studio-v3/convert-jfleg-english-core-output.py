@@ -9,6 +9,14 @@ Then, from the pinned official JFLEG checkout:
 
 The official script reports the benchmark GLEU result and uncertainty; Pari does
 not replace it with a custom fluency metric.
+
+Issue #66: `normalize_one_line()` is Pari-owned and score-affecting, so it is frozen
+as conversion protocol `pari-jfleg-one-line-normalizer` v1 (registered in
+english_core_converter_provenance.py). The manifest binds the protocol contract
+hash, this script's SHA-256, the conversion config, and the Pari benchmark
+commit/tree. Raw hypotheses are preserved alongside the converted lines and the
+count of rows the normalizer actually changed, so a future normalization change is
+a protocol revision rather than an invisible re-score.
 """
 
 from __future__ import annotations
@@ -17,9 +25,19 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from english_core_converter_provenance import (  # noqa: E402
+    JFLEG_PROTOCOL_ID,
+    build_converter_provenance,
+    registered_protocol,
+)
+
 GIT_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+PROTOCOL_VERSION = 1
 
 
 def sha256(path: Path) -> str:
@@ -31,8 +49,11 @@ def immutable_git_revision(value: object) -> bool:
 
 
 def normalize_one_line(text: str) -> str:
-    # JFLEG expects one hypothesis per source line. Preserve sentence content while
-    # collapsing model formatting/newlines that are not part of the benchmark I/O.
+    """Frozen `pari-jfleg-one-line-normalizer` v1.
+
+    JFLEG expects one hypothesis per source line. Preserve sentence content while
+    collapsing model formatting/newlines that are not part of the benchmark I/O.
+    """
     return " ".join(str(text or "").strip().split())
 
 
@@ -138,20 +159,55 @@ def main() -> None:
 
     hypotheses = []
     empty = []
+    changed_rows = 0
+    raw_rows: list[dict] = []
     for task in tasks:
         task_id = task["id"]
         if task_id not in outputs:
             hypotheses.append("")
+            raw_rows.append({"id": task_id, "rawHypothesis": None, "missingOutput": True, "changedByNormalization": False})
             continue
-        text = normalize_one_line(outputs[task_id])
+        raw_hypothesis = outputs[task_id]
+        text = normalize_one_line(raw_hypothesis)
+        changed = text != ("" if raw_hypothesis is None else str(raw_hypothesis))
+        if changed:
+            changed_rows += 1
         if not text:
             empty.append(task_id)
         hypotheses.append(text)
+        raw_rows.append({
+            "id": task_id,
+            "rawHypothesis": raw_hypothesis,
+            "normalizedHypothesis": text,
+            "missingOutput": False,
+            "changedByNormalization": changed,
+        })
 
     out_path.write_text("\n".join(hypotheses) + "\n")
+    coverage = {
+        "cases": len(tasks),
+        "hypotheses": len(hypotheses),
+        "missingOutputs": len(missing),
+        "extraOutputs": len(extra),
+        "emptyOutputs": len(empty),
+        "normalizedChangedRows": changed_rows,
+    }
+    conversion_config = {
+        "normalizerProtocol": f"{JFLEG_PROTOCOL_ID}@{PROTOCOL_VERSION}",
+    }
+    converter_provenance = build_converter_provenance(
+        benchmark="jfleg",
+        protocol_id=JFLEG_PROTOCOL_ID,
+        protocol_version=PROTOCOL_VERSION,
+        converter_path=Path(__file__),
+        conversion_config=conversion_config,
+    )
+    if not converter_provenance["benchmarkGit"]["available"]:
+        provenance_errors.append("benchmark_git_identity_unavailable")
+
     conversion_manifest = out_path.with_suffix(out_path.suffix + ".manifest.json")
     conversion_manifest.write_text(json.dumps({
-        "version": 3,
+        "version": 4,
         "promptFile": str(prompt_path),
         "promptFileSha256": prompt_hash,
         "promptManifest": str(manifest_path) if manifest_path else None,
@@ -166,10 +222,17 @@ def main() -> None:
         "runTaskCount": run.get("taskCount"),
         "outHypothesis": str(out_path),
         "outHypothesisSha256": sha256(out_path),
+        "coverage": coverage,
         "cases": len(tasks),
         "missingOutputs": len(missing),
         "extraOutputs": len(extra),
         "emptyOutputs": len(empty),
+        "normalizedChangedRows": changed_rows,
+        "rawHypotheses": raw_rows,
+        "conversionStatus": "completed" if not provenance_errors else "completed_with_provenance_errors",
+        "terminalStatus": "completed",
+        "converterProvenance": converter_provenance,
+        "conversionContract": registered_protocol("jfleg", JFLEG_PROTOCOL_ID, PROTOCOL_VERSION)["contract"],
         "promotionProvenanceErrors": provenance_errors,
         "promotionProvenanceReady": not provenance_errors,
         "officialEvaluatorRequired": True,
@@ -179,17 +242,21 @@ def main() -> None:
         "notes": [
             "Missing model-result records are provenance/completeness errors; a present but empty model output is retained as model behavior and should score accordingly.",
             "Only whitespace/newline formatting is normalized to JFLEG's one-hypothesis-per-line interface; Pari does not otherwise rewrite model hypotheses before official scoring.",
+            "normalize_one_line() is Pari-owned and score-affecting; it is frozen as conversion protocol pari-jfleg-one-line-normalizer v1. Changing it is a protocol revision requiring comparable replay from preserved raw hypotheses.",
             "Promotion provenance requires the official JFLEG repository's full 40-hex commit SHA and four distinct pinned reference files.",
             "For promotion-quality evidence, archive the official GLEU output produced from this exact hypothesis file, the pinned source, all four pinned references, and the pinned repository revision."
         ]
     }, indent=2) + "\n")
 
     print(json.dumps({
+        "converterIdentity": converter_provenance["identity"],
+        "converterProtocol": f"{JFLEG_PROTOCOL_ID}@{PROTOCOL_VERSION}",
         "cases": len(tasks),
         "hypotheses": len(hypotheses),
         "missingOutputs": len(missing),
         "extraOutputs": len(extra),
         "emptyOutputs": len(empty),
+        "normalizedChangedRows": changed_rows,
         "promotionProvenanceReady": not provenance_errors,
         "promotionProvenanceErrors": provenance_errors,
         "out": str(out_path),

@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
-import { parseChoiceLetter } from "./english-core-choice-parser.mjs";
+import {
+  allowedChoicesFromTask,
+  normalizeAllowedChoices,
+  parseChoice,
+  parseChoiceLetter,
+} from "./english-core-choice-parser.mjs";
 
 const accepted = new Map([
   ["A", "A"],
@@ -58,4 +63,53 @@ for (const text of rejected) {
   assert.equal(parseChoiceLetter(text), null, `expected ${JSON.stringify(text)} to be rejected`);
 }
 
-console.log(JSON.stringify({ accepted: accepted.size, rejected: rejected.length, status: "pass" }));
+// Task-aware allowed set (GitHub issue #44). The allowed set is frozen task
+// metadata and never the gold answer.
+const AB = ["A", "B"];
+const ABCD = ["A", "B", "C", "D"];
+const taskAware = [
+  ["A", AB, "strict_allowed_choice", "A", null],
+  ["D", ABCD, "strict_allowed_choice", "D", null],
+  ["Answer: B", AB, "recoverable_allowed_choice", "B", null],
+  ["Z", AB, "strict_invalid_option_label", null, "Z"],
+  ["C", AB, "strict_invalid_option_label", null, "C"],
+  ["E", ABCD, "strict_invalid_option_label", null, "E"],
+  ["Answer: C because it fits", AB, "recoverable_invalid_option_label", null, "C"],
+  ["b", AB, "strict_allowed_choice", "B", null],
+  ["\uff21", AB, "no_anchored_answer", null, null], // full-width A
+  ["\u212a", AB, "no_anchored_answer", null, null], // Kelvin sign
+  ["\u0410", AB, "no_anchored_answer", null, null], // Cyrillic A
+  ["", AB, "empty_output", null, null],
+  ["   ", AB, "whitespace_only", null, null],
+];
+
+for (const [text, allowed, status, letter, invalid] of taskAware) {
+  const got = parseChoice(text, allowed);
+  assert.equal(got.status, status, `status ${JSON.stringify(text)} ${JSON.stringify(allowed)}`);
+  assert.equal(got.letter, letter, `letter ${JSON.stringify(text)} ${JSON.stringify(allowed)}`);
+  assert.equal(got.invalidOptionLabel, invalid, `invalid ${JSON.stringify(text)} ${JSON.stringify(allowed)}`);
+  assert.equal(got.allowedSetFrozen, true);
+  assert.equal(parseChoiceLetter(text, allowed), letter);
+}
+
+// Out-of-domain labels never become valid under either view.
+for (const text of ["Z", "C", "Answer: C"]) {
+  assert.equal(parseChoiceLetter(text, AB), null, text);
+}
+
+assert.deepEqual(allowedChoicesFromTask({ allowedChoices: ["B", "A"] }), ["A", "B"]);
+assert.deepEqual(allowedChoicesFromTask({ allowed_choices: ["A", "B"] }), ["A", "B"]);
+assert.equal(allowedChoicesFromTask({ id: "x" }), null);
+assert.deepEqual(normalizeAllowedChoices("AB"), ["A", "B"]);
+for (const bad of [[], ["AA"], [""], ["Ä"], { A: true }, ["a", "b"]]) {
+  assert.throws(() => normalizeAllowedChoices(bad), `expected throw for ${JSON.stringify(bad)}`);
+}
+
+// Task files that predate the frozen set keep the historical permissive behavior.
+const legacy = parseChoice("Z");
+assert.equal(legacy.letter, "Z");
+assert.equal(legacy.allowedSetFrozen, false);
+
+console.log(
+  JSON.stringify({ accepted: accepted.size, rejected: rejected.length, taskAware: taskAware.length, status: "pass" }),
+);

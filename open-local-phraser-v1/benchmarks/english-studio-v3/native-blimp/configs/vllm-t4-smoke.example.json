@@ -1,0 +1,42 @@
+{
+  "schema": "native-blimp-config-1",
+  "laneId": "native-blimp",
+  "candidateId": "qwen35-2b",
+  "backend": "vllm",
+  "mode": "smoke",
+  "promotable": false,
+  "note": "Debug smoke only. Proves the pinned lane executes on T4 and that logprobs are usable. Never promotion evidence.",
+  "model": {
+    "repo": "Qwen/Qwen3.5-2B",
+    "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+    "tokenizer": "Qwen/Qwen3.5-2B",
+    "tokenizerRevision": "15852e8c16360a2fea060d615a32b45270f8a8fc"
+  },
+  "runtime": {
+    "modelArgs": {
+      "pretrained": "Qwen/Qwen3.5-2B",
+      "dtype": "float16",
+      "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+      "tokenizer": "Qwen/Qwen3.5-2B",
+      "tokenizer_revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+      "max_model_len": 4096,
+      "seed": 1234,
+      "quantization": null,
+      "tensor_parallel_size": 1,
+      "gpu_memory_utilization": 0.88,
+      "add_bos_token": true
+    },
+    "vllmVersion": "0.30.0"
+  },
+  "harness": {
+    "checkout": "/kaggle/working/lm-evaluation-harness",
+    "expectedCommit": "d6de81643928d653435c431bae19945d41d32520"
+  },
+  "benchmarkRevision": "REPLACE_WITH_THIS_BENCHMARKS_GIT_REV",
+  "outputs": {
+    "resultsDir": "/kaggle/working/results/native-blimp/qwen35-2b-smoke",
+    "receiptPath": "/kaggle/working/results/native-blimp/qwen35-2b-smoke/native-blimp-receipt.json",
+    "logSamples": true
+  },
+  "smokeLimit": 4
+}

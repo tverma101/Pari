@@ -14,6 +14,12 @@ Example:
 Promotion-quality use requires that the conversion manifest was built from a
 prompt manifest with a pinned official repository commit and exactly four pinned
 reference files.
+
+Issue #66: `normalize_one_line()` is Pari-owned and score-affecting, so the
+conversion manifest must bind a registered conversion protocol
+(`pari-jfleg-one-line-normalizer` v1) whose contract hash, converter source hash,
+config, and benchmark Git identity verify. `promotionProvenanceReady: true` is not
+self-authenticating; a missing, unknown, or drifted converter identity fails here.
 """
 
 from __future__ import annotations
@@ -27,7 +33,15 @@ import sys
 import time
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from english_core_converter_provenance import (  # noqa: E402
+    JFLEG_PROTOCOL_ID,
+    verify_converter_provenance,
+)
+
 GIT_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+CONVERTER_REL = "convert-jfleg-english-core-output.py"
 
 
 def sha256(path: Path) -> str:
@@ -143,6 +157,13 @@ def main() -> None:
     if manifest.get("outHypothesisSha256") != sha256(hyp):
         errors.append("hypothesis_hash_mismatch")
 
+    converter_path = Path(__file__).resolve().parent / CONVERTER_REL
+    errors.extend(
+        verify_converter_provenance(
+            manifest, benchmark="jfleg", converter_path=converter_path
+        )
+    )
+
     expected_revision = str(manifest.get("officialJflegRepositoryRevision") or "").strip()
     actual_revision = git_head(repo)
     dirty = git_dirty(repo)
@@ -255,6 +276,16 @@ def main() -> None:
         "hypothesisSha256": sha256(hyp),
         "conversionManifest": str(manifest_path),
         "conversionManifestSha256": sha256(manifest_path),
+        "conversionChain": {
+            "converterSource": (manifest.get("converterProvenance") or {}).get("converterSource"),
+            "converterProtocol": (manifest.get("converterProvenance") or {}).get("protocol"),
+            "conversionIdentity": (manifest.get("converterProvenance") or {}).get("identity"),
+            "benchmarkGit": (manifest.get("converterProvenance") or {}).get("benchmarkGit"),
+            "conversionConfig": (manifest.get("converterProvenance") or {}).get("conversionConfig"),
+            "coverage": manifest.get("coverage"),
+            "rawHypotheses": manifest.get("rawHypotheses"),
+            "verifiedByWrapper": True,
+        },
         "command": command,
         "protocol": {
             "metric": "official JFLEG GLEU",
@@ -277,6 +308,7 @@ def main() -> None:
             "Source and all four references are byte-checked against their canonical dev/ or test/ files in the pinned checkout before evaluation.",
             "The repository's default 500-iteration protocol is retained because eval/gleu.py uses deterministic per-iteration seeds under that default.",
             "Python/NumPy/SciPy versions are queried from the exact interpreter used to execute eval/gleu.py, not from the wrapper process by assumption.",
+            "The one-line normalizer is Pari-owned and score-affecting: this wrapper re-hashes the converter script, verifies the registered protocol contract hash, and recomputes the conversion identity, so a normalization change cannot produce a promotion-ready official score.",
             "Keep this JSON artifact with the exact hypothesis conversion manifest for promotion-quality comparison."
         ],
     }
