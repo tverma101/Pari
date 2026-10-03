@@ -37,7 +37,7 @@ jobs:
       - name: Ensure benchmark worktree was not unexpectedly mutated
         run: |
           git status --short
-          if git status --porcelain | grep -Ev '^\?\? open-local-phraser-v1/benchmarks/english-studio-v3/(english-core-shadow|english-core-prompt-robustness|english-core-choice-order-robustness)'; then
+          if git status --porcelain | grep -Ev '^\?\? open-local-phraser-v1/benchmarks/english-studio-v3/(english-core-shadow|english-core-prompt-robustness|english-core-choice-order-robustness|.*__pycache__/)'; then
             echo 'Unexpected tracked/untracked mutation from benchmark self-check' >&2
             exit 1
           fi
