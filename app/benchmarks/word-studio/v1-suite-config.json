@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "purpose": "Fast V1 model/runtime acceptance suite. This does not replace release validation.",
+  "targetUniqueSources": 200,
+  "routes": {
+    "word_phrase_alternatives": {
+      "target": 60,
+      "priority": "highest",
+      "sources": ["interactive", "smart_word_suggestions_external", "tsar_external"],
+      "metrics": ["top3_coverage", "top5_coverage", "top10_coverage", "context_grammar", "meaning_preservation", "duplicate_rate", "replacement_length_variety", "latency_first3", "latency_first10"]
+    },
+    "sentence_alternatives": {
+      "target": 35,
+      "priority": "high",
+      "sources": ["interactive", "paraphrase_v2", "iterater_holdout_external"],
+      "metrics": ["meaning_preservation", "grammar_naturalness", "register_drift", "structural_diversity", "length_inflation", "latency_first_batch"]
+    },
+    "paragraph_first_draft": {
+      "target": 35,
+      "priority": "medium",
+      "sources": ["paraphrase_v2", "quillbot_frozen", "iterater_holdout_external"],
+      "metrics": ["semantic_safety", "coherence", "vocabulary_inflation", "strength_response", "unnecessary_edit_rate", "latency"]
+    },
+    "safety_meaning": {
+      "target": 30,
+      "priority": "mandatory_gate",
+      "sources": ["eval_v1", "paraphrase_v2", "paws_external"],
+      "metrics": ["contradiction", "negation_flip", "modality_flip", "quantity_corruption", "role_reversal", "invention", "protected_span_corruption"]
+    },
+    "strength_register": {
+      "target": 25,
+      "priority": "mandatory_ux",
+      "sources": ["interactive", "paraphrase_v2", "eval_v1"],
+      "metrics": ["edit_distance_monotonicity", "semantic_stability", "readability_drift", "rare_word_drift", "register_drift"]
+    },
+    "protected_containment": {
+      "target": 15,
+      "priority": "mandatory_control",
+      "sources": ["interactive", "eval_v1"],
+      "metrics": ["protected_span_integrity", "outside_selection_mutation", "grammar_after_insertion"]
+    }
+  },
+  "globalVetoes": [
+    "contradiction",
+    "negation_flip",
+    "modality_or_certainty_change",
+    "name_date_quantity_currency_url_quote_corruption",
+    "actor_patient_reversal",
+    "invented_fact_reason_evidence_or_outcome",
+    "lost_cause_contrast_or_condition_relation",
+    "protected_span_corruption"
+  ],
+  "runtimeMeasurements": [
+    "model_bytes",
+    "peak_unified_memory",
+    "cold_load_seconds",
+    "prefill_tokens_per_second",
+    "decode_tokens_per_second",
+    "latency_first_useful_option",
+    "latency_top10_options",
+    "paragraph_latency",
+    "repeated_use_stability"
+  ],
+  "reporting": {
+    "singleAggregateScoreAllowed": false,
+    "requiredViews": [
+      "word_phrase_quality_vs_latency",
+      "sentence_quality_vs_latency",
+      "paragraph_quality_vs_runtime",
+      "quality_vs_memory",
+      "quantization_delta",
+      "mtp_delta_when_available"
+    ]
+  }
+}

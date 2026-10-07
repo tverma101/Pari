@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "status": "pinned",
+  "templates": {
+    "qwen3": {
+      "enable_thinking": false,
+      "reasoning_effort": "none"
+    },
+    "qwen35": {
+      "thinking": "off",
+      "reasoning_effort": "none"
+    }
+  }
+}
