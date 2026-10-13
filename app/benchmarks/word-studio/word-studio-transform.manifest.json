@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "suite": "word_studio_transform_v1",
+  "cases": 100,
+  "uniqueSources": 60,
+  "taskFileSha256": "42cae7153041288eea05c0da056078383b1652a9c53022af1491e5d8a2f90a72",
+  "interactiveSeedSha256": "44ea674fc49c0d5e2031992b906342e702e1d353f7388ce192ce4aac560de91f",
+  "operationCounts": {
+    "clause_rewrite": 12,
+    "collocation": 4,
+    "expansion_compression": 12,
+    "phrase_to_phrase": 12,
+    "phrase_to_word": 12,
+    "protected_context": 4,
+    "register_preserve": 6,
+    "sentence_rewrite": 12,
+    "split_join": 8,
+    "vocabulary_ceiling": 6,
+    "word_to_phrase": 12
+  },
+  "evidenceStatus": "hand_authored_product_acceptance_seed; author expectations; not published human-validated gold",
+  "scoringSeparation": "intentional_compression tasks must not use full-paraphrase semantic-equivalence thresholds",
+  "diagnosticMetadata": "sourceText/selectedText are non-gold fields already present in prompts and enable unchanged-copy diagnostics without private expectations.",
+  "privacy": "Keep model outputs and private review key in the private Kaggle workspace."
+}

@@ -17,6 +17,17 @@ Design rules:
   can change meaning are left alone.
 - Structured JSON entries must be strings. ``null``, booleans, numbers, objects
   and nested lists are rejected and reported; they never become candidates.
+- The same rule is enforced by the admission ledger itself, not only by the
+  JSON reader, so a non-string handed to ``CandidateLedger.add`` by any
+  consumer is rejected as ``typed_invalid`` and can never be stringified into
+  a candidate.
+- A Markdown-fenced completion is unwrapped before parsing. Only the fenced
+  body is the candidate source; text before or after the fence is wrapper prose
+  and is diagnosed (``word_studio_leading_prose`` /
+  ``word_studio_trailing_commentary``), never scored. A fence whose closing
+  marker has not arrived yet is handled by the same rule while streaming, so a
+  truncated fenced stream cannot score its own fence marker or partial JSON
+  line as candidates.
 - Near-duplicate detection is deterministic and cheap (documented edit/token
   thresholds). There is no model judge and no embedding lookup.
 
@@ -25,30 +36,46 @@ GitHub issue #43.
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import re
 import unicodedata
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-PARSER_VERSION = 3
+PARSER_VERSION = 5
+OPERATION_CONTRACT_VERSION = 1
 
 BULLET_RE = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+(.+?)\s*$")
 COMMENTARY_PREFIX = re.compile(
-    r"^(?:here(?:'s| are)|sure[,!:]|options?:|alternatives?:|note:|"
+    r"^(?:here(?:'s| are)|sure[,!:]|options?:|alternatives?:|note:|explanations?:|"
     r"the following|based on your request|i hope this helps|let me know)",
     re.I,
 )
 # Wrapper prose that can follow an otherwise valid list.
 COMMENTARY_TAIL_RE = re.compile(
-    r"^\s*(?:here(?:'s| are)|i hope this helps|let me know|note[:\s]|"
+    r"^\s*(?:here(?:'s| are)|i hope this helps|let me know|note[:\s]|explanations?:|"
     r"options?:|alternatives?:|would you like|feel free to|if you'd like)\b",
     re.I,
 )
 OPTIONS_ARRAY_PREFIX = re.compile(r'"options"\s*:\s*\[', re.I)
-CODE_FENCE_RE = re.compile(r"^\s*```[^\n`]*\n(?P<body>.*?)\n?\s*```\s*$", re.S)
+# Anchored at the fence itself but tolerant of wrapper prose: a model that wraps
+# its JSON in a Markdown fence frequently appends a sign-off ("Hope this
+# helps!") or a preamble afterwards. Anchoring the *whole* completion to the
+# fence made `_strip_code_fence` decline any such output, so the fenced JSON,
+# the fence markers and the trailing prose all fell through to the newline-list
+# branch and were counted as four usable candidates. Matching only the fenced
+# block keeps the JSON recoverable and lets the leftover prose be diagnosed as
+# commentary instead of scored.
+CODE_FENCE_RE = re.compile(r"```[^\n`]*\n(?P<body>.*?)\n?[ \t]*```", re.S)
+# An opening fence whose closing marker has not arrived yet. Used by the
+# streaming path so an in-progress fenced completion is never mistaken for a
+# newline list: without this, a truncated ```` ```json {"options":["a" ````
+# stream scored the fence marker and the partial JSON line as two candidates.
+OPEN_FENCE_RE = re.compile(r"^[ \t]*```[^\n`]*\n(?P<body>.*)\Z", re.S)
+MARKDOWN_HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+\S")
 NEWLINE = chr(10)
 
 # Keys a model plausibly uses when it returns structured JSON for a list.
@@ -87,14 +114,53 @@ NEAR_DUPLICATE_LENGTH_SLACK = 0.25
 # candidates ("ok", "no") are never merged into longer real alternatives.
 NEAR_DUPLICATE_MIN_CHARS = 6
 
+# --- near-duplicate semantic guards -----------------------------------------
+
+# A candidate pair that differs only in a number is never "materially the same":
+# "$50" vs "$60" and "99.9%" vs "99.8%" are different claims, not reformatting.
+# Numeric tokens are compared as a multiset so ordering and repetition do not
+# matter. This guard needs no vocabulary, so it cannot drift.
+NEAR_DUPLICATE_NUMERIC_TOKEN_RE = re.compile(r"\d+(?:[.,:/-]\d+)*")
+
+# High-signal polarity/modality words. A pair that differs in whether one of these
+# is present is treated as materially different ("formal" vs "informal"),
+# because such a word alone can invert the candidate's meaning.
+#
+# Scope note: this is a *dedupe* guard, deliberately small and self-contained.
+# studio_backend/protected_content.py (issue #51) owns the authoritative
+# negation/modality vocabulary for protected-content diagnostics; do not extend
+# this list to cover general grammar, only words that flip polarity by themselves.
+NEAR_DUPLICATE_POLARITY_TOKENS = frozenset(
+    {
+        "not",
+        "never",
+        "no",
+        "nor",
+        "neither",
+        "cannot",
+        "without",
+        "must",
+        "mustn't",
+        "should",
+        "shouldn't",
+        "may",
+        "might",
+        "always",
+        "informal",
+        "optional",
+        "required",
+    }
+)
+
 # --- route semantics -------------------------------------------------------
 
 # Routes whose contract asks for an actual transformation. An exact copy of the
 # source cannot advance useful depth on these routes.
 ROUTE_ALTERNATIVES = "alternatives"
-# ``intentional_compression`` is a separate semantic contract: a gist label may
-# legitimately differ from the source in any way, so strict full-equivalence
-# "unchanged means unusable" logic must not be applied to it.
+# ``intentional_compression`` is a separate semantic scoring contract, so an
+# unchanged copy is not rejected by the generic full-equivalence check here.
+# When a task declares a concrete gist/form target, OperationContract below is
+# still responsible for enforcing that declared form.
 ROUTE_INTENTIONAL_COMPRESSION = "intentional_compression"
 # Routes that explicitly permit identity / no-op output.
 ROUTE_IDENTITY_ALLOWED = "identity_allowed"
@@ -115,14 +181,33 @@ _JSON_KIND_BY_TYPE = {
     dict: "object",
 }
 
-# A coordinate-bearing protected value that survives but slides this far from
-# its source offset is reported as position drift. Deterministic and cheap: a
-# quarter of the source length (min 8 characters).
-POSITION_DRIFT_FRACTION = 0.25
-POSITION_DRIFT_MIN_CHARS = 8
+WORD_RE = re.compile(r"[^\W_]+(?:['’-][^\W_]+)*", re.UNICODE)
+SENTENCE_END_RE = re.compile(r"""[.!?]["'’”)\]}]*$""")
 
-DIGIT_RE = re.compile(r"\d")
-NUMERIC_TOKEN_RE = re.compile(r"[\w$€£¥%.,:/-]*\d[\w$€£¥%.,:/-]*", re.UNICODE)
+# Selected-span replacements must not quietly return the surrounding sentence.
+# This deterministic n-gram check is intentionally narrow: four consecutive
+# comparison-key words from the source that are not wholly inside the selection
+# and appear in the candidate are treated as context leakage.
+SELECTED_ONLY_NGRAM = 4
+
+
+# Frozen deterministic form constraints declared by task metadata. Prompt prose is
+# never parsed for these values; only explicit operation/category ids and word
+# target fields participate.
+_OPERATION_RULES: dict[tuple[str, str], dict[str, Any]] = {
+    ("word_to_phrase", "phrase"): {"min_words": 2, "max_words": 6},
+    ("phrase_to_word", "word"): {"min_words": 1, "max_words": 1},
+    ("phrase_to_word", "micro"): {"min_words": 1, "max_words": 3},
+    ("sentence_rewrite", "sentence"): {"require_sentence": True},
+    ("sentence_rewrite", "gist3"): {"min_words": 1, "max_words": 3},
+    ("phrase_to_phrase", "shorter"): {"direction": "shorter"},
+    ("expansion_compression", "shorter"): {"direction": "shorter"},
+    ("expansion_compression", "longer"): {"direction": "longer"},
+}
+_OPERATION_ALIASES: dict[str, dict[str, Any]] = {
+    "gist3": {"min_words": 1, "max_words": 3},
+    "compress_gist": {"min_words": 1, "max_words": 3},
+}
 
 
 def route_from_task(task: Mapping[str, Any] | None) -> str:
@@ -140,6 +225,142 @@ def route_from_task(task: Mapping[str, Any] | None) -> str:
     if "identity" in declared or "no_op" in declared or "noop" in declared:
         return ROUTE_IDENTITY_ALLOWED
     return ROUTE_ALTERNATIVES
+
+
+@dataclass(frozen=True)
+class OperationContract:
+    """Deterministic eligibility constraints derived from frozen task metadata.
+
+    This is intentionally not a semantic judge. It encodes only form constraints
+    the benchmark already declares: word-count targets, explicit shorter/longer
+    direction, sentence shape, and selected-span-only context containment.
+    """
+
+    operation: str | None = None
+    source_category: str | None = None
+    min_words: int | None = None
+    max_words: int | None = None
+    direction: str | None = None
+    require_sentence: bool = False
+    source_text: str | None = None
+    selected_text: str | None = None
+
+    @property
+    def declared(self) -> bool:
+        return bool(
+            self.operation
+            or self.source_category
+            or self.min_words is not None
+            or self.max_words is not None
+            or self.direction
+            or self.require_sentence
+        )
+
+    def to_diagnostics(self) -> dict[str, Any]:
+        """Provenance without raw task text."""
+        return {
+            "version": OPERATION_CONTRACT_VERSION,
+            "declared": self.declared,
+            "operation": self.operation,
+            "sourceCategory": self.source_category,
+            "minWords": self.min_words,
+            "maxWords": self.max_words,
+            "direction": self.direction,
+            "requireSentence": self.require_sentence,
+            "selectedOnly": self.enforces_selected_only,
+        }
+
+    @property
+    def enforces_selected_only(self) -> bool:
+        if not self.source_text or not self.selected_text:
+            return False
+        return near_key(self.source_text) != near_key(self.selected_text)
+
+
+def _optional_int(value: Any) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value.strip().isdigit():
+        return int(value.strip())
+    return None
+
+
+def operation_contract_from_task(task: Mapping[str, Any] | None) -> OperationContract:
+    """Build the versioned operation contract from explicit task fields only."""
+    if not isinstance(task, Mapping):
+        return OperationContract()
+    operation = str(
+        task.get("operation")
+        or task.get("operationId")
+        or task.get("operation_id")
+        or ""
+    ).strip().lower() or None
+    source_category = str(
+        task.get("sourceCategory")
+        or task.get("source_category")
+        or ""
+    ).strip().lower() or None
+    rules = dict(_OPERATION_RULES.get((source_category or "", operation or ""), {}))
+    if not rules and operation in _OPERATION_ALIASES:
+        rules = dict(_OPERATION_ALIASES[operation])
+
+    min_words = _optional_int(
+        task.get("targetMinWords")
+        if task.get("targetMinWords") is not None
+        else task.get("target_min_words", task.get("minWords"))
+    )
+    max_words = _optional_int(
+        task.get("targetMaxWords")
+        if task.get("targetMaxWords") is not None
+        else task.get("target_max_words", task.get("maxWords"))
+    )
+    source_text = task.get("sourceText") or task.get("source_text") or None
+    selected_text = task.get("selectedText") or task.get("selected_text") or None
+    return OperationContract(
+        operation=operation,
+        source_category=source_category,
+        min_words=min_words if min_words is not None else rules.get("min_words"),
+        max_words=max_words if max_words is not None else rules.get("max_words"),
+        direction=rules.get("direction"),
+        require_sentence=bool(rules.get("require_sentence")),
+        source_text=str(source_text) if source_text is not None else None,
+        selected_text=str(selected_text) if selected_text is not None else None,
+    )
+
+
+def coerce_operation_contract(value: Any) -> OperationContract:
+    if isinstance(value, OperationContract):
+        return value
+    if isinstance(value, Mapping):
+        known = {
+            "operation",
+            "source_category",
+            "min_words",
+            "max_words",
+            "direction",
+            "require_sentence",
+            "source_text",
+            "selected_text",
+        }
+        aliases = {
+            "sourceCategory": "source_category",
+            "minWords": "min_words",
+            "maxWords": "max_words",
+            "requireSentence": "require_sentence",
+            "sourceText": "source_text",
+            "selectedText": "selected_text",
+        }
+        normalized: dict[str, Any] = {}
+        for key in known:
+            if key in value:
+                normalized[key] = value[key]
+        for source, target in aliases.items():
+            if target not in normalized and source in value:
+                normalized[target] = value[source]
+        return OperationContract(**normalized)
+    return OperationContract()
 
 
 # ---------------------------------------------------------------------------
@@ -201,6 +422,17 @@ def near_key(text: str) -> str:
     return re.sub(r"\s+", " ", stripped).strip()
 
 
+def _numeric_tokens(key: str) -> tuple[str, ...]:
+    """Sorted numeric-token multiset of a comparison key, for the dedupe guard."""
+    return tuple(sorted(NEAR_DUPLICATE_NUMERIC_TOKEN_RE.findall(comparison_key(key))))
+
+
+def _polarity_tokens(key: str) -> tuple[str, ...]:
+    """Sorted polarity/modality token multiset of a comparison key."""
+    tokens = WORD_RE.findall(comparison_key(key))
+    return tuple(sorted(token for token in tokens if token in NEAR_DUPLICATE_POLARITY_TOKENS))
+
+
 def near_duplicate_keys(left: str, right: str) -> bool:
     """Deterministic, cheap "materially the same candidate" test.
 
@@ -211,14 +443,28 @@ def near_duplicate_keys(left: str, right: str) -> bool:
     - token-multiset overlap is >= ``NEAR_DUPLICATE_TOKEN_OVERLAP`` while the
       token counts stay within ``NEAR_DUPLICATE_LENGTH_SLACK`` of each other.
 
+    Two guards veto the pairing first, because a purely lexical test would
+    otherwise collapse alternatives whose whole point is the token that differs:
+
+    - a difference in the numeric-token multiset ("$50" vs "$60", "99.9%" vs
+      "99.8%") is a different claim, not a reformatting;
+    - a difference in the polarity/modality token multiset (see
+      ``NEAR_DUPLICATE_POLARITY_TOKENS``) can invert the meaning ("formal" vs
+      "informal", "must" vs "must not").
+
     Genuinely different alternatives ("a concise summary" vs "an unrelated
-    anecdote") fall well below both thresholds.
+    anecdote") fall well below both thresholds, and the guards keep genuinely
+    different *near*-neighbours apart.
     """
     if left == right:
         return True
     if not left or not right:
         return False
     if min(len(left), len(right)) < NEAR_DUPLICATE_MIN_CHARS:
+        return False
+    if _numeric_tokens(left) != _numeric_tokens(right):
+        return False
+    if _polarity_tokens(left) != _polarity_tokens(right):
         return False
     char_ratio = SequenceMatcher(None, left, right).ratio()
     if char_ratio >= NEAR_DUPLICATE_RATIO:
@@ -243,12 +489,83 @@ def near_duplicate_keys(left: str, right: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Deterministic operation-form eligibility
+
+
+def word_count(text: str) -> int:
+    """Count natural word tokens without depending on whitespace formatting."""
+    return len(WORD_RE.findall(comparison_key(text)))
+
+
+def _token_ngrams(tokens: Sequence[str], size: int) -> set[tuple[str, ...]]:
+    if len(tokens) < size:
+        return set()
+    return {tuple(tokens[index : index + size]) for index in range(len(tokens) - size + 1)}
+
+
+def _selection_context_leakage(candidate: str, contract: OperationContract) -> bool:
+    """Detect a selected-span replacement that returned surrounding context.
+
+    The rule is intentionally conservative and mechanical: a candidate is
+    rejected only when it contains a four-token source n-gram that is not wholly
+    inside the selected span. Semantic similarity is still left to human review.
+    """
+    if not contract.enforces_selected_only:
+        return False
+    source_tokens = comparison_key(contract.source_text or "").split()
+    selected_tokens = comparison_key(contract.selected_text or "").split()
+    candidate_ngrams = _token_ngrams(comparison_key(candidate).split(), SELECTED_ONLY_NGRAM)
+    if not candidate_ngrams:
+        return False
+    selected_ngrams = _token_ngrams(selected_tokens, SELECTED_ONLY_NGRAM)
+    return any(
+        ngram not in selected_ngrams
+        for ngram in _token_ngrams(source_tokens, SELECTED_ONLY_NGRAM)
+        if ngram in candidate_ngrams
+    )
+
+
+def operation_form_violation(
+    candidate: str,
+    *,
+    source: str | None,
+    contract: OperationContract,
+) -> list[str]:
+    """Return deterministic form violations for one candidate.
+
+    Empty contracts impose no operation-form eligibility. Human review still
+    judges naturalness, meaning, and quality.
+    """
+    if not contract.declared:
+        return []
+    raw = str(candidate or "")
+    words = word_count(raw)
+    reference = contract.selected_text or source
+    violations: list[str] = []
+    if contract.min_words is not None and words < contract.min_words:
+        violations.append("min_words")
+    if contract.max_words is not None and words > contract.max_words:
+        violations.append("max_words")
+    if contract.direction and reference:
+        source_words = word_count(reference)
+        if contract.direction == "shorter" and words >= source_words:
+            violations.append("direction_shorter")
+        if contract.direction == "longer" and words <= source_words:
+            violations.append("direction_longer")
+    if contract.require_sentence and (words < 3 or not SENTENCE_END_RE.search(raw.strip())):
+        violations.append("require_sentence")
+    if _selection_context_leakage(raw, contract):
+        violations.append("selection_context_leakage")
+    return violations
+
+
+# ---------------------------------------------------------------------------
 # Protected content
 #
-# The corruption rule is the exact-presence contract already used by
-# studio_backend/safety.py::candidate_preserves_protected_content. It is
-# reimplemented here (rather than imported) so that standalone benchmark runners
-# do not need the FastAPI-backed studio_backend package on sys.path.
+# The corruption rule is owned by studio_backend/protected_content.py (issue
+# #51). Import it lazily inside the adapter: studio_backend.__init__ imports
+# safety.py, which in turn imports this module, so a module-level import would
+# create a cycle during package initialization.
 
 
 @dataclass(frozen=True)
@@ -256,12 +573,20 @@ class ProtectedValue:
     text: str
     start: int | None = None
     end: int | None = None
+    range_encoding: str | None = None
+    span_id: str | None = None
+    kind: str | None = None
+    scope: str | None = None
+    source_sha256: str | None = None
+    protected_span_sha256: str | None = None
+    candidate_start: int | None = None
+    candidate_end: int | None = None
 
 
 def normalize_protected(values: Iterable[Any] | None) -> tuple[ProtectedValue, ...]:
     """Accept strings, ``{text,start,end}`` mappings or ProtectedValue in order."""
     out: list[ProtectedValue] = []
-    seen: set[tuple[int | None, int | None, str]] = set()
+    seen: set[tuple[int | None, int | None, str, str | None]] = set()
     for item in values or ():
         if isinstance(item, ProtectedValue):
             span = item
@@ -270,16 +595,30 @@ def normalize_protected(values: Iterable[Any] | None) -> tuple[ProtectedValue, .
         elif isinstance(item, Mapping):
             start = item.get("start")
             end = item.get("end")
+            range_encoding = item.get("rangeEncoding") or item.get("range_encoding")
+            span_id = item.get("id")
+            source_sha256 = item.get("sourceSha256")
+            protected_span_sha256 = item.get("protectedSpanSha256")
+            candidate_start = item.get("candidateStart")
+            candidate_end = item.get("candidateEnd")
             span = ProtectedValue(
                 str(item.get("text") or ""),
                 start if isinstance(start, int) else None,
                 end if isinstance(end, int) else None,
+                str(range_encoding) if range_encoding else None,
+                str(span_id) if span_id is not None else None,
+                str(item["kind"]) if item.get("kind") is not None else None,
+                str(item["scope"]) if item.get("scope") is not None else None,
+                str(source_sha256) if source_sha256 is not None else None,
+                str(protected_span_sha256) if protected_span_sha256 is not None else None,
+                candidate_start if isinstance(candidate_start, int) else None,
+                candidate_end if isinstance(candidate_end, int) else None,
             )
         else:
             continue
         if not span.text:
             continue
-        key = (span.start, span.end, span.text)
+        key = (span.start, span.end, span.text, span.range_encoding)
         if key in seen:
             continue
         seen.add(key)
@@ -287,70 +626,256 @@ def normalize_protected(values: Iterable[Any] | None) -> tuple[ProtectedValue, .
     return tuple(out)
 
 
+def _protected_contract() -> Any:
+    """Load the canonical issue #51 module without creating an import cycle."""
+    return importlib.import_module("studio_backend.protected_content")
+
+
+def _protected_payload(span: ProtectedValue) -> dict[str, Any]:
+    return {
+        "id": span.span_id,
+        "kind": span.kind,
+        "scope": span.scope,
+        "text": span.text,
+        "start": span.start,
+        "end": span.end,
+        "rangeEncoding": span.range_encoding,
+        "sourceSha256": span.source_sha256,
+        "protectedSpanSha256": span.protected_span_sha256,
+        "candidateStart": span.candidate_start,
+        "candidateEnd": span.candidate_end,
+    }
+
+
+def _infer_protected_kind(contract: Any, text: str) -> str:
+    kinds = {
+        span.kind
+        for span in contract.extract_protected_spans(str(text or ""))
+        if span.text == text
+    }
+    return next(iter(kinds)) if len(kinds) == 1 else "code"
+
+
+def _canonical_protected_spans(
+    contract: Any,
+    source: str | None,
+    protected: Iterable[Any] | None,
+) -> tuple[tuple[Any, ...], int]:
+    """Adapt legacy parser spans to canonical issue #51 span dataclasses.
+
+    Legacy benchmark tasks carry code-point offsets, while the #51 wire contract
+    carries UTF-16 offsets. An explicit ``rangeEncoding`` always wins. Otherwise a
+    coordinate is treated as a code-point offset when it reproduces the declared
+    source text exactly, and only then retried as UTF-16. This keeps existing
+    task files valid without weakening wire identity checks.
+    """
+    values = normalize_protected(protected)
+    source_text = str(source or "")
+    detected = (
+        tuple(contract.extract_protected_spans(source_text)) if source_text else ()
+    )
+    detected_at_position = {
+        (span.start, span.end, span.text): span for span in detected
+    }
+    detected_by_text: dict[str, list[Any]] = {}
+    for span in detected:
+        detected_by_text.setdefault(span.text, []).append(span)
+
+    canonical: list[Any] = []
+    digest_source = (
+        contract.compute_source_sha256(source_text) if source_text else None
+    )
+    for index, value in enumerate(values):
+        position_match = (
+            detected_at_position.get((value.start, value.end, value.text))
+            if value.start is not None and value.end is not None
+            else None
+        )
+        inferred_kind = (
+            value.kind
+            or (position_match.kind if position_match is not None else None)
+            or _infer_protected_kind(contract, value.text)
+        )
+        inferred_scope = (
+            value.scope
+            or (position_match.scope if position_match is not None else None)
+            or "required"
+        )
+        if inferred_kind not in contract.PROTECTED_SPAN_KINDS:
+            inferred_kind = "code"
+        if inferred_scope not in contract.PROTECTED_SPAN_SCOPES:
+            inferred_scope = "required"
+
+        if value.start is not None and value.end is not None and source_text:
+            payload = _protected_payload(value)
+            encoding = value.range_encoding or ""
+            code_point_match = (
+                0 <= value.start < value.end <= len(source_text)
+                and source_text[value.start : value.end] == value.text
+            )
+            if encoding or not code_point_match:
+                # An explicit encoding is a contract claim, so let the shared
+                # validator accept or reject it exactly. Only legacy spans with
+                # no declared encoding fall back to UTF-16 wire coordinates.
+                payload["rangeEncoding"] = encoding or "utf16-v1"
+                span = contract.span_from_wire(
+                    source_text,
+                    payload,
+                    source_sha256=value.source_sha256,
+                    index=index,
+                )
+            else:
+                span = contract.ProtectedContentSpan(
+                    id=str(
+                        value.span_id
+                        or (position_match.id if position_match is not None else "")
+                        or f"legacy-{index}-{value.start}-{value.end}"
+                    ),
+                    kind=inferred_kind,
+                    scope=inferred_scope,
+                    text=value.text,
+                    start=value.start,
+                    end=value.end,
+                    range_encoding="utf16-v1",
+                    source_sha256=value.source_sha256 or digest_source,
+                    protected_span_sha256=value.protected_span_sha256,
+                    candidate_start=value.candidate_start,
+                    candidate_end=value.candidate_end,
+                )
+            canonical.append(
+                replace(
+                    span,
+                    id=str(value.span_id or span.id),
+                    kind=inferred_kind,
+                    scope=inferred_scope,
+                )
+            )
+            continue
+
+        matches = [
+            span
+            for span in detected_by_text.get(value.text, ())
+            if value.kind is None or span.kind == value.kind
+        ]
+        if matches:
+            for match_index, span in enumerate(matches):
+                canonical.append(
+                    replace(
+                        span,
+                        id=str(
+                            span.id
+                            if not value.span_id or match_index > 0
+                            else value.span_id
+                        ),
+                        kind=inferred_kind,
+                        scope=inferred_scope,
+                        candidate_start=(
+                            value.candidate_start
+                            if value.candidate_start is not None
+                            else span.candidate_start
+                        ),
+                        candidate_end=(
+                            value.candidate_end
+                            if value.candidate_end is not None
+                            else span.candidate_end
+                        ),
+                    )
+                )
+            continue
+
+        base = contract.normalize_protected_spans([value.text])[0]
+        canonical.append(
+            replace(
+                base,
+                id=str(value.span_id or base.id),
+                kind=inferred_kind,
+                scope=inferred_scope,
+            )
+        )
+    return tuple(canonical), len(values)
+
+
 def protected_evaluation(
     candidate: str,
     *,
     source: str | None = None,
     protected: Iterable[Any] | None = None,
+    protected_route: str = "whole",
+    anchor_policy: str | None = None,
+    selection: tuple[int, int] | None = None,
+    selection_sha256: str | None = None,
+    candidate_range: tuple[int, int] | None = None,
+    candidate_document: str | None = None,
+    source_sha256: str | None = None,
+    strict_identity: bool = False,
 ) -> dict[str, Any]:
-    """Candidate-level protected-content diagnostics.
+    """Adapt the canonical #51 evaluation to the parser's stable public shape.
 
-    Corruption is exact-presence based:
-
-    - ``missing``: a protected value does not occur in the candidate at all;
-    - ``altered``: a digit-bearing protected value is absent but the candidate
-      substituted a different number-like token carrying the same digit count
-      (a changed number/date/amount rather than a plain omission);
-    - ``repeated_mismatch``: the source repeats the protected value, so plain
-      substring presence is misleading; the candidate must keep the same
-      occurrence count;
-    - ``positionDrift``: a coordinate-bearing span survives but moved far enough
-      that location-sensitive placement is no longer preserved. Reported, but
-      not treated as corruption on its own.
+    The returned keys remain ``protectedCount``, ``missing``, ``altered``,
+    ``repeatedMismatch``, ``positionDrift`` and ``corrupted``. Optional keyword
+    arguments expose the shared contract's local-route inputs for parity tests;
+    ordinary Word Studio diagnostics continue to use ``protected_route="whole"``.
     """
-    spans = normalize_protected(protected)
+    contract = _protected_contract()
     text = str(candidate or "")
     source_text = str(source or "")
-    missing: list[str] = []
-    altered: list[str] = []
-    repeated_mismatch: list[str] = []
-    position_drift: list[str] = []
+    try:
+        spans, declared_count = _canonical_protected_spans(
+            contract,
+            source_text,
+            protected,
+        )
+        evaluation = contract.evaluate_protected_content(
+            source_text,
+            text,
+            protected=spans,
+            route=protected_route,
+            anchor_policy=anchor_policy,
+            selection=selection,
+            selection_sha256=selection_sha256,
+            candidate_range=candidate_range,
+            candidate_document=candidate_document,
+            source_sha256=source_sha256,
+            strict_identity=strict_identity,
+        )
+    except contract.ProtectedContentError:
+        if strict_identity:
+            raise
+        return {
+            "protectedCount": len(normalize_protected(protected)),
+            "missing": [],
+            "altered": [],
+            "repeatedMismatch": [],
+            "positionDrift": [],
+            "corrupted": True,
+        }
 
-    for span in spans:
-        if span.text in text:
-            occurrences = text.count(span.text)
-            source_occurrences = source_text.count(span.text) if source_text else 1
-            if source_occurrences > 1 and occurrences != source_occurrences:
-                repeated_mismatch.append(span.text)
-            if (
-                span.start is not None
-                and source_text
-                and source_occurrences == 1
-                and occurrences == 1
-                and text.find(span.text) != span.start
-                and abs(text.find(span.text) - span.start) > max(
-                    POSITION_DRIFT_MIN_CHARS, int(len(source_text) * POSITION_DRIFT_FRACTION)
-                )
-            ):
-                position_drift.append(span.text)
-            continue
-        if DIGIT_RE.search(span.text):
-            width = len(DIGIT_RE.findall(span.text))
-            substituted = any(
-                len(DIGIT_RE.findall(token)) == width for token in NUMERIC_TOKEN_RE.findall(text)
-            )
-            if substituted:
-                altered.append(span.text)
+    def unique(values: Iterable[str]) -> list[str]:
+        seen: set[str] = set()
+        out: list[str] = []
+        for value in values:
+            if value in seen:
                 continue
-        missing.append(span.text)
+            seen.add(value)
+            out.append(value)
+        return out
+
+    text_by_id = {span.id: span.text for span in spans}
+
+    def span_texts(span_ids: Iterable[str]) -> list[str]:
+        return unique(
+            text_by_id[span_id]
+            for span_id in span_ids
+            if span_id in text_by_id
+        )
 
     return {
-        "protectedCount": len(spans),
-        "missing": missing,
-        "altered": altered,
-        "repeatedMismatch": repeated_mismatch,
-        "positionDrift": position_drift,
-        "corrupted": bool(missing or altered or repeated_mismatch),
+        "protectedCount": declared_count,
+        "missing": span_texts(evaluation.missing_span_ids),
+        "altered": span_texts(evaluation.altered_span_ids),
+        "repeatedMismatch": span_texts(evaluation.repeated_mismatch_span_ids),
+        "positionDrift": span_texts(evaluation.position_drift_span_ids),
+        "corrupted": evaluation.corrupted,
     }
 
 
@@ -367,6 +892,7 @@ class ParsedDocument:
     leading_prose: bool = False
     trailing_prose: bool = False
     commentary_mixed: bool = False
+    markdown_heading: bool = False
     wrong_json_keys: list[str] = field(default_factory=list)
 
     @property
@@ -383,11 +909,22 @@ def _json_entry_kind(value: Any) -> str:
     return _JSON_KIND_BY_TYPE.get(type(value), type(value).__name__)
 
 
-def _strip_code_fence(text: str) -> tuple[str, bool]:
-    match = CODE_FENCE_RE.match(text)
+def _strip_code_fence(text: str) -> tuple[str, bool, bool, bool]:
+    """Recover the fenced body and report wrapper prose around the fence.
+
+    Returns ``(body, fenced, leading_prose, trailing_prose)``. Only the fenced
+    block is the candidate source; anything outside the fence is prose and must
+    never be scored as a candidate. Nothing is regenerated or rewritten -- the
+    fenced body is returned byte-for-byte.
+    """
+    match = CODE_FENCE_RE.search(text)
     if not match:
-        return text, False
-    return match.group("body"), True
+        return text, False, False, False
+    before = text[: match.start()].strip()
+    after = text[match.end() :].strip()
+    leading = bool(before) and COMMENTARY_PREFIX.match(before.splitlines()[0].strip()) is not None
+    trailing = bool(after)
+    return match.group("body"), True, leading, trailing
 
 
 def _string_entries(entries: Sequence[Any]) -> tuple[list[str], list[dict[str, Any]]]:
@@ -400,7 +937,10 @@ def _string_entries(entries: Sequence[Any]) -> tuple[list[str], list[dict[str, A
     invalid: list[dict[str, Any]] = []
     for index, entry in enumerate(entries):
         if isinstance(entry, str):
-            values.append(entry.strip())
+            # Preserve the candidate text exactly as decoded. Whitespace and
+            # invisible characters are handled by ``comparison_key`` for
+            # admission/dedupe, never by rewriting the reported candidate.
+            values.append(entry)
             continue
         invalid.append({"index": index, "type": _json_entry_kind(entry)})
     return values, invalid
@@ -411,7 +951,7 @@ def parse_document(raw: str) -> ParsedDocument:
     text = str(raw or "").strip()
     if not text:
         return ParsedDocument(mode="empty_output")
-    body, fenced = _strip_code_fence(text)
+    body, fenced, fence_leading_prose, fence_trailing_prose = _strip_code_fence(text)
     body = body.strip()
     if not body:
         return ParsedDocument(mode="empty_output", fenced=fenced)
@@ -425,11 +965,20 @@ def parse_document(raw: str) -> ParsedDocument:
         if isinstance(obj, dict) and isinstance(obj.get("options"), list):
             values, invalid = _string_entries(obj["options"])
             return ParsedDocument(
-                mode="json_object", options=values, invalid_entries=invalid, fenced=fenced
+                mode="json_object",
+                options=values,
+                invalid_entries=invalid,
+                fenced=fenced,
+                leading_prose=fence_leading_prose,
+                trailing_prose=fence_trailing_prose,
             )
         if isinstance(obj, dict) and "options" in obj and not isinstance(obj.get("options"), list):
             return ParsedDocument(
-                mode="json_object_scalar_options", wrong_json_keys=["options"], fenced=fenced
+                mode="json_object_scalar_options",
+                wrong_json_keys=["options"],
+                fenced=fenced,
+                leading_prose=fence_leading_prose,
+                trailing_prose=fence_trailing_prose,
             )
         if isinstance(obj, dict):
             keys = [str(k) for k in obj.keys()]
@@ -438,21 +987,31 @@ def parse_document(raw: str) -> ParsedDocument:
                 mode="json_object_wrong_key",
                 wrong_json_keys=sorted(list_keys) or sorted(keys),
                 fenced=fenced,
+                leading_prose=fence_leading_prose,
+                trailing_prose=fence_trailing_prose,
             )
         if isinstance(obj, list):
             values, invalid = _string_entries(obj)
             return ParsedDocument(
-                mode="json_array", options=values, invalid_entries=invalid, fenced=fenced
+                mode="json_array",
+                options=values,
+                invalid_entries=invalid,
+                fenced=fenced,
+                leading_prose=fence_leading_prose,
+                trailing_prose=fence_trailing_prose,
             )
         return ParsedDocument(
             mode="json_object_wrong_key",
             wrong_json_keys=[_json_entry_kind(obj)],
             fenced=fenced,
+            leading_prose=fence_leading_prose,
+            trailing_prose=fence_trailing_prose,
         )
 
     lines = [line.rstrip() for line in text.splitlines() if line.strip()]
     if not lines:
         return ParsedDocument(mode="empty_output", fenced=fenced)
+    has_markdown_heading = any(MARKDOWN_HEADING_RE.match(line) for line in lines)
 
     bullet_values: list[str] = []
     bullet_matches = 0
@@ -464,7 +1023,12 @@ def parse_document(raw: str) -> ParsedDocument:
 
     if lines and bullet_matches == len(lines):
         return ParsedDocument(
-            mode="numbered_or_bulleted_list", options=bullet_values, fenced=fenced
+            mode="numbered_or_bulleted_list",
+            options=bullet_values,
+            fenced=fenced,
+            leading_prose=fence_leading_prose,
+            trailing_prose=fence_trailing_prose,
+            markdown_heading=has_markdown_heading,
         )
 
     if bullet_matches and bullet_matches < len(lines):
@@ -480,6 +1044,7 @@ def parse_document(raw: str) -> ParsedDocument:
                 leading_prose=leading,
                 trailing_prose=True,
                 commentary_mixed=not leading,
+                markdown_heading=has_markdown_heading,
             )
         if any(COMMENTARY_PREFIX.match(x.strip()) for x in tail):
             return ParsedDocument(
@@ -487,6 +1052,7 @@ def parse_document(raw: str) -> ParsedDocument:
                 options=bullet_values,
                 fenced=fenced,
                 commentary_mixed=True,
+                markdown_heading=has_markdown_heading,
             )
 
     if bullet_matches:
@@ -498,14 +1064,23 @@ def parse_document(raw: str) -> ParsedDocument:
             fenced=fenced,
             leading_prose=COMMENTARY_PREFIX.match(lines[0].strip()) is not None,
             commentary_mixed=True,
+            markdown_heading=has_markdown_heading,
         )
 
     if 2 <= len(lines) <= 40 and all(not COMMENTARY_PREFIX.match(line.strip()) for line in lines):
         return ParsedDocument(
-            mode="newline_list", options=[line.strip() for line in lines], fenced=fenced
+            mode="newline_list",
+            options=[line.strip() for line in lines],
+            fenced=fenced,
+            markdown_heading=has_markdown_heading,
         )
 
-    return ParsedDocument(mode="unparseable", fenced=fenced, commentary_mixed=True)
+    return ParsedDocument(
+        mode="unparseable",
+        fenced=fenced,
+        commentary_mixed=True,
+        markdown_heading=has_markdown_heading,
+    )
 
 
 def parse_options(raw: str) -> tuple[list[str], str]:
@@ -519,50 +1094,16 @@ def parse_options(raw: str) -> tuple[list[str], str]:
 
 
 def partial_candidate_count(raw: str) -> int:
-    """Count only fully completed candidates in an in-progress stream.
+    """Count the raw candidate identities visible in an in-progress stream.
 
-    This stays a *raw* completion count: it never guesses from prose and never
-    counts an unterminated JSON string. Threshold advancement uses
+    This stays a *raw* parser count: it never guesses from prose and never counts
+    an unterminated JSON string. Line-based lists are already structurally
+    delimited by their visible lines, so their final visible line is counted even
+    before a trailing newline arrives. Threshold advancement still uses
     :func:`partial_usable_unique_count`, not this number.
     """
-    text = str(raw or "")
-    complete, _mode = parse_options(text)
-    if complete:
-        return len(complete)
-
-    prefix = OPTIONS_ARRAY_PREFIX.search(text)
-    if prefix:
-        body = text[prefix.end():]
-        count = 0
-        in_string = False
-        escape = False
-        saw_nonspace = False
-        for ch in body:
-            if in_string:
-                if escape:
-                    escape = False
-                elif ch == "\\":
-                    escape = True
-                elif ch == '"':
-                    in_string = False
-                    count += 1
-                continue
-            if ch == '"':
-                in_string = True
-                saw_nonspace = True
-            elif ch == "]":
-                break
-            elif not ch.isspace() and ch not in {",", "["}:
-                saw_nonspace = True
-        if count or saw_nonspace:
-            return count
-
-    lines = [line for line in text.splitlines() if line.strip()]
-    if lines:
-        matches = [BULLET_RE.match(line) for line in lines]
-        if all(matches):
-            return sum(1 for match in matches if match)
-    return 0
+    values, _mode = partial_option_values(str(raw or ""))
+    return len(values)
 
 
 def unescape_json_string(value: str) -> str:
@@ -573,59 +1114,171 @@ def unescape_json_string(value: str) -> str:
     return decoded if isinstance(decoded, str) else value
 
 
-def partial_option_values(raw: str) -> tuple[list[str], str]:
+def _json_options_array_prefix_values(body: str) -> tuple[list[str], bool]:
+    """Recover only completed top-level string entries from an options array.
+
+    ``body`` starts immediately after ``"options": [``. Each top-level array
+    element is buffered until a structural comma or closing bracket proves it
+    complete, then decoded with :func:`json.loads`. Non-string entries --
+    including object keys inside nested objects -- can therefore never be
+    mistaken for candidates in a partial stream.
+    """
+    values: list[str] = []
+    in_string = False
+    escape = False
+    nested_depth = 0
+    element_start = 0
+    saw_nonspace = False
+
+    def flush(end: int) -> None:
+        raw = body[element_start:end].strip()
+        if not raw:
+            return
+        try:
+            value = json.loads(raw)
+        except (json.JSONDecodeError, TypeError):
+            return
+        if isinstance(value, str) and value.strip():
+            values.append(value)
+
+    for index, char in enumerate(body):
+        if in_string:
+            if escape:
+                escape = False
+            elif char == "\\":
+                escape = True
+            elif char == '"':
+                in_string = False
+                if nested_depth == 0:
+                    # At top level, a closing quote proves the current element
+                    # is a complete JSON string even before the comma/closing
+                    # bracket arrives. Nested object keys stay buffered because
+                    # ``nested_depth`` is non-zero inside objects/arrays.
+                    raw = body[element_start : index + 1].strip()
+                    try:
+                        value = json.loads(raw)
+                    except (json.JSONDecodeError, TypeError):
+                        value = None
+                    if isinstance(value, str) and value.strip():
+                        values.append(value)
+                        element_start = index + 1
+            continue
+        if char == '"':
+            in_string = True
+            saw_nonspace = True
+            continue
+        if char in "{[":
+            nested_depth += 1
+            saw_nonspace = True
+            continue
+        if char in "}]":
+            if nested_depth:
+                nested_depth -= 1
+                saw_nonspace = True
+                continue
+            if char != "]":
+                break
+            flush(index)
+            return values, True
+        if char == "," and nested_depth == 0:
+            flush(index)
+            element_start = index + 1
+            saw_nonspace = True
+            continue
+        if not char.isspace():
+            saw_nonspace = True
+    return values, saw_nonspace
+
+
+def partial_option_values(
+    raw: str,
+    *,
+    include_visible_tail: bool = True,
+) -> tuple[list[str], str]:
     """Recover the identities of the candidates completed so far.
 
     Shared by every streaming runner so identity recovery cannot drift from the
     frozen parser. Only string-typed JSON entries are recovered: a ``null``,
     boolean, number, object or nested list never produces a candidate value.
+
+    ``include_visible_tail`` is true for raw streaming counter parity with the
+    line-list parser, and false for the stricter shared incremental state, which
+    withholds a growing final line until a structural terminator arrives.
+
+    An opening fence with no closing fence yet is unwrapped before anything
+    else. Otherwise a truncated fenced stream reaches the newline-list branch
+    and the fence marker plus the partial JSON line are counted as candidates,
+    which would let a malformed fragment advance first-1/3/10.
     """
     text = str(raw or "")
+    # Only an *unterminated* fence takes this path. A closed fence must fall
+    # through to the one-shot parse, otherwise the closing ``` would be scored
+    # as a candidate line.
+    open_fence = (
+        None if CODE_FENCE_RE.search(text) else OPEN_FENCE_RE.match(text)
+    )
+    if open_fence:
+        return _partial_body_values(
+            open_fence.group("body"),
+            mode_suffix="_fenced",
+            include_visible_tail=include_visible_tail,
+        )
     options, mode = parse_options(text)
-    if options and mode != "newline_list":
-        return options, mode
-    if options:
-        # A streamed newline list is optimistic: ``parse_options`` counts every
-        # non-empty line, including a fragment that has not been terminated yet.
-        # Only newline-terminated lines are complete candidates.
+    if options and mode == "numbered_or_bulleted_list" and not include_visible_tail:
+        completed: list[str] = []
+        for line in text.split(NEWLINE)[:-1]:
+            match = BULLET_RE.match(line.rstrip())
+            if match:
+                completed.append(match.group(1).strip())
+        in_progress_mode = "numbered_or_bulleted_list_in_progress"
+        return completed, mode if len(completed) == len(options) else in_progress_mode
+    if options and mode == "newline_list" and not include_visible_tail:
         terminated = text.split(NEWLINE)[:-1]
         return [line.strip() for line in terminated if line.strip()], "newline_list_in_progress"
+    if options:
+        # Numbered/bulleted and newline lists are structurally delimited by their
+        # visible lines. The streaming runner calls this helper only at candidate
+        # completion marks, so the visible final line is a deterministic raw
+        # candidate identity even before a trailing newline arrives.
+        return options, mode
 
+    return _partial_body_values(text, mode_suffix="", include_visible_tail=include_visible_tail)
+
+
+def _partial_body_values(
+    text: str,
+    *,
+    mode_suffix: str,
+    include_visible_tail: bool,
+) -> tuple[list[str], str]:
+    """Recover completed candidates from a (possibly fenced) stream body."""
     prefix = OPTIONS_ARRAY_PREFIX.search(text)
     if prefix:
         body = text[prefix.end():]
-        values: list[str] = []
-        in_string = False
-        escape = False
-        start = 0
-        for index, char in enumerate(body):
-            if in_string:
-                if escape:
-                    escape = False
-                elif char == "\\":
-                    escape = True
-                elif char == '"':
-                    in_string = False
-                    value = unescape_json_string(body[start:index])
-                    # A malformed or mid-edit stream can surface separators as
-                    # pseudo-values. Only a recovered string with content is a
-                    # candidate; whitespace-only fragments are not.
-                    if value.strip():
-                        values.append(value)
-                continue
-            if char == '"':
-                in_string = True
-                start = index + 1
-            elif char == "]":
-                break
-        return values, "json_options_array_in_progress"
+        values, saw_nonspace = _json_options_array_prefix_values(body)
+        if values or saw_nonspace:
+            return values, f"json_options_array_in_progress{mode_suffix}"
+        return [], f"unparseable{mode_suffix}"
 
     lines = [line.rstrip() for line in text.splitlines() if line.strip()]
     if lines:
         matches = [BULLET_RE.match(line) for line in lines]
         if all(matches):
-            return [match.group(1).strip() for match in matches], "numbered_or_bulleted_list"
-    return [], "unparseable"
+            values = [match.group(1).strip() for match in matches]
+            if include_visible_tail:
+                return values, f"numbered_or_bulleted_list{mode_suffix}"
+            completed = [
+                match.group(1).strip()
+                for match in (BULLET_RE.match(line) for line in lines[:-1])
+                if match
+            ]
+            mode = (
+                f"numbered_or_bulleted_list{mode_suffix}"
+                if len(completed) == len(values)
+                else f"numbered_or_bulleted_list_in_progress{mode_suffix}"
+            )
+            return completed, mode
+    return [], f"unparseable{mode_suffix}"
 
 
 # ---------------------------------------------------------------------------
@@ -649,14 +1302,18 @@ class CandidateLedger:
 
     Admission order, first failure wins:
 
-    1. ``commentary`` - wrapper prose is never a candidate;
-    2. ``visually_empty`` - nothing survives the comparison key;
-    3. ``protected_corruption`` - a protected value is missing, altered or has a
+    1. ``typed_invalid`` - a non-string entry is never coerced into a candidate
+       (``None``/``True``/``3``/``{"x": 1}`` must not become ``"None"``/``"True"``);
+    2. ``commentary`` - wrapper prose is never a candidate;
+    3. ``visually_empty`` - nothing survives the comparison key;
+    4. ``protected_corruption`` - a protected value is missing, altered or has a
        repeated-count mismatch;
-    4. ``unchanged_source`` - exact copy of the source, but only on routes whose
+    5. ``unchanged_source`` - exact copy of the source, but only on routes whose
        contract asks for an actual transformation;
-    5. ``duplicate`` - same comparison key as an already-usable candidate;
-    6. ``near_duplicate`` - documented materially-same test against an
+    6. ``operation_form`` - deterministic word-count, direction, sentence or
+       selected-span containment violation;
+    7. ``duplicate`` - same comparison key as an already-usable candidate;
+    8. ``near_duplicate`` - documented materially-same test against an
        already-usable candidate.
     """
 
@@ -667,12 +1324,14 @@ class CandidateLedger:
         requested: int = 10,
         route: str = ROUTE_ALTERNATIVES,
         protected: Iterable[Any] | None = None,
+        operation_contract: Any = None,
         track_near_duplicates: bool = True,
     ) -> None:
         self.source = str(source) if source is not None else None
         self.requested = int(requested)
         self.route = route if route in ROUTES else ROUTE_ALTERNATIVES
         self.protected = normalize_protected(protected)
+        self.operation_contract = coerce_operation_contract(operation_contract)
         self.track_near_duplicates = track_near_duplicates
         self.accepted: list[str] = []
         self.accepted_keys: list[str] = []
@@ -687,6 +1346,8 @@ class CandidateLedger:
         self.normalized_duplicate_count = 0
         self.near_duplicate_count = 0
         self.visually_empty_count = 0
+        self.operation_form_violation_count = 0
+        self.operation_details: list[dict[str, Any]] = []
 
     @property
     def usable_unique_count(self) -> int:
@@ -701,13 +1362,24 @@ class CandidateLedger:
 
     def add(self, text: Any) -> CandidateVerdict:
         """Admit one candidate text and return its verdict."""
-        raw = str(text or "")
+        # A non-string entry is rejected before any comparison key is built.
+        # Coercing here would reintroduce exactly the issue-43 failure mode:
+        # ``True`` -> "True", ``3`` -> "3", ``{"x": 1}`` -> "{'x': 1}" would
+        # all become usable candidate strings. ``diagnose`` already filters
+        # typed entries in ``parse_document``; this keeps the shared admission
+        # rule safe for every other caller of ``CandidateLedger.add``.
+        if not isinstance(text, str):
+            self._reject("typed_invalid")
+            return self._record(
+                CandidateVerdict("", "", False, "typed_invalid")
+            )
+        raw = text
         key = comparison_key(raw)
         # A candidate that differs only in punctuation or spacing is a
         # *normalized* duplicate, not a near duplicate: the words are identical,
         # only the formatting moved. Token keys are the cheap deterministic test.
         token_key = near_key(key)
-        if COMMENTARY_PREFIX.match(raw.strip()):
+        if COMMENTARY_PREFIX.match(raw.strip()) or MARKDOWN_HEADING_RE.match(raw.strip()):
             self.commentary_count += 1
             self._reject("commentary")
             return self._record(CandidateVerdict(raw, key, False, "commentary"))
@@ -720,16 +1392,34 @@ class CandidateLedger:
             # Position drift is reported even when the value itself survives, so
             # a location-sensitive failure is never invisible.
             if any(evaluation[field] for field in ("missing", "altered", "repeatedMismatch", "positionDrift")):
-                self.protected_details.append({"text": raw, **evaluation})
+                # Candidate-level protected diagnostics deliberately do not echo
+                # the rejected candidate or the original source text. Protected
+                # values remain visible in the existing list fields for #51
+                # compatibility, but arbitrary model/source prose stays out of
+                # this diagnostic surface.
+                self.protected_details.append({"index": len(self.verbatim), **evaluation})
             if evaluation["corrupted"]:
                 self.protected_corruption_count += 1
                 self._reject("protected_corruption")
                 return self._record(CandidateVerdict(raw, key, False, "protected_corruption"))
-        if self.source is not None and key == comparison_key(self.source):
+        if self.source is not None and (
+            key == comparison_key(self.source)
+            or (near_key(key) and near_key(key) == near_key(self.source))
+        ):
             self.unchanged_source_count += 1
             if not self.unchanged_counts_as_usable:
                 self._reject("unchanged_source")
                 return self._record(CandidateVerdict(raw, key, False, "unchanged_source"))
+        violations = operation_form_violation(
+            raw,
+            source=self.source,
+            contract=self.operation_contract,
+        )
+        if violations:
+            self.operation_form_violation_count += 1
+            self.operation_details.append({"index": len(self.verbatim), "violations": violations})
+            self._reject("operation_form")
+            return self._record(CandidateVerdict(raw, key, False, "operation_form"))
         if key in self.accepted_keys:
             if raw in self.accepted:
                 self.exact_raw_duplicate_count += 1
@@ -780,11 +1470,193 @@ def partial_usable_unique_count(raw: str, *, final: bool = True, **context: Any)
     line out of the count, which is what a live chunk boundary must do. The
     streamed trackers pass the same admission rule through CandidateLedger.
     """
-    values, _mode = partial_option_values(raw)
     if final:
         options, _mode = parse_options(raw)
         values = options
+    else:
+        values, _mode = partial_option_values(raw, include_visible_tail=False)
     return usable_unique_count_of(values, **context)
+
+
+@dataclass(frozen=True)
+class IncrementalUsableSnapshot:
+    """One deterministic observation from :class:`IncrementalUsableCandidates`."""
+
+    final: bool
+    parser_mode: str
+    raw_completed_count: int
+    usable_values: tuple[str, ...]
+    usable_keys: tuple[str, ...]
+    usable_unique_count: int
+    new_values: tuple[str, ...]
+    new_keys: tuple[str, ...]
+    newly_reached_thresholds: tuple[int, ...]
+    reached_thresholds: tuple[int, ...]
+    prefix_stable: bool
+
+
+class IncrementalUsableCandidates:
+    """Shared incremental admission state for streamed Word Studio candidates.
+
+    The runner supplies the accumulated response text at each chunk boundary.
+    Every observation re-parses that text with the same
+    :class:`CandidateLedger` used by :func:`diagnose`, then reports only the
+    newly admitted candidates and newly reached thresholds. Rebuilding from the
+    accumulated text is intentional: a provisional list item is withheld until
+    a structural terminator arrives, and a later chunk cannot silently retract a
+    threshold that was already reported.
+
+    ``finish(final_text)`` performs the one-shot parse. The resulting
+    ``usable_values``/``usable_keys`` set and count are exactly the values that
+    ``diagnose(final_text, ...)`` reports for the same context.
+    """
+
+    def __init__(
+        self,
+        *,
+        thresholds: Iterable[int] = (1, 3, 10),
+        **context: Any,
+    ) -> None:
+        normalized_thresholds: set[int] = set()
+        for value in thresholds:
+            if isinstance(value, bool):
+                continue
+            number = int(value)
+            if number > 0:
+                normalized_thresholds.add(number)
+        self.thresholds = tuple(sorted(normalized_thresholds))
+        self.context = dict(context)
+        if self.context.get("protected") is not None:
+            self.context["protected"] = normalize_protected(self.context["protected"])
+        if self.context.get("operation_contract") is not None:
+            self.context["operation_contract"] = coerce_operation_contract(
+                self.context["operation_contract"]
+            )
+        self._ledger = CandidateLedger(**self.context)
+        self._raw = ""
+        self._parser_mode = "empty_output"
+        self._final = False
+        self._scan_generation = 0
+        self._last_values: tuple[str, ...] = ()
+        self._last_keys: tuple[str, ...] = ()
+        self._reached_thresholds: set[int] = set()
+
+    @property
+    def ledger(self) -> CandidateLedger:
+        return self._ledger
+
+    @property
+    def raw(self) -> str:
+        return self._raw
+
+    @property
+    def parser_mode(self) -> str:
+        return self._parser_mode
+
+    @property
+    def final(self) -> bool:
+        return self._final
+
+    @property
+    def scan_generation(self) -> int:
+        return self._scan_generation
+
+    @property
+    def usable_values(self) -> tuple[str, ...]:
+        return tuple(self._ledger.accepted)
+
+    @property
+    def usable_keys(self) -> tuple[str, ...]:
+        return tuple(self._ledger.accepted_keys)
+
+    @property
+    def usable_unique_count(self) -> int:
+        return self._ledger.usable_unique_count
+
+    def _extract(self, accumulated: str, *, final: bool) -> tuple[list[str], str]:
+        if final:
+            document = parse_document(accumulated)
+            return list(document.options), document.mode
+        values, _mode = partial_option_values(accumulated, include_visible_tail=False)
+        return list(values), _mode
+
+    def observe(self, accumulated: str, *, final: bool = False) -> IncrementalUsableSnapshot:
+        """Observe the full response text accumulated so far."""
+        text = str(accumulated or "")
+        values, mode = self._extract(text, final=final)
+        ledger = CandidateLedger(**self.context)
+        for value in values:
+            ledger.add(value)
+        usable_values = tuple(ledger.accepted)
+        usable_keys = tuple(ledger.accepted_keys)
+        prefix_stable = usable_values[: len(self._last_values)] == self._last_values
+        if prefix_stable:
+            new_values = usable_values[len(self._last_values) :]
+            new_keys = usable_keys[len(self._last_keys) :]
+        else:
+            # A malformed or structurally reclassified response must not make a
+            # runner retract an earlier threshold. Expose the change instead.
+            prior_keys = set(self._last_keys)
+            new_values = tuple(
+                value
+                for value, key in zip(usable_values, usable_keys)
+                if key not in prior_keys
+            )
+            new_keys = tuple(key for key in usable_keys if key not in prior_keys)
+        current_count = len(usable_values)
+        newly_reached = tuple(
+            threshold
+            for threshold in self.thresholds
+            if threshold not in self._reached_thresholds and current_count >= threshold
+        )
+        self._reached_thresholds.update(newly_reached)
+        self._ledger = ledger
+        self._raw = text
+        self._parser_mode = mode
+        self._final = bool(final)
+        self._scan_generation += 1
+        self._last_values = usable_values
+        self._last_keys = usable_keys
+        return IncrementalUsableSnapshot(
+            final=self._final,
+            parser_mode=mode,
+            raw_completed_count=len(values),
+            usable_values=usable_values,
+            usable_keys=usable_keys,
+            usable_unique_count=current_count,
+            new_values=new_values,
+            new_keys=new_keys,
+            newly_reached_thresholds=newly_reached,
+            reached_thresholds=tuple(
+                threshold for threshold in self.thresholds if threshold in self._reached_thresholds
+            ),
+            prefix_stable=prefix_stable,
+        )
+
+    def finish(self, final_text: str) -> IncrementalUsableSnapshot:
+        """Finalize the stream with the complete response text."""
+        return self.observe(final_text, final=True)
+
+    def one_shot_agreement(self) -> bool:
+        """Prove the finalized state equals a one-shot ``diagnose`` call."""
+        if not self._final:
+            return False
+        context = dict(self.context)
+        diagnostic = diagnose(
+            self._raw,
+            source=context.get("source"),
+            requested=int(context.get("requested", 10)),
+            route=context.get("route", ROUTE_ALTERNATIVES),
+            protected=context.get("protected"),
+            operation_contract=context.get("operation_contract"),
+        )
+        expected_values = tuple(
+            diagnostic["options"][index] for index in diagnostic["usableIndices"]
+        )
+        return (
+            expected_values == self.usable_values
+            and diagnostic["usableUniqueCount"] == self.usable_unique_count
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -798,12 +1670,19 @@ def diagnose(
     *,
     route: str = ROUTE_ALTERNATIVES,
     protected: Iterable[Any] | None = None,
+    operation_contract: Any = None,
 ) -> dict[str, Any]:
     """Full deterministic diagnostics for one Word Studio completion."""
     document = parse_document(raw)
     options = document.options
 
-    ledger = CandidateLedger(source=source, requested=requested, route=route, protected=protected)
+    ledger = CandidateLedger(
+        source=source,
+        requested=requested,
+        route=route,
+        protected=protected,
+        operation_contract=operation_contract,
+    )
     # Duplicate taxonomy is measured over *every* parsed candidate, before the
     # admission rule runs, so an unchanged copy that is also repeated still
     # reports its duplication instead of hiding behind the unchanged verdict.
@@ -846,6 +1725,8 @@ def diagnose(
         statuses.append("word_studio_trailing_commentary")
     if document.commentary_mixed:
         statuses.append("word_studio_commentary_mixed")
+    if document.markdown_heading:
+        statuses.append("word_studio_markdown_heading")
     if document.invalid_entries:
         statuses.append("word_studio_typed_invalid_entries")
     if document.mode in {"unparseable", "empty_output", "json_object_wrong_key", "json_object_scalar_options"}:
@@ -873,11 +1754,15 @@ def diagnose(
         statuses.append("contains_commentary")
     if ledger.visually_empty_count:
         statuses.append("word_studio_visually_empty_candidate")
+    if ledger.operation_form_violation_count:
+        statuses.append("word_studio_operation_form_violation")
 
     statuses = list(dict.fromkeys(statuses)) or ["ok"]
 
     return {
         "parserVersion": PARSER_VERSION,
+        "operationContractVersion": OPERATION_CONTRACT_VERSION,
+        "operationContract": ledger.operation_contract.to_diagnostics(),
         "parserMode": document.mode,
         "route": ledger.route,
         "unchangedCountsAsUsable": ledger.unchanged_counts_as_usable,
@@ -899,6 +1784,8 @@ def diagnose(
         ),
         "commentaryCandidateCount": ledger.commentary_count,
         "visuallyEmptyCandidateCount": ledger.visually_empty_count,
+        "operationFormViolationCount": ledger.operation_form_violation_count,
+        "operationDiagnostics": ledger.operation_details,
         "invalidEntryCount": len(document.invalid_entries),
         "invalidEntryTypes": document.invalid_entry_types,
         "invalidEntries": document.invalid_entries,
@@ -941,6 +1828,7 @@ def main() -> None:
                 requested=int(task.get("requestedCount") or args.requested),
                 route=route_from_task(task) if task else args.route,
                 protected=task.get("protectedSpans"),
+                operation_contract=operation_contract_from_task(task),
             ),
         })
     summary = {
