@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "purpose": "Model-agnostic behavioral contracts for fair V1 shootouts. Runtime-specific chat templates may differ, but requested behavior must remain equivalent.",
+  "globalRules": [
+    "Preserve recoverable meaning, facts, negation, uncertainty, roles, quantities, names, dates, links, quotes and code-like spans.",
+    "Do not invent details, explanations, reasons, evidence or outcomes that are not supported by the source.",
+    "Keep approximately the same register and vocabulary level unless the requested action explicitly changes it.",
+    "Do not replace simple common words with rarer or more academic words merely to make the text different.",
+    "Return only the requested rewrite/candidates, not commentary about the editing process."
+  ],
+  "strength": {
+    "15": "Very light change: repair clear grammar/flow problems and make only small wording changes. Preserve familiar wording that is already natural.",
+    "40": "Moderate change: use natural phrase substitutions and light sentence reshaping while preserving voice and ordinary vocabulary.",
+    "60": "Substantial change: rewrite phrases and clauses more freely and vary structure while preserving facts, meaning, register and vocabulary level.",
+    "90": "Large surface and syntax change: express the same content in a noticeably different way, but do not become more formal, academic, abstract or verbose by default."
+  },
+  "tasks": {
+    "paragraph_first_draft": {
+      "inputs": ["source_text", "strength"],
+      "contract": "Rewrite the pasted paragraph according to the requested strength. Produce one natural editable draft. Preserve the writer's facts, meaning, logical relationships, uncertainty and approximate voice. Do not summarize. Do not add details. Do not automatically make the vocabulary more sophisticated. Return only the rewritten paragraph.",
+      "output": {"type": "single_text"}
+    },
+    "span_alternatives": {
+      "inputs": ["full_context", "selected_span", "action", "strength", "candidate_count"],
+      "contract": "Generate replacement candidates for ONLY the selected span, using the surrounding context to preserve meaning and grammar. Replacements may be shorter or longer than the selected span, including one word becoming several words or several words becoming one. Do not rewrite unrelated text. Keep the source register unless the action requests otherwise. Produce materially different candidates, not trivial punctuation or inflection duplicates.",
+      "output": {
+        "type": "candidate_list",
+        "item": "replacement text only, without quoting the original span",
+        "preferredBatchSizes": [3, 5, 10]
+      }
+    },
+    "sentence_alternatives": {
+      "inputs": ["paragraph_context", "selected_sentence", "action", "strength", "candidate_count"],
+      "contract": "Generate several natural alternatives for the selected sentence only. Preserve every supported claim, negation, uncertainty and relationship to nearby sentences. Vary structure rather than merely swapping synonyms. Keep approximately the same register and vocabulary level. Return replacement sentences only.",
+      "output": {"type": "candidate_list", "preferredBatchSizes": [3, 5, 10]}
+    },
+    "shorter": {
+      "inputs": ["full_context", "selected_span"],
+      "contract": "Express the selected meaning more concisely in this context. Remove redundancy, not facts or qualifications. The replacement may be one word. Return replacement candidates only."
+    },
+    "longer": {
+      "inputs": ["full_context", "selected_span"],
+      "contract": "Express the selected meaning with slightly more wording while adding no new facts, reasons or claims. Expansion should clarify expression, not invent content. Return replacement candidates only."
+    },
+    "simpler": {
+      "inputs": ["full_context", "selected_span"],
+      "contract": "Express the selected meaning using ordinary, easy-to-understand English that fits the surrounding sentence. Do not weaken or change the claim. Return replacement candidates only."
+    },
+    "more_conversational": {
+      "inputs": ["full_context", "selected_span"],
+      "contract": "Make only the selected wording more conversational and natural while preserving meaning and intensity. Avoid slang that is not supported by the source. Return replacement candidates only."
+    },
+    "split_sentence": {
+      "inputs": ["paragraph_context", "selected_sentence"],
+      "contract": "Split the selected sentence into a clearer two-sentence alternative only where natural. Preserve event order, logical relations, facts and register. Return replacement text only."
+    },
+    "join_sentences": {
+      "inputs": ["paragraph_context", "selected_sentences"],
+      "contract": "Combine the selected adjacent sentences into one natural sentence only where meaning and readability remain intact. Preserve all claims and qualifications. Return replacement text only."
+    }
+  },
+  "fairnessRules": [
+    "Use identical behavioral contracts across models; only required model-specific chat/control syntax may differ.",
+    "Record the exact rendered prompt/template and generation settings for every run.",
+    "Do not give a specialist extra source meaning or gold references that a general model does not receive.",
+    "Do not enable reasoning/thinking for one contender unless it is reported as a separate runtime configuration.",
+    "Do not tune prompts per benchmark case after inspecting failures; prompt revisions create a new benchmark protocol version."
+  ]
+}

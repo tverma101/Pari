@@ -1,0 +1,3 @@
+# CPU task preparation only. Profiles were resolved with uv 0.12.5.
+# Regenerate as binary-only hash locks for CPython 3.10/3.11 and x86_64-manylinux_2_28.
+datasets==5.0.1 ; python_version >= "3.10"
