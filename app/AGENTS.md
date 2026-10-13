@@ -2,6 +2,8 @@
 
 This directory is the canonical production app. Do not implement production behavior in `../lab/`.
 
+The current plan is in `../AGENTS.md` and pinned issue #71. The generator is moving to Kaggle. The local MLX path described below is the app as it ships today; do not extend it with new local-generator work.
+
 ## Architecture
 
 - React 19 + TypeScript + Vite frontend.
@@ -23,4 +25,4 @@ npm run build:desktop
 
 Keep the old synonym/token helpers where they support contextual replacements. Keep the style selector compact and user-facing, but do not expose technical ranking selectors, model internals, background mutation, or user-facing training concepts.
 
-The native path is configured in `native-models/config.json` (env `PARI_NATIVE_MODEL_ID` / `PARI_NATIVE_MODEL_PATH` override). Qwen3-4B is the production incumbent; Qwen3.5-4B is the general-model benchmark control only. MiniCPM5-2B and Ling-3.0-tiny are challengers and must not become defaults without the issue #10/#6 measurements. The optional FreeLLMAPI route is configured only through environment variables and is not a local fallback. Do not bake model identifiers into new code. See `benchmarks/llm-shootout/README.md` and `benchmarks/quillbot/README.md`. Describe the native path as primary only when packaged loading and installed headless evidence pass. The `local-safe-engine` remains deliberately bounded and deterministic. Do not claim "beats QuillBot" until the frozen 300-500+ held-out benchmark (#8) passes on the hardened English-quality judge (#7) without higher meaning/invention failures (ro-04 regression is the canonical false-pass).
+The native path is configured in `native-models/config.json` (env `PARI_NATIVE_MODEL_ID` / `PARI_NATIVE_MODEL_PATH` override). Qwen3-4B is the production incumbent; Qwen3.5-4B is the general-model benchmark control only. MiniCPM5-2B and Ling-3.0-tiny must not become local defaults; the Kaggle generator is chosen in issue #34. The optional FreeLLMAPI route is configured only through environment variables and is not a local fallback. Do not bake model identifiers into new code. See `benchmarks/llm-shootout/README.md` and `benchmarks/quillbot/README.md`. Describe the native path as primary only when packaged loading and installed headless evidence pass. The `local-safe-engine` remains deliberately bounded and deterministic. Do not claim "beats QuillBot" until the frozen 300-500+ held-out benchmark (#8) passes on the hardened English-quality judge (#7) without higher meaning/invention failures (ro-04 regression is the canonical false-pass).
