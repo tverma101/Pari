@@ -29,3 +29,4 @@ __pycache__/
 *.pyc
 .freebuff/
 .agents/
+*.private-review.json

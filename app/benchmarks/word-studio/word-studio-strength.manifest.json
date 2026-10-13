@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "suite": "word_studio_v1_strength_private",
+  "cases": 112,
+  "uniqueSources": 28,
+  "strengths": [
+    15,
+    40,
+    60,
+    90
+  ],
+  "tasks": "/Users/tejas/Projects/Pari/app/benchmarks/word-studio/word-studio-strength-suite.jsonl",
+  "taskFileSha256": "950b06c8aa4ee332e35b3d2e04fc479dc83c878c61012c4e5b6af686d7b16d1d",
+  "promptContractSha256": "6c71d609ec4070f1419db2e01905207fc259efc9ee7b57fbfe81d8307b5410ce",
+  "syntheticSeedSha256": "cd4684f3bdb524cd4b5f7b846f5c232105892cc796a85f1ffd48f879c26ef059",
+  "interactiveSeedSha256": "44ea674fc49c0d5e2031992b906342e702e1d353f7388ce192ce4aac560de91f",
+  "evidenceStatus": "synthetic_hand_authored_unvalidated; internal_interactive_seed; not published gold",
+  "strengthInterpretation": "The slider controls how much wording/structure may change, not how strong the author's opinion becomes.",
+  "humanReview": "Use the separate private review key. No LLM judge is run; counts and latency are not quality scores.",
+  "diagnosticMetadata": "sourceText/selectedText are non-gold fields already present in the prompt; they enable unchanged-copy diagnostics without opening the private review key.",
+  "privacy": "Keep tasks, private review key, outputs, and this manifest in a private Kaggle notebook/workspace."
+}
