@@ -1,0 +1,704 @@
+{
+  "contractVersion": 1,
+  "rangeEncoding": "utf16-v1",
+  "identity": {
+    "algorithm": "sha256-utf8",
+    "preimageFields": [
+      "rangeEncoding",
+      "sourceSha256",
+      "wireStart",
+      "wireEnd",
+      "text"
+    ],
+    "preimageSeparator": "\u001f"
+  },
+  "identityVectors": [
+    {
+      "id": "ascii-source",
+      "text": "Keep 2026 exact.",
+      "sourceSha256": "ee4fab40e5da8e49a116fe117965c6300006f072e52667c61a2aaa50a06507b0",
+      "range": {
+        "start": 5,
+        "end": 9
+      },
+      "rangeSha256": "b6838fc79947227c4e446074614fa739bbeb0beea4ec00fee42461e9ddbe261a"
+    }
+  ],
+  "cases": [
+    {
+      "id": "duplicate-identical-numbers-local-wrong-occurrence",
+      "description": "A local edit cannot be satisfied by an identical number that survives elsewhere in the document.",
+      "route": "local",
+      "anchorPolicy": "exact",
+      "sourceText": "Report 2026 is ready. Keep 2026 exact here.",
+      "selection": {
+        "start": 22,
+        "end": 43
+      },
+      "candidateText": "Report 2026 is ready. Keep the year here.",
+      "candidateRange": {
+        "start": 22,
+        "end": 41
+      },
+      "protectedSpans": [
+        {
+          "id": "selected-2026",
+          "kind": "number",
+          "scope": "required",
+          "text": "2026",
+          "start": 27,
+          "end": 31
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_position_drift",
+        "spanIds": [
+          "selected-2026"
+        ]
+      },
+      "selectionText": "Keep 2026 exact here.",
+      "candidateRegionText": "Keep the year here."
+    },
+    {
+      "id": "duplicate-identical-numbers-local-correct-occurrence",
+      "description": "The bound occurrence survives in the selected replacement region.",
+      "route": "local",
+      "anchorPolicy": "exact",
+      "sourceText": "Report 2026 is ready. Keep 2026 exact here.",
+      "selection": {
+        "start": 22,
+        "end": 43
+      },
+      "candidateText": "Report 2026 is ready. Keep 2026 verbatim.",
+      "candidateRange": {
+        "start": 22,
+        "end": 41
+      },
+      "protectedSpans": [
+        {
+          "id": "selected-2026",
+          "kind": "number",
+          "scope": "required",
+          "text": "2026",
+          "start": 27,
+          "end": 31
+        }
+      ],
+      "expect": {
+        "safe": true
+      },
+      "selectionText": "Keep 2026 exact here.",
+      "candidateRegionText": "Keep 2026 verbatim."
+    },
+    {
+      "id": "duplicated-proper-name-multiplicity",
+      "description": "Two occurrences of one proper name must both survive a whole rewrite.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "Maya Chen and Maya Chen wrote it.",
+      "candidateText": "Maya Chen appears once.",
+      "protectedSpans": [
+        {
+          "id": "name-1",
+          "kind": "name",
+          "scope": "required",
+          "text": "Maya Chen",
+          "start": 0,
+          "end": 9
+        },
+        {
+          "id": "name-2",
+          "kind": "name",
+          "scope": "required",
+          "text": "Maya Chen",
+          "start": 14,
+          "end": 23
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_repeated_mismatch",
+        "spanIds": [
+          "name-1",
+          "name-2"
+        ]
+      }
+    },
+    {
+      "id": "quoted-text-with-protected-token",
+      "description": "A quote span is byte-exact and keeps its inner currency and date anchors.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "The note says \"Pay $50 by 2026-08-10\" exactly.",
+      "candidateText": "The note says \"Pay $500 by 2026-08-10\" exactly.",
+      "protectedSpans": [
+        {
+          "id": "quote",
+          "kind": "quote",
+          "scope": "required",
+          "text": "\"Pay $50 by 2026-08-10\"",
+          "start": 14,
+          "end": 37
+        },
+        {
+          "id": "amount",
+          "kind": "currency",
+          "scope": "required",
+          "text": "$50",
+          "start": 19,
+          "end": 22
+        },
+        {
+          "id": "due",
+          "kind": "date",
+          "scope": "required",
+          "text": "2026-08-10",
+          "start": 26,
+          "end": 36
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_altered",
+        "spanIds": [
+          "quote",
+          "amount"
+        ]
+      }
+    },
+    {
+      "id": "url-ending-in-sentence-punctuation",
+      "description": "Sentence punctuation is not part of the protected URL payload.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "See https://example.com/report now.",
+      "candidateText": "Read https://example.com/report today.",
+      "protectedSpans": [
+        {
+          "id": "url",
+          "kind": "url",
+          "scope": "required",
+          "text": "https://example.com/report",
+          "start": 4,
+          "end": 30
+        }
+      ],
+      "expect": {
+        "safe": true
+      }
+    },
+    {
+      "id": "url-query-parameter-changed",
+      "description": "A changed query parameter is an altered URL, not a surviving one.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "Open https://example.com/a?x=1 now.",
+      "candidateText": "Open https://example.com/a?x=2 now.",
+      "protectedSpans": [
+        {
+          "id": "url",
+          "kind": "url",
+          "scope": "required",
+          "text": "https://example.com/a?x=1",
+          "start": 5,
+          "end": 30
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_altered",
+        "spanIds": [
+          "url"
+        ]
+      }
+    },
+    {
+      "id": "citation-punctuation-changed",
+      "description": "Citation punctuation is part of the protected payload.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "See [Smith 2019] for detail.",
+      "candidateText": "See [Smith 2019; p. 4] for detail.",
+      "protectedSpans": [
+        {
+          "id": "citation",
+          "kind": "citation",
+          "scope": "required",
+          "text": "[Smith 2019]",
+          "start": 4,
+          "end": 16
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_altered",
+        "spanIds": [
+          "citation"
+        ]
+      }
+    },
+    {
+      "id": "percentage-versus-bare-number",
+      "description": "A percentage is not satisfied by the bare number it contains.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "Keep the SLA at 99.9% unchanged.",
+      "candidateText": "Keep the SLA at 99.9 unchanged.",
+      "protectedSpans": [
+        {
+          "id": "sla",
+          "kind": "percentage",
+          "scope": "required",
+          "text": "99.9%",
+          "start": 16,
+          "end": 21
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_missing",
+        "spanIds": [
+          "sla"
+        ]
+      }
+    },
+    {
+      "id": "currency-symbol-amount-reordered",
+      "description": "Reordering the symbol away from the amount no longer carries the protected currency payload.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "The total is $20.",
+      "candidateText": "The total is 20 USD.",
+      "protectedSpans": [
+        {
+          "id": "amount",
+          "kind": "currency",
+          "scope": "required",
+          "text": "$20",
+          "start": 13,
+          "end": 16
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_missing",
+        "spanIds": [
+          "amount"
+        ]
+      }
+    },
+    {
+      "id": "negation-dropped",
+      "description": "Dropping a negation anchor is corruption even when every entity survives.",
+      "route": "whole",
+      "anchorPolicy": "exact",
+      "sourceText": "The device may not change the 42.5% result.",
+      "candidateText": "The device may change the 42.5% result.",
+      "protectedSpans": [
+        {
+          "id": "modal",
+          "kind": "modality",
+          "scope": "required",
+          "text": "may",
+          "start": 11,
+          "end": 14
+        },
+        {
+          "id": "polarity",
+          "kind": "negation",
+          "scope": "required",
+          "text": "not",
+          "start": 15,
+          "end": 18
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_missing",
+        "spanIds": [
+          "polarity"
+        ]
+      }
+    },
+    {
+      "id": "double-negation-introduced",
+      "description": "Adding a second negation flips the meaning even though the original anchors survive.",
+      "route": "whole",
+      "anchorPolicy": "exact",
+      "sourceText": "You may not delete it.",
+      "candidateText": "You may not not delete it.",
+      "protectedSpans": [
+        {
+          "id": "modal",
+          "kind": "modality",
+          "scope": "required",
+          "text": "may",
+          "start": 4,
+          "end": 7
+        },
+        {
+          "id": "polarity",
+          "kind": "negation",
+          "scope": "required",
+          "text": "not",
+          "start": 8,
+          "end": 11
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_introduced",
+        "spanIds": [
+          "polarity"
+        ]
+      }
+    },
+    {
+      "id": "modal-may-becomes-must",
+      "description": "Changing a modal anchor is an altered anchor, not a dropped one.",
+      "route": "whole",
+      "anchorPolicy": "exact",
+      "sourceText": "You may delete it.",
+      "candidateText": "You must delete it.",
+      "protectedSpans": [
+        {
+          "id": "modal",
+          "kind": "modality",
+          "scope": "required",
+          "text": "may",
+          "start": 4,
+          "end": 7
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_altered",
+        "spanIds": [
+          "modal"
+        ]
+      }
+    },
+    {
+      "id": "inline-code-changed",
+      "description": "Inline code is verbatim and may not be re-lettered or suffixed.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "Call `build_plan()` before review.",
+      "candidateText": "Call `build_planLater()` before review.",
+      "protectedSpans": [
+        {
+          "id": "code",
+          "kind": "code",
+          "scope": "required",
+          "text": "`build_plan()`",
+          "start": 5,
+          "end": 19
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_altered",
+        "spanIds": [
+          "code"
+        ]
+      }
+    },
+    {
+      "id": "fenced-code-preserved",
+      "description": "A fenced code block survives reordering of the surrounding prose.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "Intro line.\n```json\n{\"a\":1}\n```\nOutro line.",
+      "candidateText": "Outro line.\nIntro line.\n```json\n{\"a\":1}\n```",
+      "protectedSpans": [
+        {
+          "id": "fence",
+          "kind": "code",
+          "scope": "required",
+          "text": "```json\n{\"a\":1}\n```",
+          "start": 12,
+          "end": 31
+        }
+      ],
+      "expect": {
+        "safe": true
+      }
+    },
+    {
+      "id": "unicode-curly-quote-versus-straight",
+      "description": "Curly and straight quotes are different code points and are never normalized.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "He said “hello” clearly.",
+      "candidateText": "He said \"hello\" clearly.",
+      "protectedSpans": [
+        {
+          "id": "quote",
+          "kind": "quote",
+          "scope": "required",
+          "text": "“hello”",
+          "start": 8,
+          "end": 15
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_altered",
+        "spanIds": [
+          "quote"
+        ]
+      }
+    },
+    {
+      "id": "emoji-before-protected-span",
+      "description": "Non-BMP characters shift UTF-16 offsets but never the protected payload.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "😀😁 Keep 99.9% exactly.",
+      "candidateText": "😀😁 Keep 99.9% precisely.",
+      "protectedSpans": [
+        {
+          "id": "sla",
+          "kind": "percentage",
+          "scope": "required",
+          "text": "99.9%",
+          "start": 10,
+          "end": 15
+        }
+      ],
+      "expect": {
+        "safe": true
+      }
+    },
+    {
+      "id": "emoji-before-protected-span-dropped",
+      "description": "The same emoji-shifted span is rejected when its payload is removed.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "😀😁 Keep 99.9% exactly.",
+      "candidateText": "😀😁 Keep the rate precisely.",
+      "protectedSpans": [
+        {
+          "id": "sla",
+          "kind": "percentage",
+          "scope": "required",
+          "text": "99.9%",
+          "start": 10,
+          "end": 15
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_missing",
+        "spanIds": [
+          "sla"
+        ]
+      }
+    },
+    {
+      "id": "whole-paragraph-rewrite-allows-reordering",
+      "description": "Whole-paragraph rewrites may move protected payloads as long as multiplicity and bytes hold.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "Alpha 2026 beta. Gamma 2026 delta.",
+      "candidateText": "Delta 2026 now. Alpha 2026 later.",
+      "protectedSpans": [
+        {
+          "id": "year-1",
+          "kind": "number",
+          "scope": "required",
+          "text": "2026",
+          "start": 6,
+          "end": 10
+        },
+        {
+          "id": "year-2",
+          "kind": "number",
+          "scope": "required",
+          "text": "2026",
+          "start": 23,
+          "end": 27
+        }
+      ],
+      "expect": {
+        "safe": true
+      }
+    },
+    {
+      "id": "whole-paragraph-rewrite-duplicates-protected-value",
+      "description": "Adding an extra occurrence of a protected value is introduced content, not preservation.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "Alpha 2026 beta. Gamma 2026 delta.",
+      "candidateText": "Delta 2026 now. Alpha 2026 later and 2026 again.",
+      "protectedSpans": [
+        {
+          "id": "year-1",
+          "kind": "number",
+          "scope": "required",
+          "text": "2026",
+          "start": 6,
+          "end": 10
+        },
+        {
+          "id": "year-2",
+          "kind": "number",
+          "scope": "required",
+          "text": "2026",
+          "start": 23,
+          "end": 27
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_introduced",
+        "spanIds": [
+          "year-1",
+          "year-2"
+        ]
+      }
+    },
+    {
+      "id": "identifier-suffix-change",
+      "description": "A client-marked identifier is not satisfied by a longer token that contains it.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "Set option abc in the config.",
+      "candidateText": "Set option xabc in the config.",
+      "protectedSpans": [
+        {
+          "id": "identifier",
+          "kind": "code",
+          "scope": "required",
+          "text": "abc",
+          "start": 11,
+          "end": 14
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_altered",
+        "spanIds": [
+          "identifier"
+        ]
+      }
+    },
+    {
+      "id": "filename-suffix-change",
+      "description": "A protected filename is not satisfied by the same stem with an extra suffix.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "Open report.txt now.",
+      "candidateText": "Open report.txt.bak now.",
+      "protectedSpans": [
+        {
+          "id": "file",
+          "kind": "code",
+          "scope": "required",
+          "text": "report.txt",
+          "start": 5,
+          "end": 15
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_altered",
+        "spanIds": [
+          "file"
+        ]
+      }
+    },
+    {
+      "id": "currency-embedded-in-longer-amount",
+      "description": "$50 must not be satisfied by $500.",
+      "route": "whole",
+      "anchorPolicy": "minimum",
+      "sourceText": "Pay $50 now.",
+      "candidateText": "Pay $500 now.",
+      "protectedSpans": [
+        {
+          "id": "amount",
+          "kind": "currency",
+          "scope": "required",
+          "text": "$50",
+          "start": 4,
+          "end": 7
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_altered",
+        "spanIds": [
+          "amount"
+        ]
+      }
+    },
+    {
+      "id": "context-only-value-not-required-in-selection",
+      "description": "A context-only value constrains the surrounding document without being copied into the replacement.",
+      "route": "local",
+      "anchorPolicy": "exact",
+      "sourceText": "The budget is $20. Replace this word with a clearer phrase now.",
+      "selection": {
+        "start": 19,
+        "end": 63
+      },
+      "candidateText": "The budget is $20. Replace this word with a sharper phrase now.",
+      "candidateRange": {
+        "start": 19,
+        "end": 63
+      },
+      "protectedSpans": [
+        {
+          "id": "budget",
+          "kind": "currency",
+          "scope": "context-only",
+          "text": "$20",
+          "start": 14,
+          "end": 17
+        }
+      ],
+      "expect": {
+        "safe": true
+      },
+      "selectionText": "Replace this word with a clearer phrase now.",
+      "candidateRegionText": "Replace this word with a sharper phrase now."
+    },
+    {
+      "id": "context-only-value-must-not-be-injected",
+      "description": "Injecting a context-only protected value into the replacement region is reported as introduced content.",
+      "route": "local",
+      "anchorPolicy": "exact",
+      "sourceText": "The budget is $20. Replace this word with a clearer phrase now.",
+      "selection": {
+        "start": 19,
+        "end": 63
+      },
+      "candidateText": "Replace this word with a clearer phrase for $20 now.",
+      "candidateRange": {
+        "start": 0,
+        "end": 52
+      },
+      "protectedSpans": [
+        {
+          "id": "budget",
+          "kind": "currency",
+          "scope": "context-only",
+          "text": "$20",
+          "start": 14,
+          "end": 17
+        }
+      ],
+      "expect": {
+        "safe": false,
+        "failureClass": "protected_introduced",
+        "spanIds": [
+          "budget"
+        ]
+      },
+      "selectionText": "Replace this word with a clearer phrase now.",
+      "candidateRegionText": "Replace this word with a clearer phrase for $20 now."
+    }
+  ]
+}

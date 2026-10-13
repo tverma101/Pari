@@ -1,32 +1,46 @@
 #!/usr/bin/env python3
-"""Deterministic model-output parser used by the live Studio adapter."""
+"""Canonical Word Studio parser adapter used by the live Studio service.
+
+The benchmark parser is the single authority for parser modes and usable
+candidate admission. This module keeps the small adapter surface used by the
+service without forking that contract.
+"""
 from __future__ import annotations
 
-import json
-import re
+from typing import Any
 
-_BULLET = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+(.+?)\s*$")
+from word_studio_output_parser import (  # type: ignore[import-not-found]
+    PARSER_VERSION,
+    CandidateLedger,
+    parse_document,
+)
+
+
+def parse_document_details(raw: str) -> dict[str, Any]:
+    document = parse_document(raw)
+    return {
+        "parserVersion": PARSER_VERSION,
+        "parserMode": document.mode,
+        "parsedCount": len(document.options),
+        "invalidEntryCount": len(document.invalid_entries),
+        "invalidEntryTypes": document.invalid_entry_types,
+        "codeFenced": document.fenced,
+        "leadingProse": document.leading_prose,
+        "trailingProse": document.trailing_prose,
+        "commentaryMixed": document.commentary_mixed,
+        "jsonWrongKeys": list(document.wrong_json_keys),
+    }
 
 
 def parse_options(raw: str) -> tuple[list[str], str]:
-    text = str(raw or "").strip()
-    if not text:
-        return [], "empty"
-    try:
-        value = json.loads(text)
-        if isinstance(value, dict) and isinstance(value.get("options"), list):
-            return [str(x).strip() for x in value["options"] if str(x).strip()], "json_object"
-        if isinstance(value, list):
-            return [str(x).strip() for x in value if str(x).strip()], "json_array"
-    except json.JSONDecodeError:
-        pass
+    document = parse_document(raw)
+    return list(document.options), document.mode
 
-    lines = [line for line in text.splitlines() if line.strip()]
-    parsed: list[str] = []
-    for line in lines:
-        match = _BULLET.match(line)
-        if match:
-            parsed.append(match.group(1).strip())
-    if parsed and len(parsed) == len(lines):
-        return parsed, "numbered_or_bulleted"
-    return [], "unparseable"
+
+__all__ = [
+    "CandidateLedger",
+    "PARSER_VERSION",
+    "parse_document",
+    "parse_document_details",
+    "parse_options",
+]
