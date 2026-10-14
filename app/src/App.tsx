@@ -47,6 +47,17 @@ import {
   serializeProtectedSpans,
   validateProtectedContent,
 } from "@/lib/safety/protectedContent";
+import {
+  selectionSpanFromDom,
+  splitEditorSpanText,
+  joinEditorSpanText,
+  type EditorDomSelection,
+} from "@/lib/editor/spanSelection";
+import {
+  appendStudioDecision,
+  markParagraphSavedInLog,
+  hashParagraph,
+} from "@/lib/persistence/decisionLogger";
 import { readClipboardText, writeClipboardText } from "@/lib/platform/nativeClipboard";
 import { applyTheme, loadSettings, saveSettings, type AppSettings } from "@/lib/settings/settingsStore";
 import {
@@ -239,6 +250,9 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
   onAnchorChange,
   onChange,
   onPaste,
+  onSelectRange,
+  onUndo,
+  onRedo,
 }: {
   editorRef: RefObject<HTMLDivElement | null>;
   result: RewriteResult;
@@ -252,6 +266,9 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
   onAnchorChange: (element: HTMLElement | null) => void;
   onChange: (value: string) => void;
   onPaste: () => void;
+  onSelectRange?: (selection: EditorDomSelection) => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
 }) {
   const changedTokenIds = useMemo(
     () => buildChangedTokenIds(originalText, text, result),
@@ -385,6 +402,13 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
     if (target && tokenId) onActivate(tokenId, target);
   };
 
+  const handleSelection = () => {
+    const element = editorRef.current;
+    if (!element) return;
+    const selection = selectionSpanFromDom(element, text);
+    if (selection && onSelectRange) onSelectRange(selection);
+  };
+
   return (
     <div
       ref={editorRef}
@@ -396,7 +420,25 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
       onInput={handleInput}
       onPaste={onPaste}
       onClick={activateFromEvent}
+      onMouseUp={handleSelection}
+      onKeyUp={(event) => {
+        if (event.shiftKey) handleSelection();
+      }}
       onKeyDown={(event) => {
+        if (event.metaKey || event.ctrlKey) {
+          const key = event.key.toLowerCase();
+          if (key === "z") {
+            event.preventDefault();
+            if (event.shiftKey) onRedo?.();
+            else onUndo?.();
+            return;
+          }
+          if (key === "y") {
+            event.preventDefault();
+            onRedo?.();
+            return;
+          }
+        }
         // Space must stay available: this is the primary editing surface and a
         // textbox has to accept it. Enter activates the token.
         if (event.key !== "Enter") return;
@@ -432,6 +474,11 @@ function SynonymPopover({
   canRevertSentence,
   loadingAlternatives,
   onClose,
+  onRevertSelection,
+  onSplit,
+  onJoin,
+  canSplit,
+  canJoin,
 }: {
   token: RewriteToken;
   results: RankingResult[];
@@ -443,6 +490,11 @@ function SynonymPopover({
   canRevertSentence: boolean;
   loadingAlternatives: boolean;
   onClose: () => void;
+  onRevertSelection?: () => void;
+  onSplit?: () => void;
+  onJoin?: () => void;
+  canSplit?: boolean;
+  canJoin?: boolean;
 }) {
   return (
     <div
@@ -506,13 +558,23 @@ function SynonymPopover({
       </div>
 
       <div className="synonym-footer flex flex-wrap gap-1.5 px-2.5 py-2.5">
-        <button
-          type="button"
-          onClick={onRevertWord}
-          className="synonym-action rounded-full px-2.5 py-1 text-[10px]"
-        >
-          Revert word
-        </button>
+        {onRevertSelection ? (
+          <button
+            type="button"
+            onClick={onRevertSelection}
+            className="synonym-action rounded-full px-2.5 py-1 text-[10px]"
+          >
+            Revert selection
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onRevertWord}
+            className="synonym-action rounded-full px-2.5 py-1 text-[10px]"
+          >
+            Revert word
+          </button>
+        )}
         {canRevertSentence && (
           <button
             type="button"
@@ -520,6 +582,24 @@ function SynonymPopover({
             className="synonym-action rounded-full px-2.5 py-1 text-[10px]"
           >
             Revert sentence
+          </button>
+        )}
+        {canSplit && onSplit && (
+          <button
+            type="button"
+            onClick={onSplit}
+            className="synonym-action rounded-full px-2.5 py-1 text-[10px]"
+          >
+            Split sentence
+          </button>
+        )}
+        {canJoin && onJoin && (
+          <button
+            type="button"
+            onClick={onJoin}
+            className="synonym-action rounded-full px-2.5 py-1 text-[10px]"
+          >
+            Join with neighbor
           </button>
         )}
         <button
@@ -761,6 +841,34 @@ export default function App() {
   const outputEditorRef = useRef<HTMLDivElement | null>(null);
   const contextualRequestRef = useRef(0);
   const strengthRegenerationTimerRef = useRef<number | null>(null);
+  const editorUndoRef = useRef<string[]>([]);
+  const editorRedoRef = useRef<string[]>([]);
+  const [, setEditorHistoryVersion] = useState(0);
+
+  const handleUndo = useCallback(() => {
+    const current = sessionRef.current;
+    if (!current) return;
+    const prev = editorUndoRef.current.pop();
+    if (prev === undefined) return;
+    editorRedoRef.current.push(current.currentEditedText);
+    setEditorHistoryVersion((v) => v + 1);
+    setSession((existing) => existing ? { ...existing, currentEditedText: prev } : null);
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    const current = sessionRef.current;
+    if (!current) return;
+    const next = editorRedoRef.current.pop();
+    if (next === undefined) return;
+    editorUndoRef.current.push(current.currentEditedText);
+    setEditorHistoryVersion((v) => v + 1);
+    setSession((existing) => existing ? { ...existing, currentEditedText: next } : null);
+  }, []);
+
+  const handleSelectSpan = useCallback((domSelection: EditorDomSelection) => {
+    if (!sessionRef.current) return;
+    setAnchorRect(domSelection.range.getBoundingClientRect());
+  }, []);
 
   const clearStrengthRegeneration = () => {
     if (strengthRegenerationTimerRef.current === null) return;
@@ -1062,6 +1170,13 @@ export default function App() {
       contextualRequestRef.current += 1;
       setContextualLoadingTokenId(null);
       setContextualAlternatives({});
+      const currentText = sessionRef.current?.currentEditedText;
+      if (currentText && currentText !== nextText) {
+        editorUndoRef.current.push(currentText);
+        if (editorUndoRef.current.length > 100) editorUndoRef.current.shift();
+        editorRedoRef.current = [];
+        setEditorHistoryVersion((v) => v + 1);
+      }
       setSession((current) => {
         if (!current || current.currentEditedText === nextText) return current;
         const event = describeTextEdit(
@@ -1083,6 +1198,25 @@ export default function App() {
     },
     []
   );
+
+  const handleSplit = useCallback(() => {
+    const current = sessionRef.current;
+    if (!current) return;
+    const next = splitEditorSpanText(current.currentEditedText);
+    if (next && next !== current.currentEditedText) {
+      applyEditedText(next, "typed");
+    }
+  }, [applyEditedText]);
+
+  const handleJoin = useCallback(() => {
+    const current = sessionRef.current;
+    if (!current) return;
+    const sentences = splitSentences(current.currentEditedText);
+    if (sentences.length >= 2) {
+      const next = joinEditorSpanText(sentences[0].text, sentences[1].text);
+      if (next) applyEditedText(next, "typed");
+    }
+  }, [applyEditedText]);
 
   const handleInputChange = (requested: string) => {
     // maxLength only constrains what the user types; it does not constrain the
@@ -1317,6 +1451,23 @@ export default function App() {
 
   const handleSelectSynonym = (replacement: string | null) => {
     if (!activeToken || !session) return;
+    if (replacement !== null) {
+      appendStudioDecision({
+        id: `decision-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        paragraphId: String(session.startedAt),
+        paragraphHash: hashParagraph(session.originalText),
+        saved: false,
+        selectionText: activeToken.originalText,
+        selectionRange: { start: activeToken.start, end: activeToken.end },
+        operation: "alternatives",
+        optionsShown: activeResults.map((r) => r.option.replacement),
+        optionPicked: replacement,
+        optionsSkipped: activeResults.map((r) => r.option.replacement).filter((r) => r !== replacement),
+        modelId: session.generationMetadata.source,
+        adapterId: null,
+        timestamp: new Date().toISOString(),
+      });
+    }
     const nextText = replaceRange(
       session.currentEditedText,
       activeToken.start,
@@ -1401,6 +1552,12 @@ export default function App() {
     }
 
     const record = buildApprovedExample(finalApprovalSession, new Date().toISOString());
+    markParagraphSavedInLog(
+      String(session.startedAt),
+      hashParagraph(session.originalText),
+      session.originalText,
+      finalApprovalSession.currentEditedText
+    );
     const nextMemory = learnFromApproval(preferenceMemory, record);
     setPersistenceError(null);
     setIsApproving(true);
@@ -1721,6 +1878,9 @@ export default function App() {
                     applyEditedText(value, source);
                   }}
                   onPaste={handlePasteOutput}
+                  onSelectRange={handleSelectSpan}
+                  onUndo={handleUndo}
+                  onRedo={handleRedo}
                 />
               )}
             </div>
@@ -1732,10 +1892,26 @@ export default function App() {
               </div>
               <div className="flex items-center gap-2">
                 {session && (
-                  <button type="button" onClick={handleRevertParagraph} disabled={!canRevertParagraph} className="secondary-button rounded-full px-3 py-[6px] text-[11.5px]">Revert edits</button>
-                )}
-                {session && (
                   <>
+                    <button
+                      type="button"
+                      onClick={handleUndo}
+                      disabled={editorUndoRef.current.length === 0}
+                      className="secondary-button rounded-full px-3 py-[6px] text-[11.5px]"
+                      title="Undo edit (Cmd+Z)"
+                    >
+                      Undo
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRedo}
+                      disabled={editorRedoRef.current.length === 0}
+                      className="secondary-button rounded-full px-3 py-[6px] text-[11.5px]"
+                      title="Redo edit (Cmd+Shift+Z)"
+                    >
+                      Redo
+                    </button>
+                    <button type="button" onClick={handleRevertParagraph} disabled={!canRevertParagraph} className="secondary-button rounded-full px-3 py-[6px] text-[11.5px]">Revert edits</button>
                     <button type="button" onClick={handleDiscard} className="secondary-button rounded-full px-3.5 py-[7px] text-[12px]">Discard</button>
                     <button type="button" onClick={() => void handleApprove()} disabled={isApproving} className="approve-button rounded-full px-4 py-[7px] text-[12px] font-[650]" aria-busy={isApproving}>{isApproving ? "Saving…" : "Save & learn"}</button>
                   </>
@@ -1769,6 +1945,10 @@ export default function App() {
               canRevertSentence={activeSentenceCanRevert}
               loadingAlternatives={contextualLoadingTokenId === activeTokenId}
               onClose={closeTokenTools}
+              onSplit={handleSplit}
+              onJoin={handleJoin}
+              canSplit={Boolean(session && session.currentEditedText.includes(","))}
+              canJoin={Boolean(session && splitSentences(session.currentEditedText).length >= 2)}
             />,
             document.body
           )
