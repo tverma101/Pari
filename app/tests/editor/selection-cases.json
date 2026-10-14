@@ -1,0 +1,83 @@
+[
+  {
+    "id": "word-to-phrase",
+    "text": "The draft helped readers.",
+    "range": { "start": 10, "end": 16 },
+    "replacement": "gave useful support to",
+    "expected": "The draft gave useful support to readers."
+  },
+  {
+    "id": "phrase-to-word",
+    "text": "The draft was very clear.",
+    "range": { "start": 14, "end": 24 },
+    "replacement": "clear",
+    "expected": "The draft was clear."
+  },
+  {
+    "id": "clause-local-containment",
+    "text": "The draft is ready, and the review can begin.",
+    "range": { "start": 10, "end": 18 },
+    "replacement": "is complete",
+    "expected": "The draft is complete, and the review can begin."
+  },
+  {
+    "id": "phrase-expansion-local-containment",
+    "text": "The final draft needs detail before Friday.",
+    "range": { "start": 22, "end": 28 },
+    "candidate": "The final draft needs extensive technical detail before Friday.",
+    "replacement": "extensive technical detail",
+    "expected": "The final draft needs extensive technical detail before Friday."
+  },
+  {
+    "id": "phrase-compression-local-containment",
+    "text": "The final draft needs detail before Friday.",
+    "range": { "start": 22, "end": 28 },
+    "candidate": "The final draft needs examples before Friday.",
+    "replacement": "examples",
+    "expected": "The final draft needs examples before Friday."
+  },
+  {
+    "id": "sentence-to-two-sentences",
+    "text": "We need more detail. The current draft is brief.",
+    "range": { "start": 0, "end": 20 },
+    "replacement": "We need more detail. Please add examples.",
+    "expected": "We need more detail. Please add examples. The current draft is brief."
+  },
+  {
+    "id": "split-explicit-semicolon",
+    "operation": "split",
+    "text": "The source is clear; the result is useful.",
+    "expected": "The source is clear. The result is useful."
+  },
+  {
+    "id": "split-colon",
+    "operation": "split",
+    "text": "The source is clear: the result is useful.",
+    "expected": "The source is clear. The result is useful."
+  },
+  {
+    "id": "split-em-dash",
+    "operation": "split",
+    "text": "The source is clear — the result is useful.",
+    "expected": "The source is clear. The result is useful."
+  },
+  {
+    "id": "split-coordinating-comma",
+    "operation": "split",
+    "text": "The source is clear, but the result is incomplete.",
+    "expected": "The source is clear. But the result is incomplete."
+  },
+  {
+    "id": "join-two-period-ended-sentences",
+    "operation": "join",
+    "text": "The source is clear. The result is useful.",
+    "expected": "The source is clear; The result is useful."
+  },
+  {
+    "id": "protected-url-retained",
+    "text": "Read the guide at https://example.com/guide.",
+    "range": { "start": 0, "end": 44 },
+    "replacement": "Review https://example.com/guide.",
+    "expected": "Review https://example.com/guide."
+  }
+]
