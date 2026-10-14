@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pari.local/schemas/studio/inert-data-framing-v1.json",
+  "title": "Pari Word Studio inert-data prompt payload v1",
+  "description": "A canonical JSON payload whose source fields are quoted data and whose control fields are authoritative.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "operation",
+    "source",
+    "protectedSpans",
+    "contextProtectedValues",
+    "lane",
+    "targetWords",
+    "outputContract",
+    "controlSha256"
+  ],
+  "properties": {
+    "contract": { "const": "pari-studio-prompt-v1" },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "instruction", "semanticMode", "semanticRule", "strength", "controlNote"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "instruction": { "type": "string", "minLength": 1 },
+        "semanticMode": { "type": "string", "minLength": 1 },
+        "semanticRule": { "type": "string", "minLength": 1 },
+        "strength": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "controlNote": { "type": "string", "minLength": 1 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "documentText",
+        "documentContext",
+        "selectedText",
+        "selection",
+        "contextRange",
+        "sourceSha256",
+        "selectionSha256"
+      ],
+      "properties": {
+        "documentText": { "type": "string" },
+        "documentContext": { "type": "string" },
+        "selectedText": { "type": "string", "minLength": 1 },
+        "selection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end"],
+          "properties": {
+            "start": { "type": "integer", "minimum": 0 },
+            "end": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "contextRange": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end"],
+          "properties": {
+            "start": { "type": "integer", "minimum": 0 },
+            "end": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "sourceSha256": { "$ref": "#/$defs/sha256" },
+        "selectionSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "protectedSpans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "start", "end"],
+        "properties": {
+          "text": { "type": "string", "minLength": 1 },
+          "start": { "type": ["integer", "null"], "minimum": 0 },
+          "end": { "type": ["integer", "null"], "minimum": 1 }
+        }
+      }
+    },
+    "contextProtectedValues": {
+      "type": "array",
+      "description": "Source data the model must not disturb, but which lies outside the selection and must not be reproduced in the replacement.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "start", "end"],
+        "properties": {
+          "text": { "type": "string", "minLength": 1 },
+          "start": { "type": ["integer", "null"], "minimum": 0 },
+          "end": { "type": ["integer", "null"], "minimum": 1 }
+        }
+      }
+    },
+    "lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "requestedFamilies", "candidateBudget", "maxNewTokens", "temperature", "topP"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "requestedFamilies": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "candidateBudget": { "type": "integer", "minimum": 1, "maximum": 40 },
+        "maxNewTokens": { "type": "integer", "minimum": 1 },
+        "temperature": { "type": "number", "minimum": 0, "maximum": 2 },
+        "topP": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "targetWords": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minWords", "maxWords"],
+      "properties": {
+        "minWords": { "type": ["integer", "null"], "minimum": 1 },
+        "maxWords": { "type": ["integer", "null"], "minimum": 1 }
+      }
+    },
+    "outputContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "field", "count", "schema", "instruction"],
+      "properties": {
+        "format": { "const": "json_object" },
+        "field": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 1, "maximum": 40 },
+        "schema": { "type": "object", "minProperties": 1 },
+        "instruction": { "type": "string", "minLength": 1 }
+      }
+    },
+    "controlSha256": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}
