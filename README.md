@@ -1,15 +1,22 @@
 # Pari
 
-Pari is a local-first paraphrasing tool for macOS. This repository holds the
-product and its supporting workspaces.
+Pari is a Mac writing assistant for school and college essays. Paste a
+paragraph, tap any word or select a sentence, and Pari shows many options that
+fit the context. You always pick the final words. The plan is in
+[`docs/PLAN.md`](docs/PLAN.md).
 
 ## Layout
 
 | Folder    | Purpose |
 |-----------|---------|
-| `app/`    | Canonical production app: React/TypeScript/Vite frontend, Swift/WKWebView desktop wrapper, benchmarks, docs. See `app/AGENTS.md`. |
-| `lab/`    | Safe Rewrite Lab — non-canonical experimental engine sandbox. See `lab/README.md`. |
-| `inspect/` | Separate standalone repo holding frozen copies of earlier project folders for inspection/diffing. Its internal folder names are historical on purpose. |
+| `app/`    | Mac app: React/TypeScript/Vite frontend and Swift/WKWebView desktop wrapper. See `app/AGENTS.md`. |
+| `bench/`  | Word Studio benchmark: tasks, Kaggle runners, scoring. |
+| `kaggle/` | Kaggle notebooks for candidate runs, data generation and training. |
+| `model/`  | Quantizing (and, only if needed, distilling) the chosen model to MLX for the Mac. |
+| `docs/`   | The plan and the decisions log. |
+
+Earlier experiments (`lab/`, the old `app/benchmarks` suites, `app/research/`)
+are kept on branch `archive/2026-10` and tag `archive-2026-10`.
 
 Build artifacts land in `app/release/` (`Pari.app`, `Pari.dmg`); superseded
 builds are moved to `app/release/archive/`.
@@ -22,6 +29,11 @@ npm ci            # first setup
 npm run build     # frontend build
 npm run build:desktop   # Pari.app + Pari.dmg via build_dmg.sh
 npm run qa:approval     # headless QA
+```
+
+```bash
+cd bench/word-studio
+python3 -m unittest discover -p 'test_*.py'   # benchmark unit tests
 ```
 
 Names that are intentionally NOT renamed (runtime identifiers, renaming would

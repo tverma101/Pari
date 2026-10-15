@@ -18,15 +18,14 @@ app/native-models/*
 app/native-models/Qwen/
 app/native-models/**/*.safetensors
 app/native-models/**/*.bin
-app/research/grammar-sources/
 app/public/models/**/onnx/
 !app/public/models/Xenova/nli-deberta-v3-xsmall/**
 app/scripts/__pycache__/
 app/native-runtime/__pycache__/
 app/docs/ui-original-*/
-inspect/
 __pycache__/
 *.pyc
 .freebuff/
 .agents/
 *.private-review.json
+.playwright-cli/

@@ -2,6 +2,8 @@
 
 Pari is a local-first paraphrasing tool with shared Personal and Warmth styles. It produces one editable rewrite, offers compact contextual suggestions, repairs malformed prose, and learns only from text the user explicitly approves.
 
+This README describes the app as it ships today. The direction it is moving in (tap-word popover, Word Lab panel, a benchmarked local model) is in [`../docs/PLAN.md`](../docs/PLAN.md).
+
 ## Product behavior
 
 - One `Paraphrase` action produces one stable draft.
@@ -155,20 +157,20 @@ Qwen3 scored 222/300 raw and 228/300 after the real Pari finalizer. A
 production-schedule best-of-four replay with the exact protected-content gate
 scored 227/300, so candidate sampling did not justify changing the default.
 These are engineering signals, not human-quality or QuillBot-parity claims;
-the held-out results and raw replays live under
-[`benchmarks/llm-shootout/`](benchmarks/llm-shootout/).
+the held-out results and raw replays are kept under `app/benchmarks/llm-shootout/`
+on the `archive/2026-10` branch.
 
 Pari also ships a separate local agent style backend. Run `npm run backend:styles` or `./scripts/build_and_run.sh --agent-style-backend` to start only the loopback API; it prints an ephemeral `127.0.0.1` URL, persists validated custom styles to `~/Library/Application Support/Open Local Phraser/custom-styles.json`, and exits after ten minutes without activity. Set `PARI_AGENT_STYLE_IDLE_TIMEOUT_SECONDS=60` for a shorter session. This mode does not create a WebKit window or change the visible app's rewrite behavior. The API supports `GET /health`, `GET /v1/styles`, `POST /v1/styles`, `PATCH /v1/styles/:id`, `DELETE /v1/styles/:id`, and `POST /v1/shutdown`. A style body contains `name`, `description`, `instructions`, `baseMode` (`personal` or `warmth`), `strength` (0–100), and optional bounded `tweaks` (`strengthOffset` -24…24, `warmthPolish`, and `preserveSentenceCount`). Saved styles appear as custom modes in Pari on the next load/focus refresh. Every custom mode routes through the same shared protection, grammar, flow, native-model, critic, fallback, and approval-learning engine; custom instructions and tweaks only add bounded preferences. `npm run qa:agent:styles` verifies headless startup, CRUD persistence, validation boundaries, and idle shutdown against the packaged binary. `npm run qa:installed:custom` additionally creates an agent style, launches the installed app headlessly, connects the separately stored model, selects that saved mode, and verifies native MLX generation plus the existing UI probes before cleaning it up.
 
 The rewrite quality gates also check sentence-flow preservation, known-to-new information order, parallel verb series (including conservative repair of simple mixed gerund lists), vague sentence openings, safe concision of padded phrases, protected spans, approval-only learning, model control-text echoes, duplicate punctuation, note-fragment repair, direct-English filler removal, collocations/verb frames, broad plural-noun and determiner-led sentence-boundary agreement, and a conservative meaning contract for negation, modality, quantity, discourse relationships, and point of view. High/Deep amounts additionally ask the native generator for paragraph-level sentence restructuring; the offline fallback applies only bounded, relationship-preserving fronted or trailing clause/context moves, method-phrase movement, and a small safe subject recast. Phrase-level alternatives are filtered by collocation and sentence context, then repaired or rejected by the same final quality gates. High-severity hard grammar defects are never accepted in a generated candidate, even when the source already contains a defect of the same class. A rejected native draft receives one stricter local critic/repair pass before the deterministic fallback is used. These checks follow established revision guidance on sentence clarity and purposeful variety from [Purdue OWL](https://owl.purdue.edu/owl/graduate_writing/introduction_to_writing/documents/revising-and-editing/sentence-clarity-transcript.pdf) and cohesion/parallel structure from the [George Mason University Writing Center](https://writingcenter.gmu.edu/writing-resources/grammar-style/improving-cohesion-the-known-new-contract).
 
-`research:grammar:download` fetches four pinned, license-tracked development snapshots in parallel: Harper for rule research alongside the bundled `harper.js` runtime, LanguageTool for broad rule coverage research, GECToR for edit-tagging correction research, and UD English EWT for held-out grammar-flow evaluation. They live under `research/grammar-sources/`, do not receive user text, and the research snapshots are not themselves bundled into the app. See [`research/quality-roadmap.md`](research/quality-roadmap.md) and [`research/grammar-sources/README.md`](research/grammar-sources/README.md) for the 80/20 quality plan and shipping constraints.
+The grammar research snapshots (Harper, LanguageTool, GECToR, UD English EWT), their download and check scripts, and the research notes were archived in the 2026-10-15 cleanup. They are under `app/research/` on the `archive/2026-10` branch. The bundled `harper.js` runtime is unaffected.
 
 The output editor also runs a local grammar/flow diagnostic after generation and after manual edits. Agreement, quantifier-head agreement, sentence boundaries, article, modal-verb, pronoun-case, repetition, common forms such as “could have”/“a lot,” and similar hard issues receive warning underlines and a short status count; contextual word choices, citation-safe sentence revert, and direct editing remain available.
 
 ## Current backend boundary
 
-The production desktop path currently uses an optional external Qwen/Qwen3-4B-MLX-4bit checkpoint launched through the one-shot local MLX worker. Qwen3.5-4B is currently the **general-model benchmark control** in `benchmarks/llm-shootout`; MiniCPM5-2B and Ling-3.0-tiny are challenger checkpoints. Keeping benchmark control, production backend, challengers, and the explicit remote route separate lets new models and grammar-specialist cascades compete without silently changing the app.
+The production desktop path currently uses an optional external Qwen/Qwen3-4B-MLX-4bit checkpoint launched through the one-shot local MLX worker. Model choice is being redone by the Word Studio benchmark in [`../docs/PLAN.md`](../docs/PLAN.md); until it picks a winner, Qwen3-4B stays the default. Keeping the benchmark, production backend, and the explicit remote route separate lets new models compete without silently changing the app.
 
 The tracked `native-models/config.json` is the source of truth for the model
 ID, local path, required files, and runtime. `PARI_NATIVE_MODEL_ID` and
@@ -194,8 +196,8 @@ normal mode. The MTP path validates the target's `qwen3_5` architecture and the
 drafter's `qwen3_5_mtp` architecture before loading them. It uses the same Pari
 prompt and postprocessing, then returns candidates to the existing local
 ranker. It is still a one-shot worker, so each request loads the target and
-drafter again; use the fresh-process benchmark in
-`benchmarks/strength-sweep/README.md` for the measured latency boundary. This
+drafter again; the measured latency boundary is in
+`app/benchmarks/strength-sweep/README.md` on the `archive/2026-10` branch. This
 opt-in path does not change the default Qwen3-4B runtime.
 
 The production quality judge is also local-only: bundled DeBERTa-v3-xsmall
