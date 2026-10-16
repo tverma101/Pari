@@ -86,12 +86,16 @@ class HardCheckTests(unittest.TestCase):
 
     def test_negation_and_names_only_warn(self) -> None:
         result = flags("ws2-screen-p01-academic-1",
-                       "Some parents fear they will be unable to contact their children during an emergency.",
+                       "Some parents fear they could lose contact with their children during an emergency.",
                        "Some parents fear they will not be able to contact their children during an emergency.")
         self.assertEqual(result[0]["fail"], [])
         self.assertIn("negation_changed", result[0]["warn"])
         self.assertTrue(result[0]["judge"])
         self.assertEqual(result[1]["warn"], [])
+        unable = flags("ws2-screen-p01-academic-1",
+                       "Some parents worry about being unable to reach their children in an emergency.",
+                       "Some parents fear an inability to contact their children during an emergency.")
+        self.assertEqual([o["warn"] for o in unable], [[], []], '"unable" and "inability" carry the negation')
         names = flags("ws2-screen-p03-condense-1", "Before 1440, books were copied by hand, which was slow.")
         self.assertIn("name_dropped", names[0]["warn"])
 

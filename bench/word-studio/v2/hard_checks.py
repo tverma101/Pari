@@ -27,7 +27,7 @@ from word_studio_output_parser import (  # noqa: E402
     word_count,
 )
 
-CHECKS_VERSION = "ws2-hard-checks-v1"
+CHECKS_VERSION = "ws2-hard-checks-v2"
 
 #: Flags that put an option below the bar without judging. Everything else warns.
 FAIL_FLAGS = {
@@ -68,7 +68,8 @@ NUMBER_WORDS = {
 NUMBER_WORDS.update({"thirty": "30", "forty": "40", "fifty": "50", "sixty": "60", "seventy": "70",
                      "eighty": "80", "ninety": "90", "hundred": "100", "thousand": "1000", "dozen": "12"})
 NEGATIONS = frozenset({"not", "no", "never", "none", "nobody", "nothing", "neither", "nor", "nowhere",
-                       "cannot", "without"})
+                       "cannot", "without", "unable", "inability", "impossible", "fail", "fails", "failed",
+                       "failing", "failure", "lack", "lacks", "lacked", "lacking"})
 QUOTED_RE = re.compile(r"[\"“”]([^\"“”]{3,})[\"“”]")
 SENTENCE_SPLIT_RE = re.compile(r"(?:(?<=[.!?])|(?<=[.!?][\"”’)]))\s+")
 

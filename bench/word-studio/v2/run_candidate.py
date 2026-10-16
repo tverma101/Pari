@@ -17,6 +17,7 @@ Rules this runner enforces:
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -357,7 +358,13 @@ class TransformersBackend:
             repetition_penalty=g["repetition_penalty"], eos_token_id=base.eos_token_id, pad_token_id=pad,
             bos_token_id=base.bos_token_id)
         placed = getattr(self.model, "hf_device_map", None) or {}
+        # One untimed generation first, so CUDA start-up is not charged to the first task.
+        started = time.perf_counter()
+        self.generate([{"role": "user", "content": "Reply with OK."}], max_new_tokens=8, seed=0,
+                      on_text=lambda *_: None)
+        warmup_seconds = round(time.perf_counter() - started, 2)
         return {
+            "warmup_seconds": warmup_seconds,
             "model_class": type(self.model).__name__,
             "dtype": self.dtype_name,
             "device_map": "single T4 (cuda:0)" if single else "auto across both T4s",
@@ -388,6 +395,8 @@ class TransformersBackend:
                 return torch.full((input_ids.shape[0],), streamer.stop.is_set(), dtype=torch.bool,
                                   device=input_ids.device)
 
+        config = copy.deepcopy(self.generation_config)
+        config.max_new_tokens = max_new_tokens
         holder: dict[str, Any] = {}
 
         def work() -> None:
@@ -395,8 +404,8 @@ class TransformersBackend:
                 torch.manual_seed(seed)
                 with torch.inference_mode():
                     holder["ids"] = self.model.generate(
-                        **inputs, generation_config=self.generation_config, max_new_tokens=max_new_tokens,
-                        streamer=streamer, stopping_criteria=StoppingCriteriaList([StopWhenAsked()]))
+                        **inputs, generation_config=config, streamer=streamer,
+                        stopping_criteria=StoppingCriteriaList([StopWhenAsked()]))
             except BaseException as exc:  # re-raised on the caller's thread
                 holder["error"] = exc
                 streamer.end()
