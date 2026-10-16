@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "verified_on": "2026-10-16",
+  "purpose": "Frozen model candidates for the Word Studio benchmark. This file contains no scores or quality ranking.",
+  "hardware_targets": {
+    "mac": {
+      "memory_gib": 16,
+      "weight_quantization_bits": 4,
+      "fit_rule": "Prefer dense models of about 8B parameters or smaller, leaving room for Pari, a browser, and context cache. The listed artifact sizes are checkpoint files, not measured runtime memory."
+    },
+    "kaggle": {
+      "accelerator": "2 x NVIDIA Tesla T4, 16 GiB each",
+      "fit_rule": "Checkpoint file size and published framework support are screening evidence only. A Kaggle runtime receipt is required before claiming a candidate is qualified."
+    }
+  },
+  "candidates": [
+    {
+      "candidate_id": "qwen35-2b",
+      "role": "mac_candidate",
+      "family": "Qwen3.5",
+      "model_id": "Qwen/Qwen3.5-2B",
+      "revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+      "parameter_count_billions": 2,
+      "upstream_weight_files_bytes": 4548221488,
+      "license": {
+        "spdx": "Apache-2.0",
+        "personal_use": "allowed_under_license_terms"
+      },
+      "mlx": {
+        "available": true,
+        "model_id": "mlx-community/Qwen3.5-2B-MLX-4bit",
+        "revision": "93760be4f1f69842a46bc13dbdc0f19e291392a3",
+        "quantization_bits": 4,
+        "weight_file_bytes": 1722271785,
+        "runtime": "mlx-vlm",
+        "note": "The published conversion card says it uses a Qwen3.5-support branch; verify compatibility with the pinned stable mlx-vlm runtime before selecting it for the Mac."
+      },
+      "mac_fit_assessment": "likely_by_4bit_artifact_size; runtime memory, context cache, and latency are unmeasured",
+      "kaggle_2xt4_assessment": "eligible_for_smoke; upstream checkpoint files are below one T4's memory by size, but runtime fit and compatibility are unmeasured",
+      "sources": [
+        {
+          "claim": "model identity, 2B parameter size, license, framework support, and upstream revision",
+          "url": "https://huggingface.co/Qwen/Qwen3.5-2B/tree/15852e8c16360a2fea060d615a32b45270f8a8fc",
+          "metadata_url": "https://huggingface.co/api/models/Qwen/Qwen3.5-2B?blobs=true",
+          "verified_on": "2026-10-16"
+        },
+        {
+          "claim": "4-bit MLX conversion, artifact size, source model, and mlx-vlm runtime",
+          "url": "https://huggingface.co/mlx-community/Qwen3.5-2B-MLX-4bit/tree/93760be4f1f69842a46bc13dbdc0f19e291392a3",
+          "metadata_url": "https://huggingface.co/api/models/mlx-community/Qwen3.5-2B-MLX-4bit?blobs=true",
+          "verified_on": "2026-10-16"
+        }
+      ]
+    },
+    {
+      "candidate_id": "qwen35-4b",
+      "role": "mac_candidate",
+      "family": "Qwen3.5",
+      "model_id": "Qwen/Qwen3.5-4B",
+      "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "parameter_count_billions": 4,
+      "upstream_weight_files_bytes": 9319828096,
+      "license": {
+        "spdx": "Apache-2.0",
+        "personal_use": "allowed_under_license_terms"
+      },
+      "mlx": {
+        "available": true,
+        "model_id": "mlx-community/Qwen3.5-4B-MLX-4bit",
+        "revision": "32f3e8ecf65426fc3306969496342d504bfa13f3",
+        "quantization_bits": 4,
+        "weight_file_bytes": 3034300695,
+        "runtime": "mlx-vlm",
+        "note": "The published conversion card says it uses a Qwen3.5-support branch; verify compatibility with the pinned stable mlx-vlm runtime before selecting it for the Mac."
+      },
+      "mac_fit_assessment": "likely_by_4bit_artifact_size; runtime memory, context cache, and latency are unmeasured",
+      "kaggle_2xt4_assessment": "eligible_for_smoke; upstream checkpoint files are below one T4's memory by size, but runtime fit and compatibility are unmeasured",
+      "sources": [
+        {
+          "claim": "model identity, 4B parameter size, license, framework support, and upstream revision",
+          "url": "https://huggingface.co/Qwen/Qwen3.5-4B/tree/851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+          "metadata_url": "https://huggingface.co/api/models/Qwen/Qwen3.5-4B?blobs=true",
+          "verified_on": "2026-10-16"
+        },
+        {
+          "claim": "4-bit MLX conversion, artifact size, source model, and mlx-vlm runtime",
+          "url": "https://huggingface.co/mlx-community/Qwen3.5-4B-MLX-4bit/tree/32f3e8ecf65426fc3306969496342d504bfa13f3",
+          "metadata_url": "https://huggingface.co/api/models/mlx-community/Qwen3.5-4B-MLX-4bit?blobs=true",
+          "verified_on": "2026-10-16"
+        }
+      ]
+    },
+    {
+      "candidate_id": "minicpm5-2b",
+      "role": "mac_candidate",
+      "family": "MiniCPM5",
+      "model_id": "openbmb/MiniCPM5-2B",
+      "revision": "f97400052a43d642bbc6e9975e2397e3ae6a6b52",
+      "parameter_count_billions": 2.51675648,
+      "upstream_weight_files_bytes": 5033557096,
+      "license": {
+        "spdx": "Apache-2.0",
+        "personal_use": "allowed_under_license_terms"
+      },
+      "mlx": {
+        "available": true,
+        "model_id": "openbmb/MiniCPM5-2B-MLX",
+        "revision": "8a9ad7539ac86281d0ac2b017ba04a5de53fe9a3",
+        "quantization_bits": 4,
+        "weight_file_bytes": 1416035216,
+        "runtime": "mlx-lm"
+      },
+      "mac_fit_assessment": "likely_by_4bit_artifact_size; runtime memory, context cache, and latency are unmeasured",
+      "kaggle_2xt4_assessment": "eligible_for_smoke; upstream checkpoint files are below one T4's memory by size, but runtime fit and compatibility are unmeasured",
+      "sources": [
+        {
+          "claim": "model identity, exact parameter count, license, Transformers/vLLM support, and upstream revision",
+          "url": "https://huggingface.co/openbmb/MiniCPM5-2B/tree/f97400052a43d642bbc6e9975e2397e3ae6a6b52",
+          "metadata_url": "https://huggingface.co/api/models/openbmb/MiniCPM5-2B?blobs=true",
+          "verified_on": "2026-10-16"
+        },
+        {
+          "claim": "official 4-bit MLX model for Apple Silicon and MLX-LM usage",
+          "url": "https://huggingface.co/openbmb/MiniCPM5-2B-MLX/tree/8a9ad7539ac86281d0ac2b017ba04a5de53fe9a3",
+          "metadata_url": "https://huggingface.co/api/models/openbmb/MiniCPM5-2B-MLX?blobs=true",
+          "verified_on": "2026-10-16"
+        }
+      ]
+    },
+    {
+      "candidate_id": "phi4-mini-instruct",
+      "role": "mac_candidate",
+      "family": "Phi-4",
+      "model_id": "microsoft/Phi-4-mini-instruct",
+      "revision": "cfbefacb99257ffa30c83adab238a50856ac3083",
+      "parameter_count_billions": 3.8,
+      "upstream_weight_files_bytes": 7672066216,
+      "license": {
+        "spdx": "MIT",
+        "personal_use": "allowed_under_license_terms"
+      },
+      "mlx": {
+        "available": true,
+        "model_id": "mlx-community/Phi-4-mini-instruct-4bit",
+        "revision": "ac1c269cb4222a4e136a3d09edad301056c1f36a",
+        "quantization_bits": 4,
+        "weight_file_bytes": 2158100796,
+        "runtime": "mlx-lm"
+      },
+      "mac_fit_assessment": "likely_by_4bit_artifact_size; runtime memory, context cache, and latency are unmeasured",
+      "kaggle_2xt4_assessment": "eligible_for_smoke; upstream checkpoint files are below one T4's memory by size, but runtime fit and compatibility are unmeasured",
+      "sources": [
+        {
+          "claim": "model identity, 3.8B parameter size, MIT license, Transformers/vLLM support, and upstream revision",
+          "url": "https://huggingface.co/microsoft/Phi-4-mini-instruct/tree/cfbefacb99257ffa30c83adab238a50856ac3083",
+          "metadata_url": "https://huggingface.co/api/models/microsoft/Phi-4-mini-instruct?blobs=true",
+          "verified_on": "2026-10-16"
+        },
+        {
+          "claim": "4-bit MLX conversion and artifact size",
+          "url": "https://huggingface.co/mlx-community/Phi-4-mini-instruct-4bit/tree/ac1c269cb4222a4e136a3d09edad301056c1f36a",
+          "metadata_url": "https://huggingface.co/api/models/mlx-community/Phi-4-mini-instruct-4bit?blobs=true",
+          "verified_on": "2026-10-16"
+        }
+      ]
+    },
+    {
+      "candidate_id": "smollm3-3b",
+      "role": "mac_candidate",
+      "family": "SmolLM3",
+      "model_id": "HuggingFaceTB/SmolLM3-3B",
+      "revision": "a07cc9a04f16550a088caea529712d1d335b0ac1",
+      "parameter_count_billions": 3,
+      "upstream_weight_files_bytes": 6150235008,
+      "license": {
+        "spdx": "Apache-2.0",
+        "personal_use": "allowed_under_license_terms"
+      },
+      "mlx": {
+        "available": true,
+        "model_id": "mlx-community/SmolLM3-3B-4bit",
+        "revision": "d3a7e0594d6642dbcfb7d149bed8b0bdf49f95ce",
+        "quantization_bits": 4,
+        "weight_file_bytes": 1730051993,
+        "runtime": "mlx-lm"
+      },
+      "mac_fit_assessment": "likely_by_4bit_artifact_size; runtime memory, context cache, and latency are unmeasured",
+      "kaggle_2xt4_assessment": "eligible_for_smoke; upstream checkpoint files are below one T4's memory by size, but runtime fit and compatibility are unmeasured",
+      "sources": [
+        {
+          "claim": "model identity, 3B model size, Apache-2.0 license, Transformers/vLLM support, and upstream revision",
+          "url": "https://huggingface.co/HuggingFaceTB/SmolLM3-3B/tree/a07cc9a04f16550a088caea529712d1d335b0ac1",
+          "metadata_url": "https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B?blobs=true",
+          "verified_on": "2026-10-16"
+        },
+        {
+          "claim": "4-bit MLX conversion and artifact size",
+          "url": "https://huggingface.co/mlx-community/SmolLM3-3B-4bit/tree/d3a7e0594d6642dbcfb7d149bed8b0bdf49f95ce",
+          "metadata_url": "https://huggingface.co/api/models/mlx-community/SmolLM3-3B-4bit?blobs=true",
+          "verified_on": "2026-10-16"
+        }
+      ]
+    },
+    {
+      "candidate_id": "qwen35-35b-a3b-gptq-int4",
+      "role": "kaggle_large_reference",
+      "family": "Qwen3.5",
+      "model_id": "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",
+      "revision": "3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b",
+      "parameter_count_billions_total": 35,
+      "parameter_count_billions_active": 3,
+      "upstream_weight_files_bytes": 24419939760,
+      "quantization": "GPTQ Int4",
+      "license": {
+        "spdx": "Apache-2.0",
+        "personal_use": "allowed_under_license_terms"
+      },
+      "mlx": {
+        "available": false,
+        "reason": "Reference is 35B total and outside the 16 GiB Mac candidate envelope."
+      },
+      "mac_fit_assessment": "outside_16_gib_candidate_envelope",
+      "kaggle_2xt4_assessment": "plausible_reference_not_run; 24.42 GB of quantized weights split across two T4s leaves estimated memory for a short-context smoke, but loading and generation are unverified",
+      "sources": [
+        {
+          "claim": "35B total/3B active parameter count, GPTQ Int4 format, Apache-2.0 license, and published vLLM support",
+          "url": "https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/tree/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b",
+          "metadata_url": "https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4?blobs=true",
+          "verified_on": "2026-10-16"
+        }
+      ]
+    }
+  ]
+}
