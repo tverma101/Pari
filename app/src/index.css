@@ -950,6 +950,85 @@ input:focus-visible {
   background: var(--surface-2);
 }
 
+.word-lab-panel {
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.word-lab-header,
+.word-lab-tabs {
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.word-lab-tab,
+.word-lab-transform {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted-strong);
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+}
+
+.word-lab-tab[aria-selected="true"],
+.word-lab-transform[aria-selected="true"] {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.word-lab-open {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.word-lab-open:hover,
+.word-lab-open[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.word-lab-context {
+  border: 1px solid var(--border-soft);
+  background: var(--surface-2);
+}
+
+.word-lab-eyebrow,
+.word-lab-action {
+  color: var(--accent-strong);
+}
+
+.word-lab-hint,
+.word-lab-label {
+  color: var(--muted);
+}
+
+.word-lab-card {
+  border: 1px solid var(--border-soft);
+  background: var(--surface);
+}
+
+.word-lab-example {
+  color: var(--text);
+}
+
+.word-lab-action {
+  border: 1px solid var(--accent-border);
+  background: var(--accent-soft);
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.word-lab-action:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.word-lab-empty {
+  border: 1px dashed var(--border);
+  color: var(--muted);
+}
+
 .empty-note {
   border: 1px dashed var(--border);
   color: var(--muted);
