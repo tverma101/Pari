@@ -74,6 +74,14 @@ const SAMPLE_TEXT =
   "Artificial intelligence is changing the way people work and learn. It can help students improve their writing, find new ideas quickly, and understand difficult topics. Many companies use these powerful tools to make their work more efficient.";
 
 const SYNONYM_LIMIT = MAX_VISIBLE_SYNONYMS;
+const INITIAL_VISIBLE_SYNONYMS = 6;
+const SYNONYM_PAGE_SIZE = 6;
+const ESSAY_FIT_SOURCES = new Set<CandidateOption["source"]>([
+  "phrase-bank",
+  "static-bank",
+  "deep-bank",
+  "contextual-mlm",
+]);
 const INLINE_WORD_TOOL_STOP_WORDS = new Set([
   "a", "about", "after", "again", "also", "an", "and", "are", "as", "been", "before", "being", "between", "both",
   "can", "could", "does", "each", "for", "from", "have", "if", "in", "into", "is", "it", "just", "more", "most", "much", "must", "of", "on", "only", "or",
@@ -95,18 +103,23 @@ function popoverStyle(anchorRect: DOMRect | null): CSSProperties {
     window.innerWidth - width - 16,
     Math.max(16, anchorRect.left + anchorRect.width / 2 - width / 2)
   );
-  const estimatedHeight = 340;
-  const top =
-    anchorRect.bottom + estimatedHeight + 12 <= window.innerHeight
-      ? anchorRect.bottom + 8
-      : Math.max(12, anchorRect.top - estimatedHeight - 8);
+  const preferredHeight = Math.max(180, Math.min(360, window.innerHeight - 24));
+  const belowTop = anchorRect.bottom + 8;
+  const belowSpace = Math.max(0, window.innerHeight - belowTop - 12);
+  const aboveSpace = Math.max(0, anchorRect.top - 20);
+  const useBelow = belowSpace >= preferredHeight || belowSpace >= Math.min(280, preferredHeight) || belowSpace >= aboveSpace;
+  const maxHeight = useBelow
+    ? Math.max(180, Math.min(preferredHeight, belowSpace))
+    : Math.max(180, Math.min(preferredHeight, aboveSpace));
+  const top = useBelow ? belowTop : Math.max(12, anchorRect.top - maxHeight - 8);
 
   return {
     position: "fixed",
     top,
     left,
     width,
-    maxHeight: Math.max(250, window.innerHeight - 24),
+    height: maxHeight,
+    maxHeight,
   };
 }
 
@@ -229,7 +242,7 @@ function renderInlineEditorContent(
       span.setAttribute("aria-haspopup", "dialog");
       span.setAttribute("aria-expanded", activeTokenId === token.id ? "true" : "false");
       span.setAttribute("aria-controls", "synonym-popover");
-      span.setAttribute("aria-label", `Choose a synonym for ${token.text}`);
+      span.setAttribute("aria-label", `Choose an essay-fit replacement for ${token.text}`);
     }
     fragment.appendChild(span);
   }
@@ -466,8 +479,11 @@ const InlineRewriteEditor = memo(function InlineRewriteEditor({
 function SynonymPopover({
   token,
   results,
+  visibleOptionCount,
+  hasMoreOptions,
   style,
   onSelect,
+  onMore,
   onRevertWord,
   onRevertSentence,
   onCopySentence,
@@ -482,8 +498,11 @@ function SynonymPopover({
 }: {
   token: RewriteToken;
   results: RankingResult[];
+  visibleOptionCount: number;
+  hasMoreOptions: boolean;
   style: CSSProperties;
   onSelect: (replacement: string | null) => void;
+  onMore: () => void;
   onRevertWord: () => void;
   onRevertSentence: () => void;
   onCopySentence: () => void;
@@ -503,14 +522,14 @@ function SynonymPopover({
       id="synonym-popover"
       role="dialog"
       aria-modal="false"
-      aria-label={`Local word choices for ${token.text}`}
+      aria-label={`Essay-fit replacements for ${token.text}`}
       style={style}
-      className="synonym-popover z-50 max-h-[360px] overflow-hidden shadow-xl animate-fade-in"
+      className="synonym-popover z-50 flex max-h-[360px] flex-col overflow-hidden shadow-xl animate-fade-in"
       onMouseDown={(event) => event.stopPropagation()}
     >
-      <div className="synonym-header flex items-start justify-between gap-3 px-3.5 py-3">
+      <div className="synonym-header flex shrink-0 items-start justify-between gap-3 px-3.5 py-3">
         <div className="min-w-0">
-          <div className="synonym-eyebrow text-[10px] font-semibold uppercase tracking-[0.16em]">Local choices</div>
+          <div className="synonym-eyebrow text-[10px] font-semibold uppercase tracking-[0.16em]">Essay-fit options</div>
           <div className="synonym-title mt-0.5 truncate text-[15px] font-semibold">{token.text}</div>
         </div>
         <button
@@ -523,7 +542,7 @@ function SynonymPopover({
         </button>
       </div>
 
-      <div className="synonym-list max-h-[248px] overflow-auto px-2 py-2">
+      <div className="synonym-list min-h-0 flex-1 overflow-auto px-2 py-2">
         <button
           type="button"
           onClick={() => onSelect(null)}
@@ -533,7 +552,7 @@ function SynonymPopover({
           <span className="synonym-label ml-2 flex-none text-[10px]">Original</span>
         </button>
 
-        {results.map((result) => (
+        {results.slice(0, visibleOptionCount).map((result) => (
           <button
             key={result.option.id}
             type="button"
@@ -547,17 +566,29 @@ function SynonymPopover({
 
         {loadingAlternatives && (
           <div className="empty-note rounded-[10px] px-3 py-2 text-[11.5px]" aria-live="polite">
-            Finding local context-aware alternatives…
+            Finding replacements for this sentence…
           </div>
         )}
         {!loadingAlternatives && results.length === 0 && (
           <div className="empty-note rounded-[10px] px-3 py-2 text-[11.5px]">
-            No safe local alternatives for this word.
+            No safe essay-fit alternatives for this word.
           </div>
+        )}
+        {hasMoreOptions && (
+          <button
+            type="button"
+            onClick={onMore}
+            disabled={loadingAlternatives}
+            className="synonym-more mt-1 w-full rounded-[10px] px-3 py-2 text-[11.5px] font-medium"
+            aria-label={`Show more replacements for ${token.text}`}
+            aria-busy={loadingAlternatives}
+          >
+            {loadingAlternatives ? "Finding more…" : "More…"}
+          </button>
         )}
       </div>
 
-      <div className="synonym-footer flex flex-wrap gap-1.5 px-2.5 py-2.5">
+      <div className="synonym-footer flex shrink-0 flex-wrap gap-1.5 px-2.5 py-2.5">
         {onRevertSelection ? (
           <button
             type="button"
@@ -829,6 +860,7 @@ export default function App() {
   const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const [contextualAlternatives, setContextualAlternatives] = useState<Record<string, CandidateOption[]>>({});
   const [contextualLoadingTokenId, setContextualLoadingTokenId] = useState<string | null>(null);
+  const [visibleSynonymCount, setVisibleSynonymCount] = useState(INITIAL_VISIBLE_SYNONYMS);
   const [harperIssues, setHarperIssues] = useState<GrammarIssue[]>([]);
   const [harperStatus, setHarperStatus] = useState<"idle" | "checking" | "ready" | "unavailable">("idle");
 
@@ -1060,11 +1092,14 @@ export default function App() {
     const sentence = session
       ? getSentenceForRange(session.currentEditedText, activeToken.start, activeToken.end)
       : { text: activeToken.text, start: activeToken.start };
-    const ranked = rankCandidatesByRule(activeToken.alternatives, {
+    const essayFitAlternatives = activeToken.alternatives.filter((option) => ESSAY_FIT_SOURCES.has(option.source));
+    const ranked = rankCandidatesByRule(essayFitAlternatives, {
       fullText: session?.currentEditedText ?? activeToken.text,
       sentence: sentence.text,
       selectedText: activeToken.text,
-      mode: engineMode,
+      // Word suggestions are always tuned for the essay surface, independent
+      // of the paragraph's Personal/Warmth rewrite style.
+      mode: "formal",
       strength: percentToStrengthLevel(engineStrength),
       freezeWords: [],
       partOfSpeech: activeToken.partOfSpeech,
@@ -1073,7 +1108,7 @@ export default function App() {
       sentenceStart: sentence.start,
     });
     return rankCandidatesByMemory(ranked, activeToken.originalText, preferenceMemory).slice(0, SYNONYM_LIMIT);
-  }, [activeToken, engineMode, engineStrength, preferenceMemory, session?.currentEditedText]);
+  }, [activeToken, engineStrength, preferenceMemory, session?.currentEditedText]);
 
   const activeSentenceCanRevert = useMemo(() => {
     if (!activeToken || !session) return false;
@@ -1269,18 +1304,26 @@ export default function App() {
     setAnchorRect(element.getBoundingClientRect());
     setActiveTokenId(tokenId);
     setActiveTokenWord(token.text.trim());
+    setVisibleSynonymCount(INITIAL_VISIBLE_SYNONYMS);
+  };
 
-    if (token.alternatives.length >= SYNONYM_LIMIT || contextualAlternatives[tokenId]) return;
+  const handleMoreSynonyms = () => {
+    if (!activeToken || !activeTokenId || !session) return;
+    if (visibleSynonymCount < activeResults.length) {
+      setVisibleSynonymCount((count) => Math.min(SYNONYM_LIMIT, count + SYNONYM_PAGE_SIZE));
+      return;
+    }
+    if (contextualAlternatives[activeTokenId] || activeResults.length >= SYNONYM_LIMIT) return;
 
     const requestId = contextualRequestRef.current + 1;
     contextualRequestRef.current = requestId;
-    setContextualLoadingTokenId(tokenId);
-    notify("Finding more local alternatives for this word…");
+    setContextualLoadingTokenId(activeTokenId);
+    notify("Finding more essay-fit alternatives…");
     const modelFailures: LocalModelFailure[] = [];
     void generateAdvancedAlternatives(
-      token,
+      activeToken,
       session.currentEditedText,
-      engineMode,
+      "formal",
       percentToStrengthLevel(engineStrength),
       {
         onModelFailure: (failure) => {
@@ -1292,23 +1335,25 @@ export default function App() {
     )
       .then((alternatives) => {
         if (contextualRequestRef.current !== requestId) return;
-        setContextualAlternatives((current) => ({ ...current, [tokenId]: alternatives }));
+        const essayFitAlternatives = alternatives.filter((option) => ESSAY_FIT_SOURCES.has(option.source));
+        setContextualAlternatives((current) => ({ ...current, [activeTokenId]: essayFitAlternatives }));
+        setVisibleSynonymCount((count) => Math.min(SYNONYM_LIMIT, count + SYNONYM_PAGE_SIZE));
         setContextualLoadingTokenId(null);
         if (modelFailures.length > 0) {
           const firstFailure = modelFailures[0];
           notify(
-            alternatives.length > 0
-              ? `${firstFailure.label} is unavailable. Built-in offline choices are still available.`
-              : "No additional safe local alternatives were found for this word."
+            essayFitAlternatives.length > 0
+              ? `${firstFailure.label} is unavailable. Built-in essay-fit choices are still available.`
+              : "No additional safe essay-fit alternatives were found for this word."
           );
         } else {
-          notify(alternatives.length > 0 ? "Local contextual alternatives are ready." : "No additional safe local alternatives were found.");
+          notify(essayFitAlternatives.length > 0 ? "More essay-fit alternatives are ready." : "No additional safe alternatives were found.");
         }
       })
       .catch((error) => {
         if (contextualRequestRef.current !== requestId) return;
         setContextualLoadingTokenId(null);
-      notify(error instanceof Error ? error.message : "Contextual alternatives were unavailable.", "error");
+        notify(error instanceof Error ? error.message : "More alternatives were unavailable.", "error");
       });
   };
 
@@ -1751,7 +1796,7 @@ export default function App() {
                 <div className="panel-title accent-text text-[13.5px] font-[650]">
                   {draftStyleLabel ? `Your ${draftStyleLabel} rewrite` : "Your rewrite"}
                 </div>
-                <div className="panel-sub mt-0.5 text-[12px] leading-relaxed">Edit directly, or select a highlighted word for local choices.</div>
+                <div className="panel-sub mt-0.5 text-[12px] leading-relaxed">Edit directly, or select a highlighted word for essay-fit choices.</div>
                 {draftDiffersFromControls && (
                   <div className="draft-drift mt-2" role="status">
                     <span className="draft-drift-text">
@@ -1791,7 +1836,7 @@ export default function App() {
                 {hasOutput && (
                   <div className="quality-legend mt-2" data-testid="quality-legend" aria-label="Rewrite highlighting key">
                     <span className="legend-item"><span className="legend-swatch legend-swatch-changed" aria-hidden="true" /> Changed wording</span>
-                    <span className="legend-item"><span className="legend-swatch legend-swatch-choice" aria-hidden="true" /> Local word choices</span>
+                    <span className="legend-item"><span className="legend-swatch legend-swatch-choice" aria-hidden="true" /> Essay-fit choices</span>
                     <span className="legend-item"><span className="legend-swatch legend-swatch-warning" aria-hidden="true" /> Grammar or flow note</span>
                   </div>
                 )}
@@ -1823,7 +1868,7 @@ export default function App() {
                       <path d="M11.6 7.2l1.9 1.9 2.6-2.9" strokeWidth="1.5" />
                     </svg>
                   </span>
-                  <span>Your {activeMode.label} rewrite will appear here after you paraphrase. Select any highlighted word to see local alternatives.</span>
+                  <span>Your {activeMode.label} rewrite will appear here after you paraphrase. Select a highlighted word for essay-fit replacements.</span>
                 </div>
               )}
               {/* Always mounted: a live region introduced together with its own
@@ -1937,8 +1982,13 @@ export default function App() {
             <SynonymPopover
               token={activeToken}
               results={activeResults}
+              visibleOptionCount={visibleSynonymCount}
+              hasMoreOptions={visibleSynonymCount < activeResults.length || (
+                activeResults.length < SYNONYM_LIMIT && activeTokenId !== null && !contextualAlternatives[activeTokenId]
+              )}
               style={popoverStyle(anchorRect)}
               onSelect={handleSelectSynonym}
+              onMore={handleMoreSynonyms}
               onRevertWord={handleRevertWord}
               onRevertSentence={handleRevertSentence}
               onCopySentence={handleCopySentence}
