@@ -46,3 +46,14 @@ jobs:
 
       - name: TypeScript typecheck
         run: npx tsc -p tsconfig.json --noEmit
+
+      - name: Use Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run Word Studio Python tests
+        working-directory: bench/word-studio
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -B -m unittest discover -p 'test_*.py'
