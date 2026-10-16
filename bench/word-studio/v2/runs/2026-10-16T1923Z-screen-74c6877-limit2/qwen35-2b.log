@@ -1,0 +1,14 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Loading weights:   0%|          | 0/320 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/320 [00:01<08:00,  1.51s/it]
+Loading weights:  90%|████████▉ | 287/320 [00:01<00:00, 245.01it/s]
+Loading weights: 100%|██████████| 320/320 [00:01<00:00, 184.28it/s]
+[transformers] Passing `generation_config` together with generation-related arguments=({'max_new_tokens'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[qwen35-2b] 1/2 ws2-screen-p01-academic-1 ok 7.5s options_seen=5
+[qwen35-2b] 2/2 ws2-screen-p01-condense-1 ok 5.7s options_seen=8
+{"candidate": "qwen35-2b", "status": "completed", "tasks": {"ok": 2, "error": 0, "failed_ids": []}}
