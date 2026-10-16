@@ -15,7 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 # The deterministic suites are the committed quality floor and are expected to
-# stay green. Known engine limitations tracked in app/docs/remaining-work.md
+# stay green. Known engine limitations (formerly tracked in app/docs/remaining-work.md,
+# now on the archive/2026-10 branch)
 # (P1.3 entailment/contradiction gate, note-fragment repair) are reported by
 # separate scripts and must not be masked by loosening these assertions.
 jobs:

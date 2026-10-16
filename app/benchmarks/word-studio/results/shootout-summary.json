@@ -1,8 +1,0 @@
-{
-  "timestamp": "2026-10-14T00:23:44Z",
-  "winner": "qwen35-4b",
-  "candidatesEvaluated": 6,
-  "benchmarkReceipt": "word-studio-matrix.json",
-  "stabilityReceipt": "stability-drift-receipt.json",
-  "fineTuneReceipt": "fine-tune-receipt.json"
-}
