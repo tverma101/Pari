@@ -109,6 +109,19 @@ class HardCheckTests(unittest.TestCase):
         self.assertEqual((failed["format"], failed["options"]), ("no_output", []))
         self.assertTrue(hard_checks.check(task, ok(options("fine"), finish="length"))["truncated"])
 
+    def test_json_followed_by_text_keeps_its_options(self) -> None:
+        task = TASKS["ws2-screen-p01-tap_word-1"]
+        for raw in (options("sound", "wise") + "\n\nNote: I kept the best first.",
+                    options("sound", "wise") + "}\n",
+                    "```json\n" + options("sound", "wise") + "}\n```"):
+            checked = hard_checks.check(task, ok(raw))
+            self.assertEqual((checked["format"], checked["parse_mode"]), ("lenient", "json_object_then_text"), raw)
+            self.assertEqual([o["text"] for o in checked["options"]], ["sound", "wise"])
+        broken = hard_checks.check(task, ok('{"options": ["sound", ["wise"]}]}'))
+        self.assertEqual((broken["format"], broken["options"]), ("unparseable", []), "malformed JSON is not repaired")
+        lines = hard_checks.check(task, ok("sound\nwise\nprudent"))
+        self.assertEqual(lines["format"], "lenient")
+
 
 class ScriptedBackend:
     """Returns the same options for every task."""

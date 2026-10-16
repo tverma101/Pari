@@ -15,6 +15,12 @@ under the old version.
    the judge, never a verdict. Numbers only warn because "19th" ->
    "Nineteenth" keeps the fact. An option that really changes or invents a
    number is 0.
+
+   Format is reported, never judged. `strict` means the reply is only the
+   JSON object. `lenient` means the options were read from JSON in a code
+   fence, from a complete JSON object followed by other text (only the object
+   counts), or from a plain list. `unparseable` means no options, so every
+   slot is below the bar. Malformed JSON is never repaired.
 2. **Judge each output.** Use the paragraph, the selection and the
    instruction in the packet. Give a relevance label to every judged option,
    then the five criteria for the list as a whole.

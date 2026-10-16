@@ -9,6 +9,7 @@ These checks never read a model name and never produce a quality score.
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -27,7 +28,7 @@ from word_studio_output_parser import (  # noqa: E402
     word_count,
 )
 
-CHECKS_VERSION = "ws2-hard-checks-v2"
+CHECKS_VERSION = "ws2-hard-checks-v3"
 
 #: Flags that put an option below the bar without judging. Everything else warns.
 FAIL_FLAGS = {
@@ -127,6 +128,39 @@ def uses_word(text: str, word: str) -> bool:
     return any(t.startswith(target) or stem(t) == target for t in words(text))
 
 
+def json_prefix_options(raw: str) -> list[str] | None:
+    """Options from a complete JSON object that opens the output, ignoring any text after it.
+
+    Models often add a note after valid JSON, or a stray closing brace. The
+    object itself is what a client would read, so it counts, as ``lenient``.
+    Malformed JSON is not repaired.
+    """
+    body = (raw or "").strip()
+    if body.startswith("```"):
+        body = body.split("\n", 1)[1] if "\n" in body else ""
+    body = body.lstrip()
+    if not body.startswith("{"):
+        return None
+    try:
+        obj, _end = json.JSONDecoder().raw_decode(body)
+    except ValueError:
+        return None
+    if not isinstance(obj, dict) or not isinstance(obj.get("options"), list):
+        return None
+    return [v for v in obj["options"] if isinstance(v, str)]
+
+
+def parse(raw: str) -> tuple[list[str], str, str]:
+    """Return ``(options, format, parse_mode)`` for a raw completion."""
+    doc = parse_document(raw)
+    if doc.mode in ("json_object", "json_array"):
+        return doc.options, format_of(doc), doc.mode
+    prefix = json_prefix_options(raw)
+    if prefix is not None:
+        return prefix, ("lenient" if prefix else "unparseable"), "json_object_then_text"
+    return doc.options, format_of(doc), doc.mode
+
+
 def format_of(doc: Any) -> str:
     if not doc.options:
         return "unparseable"
@@ -194,10 +228,10 @@ def check(task: dict[str, Any], output: dict[str, Any] | None) -> dict[str, Any]
         result.update(format="no_output", parse_mode=None, returned=0, truncated=False, options=[],
                       error=(output or {}).get("error"))
         return result
-    doc = parse_document(output.get("raw_text") or "")
+    texts, fmt, mode = parse(output.get("raw_text") or "")
     options = []
     earlier: list[str] = []
-    for index, text in enumerate(doc.options):
+    for index, text in enumerate(texts):
         flags = option_flags(task, text, earlier)
         if index >= requested:
             flags.insert(0, "beyond_requested")
@@ -206,9 +240,9 @@ def check(task: dict[str, Any], output: dict[str, Any] | None) -> dict[str, Any]
         warn = [f for f in flags if f in WARN_FLAGS]
         options.append({"index": index, "text": text, "fail": fail, "warn": warn, "judge": not fail})
     result.update(
-        format=format_of(doc),
-        parse_mode=doc.mode,
-        returned=len(doc.options),
+        format=fmt,
+        parse_mode=mode,
+        returned=len(texts),
         truncated=output.get("finish_reason") == "length",
         options=options,
     )
