@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "benchmark": "word-studio-v2",
+  "frozen_on": "2026-10-16",
+  "frozen_before_results": "No candidate output existed when these files were built. Any change to a task, prompt or decoding setting is a new benchmark version.",
+  "prompt_version": "ws2-prompts-v1",
+  "generation": {
+    "do_sample": true,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": 50,
+    "repetition_penalty": 1.0,
+    "samples_per_task": 1,
+    "seed": "first 8 bytes of sha256(task id), big-endian",
+    "thinking": "disabled: enable_thinking=False is passed to every chat template"
+  },
+  "task_kinds": {
+    "tap_word": {
+      "options": 10,
+      "max_new_tokens": 320,
+      "feature": "tap a word: context-fit replacements"
+    },
+    "phrase_to_word": {
+      "options": 10,
+      "max_new_tokens": 256,
+      "feature": "phrase to one word"
+    },
+    "word_sentences": {
+      "options": 5,
+      "max_new_tokens": 768,
+      "feature": "word to example sentences in context"
+    },
+    "condense": {
+      "options": 5,
+      "max_new_tokens": 640,
+      "feature": "sentence: same meaning in fewer words"
+    },
+    "paraphrase": {
+      "options": 5,
+      "max_new_tokens": 768,
+      "feature": "sentence: same length, new words"
+    },
+    "academic": {
+      "options": 5,
+      "max_new_tokens": 896,
+      "feature": "sentence: more academic, no new claims"
+    }
+  },
+  "source": {
+    "path": "source/paragraphs.json",
+    "sha256": "43cb4c84dff9191d69772a52a7b25eba4e376225b1b705ae35ec0feec75371db",
+    "license": "CC0-1.0",
+    "author": "Written for this benchmark by Claude (claude-opus-5-5) in a Pari session on 2026-10-16. Not user text and not copied from any essay corpus.",
+    "quotes": "Every quotation comes from a public-domain work and is listed on its paragraph. Paragraphs about copyrighted books describe the plot and quote nothing."
+  },
+  "sets": {
+    "screen": {
+      "path": "tasks/screen.jsonl",
+      "sha256": "df7c32ee7e5945f832dc24fd073f5b693d0ffa40e4afeca7ed370ad4f24f24e8",
+      "tasks": 40,
+      "paragraphs": 8,
+      "kinds": {
+        "academic": 5,
+        "condense": 6,
+        "paraphrase": 5,
+        "phrase_to_word": 6,
+        "tap_word": 12,
+        "word_sentences": 6
+      },
+      "genres": {
+        "argumentative": 10,
+        "history": 5,
+        "literary": 10,
+        "personal": 10,
+        "science": 5
+      },
+      "requested_options": 290
+    },
+    "full": {
+      "path": "tasks/full.jsonl",
+      "sha256": "1b1e7e7a5e453988d9d47c1b82ac35868c5b5acd062f45ef91113ddd4d15b79a",
+      "tasks": 200,
+      "paragraphs": 40,
+      "kinds": {
+        "academic": 28,
+        "condense": 28,
+        "paraphrase": 28,
+        "phrase_to_word": 28,
+        "tap_word": 60,
+        "word_sentences": 28
+      },
+      "genres": {
+        "argumentative": 50,
+        "history": 40,
+        "literary": 45,
+        "personal": 30,
+        "science": 35
+      },
+      "requested_options": 1440
+    }
+  },
+  "screen_and_full_disjoint": "No paragraph or sentence appears in both sets.",
+  "reuse": {
+    "reused": [
+      "word_studio_output_parser.py: parse_document, partial_option_values and near_duplicate_keys parse the JSON options, flag wrapper prose and fences, recover options from a partial stream, and find near duplicates.",
+      "The JSON {\"options\": [...]} output contract from the v1 suites.",
+      "The global rules of v1-prompt-contracts.json: keep facts, negation and certainty; invent nothing; return options only."
+    ],
+    "not_reused": [
+      "word-studio-transform-suite.jsonl: its sources are short everyday sentences, not essay paragraphs, and its operations (split/join, collocation, a vocabulary ceiling that penalises academic wording) do not match the v1 features, where 'more academic' is now a feature.",
+      "word-studio-strength-suite.jsonl: the 15/40/60/90 strength slider is not a v1 feature.",
+      "word_studio_human_eval.py: human review packets are replaced by Claude blind judging (#87).",
+      "run-kaggle-roster.py and the vLLM/Prism runners: they depend on the archived English Core lane, on a module that no longer exists (kaggle_stage_identity) and on prebuilt runtime locks. v2 uses one Transformers runner (#86)."
+    ]
+  }
+}

@@ -1,0 +1,1026 @@
+{
+  "schema_version": 1,
+  "about": {
+    "what": "Source paragraphs and task selections for the Word Studio v2 benchmark (#85).",
+    "author": "Written for this benchmark by Claude (claude-opus-5-5) in a Pari session on 2026-10-16. Not user text and not copied from any essay corpus.",
+    "license": "CC0-1.0",
+    "voice": "Plain student voice with a small vocabulary (good, bad, big, a lot, shows, hard), so the tasks look like the writing Pari is for.",
+    "quotes": "Every quotation comes from a public-domain work and is listed on its paragraph. Paragraphs about copyrighted books describe the plot and quote nothing.",
+    "sentence_index": "Task field 's' is the 1-based index into 'sentences'. 'select' must occur once in that sentence as a whole-word match unless 'occurrence' says which one."
+  },
+  "paragraphs": [
+    {
+      "id": "p01",
+      "set": "screen",
+      "genre": "argumentative",
+      "topic": "phone bans in class",
+      "sentences": [
+        "Many schools are thinking about banning phones during class, and I think this is a good idea.",
+        "When students have their phones out, they get distracted really easily and stop listening to the teacher.",
+        "A lot of kids say they only use their phones to check the time, but most of the time they are actually on social media.",
+        "In my opinion, I think that a ban would help students do better on tests because they would pay attention more.",
+        "Some parents are worried that they will not be able to reach their kids in an emergency.",
+        "However, the school office can always call a parent if something bad happens.",
+        "Overall, a phone ban is a good way to make classrooms better places to learn."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "good"},
+        {"kind": "tap_word", "s": 6, "select": "bad"},
+        {"kind": "word_sentences", "word": "detrimental", "origin": "suggested"},
+        {"kind": "condense", "s": 4},
+        {"kind": "academic", "s": 5}
+      ]
+    },
+    {
+      "id": "p02",
+      "set": "screen",
+      "genre": "literary",
+      "topic": "Atticus Finch in To Kill a Mockingbird",
+      "sentences": [
+        "In To Kill a Mockingbird, Atticus Finch shows that doing the right thing is not always easy.",
+        "He agrees to defend Tom Robinson even though he knows that most people in Maycomb will be angry at him.",
+        "Atticus is someone who never gives up on what he believes, even when his own children get bullied at school because of it.",
+        "He tells Scout that you never really understand a person until you look at things from their point of view.",
+        "This shows that he wants his kids to be fair to everyone, not just people who are like them.",
+        "Atticus is a good example of a person who stays brave when it would be easier to stay quiet."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "shows"},
+        {"kind": "phrase_to_word", "s": 3, "select": "someone who never gives up on what he believes"},
+        {"kind": "academic", "s": 2},
+        {"kind": "paraphrase", "s": 5},
+        {"kind": "word_sentences", "word": "integrity", "origin": "suggested"}
+      ]
+    },
+    {
+      "id": "p03",
+      "set": "screen",
+      "genre": "history",
+      "topic": "the printing press",
+      "sentences": [
+        "The printing press was one of the most important inventions in history.",
+        "Before Johannes Gutenberg built his press around 1440, books had to be copied by hand, which took a really long time.",
+        "Because of this, books were very expensive and only rich people and churches could have them.",
+        "After the press was invented, books could be made much faster and for a lot less money.",
+        "More people started learning how to read, and new ideas spread across Europe quickly.",
+        "Some historians say that the press helped cause big changes like the Reformation and the Scientific Revolution.",
+        "Without it, the world we live in today would probably be very different."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 5, "select": "spread"},
+        {"kind": "tap_word", "s": 6, "select": "big"},
+        {"kind": "condense", "s": 2},
+        {"kind": "paraphrase", "s": 4},
+        {"kind": "academic", "s": 6}
+      ]
+    },
+    {
+      "id": "p04",
+      "set": "screen",
+      "genre": "science",
+      "topic": "teenagers and sleep",
+      "sentences": [
+        "Teenagers need about eight to ten hours of sleep every night, but most of them get a lot less.",
+        "One reason is that their body clocks change during puberty, so they do not feel tired until late at night.",
+        "On top of that, many teens stay up looking at their phones, and the blue light makes it even harder to fall asleep.",
+        "Not getting enough sleep is bad for the brain because it makes it hard to remember things and focus in class.",
+        "It can also make teens more moody and stressed out.",
+        "Scientists have found that students who sleep more usually get better grades.",
+        "This is why some experts think schools should start later in the morning."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 4, "select": "bad"},
+        {"kind": "word_sentences", "word": "deprivation", "origin": "suggested"},
+        {"kind": "condense", "s": 3},
+        {"kind": "paraphrase", "s": 6},
+        {"kind": "phrase_to_word", "s": 5, "select": "stressed out"}
+      ]
+    },
+    {
+      "id": "p05",
+      "set": "screen",
+      "genre": "personal",
+      "topic": "learning English after moving",
+      "sentences": [
+        "When my family moved to the United States, I was eleven years old and I only knew a few words in English.",
+        "The first few months at school were really hard because I could not understand what the teachers were saying.",
+        "I felt alone most of the time, and I was too scared to talk in class.",
+        "My English teacher, Ms. Alvarez, started staying after school to help me with reading and writing.",
+        "She never made me feel stupid when I made mistakes.",
+        "Little by little, I started to understand more and even make some friends.",
+        "Now I am the one who helps new students when they first get here, because I know how it feels."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "hard"},
+        {"kind": "tap_word", "s": 3, "select": "scared"},
+        {"kind": "word_sentences", "word": "resilience", "origin": "suggested"},
+        {"kind": "paraphrase", "s": 5},
+        {"kind": "phrase_to_word", "s": 6, "select": "Little by little"}
+      ]
+    },
+    {
+      "id": "p06",
+      "set": "screen",
+      "genre": "argumentative",
+      "topic": "social media and self-image",
+      "sentences": [
+        "Social media has a big effect on how teenagers see themselves.",
+        "On apps like Instagram and TikTok, people usually only post the best parts of their lives, like vacations and nice clothes.",
+        "When teens look at these posts all day, they start to compare themselves to others and feel bad about their own lives.",
+        "A survey from 2023 found that almost half of teens said social media made them feel worse about their bodies.",
+        "Social media is not all bad, though, because it also helps people stay in touch with friends and find others with the same interests.",
+        "Still, I believe that teens should limit how much time they spend on these apps."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "big"},
+        {"kind": "condense", "s": 3},
+        {"kind": "academic", "s": 4},
+        {"kind": "phrase_to_word", "s": 2, "select": "the best parts of their lives"},
+        {"kind": "word_sentences", "word": "compare", "origin": "writer"}
+      ]
+    },
+    {
+      "id": "p07",
+      "set": "screen",
+      "genre": "literary",
+      "topic": "ambition in Macbeth",
+      "quotes": [{"text": "a tale told by an idiot", "work": "William Shakespeare, Macbeth, Act 5 Scene 5", "license": "public domain"}],
+      "sentences": [
+        "In Macbeth, Shakespeare shows how wanting power too much can destroy a person.",
+        "At the start of the play, Macbeth is a loyal soldier who fights bravely for King Duncan.",
+        "After the witches tell him he will be king, he cannot stop thinking about it.",
+        "Lady Macbeth pushes him to kill Duncan, and he finally agrees even though he feels guilty.",
+        "Once he becomes king, he keeps killing people because he is afraid of losing what he has.",
+        "By the end, Macbeth says that life is \"a tale told by an idiot,\" which shows how empty he feels.",
+        "His story is a warning about what happens when ambition gets out of control."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 4, "select": "pushes"},
+        {"kind": "tap_word", "s": 6, "select": "empty"},
+        {"kind": "condense", "s": 5},
+        {"kind": "academic", "s": 6},
+        {"kind": "phrase_to_word", "s": 1, "select": "wanting power too much"}
+      ]
+    },
+    {
+      "id": "p08",
+      "set": "screen",
+      "genre": "personal",
+      "topic": "a first job at a pizza restaurant",
+      "sentences": [
+        "Last summer I got my first job working at a small pizza restaurant near my house.",
+        "At first I thought it would be easy, but I quickly found out that it was a lot of work.",
+        "On busy nights we had to make dozens of pizzas in just a few hours, and customers got upset if their food was late.",
+        "My manager, Tony, taught me how to stay calm and do one thing at a time.",
+        "I also learned how to talk to people who were angry without getting angry myself.",
+        "The job was tiring, but it showed me that I can handle stress better than I thought.",
+        "These skills will help me in college and in any job I have in the future."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 3, "select": "upset"},
+        {"kind": "word_sentences", "word": "handle", "origin": "writer"},
+        {"kind": "paraphrase", "s": 2},
+        {"kind": "condense", "s": 3},
+        {"kind": "phrase_to_word", "s": 2, "select": "found out"}
+      ]
+    },
+    {
+      "id": "p09",
+      "set": "full",
+      "genre": "argumentative",
+      "topic": "school uniforms",
+      "sentences": [
+        "Some people think school uniforms are a bad idea, but I think they help students in many ways.",
+        "First, uniforms make it harder for kids to judge each other based on how much their clothes cost.",
+        "When everyone wears the same thing, students from poor families do not stand out as much.",
+        "Second, uniforms save time in the morning because students do not have to pick out an outfit every day.",
+        "Critics say that uniforms take away students' freedom to express themselves.",
+        "However, students can still show who they are through their hobbies, their writing, and the way they treat others."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "judge"},
+        {"kind": "tap_word", "s": 3, "select": "poor"},
+        {"kind": "phrase_to_word", "s": 4, "select": "pick out"},
+        {"kind": "paraphrase", "s": 3},
+        {"kind": "academic", "s": 5}
+      ]
+    },
+    {
+      "id": "p10",
+      "set": "full",
+      "genre": "literary",
+      "topic": "the green light in The Great Gatsby",
+      "quotes": [{"text": "believed in the green light", "work": "F. Scott Fitzgerald, The Great Gatsby (1925), chapter 9", "license": "public domain in the United States"}],
+      "sentences": [
+        "In The Great Gatsby, the green light at the end of Daisy's dock stands for Gatsby's dream of being with her again.",
+        "Gatsby stretches out his arms toward the light across the water, which shows how badly he wants something that is far away.",
+        "The light is also connected to the bigger idea of the American Dream, the belief that anyone can become rich and happy if they work hard enough.",
+        "By the end of the novel, Gatsby's dream falls apart, and the light seems to lose its meaning.",
+        "Nick says that Gatsby \"believed in the green light,\" even though the future he wanted kept moving away from him.",
+        "Fitzgerald uses the light to show that some dreams are impossible to reach."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "badly"},
+        {"kind": "tap_word", "s": 6, "select": "impossible"},
+        {"kind": "condense", "s": 3},
+        {"kind": "paraphrase", "s": 2},
+        {"kind": "academic", "s": 5}
+      ]
+    },
+    {
+      "id": "p11",
+      "set": "full",
+      "genre": "history",
+      "topic": "child labor in the Industrial Revolution",
+      "sentences": [
+        "During the Industrial Revolution, a lot of children worked in factories and mines instead of going to school.",
+        "Some of them were only six or seven years old, and they often worked twelve hours a day.",
+        "The conditions were very dangerous, and many children got hurt by the machines or became sick from breathing in dust.",
+        "Factory owners liked hiring kids because they could pay them less money than adults.",
+        "Over time, reformers wrote articles and gave speeches about how bad the situation was.",
+        "In Britain, the Factory Act of 1833 finally set limits on how many hours children could work."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 3, "select": "dangerous"},
+        {"kind": "tap_word", "s": 5, "select": "bad"},
+        {"kind": "condense", "s": 4},
+        {"kind": "phrase_to_word", "s": 6, "select": "set limits on"},
+        {"kind": "academic", "s": 2}
+      ]
+    },
+    {
+      "id": "p12",
+      "set": "full",
+      "genre": "science",
+      "topic": "antibiotic resistance",
+      "sentences": [
+        "Antibiotics are medicines that kill bacteria, and they have saved millions of lives since they were discovered.",
+        "The problem is that bacteria can change over time so that the medicine does not work on them anymore.",
+        "This happens faster when people take antibiotics they do not really need, like for a cold, which is caused by a virus.",
+        "It also happens when people stop taking their pills early because they start to feel better.",
+        "If this keeps going, simple infections could become deadly again.",
+        "To stop this, doctors need to be careful about giving out antibiotics, and patients need to finish the whole treatment."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "change"},
+        {"kind": "tap_word", "s": 5, "select": "simple"},
+        {"kind": "condense", "s": 3},
+        {"kind": "phrase_to_word", "s": 6, "select": "giving out"},
+        {"kind": "paraphrase", "s": 4}
+      ]
+    },
+    {
+      "id": "p13",
+      "set": "full",
+      "genre": "personal",
+      "topic": "a grandmother's influence",
+      "sentences": [
+        "My grandmother is the person who has had the biggest impact on my life.",
+        "She grew up on a farm in Mexico and never got the chance to finish school, but she is one of the smartest people I know.",
+        "Every Sunday she cooks a huge meal for the whole family, and she makes everyone put their phones away so we can actually talk.",
+        "She taught me that being kind is more important than being right.",
+        "When I was having a hard time in middle school, she was the one who listened to me without judging.",
+        "I want to be the kind of person who makes others feel welcome, just like she does."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "smartest"},
+        {"kind": "tap_word", "s": 3, "select": "huge"},
+        {"kind": "word_sentences", "word": "impact", "origin": "writer"},
+        {"kind": "paraphrase", "s": 4},
+        {"kind": "academic", "s": 5}
+      ]
+    },
+    {
+      "id": "p14",
+      "set": "full",
+      "genre": "argumentative",
+      "topic": "the four-day school week",
+      "sentences": [
+        "Some school districts have switched to a four-day school week to save money and give students more time to rest.",
+        "Supporters say that teachers are less tired and students come to school more ready to learn.",
+        "The extra day off can also be used for doctor appointments, jobs, or family time.",
+        "However, the longer school days can be hard for younger kids who have trouble focusing for that long.",
+        "Working parents might also have to pay for childcare on the fifth day, which could be a problem for families without much money.",
+        "Before more districts make this change, they should look closely at how it affects students' learning."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "ready"},
+        {"kind": "tap_word", "s": 5, "select": "problem"},
+        {"kind": "word_sentences", "word": "feasible", "origin": "suggested"},
+        {"kind": "phrase_to_word", "s": 6, "select": "look closely at"},
+        {"kind": "academic", "s": 3}
+      ]
+    },
+    {
+      "id": "p15",
+      "set": "full",
+      "genre": "literary",
+      "topic": "the shared dream in Of Mice and Men",
+      "sentences": [
+        "In Of Mice and Men, George and Lennie share a dream of owning a small farm together.",
+        "For George, the dream gives him a reason to keep working hard even though his life is lonely.",
+        "For Lennie, it is mostly about getting to take care of rabbits.",
+        "Most of the other workers on the ranch have no one, so they are surprised that the two men travel together.",
+        "Steinbeck uses their friendship to show how important it is to have someone who cares about you.",
+        "When the dream falls apart at the end, it shows how hard it was for poor workers to change their lives during the Great Depression."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "lonely"},
+        {"kind": "tap_word", "s": 6, "select": "hard"},
+        {"kind": "word_sentences", "word": "companionship", "origin": "suggested"},
+        {"kind": "phrase_to_word", "s": 6, "select": "falls apart"},
+        {"kind": "paraphrase", "s": 4}
+      ]
+    },
+    {
+      "id": "p16",
+      "set": "full",
+      "genre": "history",
+      "topic": "the Montgomery Bus Boycott",
+      "sentences": [
+        "The Montgomery Bus Boycott was a key event in the civil rights movement.",
+        "It started in December 1955 when Rosa Parks was arrested for refusing to give up her seat to a white passenger.",
+        "In response, Black residents of Montgomery stopped riding the city buses for more than a year.",
+        "Many people walked miles to work every day or set up carpools so that they would not have to use the buses.",
+        "The boycott hurt the bus company because it lost most of its riders.",
+        "In 1956, the Supreme Court ruled that segregation on buses was unconstitutional, and the boycott ended in victory."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "key"},
+        {"kind": "tap_word", "s": 5, "select": "hurt"},
+        {"kind": "word_sentences", "word": "solidarity", "origin": "suggested"},
+        {"kind": "condense", "s": 4},
+        {"kind": "academic", "s": 2}
+      ]
+    },
+    {
+      "id": "p17",
+      "set": "full",
+      "genre": "science",
+      "topic": "bees and pollination",
+      "sentences": [
+        "Bees are very important for the food we eat.",
+        "When a bee goes from flower to flower to collect nectar, it carries pollen that helps plants make fruits and seeds.",
+        "About one third of the food crops in the world depend on bees and other pollinators.",
+        "In the past few decades, bee populations have gone down a lot because of pesticides, disease, and the loss of wild flowers.",
+        "If bees keep disappearing, foods like apples, almonds, and blueberries could become much harder to grow.",
+        "People can help by planting flowers and avoiding chemicals in their gardens."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "important"},
+        {"kind": "tap_word", "s": 5, "select": "disappearing"},
+        {"kind": "word_sentences", "word": "indispensable", "origin": "suggested"},
+        {"kind": "condense", "s": 4},
+        {"kind": "paraphrase", "s": 3}
+      ]
+    },
+    {
+      "id": "p18",
+      "set": "full",
+      "genre": "personal",
+      "topic": "a failed robotics competition",
+      "sentences": [
+        "Joining the robotics team in tenth grade was one of the best choices I ever made.",
+        "Our first competition was a disaster because our robot stopped working in the middle of the match.",
+        "I felt embarrassed, and I wanted to quit the team right then.",
+        "Instead, our coach told us to figure out what went wrong and try again.",
+        "We spent weeks testing every part until we found a loose wire in the motor.",
+        "At our next competition, the robot worked perfectly and we made it to the finals.",
+        "That experience taught me that failing is just part of getting better."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 3, "select": "embarrassed"},
+        {"kind": "tap_word", "s": 1, "select": "best"},
+        {"kind": "word_sentences", "word": "perseverance", "origin": "suggested"},
+        {"kind": "condense", "s": 2},
+        {"kind": "phrase_to_word", "s": 4, "select": "figure out"}
+      ]
+    },
+    {
+      "id": "p19",
+      "set": "full",
+      "genre": "argumentative",
+      "topic": "standardized tests",
+      "sentences": [
+        "Standardized tests like the SAT are supposed to measure how ready students are for college, but they do not tell the whole story.",
+        "A student's score can depend a lot on whether their family could pay for tutoring and practice books.",
+        "Some students are also very nervous test-takers, so their scores do not show what they actually know.",
+        "Because of this, more than 1,800 colleges have made the SAT optional.",
+        "I think colleges should look at grades, essays, and activities instead of focusing on one test score."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "measure"},
+        {"kind": "tap_word", "s": 3, "select": "nervous"},
+        {"kind": "phrase_to_word", "s": 2, "select": "pay for"},
+        {"kind": "paraphrase", "s": 4},
+        {"kind": "academic", "s": 5}
+      ]
+    },
+    {
+      "id": "p20",
+      "set": "full",
+      "genre": "literary",
+      "topic": "haste in Romeo and Juliet",
+      "quotes": [{"text": "they stumble that run fast", "work": "William Shakespeare, Romeo and Juliet, Act 2 Scene 3", "license": "public domain"}],
+      "sentences": [
+        "Romeo and Juliet is often called a love story, but it is also a story about how acting too fast can lead to disaster.",
+        "Romeo and Juliet meet, fall in love, and get married in less than a week.",
+        "Neither of them stops to think about what their families will do when they find out.",
+        "Friar Laurence even warns Romeo that \"they stumble that run fast,\" but Romeo does not listen.",
+        "When Romeo hears that Juliet is dead, he kills himself right away instead of waiting to learn the truth.",
+        "If the two young lovers had slowed down, the play might have had a happy ending."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "fast"},
+        {"kind": "tap_word", "s": 4, "select": "warns"},
+        {"kind": "condense", "s": 3},
+        {"kind": "paraphrase", "s": 5},
+        {"kind": "academic", "s": 4}
+      ]
+    },
+    {
+      "id": "p21",
+      "set": "full",
+      "genre": "history",
+      "topic": "the Black Death",
+      "sentences": [
+        "The Black Death was a plague that spread across Europe starting in 1347.",
+        "It was carried by fleas that lived on rats, and it moved quickly along trade routes and through crowded cities.",
+        "Within just a few years, it killed somewhere between a third and half of Europe's population.",
+        "Because so many workers died, the people who survived could ask for higher pay, which made the old feudal system weaker.",
+        "The plague also made a lot of people question the church, since prayers did not seem to stop the disease."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "crowded"},
+        {"kind": "tap_word", "s": 4, "select": "weaker"},
+        {"kind": "condense", "s": 5},
+        {"kind": "phrase_to_word", "s": 4, "select": "ask for"},
+        {"kind": "academic", "s": 3}
+      ]
+    },
+    {
+      "id": "p22",
+      "set": "full",
+      "genre": "science",
+      "topic": "coral bleaching",
+      "sentences": [
+        "Coral reefs are some of the most beautiful places on Earth, but they are in serious trouble.",
+        "When the ocean gets too warm, corals push out the tiny algae that live inside them and give them their color.",
+        "This is called coral bleaching, and if the water stays hot for too long, the coral can die.",
+        "Reefs are home to about a quarter of all ocean species, so losing them would hurt a lot of sea life.",
+        "They also protect coastlines from big waves during storms.",
+        "Cutting down on pollution and greenhouse gases is the best way to give reefs a chance to recover."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "serious"},
+        {"kind": "tap_word", "s": 4, "select": "hurt"},
+        {"kind": "condense", "s": 2},
+        {"kind": "phrase_to_word", "s": 6, "select": "Cutting down on"},
+        {"kind": "paraphrase", "s": 4}
+      ]
+    },
+    {
+      "id": "p23",
+      "set": "full",
+      "genre": "argumentative",
+      "topic": "lowering the voting age",
+      "sentences": [
+        "Some people believe the voting age should be lowered from 18 to 16.",
+        "At sixteen, many teenagers already have jobs, pay taxes, and can drive a car.",
+        "Laws about schools, the environment, and the economy will affect young people for the rest of their lives, so they should have a say in them.",
+        "Critics argue that sixteen-year-olds are not mature enough to make good choices about politics.",
+        "However, studies of places like Austria, where sixteen-year-olds can vote, show that young voters make choices that are just as thought-out as older voters."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 3, "select": "say"},
+        {"kind": "tap_word", "s": 4, "select": "mature"},
+        {"kind": "word_sentences", "word": "enfranchise", "origin": "suggested"},
+        {"kind": "paraphrase", "s": 2},
+        {"kind": "academic", "s": 4}
+      ]
+    },
+    {
+      "id": "p24",
+      "set": "full",
+      "genre": "literary",
+      "topic": "the creature in Frankenstein",
+      "quotes": [{"text": "I was benevolent and good; misery made me a fiend.", "work": "Mary Shelley, Frankenstein (1818), volume 2 chapter 2", "license": "public domain"}],
+      "sentences": [
+        "In Frankenstein, Mary Shelley shows that the creature becomes a monster because of how he is treated.",
+        "When he is first created, the creature is gentle and wants to be loved.",
+        "However, every person who sees him is scared of his appearance and attacks him or runs away.",
+        "Even Victor Frankenstein, the man who made him, abandons him right after bringing him to life.",
+        "The creature says, \"I was benevolent and good; misery made me a fiend.\"",
+        "This line shows that his anger comes from being rejected over and over, not from his nature."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "gentle"},
+        {"kind": "tap_word", "s": 3, "select": "scared"},
+        {"kind": "word_sentences", "word": "isolation", "origin": "suggested"},
+        {"kind": "phrase_to_word", "s": 6, "select": "over and over"},
+        {"kind": "academic", "s": 4}
+      ]
+    },
+    {
+      "id": "p25",
+      "set": "full",
+      "genre": "history",
+      "topic": "the Dust Bowl",
+      "sentences": [
+        "The Dust Bowl was a period in the 1930s when huge dust storms hit the Great Plains.",
+        "Farmers had plowed up the grass that held the soil in place, and then a long drought dried everything out.",
+        "When strong winds came, they picked up the loose dirt and created clouds of dust so thick that people could not see the sun.",
+        "Crops died, animals got sick, and many families lost their farms.",
+        "Thousands of people packed up their belongings and moved west to California looking for work.",
+        "The disaster taught the government that it needed to help farmers protect the land."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "hit"},
+        {"kind": "tap_word", "s": 3, "select": "thick"},
+        {"kind": "word_sentences", "word": "drought", "origin": "writer"},
+        {"kind": "phrase_to_word", "s": 5, "select": "looking for"},
+        {"kind": "paraphrase", "s": 2}
+      ]
+    },
+    {
+      "id": "p26",
+      "set": "full",
+      "genre": "personal",
+      "topic": "volunteering at a food bank",
+      "sentences": [
+        "Every Saturday for the past two years, I have volunteered at a food bank in my neighborhood.",
+        "At first, I only went because I needed community service hours for school.",
+        "But after a few weeks, I started to really care about the people who came in.",
+        "Many of them were working parents who just did not have enough money at the end of the month.",
+        "One woman told me that the food we gave her was the only reason her kids had dinner that week.",
+        "Hearing that made me realize how many people in my own town are struggling.",
+        "Now I want to study social work so I can help families like hers."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 6, "select": "struggling"},
+        {"kind": "tap_word", "s": 6, "select": "realize"},
+        {"kind": "word_sentences", "word": "compassion", "origin": "suggested"},
+        {"kind": "condense", "s": 4},
+        {"kind": "academic", "s": 2}
+      ]
+    },
+    {
+      "id": "p27",
+      "set": "full",
+      "genre": "argumentative",
+      "topic": "banning plastic bags",
+      "sentences": [
+        "Plastic bags are cheap and easy to use, but they cause big problems for the environment.",
+        "Most of them are only used once before they get thrown away.",
+        "Because they are so light, they often blow out of trash cans and end up in rivers and oceans, where animals like sea turtles mistake them for food.",
+        "A plastic bag can take hundreds of years to break down.",
+        "Several states, such as California and New York, have already banned single-use plastic bags.",
+        "I think every state should do the same and encourage people to bring reusable bags to the store."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "cheap"},
+        {"kind": "tap_word", "s": 6, "select": "encourage"},
+        {"kind": "word_sentences", "word": "sustainable", "origin": "suggested"},
+        {"kind": "condense", "s": 3},
+        {"kind": "paraphrase", "s": 5}
+      ]
+    },
+    {
+      "id": "p28",
+      "set": "full",
+      "genre": "literary",
+      "topic": "the loss of order in Lord of the Flies",
+      "sentences": [
+        "In Lord of the Flies, a group of boys stranded on an island slowly lose their sense of right and wrong.",
+        "At first, they choose Ralph as their leader and try to follow rules, like only speaking when they hold the conch shell.",
+        "As time goes on, Jack becomes more interested in hunting than in keeping the signal fire going.",
+        "More and more boys join Jack's tribe because it seems more fun than doing chores.",
+        "By the end, the boys have turned violent, and two of them are dead.",
+        "Golding uses the story to suggest that people can quickly become savage when there are no rules to control them."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 4, "select": "fun"},
+        {"kind": "tap_word", "s": 5, "select": "violent"},
+        {"kind": "word_sentences", "word": "civilization", "origin": "suggested"},
+        {"kind": "condense", "s": 3},
+        {"kind": "phrase_to_word", "s": 1, "select": "sense of right and wrong"}
+      ]
+    },
+    {
+      "id": "p29",
+      "set": "full",
+      "genre": "history",
+      "topic": "women's suffrage in the United States",
+      "sentences": [
+        "The fight for women's right to vote in the United States lasted for more than seventy years.",
+        "It officially began at the Seneca Falls Convention in 1848, where activists like Elizabeth Cady Stanton demanded equal rights for women.",
+        "For decades, suffragists gave speeches, marched in parades, and even went to jail for their cause.",
+        "Many people at the time thought that women were too emotional to make decisions about politics.",
+        "Finally, in 1920, the 19th Amendment was passed, which gave women the right to vote.",
+        "This victory showed that ordinary people can change the law if they keep pushing for it."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 6, "select": "ordinary"},
+        {"kind": "condense", "s": 3},
+        {"kind": "phrase_to_word", "s": 6, "select": "keep pushing for it"},
+        {"kind": "paraphrase", "s": 4},
+        {"kind": "academic", "s": 5}
+      ]
+    },
+    {
+      "id": "p30",
+      "set": "full",
+      "genre": "science",
+      "topic": "how vaccines work",
+      "sentences": [
+        "Vaccines work by teaching the immune system how to fight a disease before a person ever gets sick.",
+        "They contain a weak or harmless piece of a germ, which the body learns to recognize.",
+        "If the real germ shows up later, the immune system can attack it quickly.",
+        "Thanks to vaccines, diseases like smallpox have been wiped out, and polio is almost gone.",
+        "When enough people in a community are vaccinated, it also protects those who cannot get the shot, like newborn babies.",
+        "This is called herd immunity."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "weak"},
+        {"kind": "word_sentences", "word": "immunity", "origin": "writer"},
+        {"kind": "phrase_to_word", "s": 4, "select": "wiped out"},
+        {"kind": "paraphrase", "s": 3},
+        {"kind": "academic", "s": 5}
+      ]
+    },
+    {
+      "id": "p31",
+      "set": "full",
+      "genre": "argumentative",
+      "topic": "too much homework",
+      "sentences": [
+        "Many students say they have too much homework, and I agree that it can sometimes do more harm than good.",
+        "After a full day of classes, students still have to spend three or four hours on assignments every night.",
+        "This leaves them with very little time for sports, family, or sleep.",
+        "Some homework is helpful because it lets students practice what they learned in class.",
+        "But when teachers give busywork just to fill time, students get tired and stop caring about learning.",
+        "Schools should set limits on homework so that it is useful and not overwhelming."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 4, "select": "helpful"},
+        {"kind": "word_sentences", "word": "excessive", "origin": "suggested"},
+        {"kind": "condense", "s": 2},
+        {"kind": "paraphrase", "s": 5},
+        {"kind": "academic", "s": 6}
+      ]
+    },
+    {
+      "id": "p32",
+      "set": "full",
+      "genre": "literary",
+      "topic": "fear in The Crucible",
+      "sentences": [
+        "In The Crucible, Arthur Miller shows how fear can make a whole town turn against itself.",
+        "When a group of girls in Salem start accusing people of witchcraft, the adults believe them without asking for proof.",
+        "Anyone who disagrees with the court is in danger of being accused too.",
+        "John Proctor knows the girls are lying, but at first he is afraid to speak up because he has his own secret.",
+        "In the end, he chooses to die rather than sign a false confession.",
+        "Miller wrote the play in the 1950s to criticize the way people were being accused of being communists without real evidence."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 4, "select": "afraid"},
+        {"kind": "word_sentences", "word": "hysteria", "origin": "suggested"},
+        {"kind": "condense", "s": 2},
+        {"kind": "phrase_to_word", "s": 4, "select": "speak up"},
+        {"kind": "academic", "s": 6}
+      ]
+    },
+    {
+      "id": "p33",
+      "set": "full",
+      "genre": "personal",
+      "topic": "caring for a younger brother",
+      "sentences": [
+        "Since my mom works night shifts at the hospital, I have been taking care of my little brother after school since I was thirteen.",
+        "I help him with his homework, make him dinner, and make sure he goes to bed on time.",
+        "Some days it is stressful, especially when I have a big test the next morning.",
+        "But taking care of him has made me more patient and responsible than most kids my age.",
+        "I have learned how to manage my time and stay calm when things do not go as planned.",
+        "My brother looks up to me, and that makes all the hard work worth it."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 3, "select": "stressful"},
+        {"kind": "word_sentences", "word": "responsible", "origin": "writer"},
+        {"kind": "condense", "s": 1},
+        {"kind": "phrase_to_word", "s": 6, "select": "looks up to"},
+        {"kind": "paraphrase", "s": 5}
+      ]
+    },
+    {
+      "id": "p34",
+      "set": "full",
+      "genre": "argumentative",
+      "topic": "paying college athletes",
+      "sentences": [
+        "College athletes bring in millions of dollars for their schools, but for a long time they were not allowed to earn any of it.",
+        "Big football and basketball programs sell tickets, jerseys, and TV rights, while the players who make it all possible get nothing except a scholarship.",
+        "Many athletes spend more than forty hours a week on their sport, which makes it hard to keep a part-time job.",
+        "In 2021, new rules finally let athletes make money from their name and image.",
+        "I think this was a fair change, and schools should go even further by sharing some of their profits with players."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 5, "select": "fair"},
+        {"kind": "condense", "s": 2},
+        {"kind": "phrase_to_word", "s": 1, "select": "bring in"},
+        {"kind": "paraphrase", "s": 3},
+        {"kind": "academic", "s": 4}
+      ]
+    },
+    {
+      "id": "p35",
+      "set": "full",
+      "genre": "history",
+      "topic": "the Apollo 11 moon landing",
+      "sentences": [
+        "On July 20, 1969, Neil Armstrong became the first person to walk on the moon.",
+        "The Apollo 11 mission was the result of years of hard work by thousands of scientists, engineers, and astronauts.",
+        "The United States wanted to beat the Soviet Union in the space race, which was part of the larger Cold War.",
+        "Millions of people around the world watched the landing live on television.",
+        "The mission showed what humans can do when they work together toward a big goal.",
+        "It also led to new technologies that we still use today."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 3, "select": "beat"},
+        {"kind": "word_sentences", "word": "milestone", "origin": "suggested"},
+        {"kind": "phrase_to_word", "s": 5, "select": "work together"},
+        {"kind": "paraphrase", "s": 4},
+        {"kind": "academic", "s": 1}
+      ]
+    },
+    {
+      "id": "p36",
+      "set": "full",
+      "genre": "science",
+      "topic": "renewable energy",
+      "sentences": [
+        "Renewable energy comes from sources that do not run out, like the sun, wind, and water.",
+        "Unlike coal and oil, these sources do not release a lot of greenhouse gases when they make electricity.",
+        "In the last ten years, the cost of solar panels has dropped so much that solar power is now cheaper than coal in many places.",
+        "One problem is that the sun does not always shine and the wind does not always blow, so we need better batteries to store the energy.",
+        "Even with these challenges, switching to renewable energy is one of the best ways to slow down climate change."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 3, "select": "dropped"},
+        {"kind": "word_sentences", "word": "renewable", "origin": "writer"},
+        {"kind": "condense", "s": 4},
+        {"kind": "paraphrase", "s": 2},
+        {"kind": "academic", "s": 5}
+      ]
+    },
+    {
+      "id": "p37",
+      "set": "full",
+      "genre": "literary",
+      "topic": "power in Animal Farm",
+      "sentences": [
+        "In Animal Farm, George Orwell uses a story about farm animals to show how power can corrupt leaders.",
+        "After the animals take over the farm, they promise that all animals will be treated the same.",
+        "Over time, the pigs start giving themselves special privileges, like sleeping in beds and drinking alcohol.",
+        "Napoleon uses his dogs to scare anyone who questions him, and he changes the rules whenever it helps him.",
+        "By the end, the other animals cannot tell the difference between the pigs and the humans.",
+        "Orwell was warning readers that a revolution can end up with the same problems it was trying to fix."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 4, "select": "scare"},
+        {"kind": "word_sentences", "word": "corrupt", "origin": "writer"},
+        {"kind": "condense", "s": 3},
+        {"kind": "phrase_to_word", "s": 2, "select": "take over"},
+        {"kind": "academic", "s": 5}
+      ]
+    },
+    {
+      "id": "p38",
+      "set": "full",
+      "genre": "personal",
+      "topic": "coming back from a knee injury",
+      "sentences": [
+        "During my junior year, I tore a ligament in my knee during a soccer game and had to miss the rest of the season.",
+        "Soccer had always been a big part of who I was, so not being able to play made me feel lost.",
+        "For the first few weeks, I barely wanted to leave my room.",
+        "Then my physical therapist pushed me to set small goals, like walking without crutches or doing ten squats.",
+        "Every small win gave me a little more confidence.",
+        "When I finally stepped back onto the field the next fall, I was stronger, both physically and mentally."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "lost"},
+        {"kind": "word_sentences", "word": "setback", "origin": "suggested"},
+        {"kind": "condense", "s": 1},
+        {"kind": "phrase_to_word", "s": 5, "select": "small win"},
+        {"kind": "paraphrase", "s": 4}
+      ]
+    },
+    {
+      "id": "p39",
+      "set": "full",
+      "genre": "argumentative",
+      "topic": "fast food ads aimed at children",
+      "sentences": [
+        "Fast food companies spend billions of dollars every year on ads that are aimed at children.",
+        "These commercials often use cartoon characters, bright colors, and free toys to make kids want to eat there.",
+        "Young children cannot always tell the difference between an ad and a regular TV show, so they believe what the ads say.",
+        "This is a problem because eating too much fast food can lead to health issues like obesity and diabetes.",
+        "I believe the government should put stronger limits on food ads that target kids, the same way it does for cigarette ads."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "bright"},
+        {"kind": "condense", "s": 5},
+        {"kind": "phrase_to_word", "s": 1, "select": "are aimed at"},
+        {"kind": "paraphrase", "s": 3},
+        {"kind": "academic", "s": 4}
+      ]
+    },
+    {
+      "id": "p40",
+      "set": "full",
+      "genre": "history",
+      "topic": "the Silk Road",
+      "sentences": [
+        "The Silk Road was not one single road but a network of trade routes that connected China to the Middle East and Europe.",
+        "Merchants traveled these routes for more than a thousand years, carrying goods like silk, spices, and paper.",
+        "But the Silk Road did more than move products from one place to another.",
+        "It also helped spread religions, languages, and inventions between very different cultures.",
+        "For example, Buddhism traveled from India to China along these routes.",
+        "In many ways, the Silk Road was an early example of how the world is connected."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 6, "select": "connected"},
+        {"kind": "word_sentences", "word": "exchange", "origin": "suggested"},
+        {"kind": "phrase_to_word", "s": 4, "select": "very different"},
+        {"kind": "paraphrase", "s": 2},
+        {"kind": "academic", "s": 1}
+      ]
+    },
+    {
+      "id": "p41",
+      "set": "full",
+      "genre": "science",
+      "topic": "microplastics",
+      "sentences": [
+        "Every year, millions of tons of plastic end up in the ocean.",
+        "Over time, sunlight and waves break this plastic into tiny pieces called microplastics.",
+        "These pieces are so small that fish and other sea animals eat them by accident.",
+        "Scientists have even found microplastics in drinking water, salt, and human blood.",
+        "We still do not fully understand how they affect our health, but some studies suggest they could cause inflammation.",
+        "Reducing how much plastic we use is the most important step we can take to fix this problem."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "tiny"},
+        {"kind": "word_sentences", "word": "contaminate", "origin": "suggested"},
+        {"kind": "condense", "s": 5},
+        {"kind": "phrase_to_word", "s": 3, "select": "by accident"},
+        {"kind": "academic", "s": 4}
+      ]
+    },
+    {
+      "id": "p42",
+      "set": "full",
+      "genre": "literary",
+      "topic": "Greasers and Socs in The Outsiders",
+      "sentences": [
+        "In The Outsiders, Ponyboy learns that people are more alike than they seem.",
+        "At the start of the novel, he believes that the Socs, the rich kids from the west side, have perfect lives with no problems.",
+        "Then he meets Cherry Valance, a Soc girl who tells him that rich kids have troubles too.",
+        "Later, Randy, another Soc, admits that he is tired of all the fighting between the two groups.",
+        "These conversations make Ponyboy realize that the line between Greasers and Socs is not as clear as he thought.",
+        "S. E. Hinton shows that judging people by their group keeps us from seeing who they really are."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 2, "select": "perfect"},
+        {"kind": "word_sentences", "word": "stereotype", "origin": "suggested"},
+        {"kind": "condense", "s": 2},
+        {"kind": "paraphrase", "s": 4},
+        {"kind": "academic", "s": 5}
+      ]
+    },
+    {
+      "id": "p43",
+      "set": "full",
+      "genre": "history",
+      "topic": "the causes of World War I",
+      "sentences": [
+        "World War I had many causes, but the event that started it was the assassination of Archduke Franz Ferdinand in 1914.",
+        "Before that, the major powers of Europe had already been building up their armies and making alliances with each other.",
+        "These alliances meant that a fight between two countries could quickly pull in many others.",
+        "When Austria-Hungary declared war on Serbia, Russia came to Serbia's defense, and then Germany, France, and Britain joined in.",
+        "Nationalism also played a big role, because many people were proud of their countries and eager to prove their strength."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 3, "select": "pull"},
+        {"kind": "word_sentences", "word": "escalate", "origin": "suggested"},
+        {"kind": "condense", "s": 2},
+        {"kind": "phrase_to_word", "s": 2, "select": "building up"},
+        {"kind": "paraphrase", "s": 5}
+      ]
+    },
+    {
+      "id": "p44",
+      "set": "full",
+      "genre": "argumentative",
+      "topic": "AI tools in classrooms",
+      "sentences": [
+        "Artificial intelligence tools like chatbots are becoming common in schools, and teachers are not sure how to handle them.",
+        "Some teachers worry that students will use AI to write their essays and never learn how to think for themselves.",
+        "Others believe AI can be a useful tutor that explains hard ideas in a simple way.",
+        "In my experience, AI is most helpful when I use it to check my understanding, not to do the work for me.",
+        "Schools should teach students how to use these tools honestly instead of banning them completely."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "handle"},
+        {"kind": "condense", "s": 2},
+        {"kind": "phrase_to_word", "s": 2, "select": "think for themselves"},
+        {"kind": "paraphrase", "s": 3},
+        {"kind": "academic", "s": 4}
+      ]
+    },
+    {
+      "id": "p45",
+      "set": "full",
+      "genre": "literary",
+      "topic": "delay in Hamlet",
+      "quotes": [{"text": "To be, or not to be", "work": "William Shakespeare, Hamlet, Act 3 Scene 1", "license": "public domain"}],
+      "sentences": [
+        "Hamlet is a character who thinks too much and acts too little.",
+        "After his father's ghost tells him that Claudius murdered him, Hamlet promises to get revenge.",
+        "But instead of acting right away, he spends most of the play doubting himself and planning.",
+        "In his famous speech, he asks, \"To be, or not to be,\" as he wonders whether life is worth the pain.",
+        "Even when he has a perfect chance to kill Claudius while he is praying, he decides to wait.",
+        "His delay ends up causing the deaths of many people, including himself."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 3, "select": "doubting"},
+        {"kind": "word_sentences", "word": "indecisive", "origin": "suggested"},
+        {"kind": "phrase_to_word", "s": 2, "select": "get revenge"},
+        {"kind": "paraphrase", "s": 5},
+        {"kind": "academic", "s": 4}
+      ]
+    },
+    {
+      "id": "p46",
+      "set": "full",
+      "genre": "science",
+      "topic": "exercise and the brain",
+      "sentences": [
+        "Most people know that exercise is good for the body, but it is also good for the brain.",
+        "When we exercise, our hearts pump more blood to the brain, which brings it extra oxygen.",
+        "Studies have shown that regular exercise can improve memory and help people focus.",
+        "It can also lower stress and make people feel happier because the body releases chemicals called endorphins.",
+        "Even a short walk of twenty minutes can make a difference.",
+        "For students, this means that taking breaks to move around might actually help them study better."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 1, "select": "good", "occurrence": 2},
+        {"kind": "word_sentences", "word": "cognitive", "origin": "suggested"},
+        {"kind": "condense", "s": 2},
+        {"kind": "paraphrase", "s": 5},
+        {"kind": "academic", "s": 3}
+      ]
+    },
+    {
+      "id": "p47",
+      "set": "full",
+      "genre": "personal",
+      "topic": "being the first in the family to apply to college",
+      "sentences": [
+        "I will be the first person in my family to go to college, and that comes with a lot of pressure.",
+        "My parents did not have the chance to continue their education because they had to start working when they were teenagers.",
+        "They have always told me that school is the key to a better life.",
+        "Filling out applications was confusing because no one at home had done it before, so I had to ask my counselor for help with almost every step.",
+        "Even though the process was hard, it made me more determined to succeed.",
+        "I want to make my parents proud and show my younger cousins that college is possible for them too."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 4, "select": "confusing"},
+        {"kind": "word_sentences", "word": "aspiration", "origin": "suggested"},
+        {"kind": "condense", "s": 1},
+        {"kind": "phrase_to_word", "s": 4, "select": "Filling out"},
+        {"kind": "academic", "s": 2}
+      ]
+    },
+    {
+      "id": "p48",
+      "set": "full",
+      "genre": "argumentative",
+      "topic": "why public libraries still matter",
+      "sentences": [
+        "Some people think public libraries are not needed anymore because everything is online, but I strongly disagree.",
+        "Libraries give free internet and computers to people who cannot afford them at home.",
+        "They also offer programs like reading groups for kids, job help for adults, and English classes for immigrants.",
+        "For many people, the library is one of the only safe and quiet places where they can study.",
+        "If cities cut library funding, the people who would be hurt the most are the ones who already have the least.",
+        "That is why we should keep supporting our libraries."
+      ],
+      "tasks": [
+        {"kind": "tap_word", "s": 4, "select": "safe"},
+        {"kind": "word_sentences", "word": "accessible", "origin": "suggested"},
+        {"kind": "condense", "s": 1},
+        {"kind": "phrase_to_word", "s": 6, "select": "keep supporting"},
+        {"kind": "paraphrase", "s": 5}
+      ]
+    }
+  ]
+}

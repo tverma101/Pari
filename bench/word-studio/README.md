@@ -2,6 +2,12 @@
 
 This directory is the portable Word Studio evaluation and runtime lane from PR #26. It lives at `bench/word-studio` (moved from `app/benchmarks/word-studio` in the 2026-10-15 cleanup; see `docs/PLAN.md`).
 
+## v2: base-model selection
+
+[`v2/`](v2/README.md) is the current benchmark for choosing the base model on
+Kaggle 2×T4 (#85, #86, #87). The v1 files below are the older product suites
+and runners.
+
 ## Suites
 
 - `interactive.seed.json` and `word-studio-synthetic.seed.json` are the tracked seeds.
