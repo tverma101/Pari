@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p02-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-2b",
+  "messages_sha256": "759cefb8739040b6e7f9e7c97a128e71dc776975deb056e46c43c9d5e014197e",
+  "seed": 7447245182115885959,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"demonstrates\", \"illustrates\", \"exhibits\", \"reveals\", \"proves\"]}\n",
+  "timing": {
+    "first_text_ms": 348.5,
+    "option_ms": [
+      727.8,
+      914.8,
+      1144.5,
+      1337.7,
+      1525.9
+    ],
+    "total_ms": 1669.6,
+    "stream": [
+      [
+        348.5,
+        2
+      ],
+      [
+        397.0,
+        9
+      ],
+      [
+        444.8,
+        11
+      ],
+      [
+        492.1,
+        14
+      ],
+      [
+        540.1,
+        15
+      ],
+      [
+        587.9,
+        19
+      ],
+      [
+        635.6,
+        22
+      ],
+      [
+        681.7,
+        26
+      ],
+      [
+        727.8,
+        28
+      ],
+      [
+        774.4,
+        30
+      ],
+      [
+        820.9,
+        37
+      ],
+      [
+        868.9,
+        41
+      ],
+      [
+        914.8,
+        43
+      ],
+      [
+        961.4,
+        45
+      ],
+      [
+        1007.1,
+        47
+      ],
+      [
+        1052.6,
+        50
+      ],
+      [
+        1098.0,
+        53
+      ],
+      [
+        1144.5,
+        55
+      ],
+      [
+        1194.3,
+        57
+      ],
+      [
+        1243.8,
+        61
+      ],
+      [
+        1291.1,
+        64
+      ],
+      [
+        1337.7,
+        66
+      ],
+      [
+        1383.8,
+        68
+      ],
+      [
+        1430.7,
+        71
+      ],
+      [
+        1477.9,
+        74
+      ],
+      [
+        1525.9,
+        77
+      ],
+      [
+        1622.5,
+        78
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn To Kill a Mockingbird, Atticus Finch shows that doing the right thing is not always easy. He agrees to defend Tom Robinson even though he knows that most people in Maycomb will be angry at him. Atticus is someone who never gives up on what he believes, even when his own children get bullied at school because of it. He tells Scout that you never really understand a person until you look at things from their point of view. This shows that he wants his kids to be fair to everyone, not just people who are like them. Atticus is a good example of a person who stays brave when it would be easier to stay quiet.\n\"\"\"\n\nThe writer tapped the word \"shows\" in this sentence (marked with [[ ]]):\nIn To Kill a Mockingbird, Atticus Finch [[shows]] that doing the right thing is not always easy.\n\nGive 10 replacements for \"shows\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"shows\" without changing the rest of the sentence. Do not repeat \"shows\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 370,
+  "new_tokens": 29,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p08-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-2b",
+  "messages_sha256": "74c5db912f03647508de0714ecb5ae15db54b711897693051f3513873f789c73",
+  "seed": 935646832593167479,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"discovered\", \"learned\", \"found\", \"realized\", \"understood\", \"learned\", \"realized\", \"came to realize\", \"told me\", \"found out\", \"learned about\"]}\n",
+  "timing": {
+    "first_text_ms": 370.3,
+    "option_ms": [
+      687.6,
+      879.0,
+      1024.1,
+      1218.3,
+      1405.7,
+      1600.6,
+      1791.9,
+      2031.5,
+      2270.6,
+      2464.1,
+      2703.8
+    ],
+    "total_ms": 2851.5,
+    "stream": [
+      [
+        370.3,
+        2
+      ],
+      [
+        418.1,
+        9
+      ],
+      [
+        466.4,
+        11
+      ],
+      [
+        533.2,
+        14
+      ],
+      [
+        590.5,
+        17
+      ],
+      [
+        639.7,
+        24
+      ],
+      [
+        687.6,
+        26
+      ],
+      [
+        734.6,
+        28
+      ],
+      [
+        783.0,
+        33
+      ],
+      [
+        830.1,
+        35
+      ],
+      [
+        879.0,
+        37
+      ],
+      [
+        927.7,
+        39
+      ],
+      [
+        977.1,
+        44
+      ],
+      [
+        1024.1,
+        46
+      ],
+      [
+        1071.3,
+        48
+      ],
+      [
+        1121.4,
+        52
+      ],
+      [
+        1169.8,
+        56
+      ],
+      [
+        1218.3,
+        58
+      ],
+      [
+        1265.5,
+        60
+      ],
+      [
+        1312.6,
+        65
+      ],
+      [
+        1358.9,
+        70
+      ],
+      [
+        1405.7,
+        72
+      ],
+      [
+        1453.1,
+        74
+      ],
+      [
+        1504.3,
+        79
+      ],
+      [
+        1552.8,
+        81
+      ],
+      [
+        1600.6,
+        83
+      ],
+      [
+        1647.9,
+        85
+      ],
+      [
+        1695.8,
+        89
+      ],
+      [
+        1744.5,
+        93
+      ],
+      [
+        1791.9,
+        95
+      ],
+      [
+        1838.3,
+        97
+      ],
+      [
+        1885.3,
+        101
+      ],
+      [
+        1935.8,
+        104
+      ],
+      [
+        1984.8,
+        112
+      ],
+      [
+        2031.5,
+        114
+      ],
+      [
+        2079.7,
+        116
+      ],
+      [
+        2128.6,
+        117
+      ],
+      [
+        2176.2,
+        120
+      ],
+      [
+        2223.6,
+        123
+      ],
+      [
+        2270.6,
+        125
+      ],
+      [
+        2321.1,
+        127
+      ],
+      [
+        2368.1,
+        132
+      ],
+      [
+        2414.9,
+        136
+      ],
+      [
+        2464.1,
+        138
+      ],
+      [
+        2511.9,
+        140
+      ],
+      [
+        2560.1,
+        145
+      ],
+      [
+        2607.5,
+        147
+      ],
+      [
+        2654.8,
+        153
+      ],
+      [
+        2703.8,
+        156
+      ],
+      [
+        2802.5,
+        157
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nLast summer I got my first job working at a small pizza restaurant near my house. At first I thought it would be easy, but I quickly found out that it was a lot of work. On busy nights we had to make dozens of pizzas in just a few hours, and customers got upset if their food was late. My manager, Tony, taught me how to stay calm and do one thing at a time. I also learned how to talk to people who were angry without getting angry myself. The job was tiring, but it showed me that I can handle stress better than I thought. These skills will help me in college and in any job I have in the future.\n\"\"\"\n\nThe writer selected the phrase \"found out\" in this sentence (marked with [[ ]]):\nAt first I thought it would be easy, but I quickly [[found out]] that it was a lot of work.\n\nGive 10 single words that can replace \"found out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 354,
+  "new_tokens": 52,
+  "finish_reason": "stop",
+  "error": null
+}

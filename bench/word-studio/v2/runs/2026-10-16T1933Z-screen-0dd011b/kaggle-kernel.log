@@ -1,0 +1,401 @@
+[{"stream_name":"stdout","time":5.039404841,"data":"$ git clone --quiet https://github.com/tverma101/Pari.git /tmp/Pari\n"}
+,{"stream_name":"stdout","time":10.392810331,"data":"$ git -C /tmp/Pari checkout --quiet 0dd011b8aaf4b58f32fa44d7a4accbb26d07d779\n"}
+,{"stream_name":"stdout","time":10.672639508,"data":"$ /usr/bin/python3 -m pip install --quiet transformers==5.18.0 accelerate==1.15.0\n"}
+,{"stream_name":"stdout","time":13.231133742,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.6/12.6 MB 94.8 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":13.276806349,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 394.3/394.3 kB 15.1 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":13.3196048,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 846.4/846.4 kB 37.6 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":32.156567561,"data":"=== qwen35-2b ===\n"}
+,{"stream_name":"stdout","time":59.470833045,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":92.607924696,"data":"\n"}
+,{"stream_name":"stdout","time":94.317060777,"data":"Loading weights:   0%|          | 0/320 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":94.41929932,"data":"Loading weights:   0%|          | 1/320 [00:01\u003c09:04,  1.71s/it]\n"}
+,{"stream_name":"stdout","time":94.423438025,"data":"Loading weights:  98%|█████████▊| 312/320 [00:01\u003c00:00, 240.12it/s]\n"}
+,{"stream_name":"stdout","time":94.423454056,"data":"Loading weights: 100%|██████████| 320/320 [00:01\u003c00:00, 176.31it/s]\n"}
+,{"stream_name":"stdout","time":95.391860721,"data":"[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":96.657281126,"data":"[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":97.265820387,"data":"[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":97.321204606,"data":"[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":102.473565942,"data":"[qwen35-2b] 1/40 ws2-screen-p01-academic-1 ok 4.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":108.42799498,"data":"[qwen35-2b] 2/40 ws2-screen-p01-condense-1 ok 6.0s options_seen=8\n"}
+,{"stream_name":"stdout","time":111.931626882,"data":"[qwen35-2b] 3/40 ws2-screen-p01-tap_word-1 ok 3.5s options_seen=13\n"}
+,{"stream_name":"stdout","time":116.159417943,"data":"[qwen35-2b] 4/40 ws2-screen-p01-tap_word-2 ok 4.2s options_seen=13\n"}
+,{"stream_name":"stdout","time":133.846153721,"data":"[qwen35-2b] 5/40 ws2-screen-p01-word_sentences-1 ok 17.7s options_seen=6\n"}
+,{"stream_name":"stdout","time":139.525438144,"data":"[qwen35-2b] 6/40 ws2-screen-p02-academic-1 ok 5.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":143.980561518,"data":"[qwen35-2b] 7/40 ws2-screen-p02-paraphrase-1 ok 4.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":146.196892438,"data":"[qwen35-2b] 8/40 ws2-screen-p02-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":147.867500309,"data":"[qwen35-2b] 9/40 ws2-screen-p02-tap_word-1 ok 1.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":154.146796364,"data":"[qwen35-2b] 10/40 ws2-screen-p02-word_sentences-1 ok 6.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":165.119551124,"data":"[qwen35-2b] 11/40 ws2-screen-p03-academic-1 ok 11.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":172.826185104,"data":"[qwen35-2b] 12/40 ws2-screen-p03-condense-1 ok 7.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":179.019088381,"data":"[qwen35-2b] 13/40 ws2-screen-p03-paraphrase-1 ok 6.2s options_seen=8\n"}
+,{"stream_name":"stdout","time":182.670418107,"data":"[qwen35-2b] 14/40 ws2-screen-p03-tap_word-1 ok 3.7s options_seen=13\n"}
+,{"stream_name":"stdout","time":185.013233697,"data":"[qwen35-2b] 15/40 ws2-screen-p03-tap_word-2 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":191.6449945,"data":"[qwen35-2b] 16/40 ws2-screen-p04-condense-1 ok 6.6s options_seen=4\n"}
+,{"stream_name":"stdout","time":196.179144151,"data":"[qwen35-2b] 17/40 ws2-screen-p04-paraphrase-1 ok 4.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":198.781561313,"data":"[qwen35-2b] 18/40 ws2-screen-p04-phrase_to_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":201.684747425,"data":"[qwen35-2b] 19/40 ws2-screen-p04-tap_word-1 ok 2.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":205.566712738,"data":"[qwen35-2b] 20/40 ws2-screen-p04-word_sentences-1 ok 3.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":211.267151728,"data":"[qwen35-2b] 21/40 ws2-screen-p05-paraphrase-1 ok 5.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":214.017842019,"data":"[qwen35-2b] 22/40 ws2-screen-p05-phrase_to_word-1 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":216.646996004,"data":"[qwen35-2b] 23/40 ws2-screen-p05-tap_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":219.369449072,"data":"[qwen35-2b] 24/40 ws2-screen-p05-tap_word-2 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":225.555915715,"data":"[qwen35-2b] 25/40 ws2-screen-p05-word_sentences-1 ok 6.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":232.204915372,"data":"[qwen35-2b] 26/40 ws2-screen-p06-academic-1 ok 6.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":236.454613037,"data":"[qwen35-2b] 27/40 ws2-screen-p06-condense-1 ok 4.2s options_seen=8\n"}
+,{"stream_name":"stdout","time":238.948752438,"data":"[qwen35-2b] 28/40 ws2-screen-p06-phrase_to_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":242.672151718,"data":"[qwen35-2b] 29/40 ws2-screen-p06-tap_word-1 ok 3.7s options_seen=13\n"}
+,{"stream_name":"stdout","time":279.783277447,"data":"[qwen35-2b] 30/40 ws2-screen-p06-word_sentences-1 ok 37.1s options_seen=44\n"}
+,{"stream_name":"stdout","time":288.814804342,"data":"[qwen35-2b] 31/40 ws2-screen-p07-academic-1 ok 9.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":293.245021878,"data":"[qwen35-2b] 32/40 ws2-screen-p07-condense-1 ok 4.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":295.827298494,"data":"[qwen35-2b] 33/40 ws2-screen-p07-phrase_to_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":298.367484268,"data":"[qwen35-2b] 34/40 ws2-screen-p07-tap_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":300.873025786,"data":"[qwen35-2b] 35/40 ws2-screen-p07-tap_word-2 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":308.390480635,"data":"[qwen35-2b] 36/40 ws2-screen-p08-condense-1 ok 7.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":340.86424603,"data":"[qwen35-2b] 37/40 ws2-screen-p08-paraphrase-1 ok 32.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":343.717003381,"data":"[qwen35-2b] 38/40 ws2-screen-p08-phrase_to_word-1 ok 2.9s options_seen=11\n"}
+,{"stream_name":"stdout","time":346.418526307,"data":"[qwen35-2b] 39/40 ws2-screen-p08-tap_word-1 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":350.836012275,"data":"[qwen35-2b] 40/40 ws2-screen-p08-word_sentences-1 ok 4.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":350.878747261,"data":"{\"candidate\": \"qwen35-2b\", \"status\": \"completed\", \"tasks\": {\"ok\": 40, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":355.379751006,"data":"=== qwen35-4b ===\n"}
+,{"stream_name":"stdout","time":366.630891919,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":369.22607044,"data":"\n"}
+,{"stream_name":"stdout","time":416.073892865,"data":"Fetching 2 files:   0%|          | 0/2 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":416.080898418,"data":"Fetching 2 files:  50%|█████     | 1/2 [00:46\u003c00:46, 46.85s/it]\n"}
+,{"stream_name":"stdout","time":416.080918445,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:46\u003c00:00, 23.43s/it]\n"}
+,{"stream_name":"stdout","time":416.56868296,"data":"\n"}
+,{"stream_name":"stdout","time":418.521059686,"data":"Loading weights:   0%|          | 0/426 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":418.637142414,"data":"Loading weights:   0%|          | 1/426 [00:01\u003c13:49,  1.95s/it]\n"}
+,{"stream_name":"stdout","time":419.220348128,"data":"Loading weights:  30%|███       | 128/426 [00:02\u003c00:03, 86.16it/s]\n"}
+,{"stream_name":"stdout","time":419.629102325,"data":"Loading weights:  45%|████▌     | 193/426 [00:02\u003c00:02, 95.23it/s]\n"}
+,{"stream_name":"stdout","time":419.971179559,"data":"Loading weights:  55%|█████▍    | 234/426 [00:03\u003c00:01, 96.65it/s]\n"}
+,{"stream_name":"stdout","time":420.129425037,"data":"Loading weights:  62%|██████▏   | 263/426 [00:03\u003c00:01, 93.72it/s]\n"}
+,{"stream_name":"stdout","time":420.302381759,"data":"Loading weights:  67%|██████▋   | 285/426 [00:03\u003c00:01, 99.95it/s]\n"}
+,{"stream_name":"stdout","time":420.506869927,"data":"Loading weights:  71%|███████▏  | 304/426 [00:03\u003c00:01, 101.66it/s]\n"}
+,{"stream_name":"stdout","time":420.64918097,"data":"Loading weights:  75%|███████▌  | 321/426 [00:03\u003c00:01, 97.41it/s] \n"}
+,{"stream_name":"stdout","time":420.794789867,"data":"Loading weights:  79%|███████▊  | 335/426 [00:04\u003c00:00, 97.95it/s]\n"}
+,{"stream_name":"stdout","time":420.94815856,"data":"Loading weights:  82%|████████▏ | 348/426 [00:04\u003c00:00, 95.70it/s]\n"}
+,{"stream_name":"stdout","time":421.078057107,"data":"Loading weights:  85%|████████▍ | 360/426 [00:04\u003c00:00, 91.86it/s]\n"}
+,{"stream_name":"stdout","time":421.209158094,"data":"Loading weights:  87%|████████▋ | 371/426 [00:04\u003c00:00, 89.88it/s]\n"}
+,{"stream_name":"stdout","time":421.324049296,"data":"Loading weights:  90%|█████████ | 385/426 [00:04\u003c00:00, 93.95it/s]\n"}
+,{"stream_name":"stdout","time":421.470769435,"data":"Loading weights:  93%|█████████▎| 398/426 [00:04\u003c00:00, 98.47it/s]\n"}
+,{"stream_name":"stdout","time":421.589337479,"data":"Loading weights:  96%|█████████▋| 411/426 [00:04\u003c00:00, 95.51it/s]\n"}
+,{"stream_name":"stdout","time":421.589661561,"data":"Loading weights: 100%|█████████▉| 424/426 [00:05\u003c00:00, 99.14it/s]\n"}
+,{"stream_name":"stdout","time":421.58967525,"data":"Loading weights: 100%|██████████| 426/426 [00:05\u003c00:00, 84.84it/s]\n"}
+,{"stream_name":"stdout","time":422.142718743,"data":"[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":422.54973576,"data":"[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":422.890008701,"data":"[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":422.922698885,"data":"[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":430.225024725,"data":"[qwen35-4b] 1/40 ws2-screen-p01-academic-1 ok 7.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":435.479561482,"data":"[qwen35-4b] 2/40 ws2-screen-p01-condense-1 ok 5.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":438.590368505,"data":"[qwen35-4b] 3/40 ws2-screen-p01-tap_word-1 ok 3.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":441.824153267,"data":"[qwen35-4b] 4/40 ws2-screen-p01-tap_word-2 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":447.419828115,"data":"[qwen35-4b] 5/40 ws2-screen-p01-word_sentences-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":455.949729171,"data":"[qwen35-4b] 6/40 ws2-screen-p02-academic-1 ok 8.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":464.00156212,"data":"[qwen35-4b] 7/40 ws2-screen-p02-paraphrase-1 ok 8.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":467.451077604,"data":"[qwen35-4b] 8/40 ws2-screen-p02-phrase_to_word-1 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":471.089034252,"data":"[qwen35-4b] 9/40 ws2-screen-p02-tap_word-1 ok 3.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":479.285051875,"data":"[qwen35-4b] 10/40 ws2-screen-p02-word_sentences-1 ok 8.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":487.385619473,"data":"[qwen35-4b] 11/40 ws2-screen-p03-academic-1 ok 8.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":495.490395155,"data":"[qwen35-4b] 12/40 ws2-screen-p03-condense-1 ok 8.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":503.079653285,"data":"[qwen35-4b] 13/40 ws2-screen-p03-paraphrase-1 ok 7.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":506.449888617,"data":"[qwen35-4b] 14/40 ws2-screen-p03-tap_word-1 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":509.634724218,"data":"[qwen35-4b] 15/40 ws2-screen-p03-tap_word-2 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":515.599058429,"data":"[qwen35-4b] 16/40 ws2-screen-p04-condense-1 ok 6.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":520.86552701,"data":"[qwen35-4b] 17/40 ws2-screen-p04-paraphrase-1 ok 5.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":524.406382269,"data":"[qwen35-4b] 18/40 ws2-screen-p04-phrase_to_word-1 ok 3.5s options_seen=1\n"}
+,{"stream_name":"stdout","time":528.805073216,"data":"[qwen35-4b] 19/40 ws2-screen-p04-tap_word-1 ok 4.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":535.353564155,"data":"[qwen35-4b] 20/40 ws2-screen-p04-word_sentences-1 ok 6.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":539.945172866,"data":"[qwen35-4b] 21/40 ws2-screen-p05-paraphrase-1 ok 4.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":543.670870564,"data":"[qwen35-4b] 22/40 ws2-screen-p05-phrase_to_word-1 ok 3.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":547.058795992,"data":"[qwen35-4b] 23/40 ws2-screen-p05-tap_word-1 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":550.694969974,"data":"[qwen35-4b] 24/40 ws2-screen-p05-tap_word-2 ok 3.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":558.08223043,"data":"[qwen35-4b] 25/40 ws2-screen-p05-word_sentences-1 ok 7.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":567.189062188,"data":"[qwen35-4b] 26/40 ws2-screen-p06-academic-1 ok 9.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":574.102458485,"data":"[qwen35-4b] 27/40 ws2-screen-p06-condense-1 ok 6.9s options_seen=8\n"}
+,{"stream_name":"stdout","time":576.180289135,"data":"[qwen35-4b] 28/40 ws2-screen-p06-phrase_to_word-1 ok 2.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":581.015971391,"data":"[qwen35-4b] 29/40 ws2-screen-p06-tap_word-1 ok 4.8s options_seen=13\n"}
+,{"stream_name":"stdout","time":587.845035293,"data":"[qwen35-4b] 30/40 ws2-screen-p06-word_sentences-1 ok 6.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":598.629655315,"data":"[qwen35-4b] 31/40 ws2-screen-p07-academic-1 ok 10.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":604.283587737,"data":"[qwen35-4b] 32/40 ws2-screen-p07-condense-1 ok 5.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":607.618027005,"data":"[qwen35-4b] 33/40 ws2-screen-p07-phrase_to_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":611.177652063,"data":"[qwen35-4b] 34/40 ws2-screen-p07-tap_word-1 ok 3.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":614.649418271,"data":"[qwen35-4b] 35/40 ws2-screen-p07-tap_word-2 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":623.039446553,"data":"[qwen35-4b] 36/40 ws2-screen-p08-condense-1 ok 8.4s options_seen=8\n"}
+,{"stream_name":"stdout","time":630.224896886,"data":"[qwen35-4b] 37/40 ws2-screen-p08-paraphrase-1 ok 7.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":633.522307958,"data":"[qwen35-4b] 38/40 ws2-screen-p08-phrase_to_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":637.203695919,"data":"[qwen35-4b] 39/40 ws2-screen-p08-tap_word-1 ok 3.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":644.911885571,"data":"[qwen35-4b] 40/40 ws2-screen-p08-word_sentences-1 ok 7.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":644.954464448,"data":"{\"candidate\": \"qwen35-4b\", \"status\": \"completed\", \"tasks\": {\"ok\": 40, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":646.887097063,"data":"=== minicpm5-2b ===\n"}
+,{"stream_name":"stdout","time":658.273241396,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":688.425125315,"data":"\n"}
+,{"stream_name":"stdout","time":689.332852366,"data":"Loading weights:   0%|          | 0/381 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":689.475855382,"data":"Loading weights:   0%|          | 1/381 [00:00\u003c05:45,  1.10it/s]\n"}
+,{"stream_name":"stdout","time":689.584159993,"data":"Loading weights:   1%|          | 2/381 [00:01\u003c02:53,  2.18it/s]\n"}
+,{"stream_name":"stdout","time":689.807200281,"data":"Loading weights:  29%|██▉       | 112/381 [00:01\u003c00:01, 170.11it/s]\n"}
+,{"stream_name":"stdout","time":689.968387037,"data":"Loading weights:  42%|████▏     | 159/381 [00:01\u003c00:01, 183.22it/s]\n"}
+,{"stream_name":"stdout","time":690.105231048,"data":"Loading weights:  51%|█████▏    | 196/381 [00:01\u003c00:00, 194.99it/s]\n"}
+,{"stream_name":"stdout","time":690.275687743,"data":"Loading weights:  60%|█████▉    | 228/381 [00:01\u003c00:00, 204.07it/s]\n"}
+,{"stream_name":"stdout","time":690.384718459,"data":"Loading weights:  67%|██████▋   | 257/381 [00:01\u003c00:00, 194.08it/s]\n"}
+,{"stream_name":"stdout","time":690.48764145,"data":"Loading weights:  75%|███████▍  | 284/381 [00:01\u003c00:00, 205.38it/s]\n"}
+,{"stream_name":"stdout","time":690.587640833,"data":"Loading weights:  81%|████████▏ | 310/381 [00:02\u003c00:00, 215.90it/s]\n"}
+,{"stream_name":"stdout","time":690.714093745,"data":"Loading weights:  88%|████████▊ | 336/381 [00:02\u003c00:00, 226.28it/s]\n"}
+,{"stream_name":"stdout","time":690.797604906,"data":"Loading weights:  95%|█████████▌| 362/381 [00:02\u003c00:00, 220.20it/s]\n"}
+,{"stream_name":"stdout","time":690.797642063,"data":"Loading weights: 100%|██████████| 381/381 [00:02\u003c00:00, 160.43it/s]\n"}
+,{"stream_name":"stdout","time":696.299132724,"data":"[minicpm5-2b] 1/40 ws2-screen-p01-academic-1 ok 4.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":698.845571867,"data":"[minicpm5-2b] 2/40 ws2-screen-p01-condense-1 ok 2.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":700.794819449,"data":"[minicpm5-2b] 3/40 ws2-screen-p01-tap_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":702.704222901,"data":"[minicpm5-2b] 4/40 ws2-screen-p01-tap_word-2 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":706.160492204,"data":"[minicpm5-2b] 5/40 ws2-screen-p01-word_sentences-1 ok 3.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":711.78884418,"data":"[minicpm5-2b] 6/40 ws2-screen-p02-academic-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":717.727850536,"data":"[minicpm5-2b] 7/40 ws2-screen-p02-paraphrase-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":720.055331074,"data":"[minicpm5-2b] 8/40 ws2-screen-p02-phrase_to_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":722.622886022,"data":"[minicpm5-2b] 9/40 ws2-screen-p02-tap_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":726.210727669,"data":"[minicpm5-2b] 10/40 ws2-screen-p02-word_sentences-1 ok 3.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":732.697782262,"data":"[minicpm5-2b] 11/40 ws2-screen-p03-academic-1 ok 6.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":736.155838862,"data":"[minicpm5-2b] 12/40 ws2-screen-p03-condense-1 ok 3.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":741.312566884,"data":"[minicpm5-2b] 13/40 ws2-screen-p03-paraphrase-1 ok 5.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":743.883076286,"data":"[minicpm5-2b] 14/40 ws2-screen-p03-tap_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":745.913001249,"data":"[minicpm5-2b] 15/40 ws2-screen-p03-tap_word-2 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":750.898042277,"data":"[minicpm5-2b] 16/40 ws2-screen-p04-condense-1 ok 5.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":754.775072178,"data":"[minicpm5-2b] 17/40 ws2-screen-p04-paraphrase-1 ok 3.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":757.046881351,"data":"[minicpm5-2b] 18/40 ws2-screen-p04-phrase_to_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":759.535751497,"data":"[minicpm5-2b] 19/40 ws2-screen-p04-tap_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":763.131579744,"data":"[minicpm5-2b] 20/40 ws2-screen-p04-word_sentences-1 ok 3.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":766.441753177,"data":"[minicpm5-2b] 21/40 ws2-screen-p05-paraphrase-1 ok 3.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":768.713046512,"data":"[minicpm5-2b] 22/40 ws2-screen-p05-phrase_to_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":771.09302059,"data":"[minicpm5-2b] 23/40 ws2-screen-p05-tap_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":773.390263745,"data":"[minicpm5-2b] 24/40 ws2-screen-p05-tap_word-2 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":777.205596172,"data":"[minicpm5-2b] 25/40 ws2-screen-p05-word_sentences-1 ok 3.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":783.814098366,"data":"[minicpm5-2b] 26/40 ws2-screen-p06-academic-1 ok 6.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":786.177167739,"data":"[minicpm5-2b] 27/40 ws2-screen-p06-condense-1 ok 2.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":788.029577477,"data":"[minicpm5-2b] 28/40 ws2-screen-p06-phrase_to_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":789.874663847,"data":"[minicpm5-2b] 29/40 ws2-screen-p06-tap_word-1 ok 1.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":793.857098936,"data":"[minicpm5-2b] 30/40 ws2-screen-p06-word_sentences-1 ok 4.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":800.123022921,"data":"[minicpm5-2b] 31/40 ws2-screen-p07-academic-1 ok 6.3s options_seen=1\n"}
+,{"stream_name":"stdout","time":803.203803907,"data":"[minicpm5-2b] 32/40 ws2-screen-p07-condense-1 ok 3.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":805.397597358,"data":"[minicpm5-2b] 33/40 ws2-screen-p07-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":807.698818943,"data":"[minicpm5-2b] 34/40 ws2-screen-p07-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":809.476936689,"data":"[minicpm5-2b] 35/40 ws2-screen-p07-tap_word-2 ok 1.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":811.615399825,"data":"[minicpm5-2b] 36/40 ws2-screen-p08-condense-1 ok 2.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":816.977612234,"data":"[minicpm5-2b] 37/40 ws2-screen-p08-paraphrase-1 ok 5.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":818.98655116,"data":"[minicpm5-2b] 38/40 ws2-screen-p08-phrase_to_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":821.412520361,"data":"[minicpm5-2b] 39/40 ws2-screen-p08-tap_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":824.287809296,"data":"[minicpm5-2b] 40/40 ws2-screen-p08-word_sentences-1 ok 2.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":824.331983812,"data":"{\"candidate\": \"minicpm5-2b\", \"status\": \"completed\", \"tasks\": {\"ok\": 40, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":825.94677166,"data":"=== phi4-mini-instruct ===\n"}
+,{"stream_name":"stdout","time":836.909247287,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":836.929666894,"data":"[transformers] This model config has set a `rope_parameters['original_max_position_embeddings']` field, to be used together with `max_position_embeddings` to determine a scaling factor. Please set the `factor` field of `rope_parameters`with this ratio instead -- we recommend the use of this field over `original_max_position_embeddings`, as it is compatible with most model architectures.\n"}
+,{"stream_name":"stdout","time":839.860706921,"data":"\n"}
+,{"stream_name":"stdout","time":879.651030464,"data":"Fetching 2 files:   0%|          | 0/2 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":879.651934792,"data":"Fetching 2 files:  50%|█████     | 1/2 [00:39\u003c00:39, 39.79s/it]\n"}
+,{"stream_name":"stdout","time":879.651975813,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:39\u003c00:00, 19.90s/it]\n"}
+,{"stream_name":"stdout","time":880.0070281,"data":"\n"}
+,{"stream_name":"stdout","time":882.122043666,"data":"Loading weights:   0%|          | 0/194 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":882.250499648,"data":"Loading weights:   1%|          | 1/194 [00:02\u003c06:47,  2.11s/it]\n"}
+,{"stream_name":"stdout","time":882.805125675,"data":"Loading weights:  39%|███▊      | 75/194 [00:02\u003c00:02, 46.41it/s]\n"}
+,{"stream_name":"stdout","time":883.228205541,"data":"Loading weights:  56%|█████▌    | 109/194 [00:02\u003c00:01, 51.33it/s]\n"}
+,{"stream_name":"stdout","time":883.434269108,"data":"Loading weights:  68%|██████▊   | 131/194 [00:03\u003c00:01, 51.51it/s]\n"}
+,{"stream_name":"stdout","time":883.647550834,"data":"Loading weights:  75%|███████▌  | 146/194 [00:03\u003c00:00, 54.81it/s]\n"}
+,{"stream_name":"stdout","time":883.831082444,"data":"Loading weights:  82%|████████▏ | 159/194 [00:03\u003c00:00, 55.96it/s]\n"}
+,{"stream_name":"stdout","time":884.013186709,"data":"Loading weights:  88%|████████▊ | 170/194 [00:03\u003c00:00, 56.69it/s]\n"}
+,{"stream_name":"stdout","time":884.136057782,"data":"Loading weights:  92%|█████████▏| 179/194 [00:04\u003c00:00, 55.17it/s]\n"}
+,{"stream_name":"stdout","time":884.175978577,"data":"Loading weights:  97%|█████████▋| 189/194 [00:04\u003c00:00, 59.57it/s]\n"}
+,{"stream_name":"stdout","time":884.176010472,"data":"Loading weights: 100%|██████████| 194/194 [00:04\u003c00:00, 46.53it/s]\n"}
+,{"stream_name":"stdout","time":890.510653001,"data":"[phi4-mini-instruct] 1/40 ws2-screen-p01-academic-1 ok 5.4s options_seen=8\n"}
+,{"stream_name":"stdout","time":894.174076383,"data":"[phi4-mini-instruct] 2/40 ws2-screen-p01-condense-1 ok 3.7s options_seen=8\n"}
+,{"stream_name":"stdout","time":896.321504244,"data":"[phi4-mini-instruct] 3/40 ws2-screen-p01-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":898.451980023,"data":"[phi4-mini-instruct] 4/40 ws2-screen-p01-tap_word-2 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":902.653296577,"data":"[phi4-mini-instruct] 5/40 ws2-screen-p01-word_sentences-1 ok 4.2s options_seen=8\n"}
+,{"stream_name":"stdout","time":908.925850313,"data":"[phi4-mini-instruct] 6/40 ws2-screen-p02-academic-1 ok 6.3s options_seen=8\n"}
+,{"stream_name":"stdout","time":914.014134819,"data":"[phi4-mini-instruct] 7/40 ws2-screen-p02-paraphrase-1 ok 5.1s options_seen=8\n"}
+,{"stream_name":"stdout","time":916.49477065,"data":"[phi4-mini-instruct] 8/40 ws2-screen-p02-phrase_to_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":918.843919359,"data":"[phi4-mini-instruct] 9/40 ws2-screen-p02-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":925.344922458,"data":"[phi4-mini-instruct] 10/40 ws2-screen-p02-word_sentences-1 ok 6.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":933.068318058,"data":"[phi4-mini-instruct] 11/40 ws2-screen-p03-academic-1 ok 7.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":936.869743994,"data":"[phi4-mini-instruct] 12/40 ws2-screen-p03-condense-1 ok 3.8s options_seen=8\n"}
+,{"stream_name":"stdout","time":941.518524147,"data":"[phi4-mini-instruct] 13/40 ws2-screen-p03-paraphrase-1 ok 4.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":944.072281892,"data":"[phi4-mini-instruct] 14/40 ws2-screen-p03-tap_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":946.263345597,"data":"[phi4-mini-instruct] 15/40 ws2-screen-p03-tap_word-2 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":950.185673676,"data":"[phi4-mini-instruct] 16/40 ws2-screen-p04-condense-1 ok 3.9s options_seen=8\n"}
+,{"stream_name":"stdout","time":954.644066455,"data":"[phi4-mini-instruct] 17/40 ws2-screen-p04-paraphrase-1 ok 4.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":957.050250295,"data":"[phi4-mini-instruct] 18/40 ws2-screen-p04-phrase_to_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":960.373213831,"data":"[phi4-mini-instruct] 19/40 ws2-screen-p04-tap_word-1 ok 3.3s options_seen=13\n"}
+,{"stream_name":"stdout","time":965.966428312,"data":"[phi4-mini-instruct] 20/40 ws2-screen-p04-word_sentences-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":969.38943152,"data":"[phi4-mini-instruct] 21/40 ws2-screen-p05-paraphrase-1 ok 3.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":971.776690201,"data":"[phi4-mini-instruct] 22/40 ws2-screen-p05-phrase_to_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":974.079202141,"data":"[phi4-mini-instruct] 23/40 ws2-screen-p05-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":976.604993836,"data":"[phi4-mini-instruct] 24/40 ws2-screen-p05-tap_word-2 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":982.436004007,"data":"[phi4-mini-instruct] 25/40 ws2-screen-p05-word_sentences-1 ok 5.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":988.90840989,"data":"[phi4-mini-instruct] 26/40 ws2-screen-p06-academic-1 ok 6.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":992.628672438,"data":"[phi4-mini-instruct] 27/40 ws2-screen-p06-condense-1 ok 3.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":995.010487049,"data":"[phi4-mini-instruct] 28/40 ws2-screen-p06-phrase_to_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":997.158705746,"data":"[phi4-mini-instruct] 29/40 ws2-screen-p06-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1002.975782498,"data":"[phi4-mini-instruct] 30/40 ws2-screen-p06-word_sentences-1 ok 5.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1009.420437309,"data":"[phi4-mini-instruct] 31/40 ws2-screen-p07-academic-1 ok 6.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1012.277434777,"data":"[phi4-mini-instruct] 32/40 ws2-screen-p07-condense-1 ok 2.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1014.764483815,"data":"[phi4-mini-instruct] 33/40 ws2-screen-p07-phrase_to_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":1017.242664028,"data":"[phi4-mini-instruct] 34/40 ws2-screen-p07-tap_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":1019.862042002,"data":"[phi4-mini-instruct] 35/40 ws2-screen-p07-tap_word-2 ok 2.6s options_seen=11\n"}
+,{"stream_name":"stdout","time":1024.886172366,"data":"[phi4-mini-instruct] 36/40 ws2-screen-p08-condense-1 ok 5.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1030.403923995,"data":"[phi4-mini-instruct] 37/40 ws2-screen-p08-paraphrase-1 ok 5.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":1032.706067841,"data":"[phi4-mini-instruct] 38/40 ws2-screen-p08-phrase_to_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1035.477562733,"data":"[phi4-mini-instruct] 39/40 ws2-screen-p08-tap_word-1 ok 2.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":1039.421723761,"data":"[phi4-mini-instruct] 40/40 ws2-screen-p08-word_sentences-1 ok 3.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1039.464707211,"data":"{\"candidate\": \"phi4-mini-instruct\", \"status\": \"completed\", \"tasks\": {\"ok\": 40, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":1041.513888636,"data":"=== smollm3-3b ===\n"}
+,{"stream_name":"stdout","time":1052.543496273,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":1055.515565074,"data":"\n"}
+,{"stream_name":"stdout","time":1065.836538832,"data":"Fetching 2 files:   0%|          | 0/2 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":1087.401196691,"data":"Fetching 2 files:  50%|█████     | 1/2 [00:10\u003c00:10, 10.32s/it]\n"}
+,{"stream_name":"stdout","time":1087.401655457,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:31\u003c00:00, 16.93s/it]\n"}
+,{"stream_name":"stdout","time":1087.401670916,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:31\u003c00:00, 15.94s/it]\n"}
+,{"stream_name":"stdout","time":1088.078055895,"data":"\n"}
+,{"stream_name":"stdout","time":1088.429561568,"data":"Loading weights:   0%|          | 0/326 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":1088.537167017,"data":"Loading weights:   0%|          | 1/326 [00:00\u003c01:54,  2.84it/s]\n"}
+,{"stream_name":"stdout","time":1088.666471071,"data":"Loading weights:   9%|▉         | 30/326 [00:00\u003c00:03, 83.58it/s]\n"}
+,{"stream_name":"stdout","time":1088.827183129,"data":"Loading weights:  14%|█▍        | 46/326 [00:00\u003c00:02, 97.37it/s]\n"}
+,{"stream_name":"stdout","time":1088.943174741,"data":"Loading weights:  19%|█▊        | 61/326 [00:00\u003c00:02, 96.45it/s]\n"}
+,{"stream_name":"stdout","time":1089.047267213,"data":"Loading weights:  23%|██▎       | 75/326 [00:00\u003c00:02, 102.56it/s]\n"}
+,{"stream_name":"stdout","time":1089.15845306,"data":"Loading weights:  27%|██▋       | 88/326 [00:00\u003c00:02, 108.57it/s]\n"}
+,{"stream_name":"stdout","time":1089.296071428,"data":"Loading weights:  31%|███       | 101/326 [00:01\u003c00:02, 110.87it/s]\n"}
+,{"stream_name":"stdout","time":1089.422893964,"data":"Loading weights:  35%|███▍      | 114/326 [00:01\u003c00:02, 105.33it/s]\n"}
+,{"stream_name":"stdout","time":1089.5386525,"data":"Loading weights:  39%|███▊      | 126/326 [00:01\u003c00:01, 102.04it/s]\n"}
+,{"stream_name":"stdout","time":1089.654206725,"data":"Loading weights:  42%|████▏     | 138/326 [00:01\u003c00:01, 102.49it/s]\n"}
+,{"stream_name":"stdout","time":1089.774765529,"data":"Loading weights:  46%|████▌     | 149/326 [00:01\u003c00:01, 100.55it/s]\n"}
+,{"stream_name":"stdout","time":1089.908447446,"data":"Loading weights:  51%|█████     | 165/326 [00:01\u003c00:01, 110.11it/s]\n"}
+,{"stream_name":"stdout","time":1090.051161523,"data":"Loading weights:  54%|█████▍    | 177/326 [00:01\u003c00:01, 103.52it/s]\n"}
+,{"stream_name":"stdout","time":1090.154185738,"data":"Loading weights:  59%|█████▉    | 192/326 [00:01\u003c00:01, 104.04it/s]\n"}
+,{"stream_name":"stdout","time":1090.312014437,"data":"Loading weights:  62%|██████▏   | 203/326 [00:02\u003c00:01, 104.76it/s]\n"}
+,{"stream_name":"stdout","time":1090.471344384,"data":"Loading weights:  67%|██████▋   | 219/326 [00:02\u003c00:01, 103.55it/s]\n"}
+,{"stream_name":"stdout","time":1090.587685056,"data":"Loading weights:  73%|███████▎  | 237/326 [00:02\u003c00:00, 107.21it/s]\n"}
+,{"stream_name":"stdout","time":1090.744192559,"data":"Loading weights:  78%|███████▊  | 255/326 [00:02\u003c00:00, 119.14it/s]\n"}
+,{"stream_name":"stdout","time":1090.880634876,"data":"Loading weights:  82%|████████▏ | 268/326 [00:02\u003c00:00, 107.38it/s]\n"}
+,{"stream_name":"stdout","time":1091.003486748,"data":"Loading weights:  87%|████████▋ | 282/326 [00:02\u003c00:00, 105.66it/s]\n"}
+,{"stream_name":"stdout","time":1091.148728226,"data":"Loading weights:  90%|████████▉ | 293/326 [00:02\u003c00:00, 101.30it/s]\n"}
+,{"stream_name":"stdout","time":1091.22333318,"data":"Loading weights:  95%|█████████▍| 309/326 [00:03\u003c00:00, 104.10it/s]\n"}
+,{"stream_name":"stdout","time":1091.22335761,"data":"Loading weights: 100%|██████████| 326/326 [00:03\u003c00:00, 103.58it/s]\n"}
+,{"stream_name":"stdout","time":1092.038079235,"data":"[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.\n"}
+,{"stream_name":"stdout","time":1097.077090101,"data":"[smollm3-3b] 1/40 ws2-screen-p01-academic-1 ok 5.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1101.319922014,"data":"[smollm3-3b] 2/40 ws2-screen-p01-condense-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1103.273746879,"data":"[smollm3-3b] 3/40 ws2-screen-p01-tap_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1107.544520118,"data":"[smollm3-3b] 4/40 ws2-screen-p01-tap_word-2 ok 4.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1111.310013528,"data":"[smollm3-3b] 5/40 ws2-screen-p01-word_sentences-1 ok 3.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1116.406431555,"data":"[smollm3-3b] 6/40 ws2-screen-p02-academic-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1121.462593034,"data":"[smollm3-3b] 7/40 ws2-screen-p02-paraphrase-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1123.724146295,"data":"[smollm3-3b] 8/40 ws2-screen-p02-phrase_to_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1125.91269008,"data":"[smollm3-3b] 9/40 ws2-screen-p02-tap_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1135.52146598,"data":"[smollm3-3b] 10/40 ws2-screen-p02-word_sentences-1 ok 9.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1142.32593242,"data":"[smollm3-3b] 11/40 ws2-screen-p03-academic-1 ok 6.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1146.51125057,"data":"[smollm3-3b] 12/40 ws2-screen-p03-condense-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1152.427774661,"data":"[smollm3-3b] 13/40 ws2-screen-p03-paraphrase-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1154.526907581,"data":"[smollm3-3b] 14/40 ws2-screen-p03-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1156.383329927,"data":"[smollm3-3b] 15/40 ws2-screen-p03-tap_word-2 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":1160.774642085,"data":"[smollm3-3b] 16/40 ws2-screen-p04-condense-1 ok 4.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1164.209178465,"data":"[smollm3-3b] 17/40 ws2-screen-p04-paraphrase-1 ok 3.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1166.387860744,"data":"[smollm3-3b] 18/40 ws2-screen-p04-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1168.834768485,"data":"[smollm3-3b] 19/40 ws2-screen-p04-tap_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":1180.970306982,"data":"[smollm3-3b] 20/40 ws2-screen-p04-word_sentences-1 ok 12.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1184.296503391,"data":"[smollm3-3b] 21/40 ws2-screen-p05-paraphrase-1 ok 3.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1186.470000573,"data":"[smollm3-3b] 22/40 ws2-screen-p05-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1188.79018292,"data":"[smollm3-3b] 23/40 ws2-screen-p05-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1191.058174699,"data":"[smollm3-3b] 24/40 ws2-screen-p05-tap_word-2 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1195.884085763,"data":"[smollm3-3b] 25/40 ws2-screen-p05-word_sentences-1 ok 4.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1202.258054894,"data":"[smollm3-3b] 26/40 ws2-screen-p06-academic-1 ok 6.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1206.226143102,"data":"[smollm3-3b] 27/40 ws2-screen-p06-condense-1 ok 4.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1208.471751711,"data":"[smollm3-3b] 28/40 ws2-screen-p06-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1210.374570063,"data":"[smollm3-3b] 29/40 ws2-screen-p06-tap_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":1216.403107073,"data":"[smollm3-3b] 30/40 ws2-screen-p06-word_sentences-1 ok 6.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1222.664286922,"data":"[smollm3-3b] 31/40 ws2-screen-p07-academic-1 ok 6.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1225.5226358,"data":"[smollm3-3b] 32/40 ws2-screen-p07-condense-1 ok 2.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1228.022739014,"data":"[smollm3-3b] 33/40 ws2-screen-p07-phrase_to_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":1230.344096603,"data":"[smollm3-3b] 34/40 ws2-screen-p07-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1234.335645556,"data":"[smollm3-3b] 35/40 ws2-screen-p07-tap_word-2 ok 4.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1240.732162646,"data":"[smollm3-3b] 36/40 ws2-screen-p08-condense-1 ok 6.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1246.005761366,"data":"[smollm3-3b] 37/40 ws2-screen-p08-paraphrase-1 ok 5.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1248.074782402,"data":"[smollm3-3b] 38/40 ws2-screen-p08-phrase_to_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1250.507966553,"data":"[smollm3-3b] 39/40 ws2-screen-p08-tap_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":1253.965915492,"data":"[smollm3-3b] 40/40 ws2-screen-p08-word_sentences-1 ok 3.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":1254.007409438,"data":"{\"candidate\": \"smollm3-3b\", \"status\": \"completed\", \"tasks\": {\"ok\": 40, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":1255.643827953,"data":"=== control-missing-revision ===\n"}
+,{"stream_name":"stdout","time":1266.578677738,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":1266.628910572,"data":"[control-missing-revision] FAILED to load: RevisionNotFoundError: 404 Client Error. (Request ID: Root=1-6ad280f7-5621c9316fcdc9ce1981b602;b4171813-d9b5-4314-a14f-59fa71853f1b)\n"}
+,{"stream_name":"stdout","time":1266.62893265,"data":"\n"}
+,{"stream_name":"stdout","time":1266.628968379,"data":"Revision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false\u0026expand=false.\n"}
+,{"stream_name":"stdout","time":1266.628976525,"data":"\n"}
+,{"stream_name":"stdout","time":1266.629068077,"data":"{\"candidate\": \"control-missing-revision\", \"status\": \"failed\", \"tasks\": {\"ok\": 0, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":1267.704746093,"data":"{\n"}
+,{"stream_name":"stdout","time":1267.704772541,"data":"  \"qwen35-2b\": {\n"}
+,{"stream_name":"stdout","time":1267.704777573,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":1267.704781551,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":1267.70478553,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":1267.704789449,"data":"      \"ok\": 40,\n"}
+,{"stream_name":"stdout","time":1267.704793749,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":1267.704797519,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":1267.704801501,"data":"    },\n"}
+,{"stream_name":"stdout","time":1267.704805306,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":1267.704809086,"data":"    \"wall_seconds\": 323.0\n"}
+,{"stream_name":"stdout","time":1267.704812929,"data":"  },\n"}
+,{"stream_name":"stdout","time":1267.704817094,"data":"  \"qwen35-4b\": {\n"}
+,{"stream_name":"stdout","time":1267.704821043,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":1267.704824939,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":1267.70482892,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":1267.704832886,"data":"      \"ok\": 40,\n"}
+,{"stream_name":"stdout","time":1267.704836922,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":1267.704840637,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":1267.704844622,"data":"    },\n"}
+,{"stream_name":"stdout","time":1267.704848112,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":1267.704852161,"data":"    \"wall_seconds\": 291.1\n"}
+,{"stream_name":"stdout","time":1267.704856311,"data":"  },\n"}
+,{"stream_name":"stdout","time":1267.704860196,"data":"  \"minicpm5-2b\": {\n"}
+,{"stream_name":"stdout","time":1267.704864214,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":1267.704868233,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":1267.704872104,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":1267.704876379,"data":"      \"ok\": 40,\n"}
+,{"stream_name":"stdout","time":1267.704880977,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":1267.704884971,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":1267.704888946,"data":"    },\n"}
+,{"stream_name":"stdout","time":1267.704892908,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":1267.704896948,"data":"    \"wall_seconds\": 178.8\n"}
+,{"stream_name":"stdout","time":1267.704900926,"data":"  },\n"}
+,{"stream_name":"stdout","time":1267.704905071,"data":"  \"phi4-mini-instruct\": {\n"}
+,{"stream_name":"stdout","time":1267.704909009,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":1267.704912822,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":1267.704916502,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":1267.704920228,"data":"      \"ok\": 40,\n"}
+,{"stream_name":"stdout","time":1267.704924493,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":1267.70492818,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":1267.704932049,"data":"    },\n"}
+,{"stream_name":"stdout","time":1267.704935329,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":1267.704939309,"data":"    \"wall_seconds\": 215.2\n"}
+,{"stream_name":"stdout","time":1267.704962802,"data":"  },\n"}
+,{"stream_name":"stdout","time":1267.704967278,"data":"  \"smollm3-3b\": {\n"}
+,{"stream_name":"stdout","time":1267.704994084,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":1267.704997858,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":1267.70500206,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":1267.705005299,"data":"      \"ok\": 40,\n"}
+,{"stream_name":"stdout","time":1267.705009375,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":1267.705012707,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":1267.705016375,"data":"    },\n"}
+,{"stream_name":"stdout","time":1267.705020095,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":1267.705023826,"data":"    \"wall_seconds\": 213.9\n"}
+,{"stream_name":"stdout","time":1267.705027723,"data":"  },\n"}
+,{"stream_name":"stdout","time":1267.705031942,"data":"  \"control-missing-revision\": {\n"}
+,{"stream_name":"stdout","time":1267.705035915,"data":"    \"exit_code\": 2,\n"}
+,{"stream_name":"stdout","time":1267.705039836,"data":"    \"status\": \"failed\",\n"}
+,{"stream_name":"stdout","time":1267.705043317,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":1267.705047251,"data":"      \"ok\": 0,\n"}
+,{"stream_name":"stdout","time":1267.705050924,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":1267.705054781,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":1267.705058604,"data":"    },\n"}
+,{"stream_name":"stdout","time":1267.705063229,"data":"    \"error\": \"404 Client Error. (Request ID: Root=1-6ad280f7-5621c9316fcdc9ce1981b602;b4171813-d9b5-4314-a14f-59fa71853f1b)\\n\\nRevision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false\u0026expand=false.\\nInvalid rev id: 0000000000000000000000000000000000000000\",\n"}
+,{"stream_name":"stdout","time":1267.705069228,"data":"    \"wall_seconds\": 12.1\n"}
+,{"stream_name":"stdout","time":1267.705073309,"data":"  }\n"}
+,{"stream_name":"stdout","time":1267.705077302,"data":"}\n"}
+,{"stream_name":"stderr","time":1269.777253774,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":1269.777278015,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":1270.04486977,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":1270.044894916,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":1270.828110677,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":1271.885238639,"data":"[NbConvertApp] Writing 303309 bytes to __results__.html\n"}
+]

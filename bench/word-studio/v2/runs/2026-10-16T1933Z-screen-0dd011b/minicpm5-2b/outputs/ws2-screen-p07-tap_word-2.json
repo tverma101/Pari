@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p07-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "minicpm5-2b",
+  "messages_sha256": "ea14e2afef41d8b5eaeafbf37b249f01dbd71e3d8a95ba7a49579c5ed5de72b1",
+  "seed": 2613629754426857759,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"void\", \"empty\", \"void\", \"empty\", \"void\", \"empty\", \"void\", \"empty\", \"void\", \"empty\"]}",
+  "timing": {
+    "first_text_ms": 134.0,
+    "option_ms": [
+      377.1,
+      521.2,
+      668.1,
+      814.7,
+      958.6,
+      1103.0,
+      1248.1,
+      1392.9,
+      1535.7,
+      1680.3
+    ],
+    "total_ms": 1777.1,
+    "stream": [
+      [
+        134.0,
+        2
+      ],
+      [
+        183.1,
+        9
+      ],
+      [
+        232.7,
+        11
+      ],
+      [
+        280.5,
+        14
+      ],
+      [
+        329.7,
+        18
+      ],
+      [
+        377.1,
+        20
+      ],
+      [
+        424.9,
+        22
+      ],
+      [
+        473.8,
+        27
+      ],
+      [
+        521.2,
+        29
+      ],
+      [
+        570.0,
+        31
+      ],
+      [
+        619.1,
+        35
+      ],
+      [
+        668.1,
+        37
+      ],
+      [
+        716.8,
+        39
+      ],
+      [
+        766.0,
+        44
+      ],
+      [
+        814.7,
+        46
+      ],
+      [
+        862.6,
+        48
+      ],
+      [
+        910.6,
+        52
+      ],
+      [
+        958.6,
+        54
+      ],
+      [
+        1006.3,
+        56
+      ],
+      [
+        1054.8,
+        61
+      ],
+      [
+        1103.0,
+        63
+      ],
+      [
+        1152.1,
+        65
+      ],
+      [
+        1199.6,
+        69
+      ],
+      [
+        1248.1,
+        71
+      ],
+      [
+        1297.4,
+        73
+      ],
+      [
+        1345.2,
+        78
+      ],
+      [
+        1392.9,
+        80
+      ],
+      [
+        1440.4,
+        82
+      ],
+      [
+        1487.9,
+        86
+      ],
+      [
+        1535.7,
+        88
+      ],
+      [
+        1583.0,
+        90
+      ],
+      [
+        1631.2,
+        95
+      ],
+      [
+        1680.3,
+        97
+      ],
+      [
+        1728.2,
+        98
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<s><|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Macbeth, Shakespeare shows how wanting power too much can destroy a person. At the start of the play, Macbeth is a loyal soldier who fights bravely for King Duncan. After the witches tell him he will be king, he cannot stop thinking about it. Lady Macbeth pushes him to kill Duncan, and he finally agrees even though he feels guilty. Once he becomes king, he keeps killing people because he is afraid of losing what he has. By the end, Macbeth says that life is \"a tale told by an idiot,\" which shows how empty he feels. His story is a warning about what happens when ambition gets out of control.\n\"\"\"\n\nThe writer tapped the word \"empty\" in this sentence (marked with [[ ]]):\nBy the end, Macbeth says that life is \"a tale told by an idiot,\" which shows how [[empty]] he feels.\n\nGive 10 replacements for \"empty\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"empty\" without changing the rest of the sentence. Do not repeat \"empty\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 365,
+  "new_tokens": 35,
+  "finish_reason": "stop",
+  "error": null
+}

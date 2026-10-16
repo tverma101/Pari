@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p01-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "minicpm5-2b",
+  "messages_sha256": "28de61dda656892a92a143e71a37eb0b94cd54b62fb819f5bf44ee11d5c2f96c",
+  "seed": 1391277841205885292,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"serious\", \"serious\", \"serious\", \"serious\", \"serious\", \"serious\", \"serious\", \"serious\", \"serious\", \"serious\"]}",
+  "timing": {
+    "first_text_ms": 126.9,
+    "option_ms": [
+      382.9,
+      530.9,
+      716.0,
+      871.6,
+      1032.6,
+      1190.4,
+      1348.4,
+      1501.2,
+      1654.2,
+      1806.6
+    ],
+    "total_ms": 1908.3,
+    "stream": [
+      [
+        126.9,
+        2
+      ],
+      [
+        182.0,
+        9
+      ],
+      [
+        232.6,
+        11
+      ],
+      [
+        283.7,
+        14
+      ],
+      [
+        334.7,
+        21
+      ],
+      [
+        382.9,
+        23
+      ],
+      [
+        432.1,
+        25
+      ],
+      [
+        480.3,
+        32
+      ],
+      [
+        530.9,
+        34
+      ],
+      [
+        596.4,
+        36
+      ],
+      [
+        662.5,
+        43
+      ],
+      [
+        716.0,
+        45
+      ],
+      [
+        767.9,
+        47
+      ],
+      [
+        820.1,
+        54
+      ],
+      [
+        871.6,
+        56
+      ],
+      [
+        924.9,
+        58
+      ],
+      [
+        980.4,
+        65
+      ],
+      [
+        1032.6,
+        67
+      ],
+      [
+        1086.3,
+        69
+      ],
+      [
+        1138.4,
+        76
+      ],
+      [
+        1190.4,
+        78
+      ],
+      [
+        1243.3,
+        80
+      ],
+      [
+        1296.5,
+        87
+      ],
+      [
+        1348.4,
+        89
+      ],
+      [
+        1399.8,
+        91
+      ],
+      [
+        1450.7,
+        98
+      ],
+      [
+        1501.2,
+        100
+      ],
+      [
+        1551.9,
+        102
+      ],
+      [
+        1603.4,
+        109
+      ],
+      [
+        1654.2,
+        111
+      ],
+      [
+        1704.8,
+        113
+      ],
+      [
+        1755.3,
+        120
+      ],
+      [
+        1806.6,
+        122
+      ],
+      [
+        1858.2,
+        123
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<s><|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nMany schools are thinking about banning phones during class, and I think this is a good idea. When students have their phones out, they get distracted really easily and stop listening to the teacher. A lot of kids say they only use their phones to check the time, but most of the time they are actually on social media. In my opinion, I think that a ban would help students do better on tests because they would pay attention more. Some parents are worried that they will not be able to reach their kids in an emergency. However, the school office can always call a parent if something bad happens. Overall, a phone ban is a good way to make classrooms better places to learn.\n\"\"\"\n\nThe writer tapped the word \"bad\" in this sentence (marked with [[ ]]):\nHowever, the school office can always call a parent if something [[bad]] happens.\n\nGive 10 replacements for \"bad\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"bad\" without changing the rest of the sentence. Do not repeat \"bad\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 367,
+  "new_tokens": 35,
+  "finish_reason": "stop",
+  "error": null
+}

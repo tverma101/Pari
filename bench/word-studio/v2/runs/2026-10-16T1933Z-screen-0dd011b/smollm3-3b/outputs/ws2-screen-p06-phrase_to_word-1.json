@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p06-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "0edb3657cb51c8c414527e2f374193deaf5a52ff4392ecfa2ea1ec33c46c08f5",
+  "seed": 2934303832297020125,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"best\", \"best moments\", \"good parts\", \"highlighted moments\", \"glamorous parts\", \"highlights\", \"nicest moments\", \"exciting parts\", \"positive moments\", \"worthwhile parts\"]}",
+  "timing": {
+    "first_text_ms": 174.2,
+    "option_ms": [
+      391.1,
+      563.1,
+      735.1,
+      951.2,
+      1209.0,
+      1381.6,
+      1598.5,
+      1814.5,
+      1986.0,
+      2200.8
+    ],
+    "total_ms": 2244.5,
+    "stream": [
+      [
+        174.2,
+        2
+      ],
+      [
+        217.7,
+        9
+      ],
+      [
+        260.5,
+        11
+      ],
+      [
+        303.9,
+        14
+      ],
+      [
+        348.4,
+        18
+      ],
+      [
+        391.1,
+        20
+      ],
+      [
+        434.7,
+        22
+      ],
+      [
+        477.1,
+        26
+      ],
+      [
+        520.7,
+        34
+      ],
+      [
+        563.1,
+        36
+      ],
+      [
+        606.9,
+        38
+      ],
+      [
+        649.7,
+        42
+      ],
+      [
+        692.5,
+        48
+      ],
+      [
+        735.1,
+        50
+      ],
+      [
+        777.5,
+        52
+      ],
+      [
+        820.3,
+        61
+      ],
+      [
+        863.7,
+        63
+      ],
+      [
+        907.9,
+        71
+      ],
+      [
+        951.2,
+        73
+      ],
+      [
+        994.2,
+        75
+      ],
+      [
+        1036.5,
+        77
+      ],
+      [
+        1079.2,
+        79
+      ],
+      [
+        1122.3,
+        84
+      ],
+      [
+        1166.0,
+        90
+      ],
+      [
+        1209.0,
+        92
+      ],
+      [
+        1251.5,
+        94
+      ],
+      [
+        1293.8,
+        98
+      ],
+      [
+        1338.4,
+        104
+      ],
+      [
+        1381.6,
+        106
+      ],
+      [
+        1424.7,
+        108
+      ],
+      [
+        1467.2,
+        111
+      ],
+      [
+        1512.0,
+        114
+      ],
+      [
+        1555.2,
+        122
+      ],
+      [
+        1598.5,
+        124
+      ],
+      [
+        1642.0,
+        126
+      ],
+      [
+        1686.1,
+        129
+      ],
+      [
+        1729.3,
+        134
+      ],
+      [
+        1772.4,
+        140
+      ],
+      [
+        1814.5,
+        142
+      ],
+      [
+        1857.7,
+        144
+      ],
+      [
+        1901.3,
+        152
+      ],
+      [
+        1943.6,
+        160
+      ],
+      [
+        1986.0,
+        162
+      ],
+      [
+        2029.7,
+        164
+      ],
+      [
+        2072.5,
+        169
+      ],
+      [
+        2115.8,
+        174
+      ],
+      [
+        2158.1,
+        180
+      ],
+      [
+        2200.8,
+        183
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 16 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nSocial media has a big effect on how teenagers see themselves. On apps like Instagram and TikTok, people usually only post the best parts of their lives, like vacations and nice clothes. When teens look at these posts all day, they start to compare themselves to others and feel bad about their own lives. A survey from 2023 found that almost half of teens said social media made them feel worse about their bodies. Social media is not all bad, though, because it also helps people stay in touch with friends and find others with the same interests. Still, I believe that teens should limit how much time they spend on these apps.\n\"\"\"\n\nThe writer selected the phrase \"the best parts of their lives\" in this sentence (marked with [[ ]]):\nOn apps like Instagram and TikTok, people usually only post [[the best parts of their lives]], like vacations and nice clothes.\n\nGive 10 single words that can replace \"the best parts of their lives\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 383,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

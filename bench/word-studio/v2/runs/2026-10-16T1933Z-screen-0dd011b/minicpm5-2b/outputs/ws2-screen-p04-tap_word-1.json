@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p04-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "minicpm5-2b",
+  "messages_sha256": "1c67275b6d8914ba2ac78d37f3ba628364f5410228643fafd2fe3099a52c9dad",
+  "seed": 2392126654153897159,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"negative\", \"harmful\", \"detrimental\", \"harmful\", \"damaging\", \"harmful\", \"detrimental\", \"harmful\", \"detrimental\", \"harmful\"]}",
+  "timing": {
+    "first_text_ms": 132.8,
+    "option_ms": [
+      386.6,
+      594.6,
+      849.0,
+      1053.4,
+      1258.1,
+      1461.9,
+      1718.9,
+      1923.4,
+      2178.5,
+      2383.2
+    ],
+    "total_ms": 2487.5,
+    "stream": [
+      [
+        132.8,
+        2
+      ],
+      [
+        184.7,
+        9
+      ],
+      [
+        235.6,
+        11
+      ],
+      [
+        285.8,
+        14
+      ],
+      [
+        335.9,
+        22
+      ],
+      [
+        386.6,
+        24
+      ],
+      [
+        437.9,
+        26
+      ],
+      [
+        489.9,
+        30
+      ],
+      [
+        542.6,
+        33
+      ],
+      [
+        594.6,
+        35
+      ],
+      [
+        644.9,
+        37
+      ],
+      [
+        694.8,
+        38
+      ],
+      [
+        746.4,
+        41
+      ],
+      [
+        797.4,
+        48
+      ],
+      [
+        849.0,
+        50
+      ],
+      [
+        900.7,
+        52
+      ],
+      [
+        952.1,
+        56
+      ],
+      [
+        1003.6,
+        59
+      ],
+      [
+        1053.4,
+        61
+      ],
+      [
+        1103.4,
+        63
+      ],
+      [
+        1153.4,
+        66
+      ],
+      [
+        1207.2,
+        71
+      ],
+      [
+        1258.1,
+        73
+      ],
+      [
+        1308.9,
+        75
+      ],
+      [
+        1360.5,
+        79
+      ],
+      [
+        1411.7,
+        82
+      ],
+      [
+        1461.9,
+        84
+      ],
+      [
+        1512.8,
+        86
+      ],
+      [
+        1563.9,
+        87
+      ],
+      [
+        1615.2,
+        90
+      ],
+      [
+        1666.7,
+        97
+      ],
+      [
+        1718.9,
+        99
+      ],
+      [
+        1770.3,
+        101
+      ],
+      [
+        1821.6,
+        105
+      ],
+      [
+        1873.0,
+        108
+      ],
+      [
+        1923.4,
+        110
+      ],
+      [
+        1974.2,
+        112
+      ],
+      [
+        2025.0,
+        113
+      ],
+      [
+        2075.7,
+        116
+      ],
+      [
+        2125.8,
+        123
+      ],
+      [
+        2178.5,
+        125
+      ],
+      [
+        2229.6,
+        127
+      ],
+      [
+        2280.9,
+        131
+      ],
+      [
+        2332.2,
+        134
+      ],
+      [
+        2383.2,
+        136
+      ],
+      [
+        2435.2,
+        137
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<s><|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nTeenagers need about eight to ten hours of sleep every night, but most of them get a lot less. One reason is that their body clocks change during puberty, so they do not feel tired until late at night. On top of that, many teens stay up looking at their phones, and the blue light makes it even harder to fall asleep. Not getting enough sleep is bad for the brain because it makes it hard to remember things and focus in class. It can also make teens more moody and stressed out. Scientists have found that students who sleep more usually get better grades. This is why some experts think schools should start later in the morning.\n\"\"\"\n\nThe writer tapped the word \"bad\" in this sentence (marked with [[ ]]):\nNot getting enough sleep is [[bad]] for the brain because it makes it hard to remember things and focus in class.\n\nGive 10 replacements for \"bad\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"bad\" without changing the rest of the sentence. Do not repeat \"bad\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 368,
+  "new_tokens": 47,
+  "finish_reason": "stop",
+  "error": null
+}
