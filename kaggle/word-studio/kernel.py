@@ -74,7 +74,9 @@ def main() -> int:
     sh([sys.executable, "-m", "pip", "install", "--quiet", *CONFIG["pip"]])
     (RUN_DIR / "pip-freeze.txt").write_text(capture([sys.executable, "-m", "pip", "freeze"]), encoding="utf-8")
 
-    env = dict(os.environ, HF_HOME=str(HF_HOME), PYTHONDONTWRITEBYTECODE="1", TOKENIZERS_PARALLELISM="false")
+    # Unbuffered, so a candidate killed by the watchdog still leaves its progress in the log.
+    env = dict(os.environ, HF_HOME=str(HF_HOME), PYTHONDONTWRITEBYTECODE="1", PYTHONUNBUFFERED="1",
+               TOKENIZERS_PARALLELISM="false")
     summary = {"config": CONFIG, "git_head": head, "started_at": now(), "candidates": {}}
     for candidate in CONFIG["candidates"]:
         out = RUN_DIR / candidate
@@ -82,6 +84,8 @@ def main() -> int:
                "--out", str(out)]
         if CONFIG.get("limit"):
             cmd += ["--limit", str(CONFIG["limit"])]
+        if CONFIG.get("dtype"):
+            cmd += ["--dtype", CONFIG["dtype"]]
         started = time.time()
         log_path = RUN_DIR / f"{candidate}.log"
         print(f"=== {candidate} ===", flush=True)

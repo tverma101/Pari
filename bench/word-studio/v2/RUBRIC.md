@@ -10,8 +10,11 @@ under the old version.
 
 1. **Code checks first** (`v2/hard_checks.py`). An option with a `fail` flag
    breaks a rule the prompt states plainly. It is not judged and counts as
-   relevance 0. A `warn` flag (negation changed, name dropped, length off, new
-   quotation, copies the paragraph) is a hint for the judge, never a verdict.
+   relevance 0. A `warn` flag (a number changed or added, negation changed,
+   name dropped, length off, new quotation, copies the paragraph) is a hint for
+   the judge, never a verdict. Numbers only warn because "19th" ->
+   "Nineteenth" keeps the fact. An option that really changes or invents a
+   number is 0.
 2. **Judge each output.** Use the paragraph, the selection and the
    instruction in the packet. Give a relevance label to every judged option,
    then the five criteria for the list as a whole.

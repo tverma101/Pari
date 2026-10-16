@@ -38,11 +38,13 @@ FAIL_FLAGS = {
     "too_many_words": "tap_word allows at most three words, phrase_to_word exactly one",
     "missing_word": "word_sentences option does not contain the target word or a form of it",
     "not_shorter": "condense option is not shorter than the original",
-    "number_changed": "a number in the original is missing from the option",
     "quote_dropped": "a quotation in the original is missing or altered in the option",
-    "invented_number": "the option contains a number that is not in the paragraph",
 }
+#: Numbers only warn: "19th" -> "Nineteenth" or "1,800" -> "over 1800" keeps the fact,
+#: and only the judge can tell that from a changed or invented statistic.
 WARN_FLAGS = {
+    "number_changed": "a number in the original does not appear in the option, as digits or words",
+    "invented_number": "the option has a number that is not in the paragraph, as digits or words",
     "negation_changed": "the original and the option disagree on negation words",
     "name_dropped": "a capitalised name in the original is missing from the option",
     "length_off": "paraphrase length is under half or over 1.75 times the original",
@@ -51,7 +53,20 @@ WARN_FLAGS = {
 }
 
 TAP_MAX_WORDS = 3
-NUMBER_RE = re.compile(r"\d+(?:[.,:/]\d+)*%?")
+NUMBER_RE = re.compile(r"\d+(?:[.:/]\d+)*")
+NUMBER_WORDS = {
+    word: str(value)
+    for value, names in enumerate([
+        ("zero",), ("one", "first", "once"), ("two", "second", "twice"), ("three", "third"), ("four", "fourth"),
+        ("five", "fifth"), ("six", "sixth"), ("seven", "seventh"), ("eight", "eighth"), ("nine", "ninth"),
+        ("ten", "tenth"), ("eleven", "eleventh"), ("twelve", "twelfth"), ("thirteen", "thirteenth"),
+        ("fourteen", "fourteenth"), ("fifteen", "fifteenth"), ("sixteen", "sixteenth"),
+        ("seventeen", "seventeenth"), ("eighteen", "eighteenth"), ("nineteen", "nineteenth"),
+        ("twenty", "twentieth")])
+    for word in names
+}
+NUMBER_WORDS.update({"thirty": "30", "forty": "40", "fifty": "50", "sixty": "60", "seventy": "70",
+                     "eighty": "80", "ninety": "90", "hundred": "100", "thousand": "1000", "dozen": "12"})
 NEGATIONS = frozenset({"not", "no", "never", "none", "nobody", "nothing", "neither", "nor", "nowhere",
                        "cannot", "without"})
 QUOTED_RE = re.compile(r"[\"“”]([^\"“”]{3,})[\"“”]")
@@ -63,7 +78,18 @@ def words(text: str) -> list[str]:
 
 
 def numbers(text: str) -> list[str]:
-    return NUMBER_RE.findall(text)
+    """Digit numbers, with thousands separators dropped: "1,800" -> "1800", "19th" -> "19", "10%" -> "10"."""
+    return NUMBER_RE.findall(re.sub(r"(?<=\d),(?=\d{3}\b)", "", text))
+
+
+def number_forms(text: str) -> set[str]:
+    """Every number in ``text`` as digits, including small numbers written as words."""
+    found = set(numbers(text))
+    for token in re.split(r"[\s-]+", comparison_key(text)):
+        token = token.strip(".,;:!?\"'“”’()")
+        if token in NUMBER_WORDS:
+            found.add(NUMBER_WORDS[token])
+    return found
 
 
 def has_negation(text: str) -> bool:
@@ -129,8 +155,8 @@ def option_flags(task: dict[str, Any], text: str, earlier: list[str]) -> list[st
     if kind in SENTENCE_KINDS and selected:
         if kind == "condense" and word_count(text) >= word_count(selected):
             flags.append("not_shorter")
-        option_numbers = numbers(text)
-        if any(option_numbers.count(n) < numbers(selected).count(n) for n in set(numbers(selected))):
+        option_numbers = number_forms(text)
+        if any(n not in option_numbers for n in numbers(selected)):
             flags.append("number_changed")
         for quote in task.get("quotes") or []:
             if unquote(quote["text"]) in unquote(selected) and unquote(quote["text"]) not in unquote(text):
@@ -146,7 +172,7 @@ def option_flags(task: dict[str, Any], text: str, earlier: list[str]) -> list[st
             if ratio < 0.5 or ratio > 1.75:
                 flags.append("length_off")
     paragraph = task["paragraph"]
-    if any(n not in numbers(paragraph) for n in numbers(text)):
+    if any(n not in number_forms(paragraph) for n in numbers(text)):
         flags.append("invented_number")
     if kind in SENTENCE_KINDS or kind == "word_sentences":
         paragraph_key = unquote(paragraph)

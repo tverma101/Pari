@@ -31,7 +31,8 @@ class HardCheckTests(unittest.TestCase):
         self.assertIn("echo", result[1]["fail"])
         self.assertIn("duplicate", result[2]["fail"])
         self.assertIn("too_many_words", result[3]["fail"])
-        self.assertIn("invented_number", result[4]["fail"])
+        self.assertIn("invented_number", result[4]["warn"])
+        self.assertTrue(result[4]["judge"])
         self.assertFalse(result[1]["judge"])
 
     def test_options_beyond_the_request_are_not_judged(self) -> None:
@@ -61,14 +62,22 @@ class HardCheckTests(unittest.TestCase):
         self.assertEqual(result[0]["fail"], [])
         self.assertIn("not_shorter", result[1]["fail"])
 
-    def test_numbers_and_quotes_must_survive(self) -> None:
+    def test_numbers_warn_and_quotes_must_survive(self) -> None:
         numbers = flags("ws2-screen-p06-academic-1",
                         "A 2023 survey found that nearly half of adolescents reported worse body image.",
                         "A recent survey found that nearly half of adolescents reported worse body image.",
                         "A 2023 survey of 500 teens found that nearly half reported worse body image.")
-        self.assertEqual(numbers[0]["fail"], [])
-        self.assertIn("number_changed", numbers[1]["fail"])
-        self.assertIn("invented_number", numbers[2]["fail"])
+        self.assertEqual((numbers[0]["fail"], numbers[0]["warn"]), ([], []))
+        self.assertIn("number_changed", numbers[1]["warn"])
+        self.assertIn("invented_number", numbers[2]["warn"])
+        self.assertTrue(all(o["judge"] for o in numbers), "numbers only warn; the judge decides")
+        task = dict(TASKS["ws2-screen-p06-academic-1"])
+        sentence = "The 19th Amendment came after 1,800 colleges and two wars."
+        task.update(paragraph=sentence, sentence=sentence, selection={"start": 0, "end": len(sentence),
+                                                                      "text": sentence})
+        same = hard_checks.check(task, ok(options("The Nineteenth Amendment followed 1800 colleges and two wars.",
+                                                  "The 19th Amendment followed over 1800 colleges and 2 wars.")))
+        self.assertEqual([o["warn"] for o in same["options"]], [[], []], "the same numbers in other forms")
         quotes = flags("ws2-screen-p07-academic-1",
                        "Ultimately, Macbeth calls life “a tale told by an idiot,” revealing his emptiness.",
                        "Ultimately, Macbeth calls life meaningless, revealing his emptiness.")
@@ -221,6 +230,28 @@ class BlindAggregateTests(unittest.TestCase):
         def bad_criteria(rows, key):
             rows[1]["criteria"]["fit"] = 6
         self.assert_refused(self.fill_scores(bad_criteria), "criteria must give")
+
+    def test_runs_from_other_task_files_are_refused(self) -> None:
+        run_json = self.run_dir / "cand-a" / "run.json"
+        record = json.loads(run_json.read_text(encoding="utf-8"))
+        for cid in ("cand-a", "cand-b"):
+            path = self.run_dir / cid / "run.json"
+            other = json.loads(path.read_text(encoding="utf-8"))
+            other["task_file_sha256"] = "1" * 64
+            path.write_text(json.dumps(other), encoding="utf-8")
+        with self.assertRaises(SystemExit) as caught:
+            blind.build(self.run_dir, self.judging.parent / "other", task_ids=JUDGED)
+        self.assertIn("different screen task file", str(caught.exception))
+        self.assertEqual(record["task_set"], "screen")
+
+    def test_outputs_from_other_messages_are_refused(self) -> None:
+        raw = self.run_dir / "cand-a" / "outputs" / f"{JUDGED[0]}.json"
+        output = json.loads(raw.read_text(encoding="utf-8"))
+        output["messages_sha256"] = "2" * 64
+        raw.write_text(json.dumps(output), encoding="utf-8")
+        self.judging = self.judging.parent / "rebuilt"
+        blind.build(self.run_dir, self.judging, task_ids=JUDGED)
+        self.assert_refused(self.fill_scores(), "different messages")
 
     def test_judging_is_never_overwritten(self) -> None:
         with self.assertRaises(SystemExit):

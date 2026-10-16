@@ -26,7 +26,7 @@ WORD_STUDIO = HERE.parent
 if str(WORD_STUDIO) not in sys.path:
     sys.path.insert(0, str(WORD_STUDIO))
 
-from v2 import blind, build_tasks, hard_checks  # noqa: E402
+from v2 import blind, build_tasks, hard_checks, run_candidate  # noqa: E402
 
 TOP = 3
 
@@ -79,6 +79,9 @@ def verify(judging: Path, scores_path: Path) -> tuple[dict[str, Any], dict[str, 
     for field in ("rubric_sha256", "key_sha256"):
         if header.get(field) != index[field]:
             problems.append(f"header {field} does not match packets/index.json")
+    if index["checks_version"] != hard_checks.CHECKS_VERSION:
+        problems.append(f"packets were built with {index['checks_version']}, the code checks are now "
+                        f"{hard_checks.CHECKS_VERSION}")
     tasks = {t["id"]: t for t in build_tasks.load_tasks(key["task_set"])}
     expected = {(t, label) for t, labels in key["tasks"].items() for label in labels}
     seen: Counter = Counter((r.get("task_id"), r.get("label")) for r in rows)
@@ -109,6 +112,9 @@ def verify(judging: Path, scores_path: Path) -> tuple[dict[str, Any], dict[str, 
             problems.append(f"{where}: raw output {sealed['raw_output']} changed after packets were built")
             continue
         output = json.loads(raw_path.read_text(encoding="utf-8"))
+        if output.get("messages_sha256") != run_candidate.messages_digest(tasks[task_id]["messages"]):
+            problems.append(f"{where}: the output was generated from different messages than task {task_id} has now")
+            continue
         checked = hard_checks.check(tasks[task_id], output)
         judged = {str(o["index"] + 1) for o in checked["options"] if o["judge"]}
         relevance = row.get("relevance") or {}

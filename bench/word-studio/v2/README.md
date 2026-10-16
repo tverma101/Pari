@@ -55,7 +55,12 @@ python3 -m v2.aggregate --judging v2/judging/<run-id>
 ```
 
 Runs, judging folders and results are never overwritten. A new attempt gets a
-new run id. A failed candidate is recorded with its error and gets no scores.
+new run id (it carries the UTC launch time). The kernel slug is reused and
+Kaggle serves only its latest output, so fetch a run before launching another.
+A failed candidate is recorded with its error and gets no scores.
+
+Start with a smoke run (`--limit 2`) of every candidate. It shows which ones
+load and generate on T4 in fp16 before the full screen spends quota.
 
 ## Rebuilding the tasks
 

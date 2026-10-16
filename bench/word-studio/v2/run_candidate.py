@@ -21,6 +21,7 @@ import hashlib
 import json
 import os
 import platform
+import queue
 import subprocess
 import sys
 import threading
@@ -49,7 +50,7 @@ class Backend(Protocol):
     def load(self) -> dict[str, Any]: ...
 
     def generate(self, messages: list[dict[str, str]], *, max_new_tokens: int, seed: int,
-                 on_text: Callable[[str], None]) -> dict[str, Any]: ...
+                 on_text: Callable[..., None]) -> dict[str, Any]: ...
 
     def environment(self) -> dict[str, Any]: ...
 
@@ -60,6 +61,10 @@ def utc_now() -> str:
 
 def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def messages_digest(messages: list[dict[str, str]]) -> str:
+    return sha256_text(json.dumps(messages, ensure_ascii=False, sort_keys=True))
 
 
 def task_seed(task_id: str) -> int:
@@ -110,13 +115,14 @@ class StreamClock:
         self.chunks: list[list[float | int]] = []
         self.option_ms: list[float] = []
 
-    def elapsed_ms(self) -> float:
-        return round((time.perf_counter() - self.started) * 1000.0, 1)
+    def elapsed_ms(self, at: float | None = None) -> float:
+        return round(((time.perf_counter() if at is None else at) - self.started) * 1000.0, 1)
 
-    def on_text(self, chunk: str) -> None:
+    def on_text(self, chunk: str, at: float | None = None) -> None:
+        """Record ``chunk``; ``at`` is the ``perf_counter()`` time its token arrived, if known."""
         if not chunk:
             return
-        now = self.elapsed_ms()
+        now = self.elapsed_ms(at)
         self.text += chunk
         self.chunks.append([now, len(self.text)])
         done, _mode = partial_option_values(self.text, include_visible_tail=False)
@@ -134,7 +140,7 @@ class StreamClock:
             "option_ms": self.option_ms,
             "total_ms": total,
             "stream": self.chunks,
-            "note": "Milliseconds from the generate call. option_ms[i] is when option i+1 was complete in the stream; the last options may only complete at the end of the stream.",
+            "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms.",
         }
 
 
@@ -192,7 +198,7 @@ def run(candidate: dict[str, Any], set_name: str, out_dir: Path, backend: Backen
             "task_id": task["id"],
             "kind": task["kind"],
             "candidate_id": candidate["candidate_id"],
-            "messages_sha256": sha256_text(json.dumps(task["messages"], ensure_ascii=False, sort_keys=True)),
+            "messages_sha256": messages_digest(task["messages"]),
             "seed": seed,
             "max_new_tokens": task["max_new_tokens"],
         }
@@ -232,6 +238,58 @@ def run(candidate: dict[str, Any], set_name: str, out_dir: Path, backend: Backen
     return run_record
 
 
+class TokenStreamer:
+    """Releases decoded text on every generated token, stamped with when it arrived.
+
+    Transformers' ``TextIteratorStreamer`` only releases text at a space or a
+    newline, so a model that writes compact JSON would seem to produce every
+    option at the very end. This streamer holds back only an incomplete
+    character. ``generate`` calls ``put`` with the prompt first, then with each
+    new token, then ``end``.
+    """
+
+    def __init__(self, decode: Callable[[list[int]], str], *, timeout: float) -> None:
+        self.decode = decode
+        self.timeout = timeout
+        self.ids: list[int] = []
+        self.released = 0
+        self.prompt_seen = False
+        self.stop = threading.Event()
+        self._queue: queue.Queue = queue.Queue()
+
+    def _release(self) -> None:
+        text = self.decode(self.ids)
+        if len(text) > self.released and not text.endswith("\ufffd"):
+            self._queue.put((time.perf_counter(), text[self.released:]))
+            self.released = len(text)
+
+    def put(self, value: Any) -> None:
+        ids = value.tolist() if hasattr(value, "tolist") else list(value)
+        if ids and isinstance(ids[0], list):
+            if len(ids) != 1:
+                raise ValueError("TokenStreamer streams one sequence at a time")
+            ids = ids[0]
+        if not self.prompt_seen:
+            self.prompt_seen = True
+            return
+        self.ids.extend(int(i) for i in ids)
+        self._release()
+
+    def end(self) -> None:
+        text = self.decode(self.ids)
+        if len(text) > self.released:
+            self._queue.put((time.perf_counter(), text[self.released:]))
+            self.released = len(text)
+        self._queue.put(None)
+
+    def __iter__(self):
+        while True:
+            item = self._queue.get(timeout=self.timeout)
+            if item is None:
+                return
+            yield item
+
+
 class TransformersBackend:
     """Hugging Face Transformers on CUDA. No remote code, no fallbacks."""
 
@@ -243,6 +301,8 @@ class TransformersBackend:
         self.model_id, self.revision, self.dtype_name = model_id, revision, dtype
         self.weight_bytes = weight_bytes
         self.model = self.tokenizer = self.generation_config = None
+        #: Set when a generation could not be stopped; later tasks are refused, not run on a busy model.
+        self.wedged: str | None = None
 
     def environment(self) -> dict[str, Any]:
         from importlib import metadata
@@ -309,45 +369,69 @@ class TransformersBackend:
         }
 
     def generate(self, messages: list[dict[str, str]], *, max_new_tokens: int, seed: int,
-                 on_text: Callable[[str], None]) -> dict[str, Any]:
+                 on_text: Callable[..., None]) -> dict[str, Any]:
         import torch
-        from transformers import TextIteratorStreamer
+        from transformers import StoppingCriteria, StoppingCriteriaList
 
+        if self.wedged:
+            raise RuntimeError(f"not run: an earlier generation never stopped ({self.wedged}), so the model is busy")
         tok = self.tokenizer
         rendered = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True, enable_thinking=False)
         inputs = tok.apply_chat_template(messages, tokenize=True, add_generation_prompt=True, enable_thinking=False,
                                          return_tensors="pt", return_dict=True)
         inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
         prompt_tokens = int(inputs["input_ids"].shape[1])
-        streamer = TextIteratorStreamer(tok, skip_prompt=True, skip_special_tokens=True, timeout=900)
+        streamer = TokenStreamer(lambda ids: tok.decode(ids, skip_special_tokens=True), timeout=900)
+
+        class StopWhenAsked(StoppingCriteria):
+            def __call__(self, input_ids, scores, **kwargs):
+                return torch.full((input_ids.shape[0],), streamer.stop.is_set(), dtype=torch.bool,
+                                  device=input_ids.device)
+
         holder: dict[str, Any] = {}
 
         def work() -> None:
             try:
                 torch.manual_seed(seed)
                 with torch.inference_mode():
-                    holder["ids"] = self.model.generate(**inputs, generation_config=self.generation_config,
-                                                        max_new_tokens=max_new_tokens, streamer=streamer)
+                    holder["ids"] = self.model.generate(
+                        **inputs, generation_config=self.generation_config, max_new_tokens=max_new_tokens,
+                        streamer=streamer, stopping_criteria=StoppingCriteriaList([StopWhenAsked()]))
             except BaseException as exc:  # re-raised on the caller's thread
                 holder["error"] = exc
                 streamer.end()
 
         thread = threading.Thread(target=work, daemon=True)
         thread.start()
-        for piece in streamer:
-            on_text(piece)
+        try:
+            for at, piece in streamer:
+                on_text(piece, at)
+        except BaseException as exc:
+            streamer.stop.set()
+            thread.join(timeout=300)
+            if thread.is_alive():
+                self.wedged = f"{type(exc).__name__} while streaming"
+            raise
         thread.join()
         if "error" in holder:
             raise holder["error"]
         new_ids = holder["ids"][0, prompt_tokens:]
         text = tok.decode(new_ids, skip_special_tokens=True)
         new_tokens = int(new_ids.shape[0])
+        eos = self.generation_config.eos_token_id
+        eos_ids = {i for i in (eos if isinstance(eos, list) else [eos]) if i is not None}
+        if new_tokens and int(new_ids[-1]) in eos_ids:
+            finish = "stop"
+        elif new_tokens >= max_new_tokens:
+            finish = "length"
+        else:
+            finish = "stop"
         return {
             "text": text,
             "rendered_prompt": rendered,
             "prompt_tokens": prompt_tokens,
             "new_tokens": new_tokens,
-            "finish_reason": "length" if new_tokens >= max_new_tokens else "stop",
+            "finish_reason": finish,
         }
 
 

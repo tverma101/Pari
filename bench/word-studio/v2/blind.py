@@ -138,7 +138,11 @@ def build(run_dir: Path, out_dir: Path, *, task_ids: list[str] | None = None) ->
     sets = {(e["run"]["task_set"], e["run"]["task_file_sha256"], e["run"]["prompt_version"]) for e in judged}
     if len(sets) != 1:
         raise SystemExit(f"candidates ran different task sets or prompts: {sorted(sets)}")
-    set_name = judged[0]["run"]["task_set"]
+    set_name, task_sha, _prompt = sets.pop()
+    manifest = json.loads(build_tasks.MANIFEST.read_text(encoding="utf-8"))
+    if manifest["sets"][set_name]["sha256"] != task_sha:
+        raise SystemExit(f"the runs used a different {set_name} task file than v2/tasks has now; "
+                         "judge them from the commit they ran at")
     tasks = {t["id"]: t for t in build_tasks.load_tasks(set_name)}
     have = [{p.stem for p in (e["dir"] / "outputs").glob("*.json")} for e in judged]
     common = set.intersection(*have)

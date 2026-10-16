@@ -7,6 +7,9 @@
 The kernel clones this repository at one commit, so that commit must already be
 on GitHub. ``--dry-run`` writes the kernel folder without pushing. This uses
 your Kaggle account and GPU quota; run it only when you mean to.
+
+Every launch reuses one kernel slug, and Kaggle serves only the latest
+version's output, so fetch a run before launching the next one.
 """
 from __future__ import annotations
 
@@ -16,7 +19,7 @@ import re
 import subprocess
 import sys
 import tempfile
-from datetime import date
+from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -26,6 +29,8 @@ REPO_URL = "https://github.com/tverma101/Pari.git"
 KERNEL_SLUG = "pari-word-studio-v2"
 PIP = ["transformers==5.18.0", "accelerate==1.15.0"]
 CONFIG_LINE = "CONFIG = {}  # filled in by launch.py"
+#: Kaggle stops a GPU session at 12 hours; leave room for setup and downloads.
+SESSION_BUDGET_S = 11 * 3600
 
 
 def git(*args: str) -> str:
@@ -80,7 +85,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--candidates", required=True, help="comma-separated candidate ids")
     parser.add_argument("--ref", default="HEAD", help="commit to run; it must be pushed to GitHub")
     parser.add_argument("--limit", type=int, help="first N tasks per candidate (smoke test only)")
-    parser.add_argument("--timeout-s", type=int, default=7200, help="per-candidate wall-clock limit")
+    parser.add_argument("--timeout-s", type=int, default=3600, help="per-candidate wall-clock limit")
+    parser.add_argument("--dtype", default="float16", choices=["float16", "float32"],
+                        help="T4 has no bfloat16; float32 needs both GPUs for a 4B model")
     parser.add_argument("--username", help="Kaggle username (default: from kaggle config view)")
     parser.add_argument("--folder", type=Path, help="where to write the kernel folder")
     parser.add_argument("--dry-run", action="store_true")
@@ -90,11 +97,15 @@ def main(argv: list[str] | None = None) -> int:
     unknown = sorted(set(candidates) - known_candidates())
     if unknown:
         raise SystemExit(f"unknown candidates: {unknown}")
+    if args.timeout_s * len(candidates) > SESSION_BUDGET_S:
+        raise SystemExit(f"{len(candidates)} candidates x {args.timeout_s} s could pass Kaggle's 12-hour session; "
+                         "lower --timeout-s or split the candidates across launches")
     sha = git("rev-parse", args.ref)
     git("fetch", "--quiet", "origin")
     if not git("branch", "-r", "--contains", sha):
         raise SystemExit(f"{sha} is not on GitHub yet; push it first so the kernel can clone it")
-    run_id = f"{date.today().isoformat()}-{args.set}-{sha[:7]}" + (f"-limit{args.limit}" if args.limit else "")
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%MZ")
+    run_id = f"{stamp}-{args.set}-{sha[:7]}" + (f"-limit{args.limit}" if args.limit else "")
     config = {
         "run_id": run_id,
         "repo_url": REPO_URL,
@@ -103,6 +114,7 @@ def main(argv: list[str] | None = None) -> int:
         "candidates": candidates,
         "pip": PIP,
         "per_candidate_timeout_s": args.timeout_s,
+        "dtype": args.dtype,
         "limit": args.limit,
     }
     username = args.username or kaggle_username()

@@ -47,6 +47,13 @@ class KaggleKernelTests(unittest.TestCase):
         self.assertIn("control-missing-revision", known)
         self.assertIn("qwen35-4b", known)
 
+    def test_launch_refuses_runs_longer_than_a_kaggle_session(self) -> None:
+        launch = load("launch")
+        with self.assertRaises(SystemExit) as caught:
+            launch.main(["--set", "screen", "--candidates", "qwen35-2b,qwen35-4b,smollm3-3b",
+                         "--timeout-s", "20000", "--dry-run"])
+        self.assertIn("12-hour session", str(caught.exception))
+
     def test_unfilled_kernel_refuses_to_run(self) -> None:
         kernel = load("kernel")
         with self.assertRaises(SystemExit):

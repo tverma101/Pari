@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from typing import Any, Callable
@@ -111,6 +112,35 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(run_candidate.task_seed("ws2-screen-p01-tap_word-1"),
                          run_candidate.task_seed("ws2-screen-p01-tap_word-1"))
         self.assertNotEqual(run_candidate.task_seed("a"), run_candidate.task_seed("b"))
+
+    def test_token_streamer_releases_compact_json_per_token(self) -> None:
+        pieces = ['{"', 'options', '":["', 'fast', '","', 'quick', '","', 'rap', 'id', '"]}']
+        vocab = {i: p for i, p in enumerate(pieces)}
+        streamer = run_candidate.TokenStreamer(lambda ids: "".join(vocab[i] for i in ids), timeout=1)
+        clock = run_candidate.StreamClock()
+        streamer.put([[90, 91, 92]])  # the prompt, which generate passes first
+        for i in range(len(pieces)):
+            time.sleep(0.003)
+            streamer.put([i])
+        streamer.end()
+        released = list(streamer)
+        self.assertEqual([text for _, text in released], pieces)
+        self.assertEqual(sorted(at for at, _ in released), [at for at, _ in released])
+        for at, text in released:
+            clock.on_text(text, at)
+        timing = clock.finish("".join(pieces))
+        self.assertEqual(len(timing["option_ms"]), 3)
+        self.assertEqual(len(timing["stream"]), len(pieces), "one stream entry per token, not per space")
+        self.assertLess(timing["option_ms"][0], timing["option_ms"][2])
+
+    def test_token_streamer_holds_back_a_split_character(self) -> None:
+        decoded = {1: "caf", 2: "caf\ufffd", 3: "café"}
+        streamer = run_candidate.TokenStreamer(lambda ids: decoded[len(ids)], timeout=1)
+        streamer.put([[7]])
+        for token in (1, 2, 3):
+            streamer.put([token])
+        streamer.end()
+        self.assertEqual([text for _, text in streamer], ["caf", "é"])
 
     def test_runner_source_has_no_fallback_numbers(self) -> None:
         source = Path(run_candidate.__file__).read_text(encoding="utf-8").lower()
