@@ -15,7 +15,7 @@ The benchmark that picks Pari's base model (#85, #86, #87). It runs on Kaggle
 | `hard_checks.py` | Code checks on every option before judging. |
 | `blind.py` | Builds blind judging packets and a sealed key from a fetched run. |
 | `RUBRIC.md` | The judging rubric, relevance bar, swap rule (#91) and score file format. |
-| `aggregate.py` | Verifies every score's citation against the raw outputs, un-blinds and writes results. |
+| `aggregate.py` | Verifies rubric, packet, index and raw-output hashes plus every score citation, then un-blinds and writes results. |
 
 ## Task kinds
 
@@ -47,7 +47,7 @@ python3 kaggle/word-studio/fetch.py --run-id <run-id>
 From `bench/word-studio`:
 
 ```bash
-# 3. Build blind packets. The judge reads packets/*.md only.
+# 3. Build blind packets. The judge reads RUBRIC.md, packets/*.md and scores.template.jsonl only.
 python3 -m v2.blind --run v2/runs/<run-id>
 # 4. Claude fills scores.template.jsonl in a session and saves it as scores.jsonl.
 # 5. Verify citations, un-blind and write v2/results/<run-id>/.
