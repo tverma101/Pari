@@ -63,7 +63,8 @@ def latency(values: list[float]) -> dict[str, Any]:
 def verify(judging: Path, scores_path: Path) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
     """Return (index, key, verified rows) or raise VerificationError."""
     problems: list[str] = []
-    index = json.loads((judging / "packets" / "index.json").read_text(encoding="utf-8"))
+    index_path = judging / "packets" / "index.json"
+    index = json.loads(index_path.read_text(encoding="utf-8"))
     key_path = judging / "sealed" / "key.json"
     if blind.sha256_file(key_path) != index["key_sha256"]:
         raise VerificationError(["sealed/key.json does not match the sha256 recorded in packets/index.json"])
@@ -79,6 +80,21 @@ def verify(judging: Path, scores_path: Path) -> tuple[dict[str, Any], dict[str, 
     for field in ("rubric_sha256", "key_sha256"):
         if header.get(field) != index[field]:
             problems.append(f"header {field} does not match packets/index.json")
+    if header.get("packets_index_sha256") != blind.sha256_file(index_path):
+        problems.append("packets/index.json changed after the score template was created")
+    if blind.sha256_file(blind.RUBRIC) != index["rubric_sha256"]:
+        problems.append("current RUBRIC.md changed after the judging packets were built")
+    packet_hashes = index.get("packet_hashes")
+    task_ids = set(index["tasks"])
+    if not isinstance(packet_hashes, dict) or set(packet_hashes) != task_ids:
+        problems.append("packet hash list does not match the task list in packets/index.json")
+    else:
+        for task_id in sorted(task_ids):
+            packet_path = judging / "packets" / f"{task_id}.md"
+            if not packet_path.is_file():
+                problems.append(f"packet {task_id} is missing")
+            elif blind.sha256_file(packet_path) != packet_hashes[task_id]:
+                problems.append(f"packet {task_id} changed after packets/index.json was created")
     if index["checks_version"] != hard_checks.CHECKS_VERSION:
         problems.append(f"packets were built with {index['checks_version']}, the code checks are now "
                         f"{hard_checks.CHECKS_VERSION}")
@@ -122,7 +138,8 @@ def verify(judging: Path, scores_path: Path) -> tuple[dict[str, Any], dict[str, 
             extra, missing = sorted(set(relevance) - judged), sorted(judged - set(relevance))
             problems.append(f"{where}: relevance keys wrong (labels code-failed or absent options {extra}, "
                             f"misses judged options {missing})")
-        if any(v not in (0, 1, 2) for v in relevance.values()):
+        if any(not isinstance(v, int) or isinstance(v, bool) or v not in (0, 1, 2)
+               for v in relevance.values()):
             problems.append(f"{where}: relevance labels must be 0, 1 or 2")
         if 0 in relevance.values() and not str(row.get("note") or "").strip():
             problems.append(f"{where}: a 0 label needs a note")
@@ -171,9 +188,8 @@ def candidate_metrics(items: list[dict[str, Any]]) -> dict[str, Any]:
         formats[checked["format"]] += 1
         truncated += checked["truncated"]
         for option in checked["options"]:
-            if "beyond_requested" not in option["fail"]:
-                fails.update(option["fail"])
-                warns.update(option["warn"])
+            fails.update(option["fail"])
+            warns.update(option["warn"])
         for name, value in (row["criteria"] or {}).items():
             criteria[name].append(value)
         timing = output.get("timing") or {}

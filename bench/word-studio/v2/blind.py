@@ -183,20 +183,27 @@ def build(run_dir: Path, out_dir: Path, *, task_ids: list[str] | None = None) ->
                                                                   "raw_output")} for e in entries}
         template += [template_row(task_id, e) for e in entries]
     write_json(out_dir / "sealed" / "key.json", key)
+    packet_hashes = {
+        task_id: sha256_file(out_dir / "packets" / f"{task_id}.md")
+        for task_id in chosen
+    }
     index = {
         "run_id": run_dir.name,
         "task_set": set_name,
         "tasks": chosen,
+        "packet_hashes": packet_hashes,
         "outputs_per_task": len(judged),
         "checks_version": hard_checks.CHECKS_VERSION,
         "rubric_sha256": sha256_file(RUBRIC),
         "key_sha256": sha256_file(out_dir / "sealed" / "key.json"),
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "judge_reads": "packets/*.md only; sealed/key.json stays closed until scores.jsonl is final",
+        "judge_reads": "RUBRIC.md, packets/*.md, and scores.template.jsonl only; candidate/run metadata, raw outputs, and sealed/key.json stay closed until scores.jsonl is final",
     }
-    write_json(out_dir / "packets" / "index.json", index)
+    index_path = out_dir / "packets" / "index.json"
+    write_json(index_path, index)
     header = {"header": True, "judge": None, "session": None, "blind": True,
-              "rubric_sha256": index["rubric_sha256"], "key_sha256": index["key_sha256"]}
+              "rubric_sha256": index["rubric_sha256"], "key_sha256": index["key_sha256"],
+              "packets_index_sha256": sha256_file(index_path)}
     with (out_dir / "scores.template.jsonl").open("w", encoding="utf-8") as fh:
         for row in [header, *template]:
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")

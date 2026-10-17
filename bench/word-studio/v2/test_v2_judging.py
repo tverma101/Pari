@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from typing import Any, Callable
+from unittest.mock import patch
 
 from v2 import aggregate, blind, build_tasks, hard_checks, run_candidate
 
@@ -122,6 +123,21 @@ class HardCheckTests(unittest.TestCase):
         lines = hard_checks.check(task, ok("sound\nwise\nprudent"))
         self.assertEqual(lines["format"], "lenient")
 
+    def test_candidate_metrics_count_extra_options(self) -> None:
+        metrics = aggregate.candidate_metrics([{
+            "checked": {"requested": 1, "options": [{"index": 1,
+                                                        "fail": ["beyond_requested", "duplicate"],
+                                                        "warn": ["number_changed"]}],
+                        "format": "strict", "truncated": False},
+            "row": {"task_id": "task-1", "output_ref": "o-1", "relevance": {"1": 1},
+                    "criteria": {name: 4 for name in blind.CRITERIA}},
+            "output": {"status": "error"},
+            "sealed": {"raw_output": "runs/task-1.json", "output_sha256": "a" * 64},
+            "kind": "tap_word",
+        }])
+        self.assertEqual(metrics["fail_flags"], {"beyond_requested": 1, "duplicate": 1})
+        self.assertEqual(metrics["warn_flags"], {"number_changed": 1})
+
 
 class ScriptedBackend:
     """Returns the same options for every task."""
@@ -194,6 +210,10 @@ class BlindAggregateTests(unittest.TestCase):
         self.assertIn("not judged, counts as 0 (fail: duplicate)", tap)
         key = json.loads((self.judging / "sealed" / "key.json").read_text(encoding="utf-8"))
         self.assertEqual([e["candidate_id"] for e in key["not_judged"]], ["cand-broken"])
+        self.assertEqual(set(self.index["packet_hashes"]), set(JUDGED))
+        header = aggregate.read_jsonl(self.judging / "scores.template.jsonl")[0]
+        self.assertEqual(header["packets_index_sha256"],
+                         blind.sha256_file(self.judging / "packets" / "index.json"))
 
     def test_aggregate_traces_every_number(self) -> None:
         result = aggregate.aggregate(self.judging, self.fill_scores())
@@ -226,6 +246,33 @@ class BlindAggregateTests(unittest.TestCase):
         def edit(rows, key):
             rows[1]["output_sha256"] = "0" * 64
         self.assert_refused(self.fill_scores(edit), "output_sha256 does not match")
+
+    def test_a_changed_packet_is_refused(self) -> None:
+        scores = self.fill_scores()
+        packet = self.judging / "packets" / f"{JUDGED[0]}.md"
+        packet.write_text(packet.read_text(encoding="utf-8").replace("Paragraph:", "Changed paragraph:"),
+                          encoding="utf-8")
+        self.assert_refused(scores, f"packet {JUDGED[0]} changed")
+
+    def test_a_changed_packet_index_is_refused(self) -> None:
+        scores = self.fill_scores()
+        index = self.judging / "packets" / "index.json"
+        index.write_text(index.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        self.assert_refused(scores, "packets/index.json changed")
+
+    def test_changed_rubric_is_refused(self) -> None:
+        scores = self.fill_scores()
+        with tempfile.TemporaryDirectory() as tmp:
+            changed_rubric = Path(tmp) / "RUBRIC.md"
+            changed_rubric.write_text("changed after packet creation", encoding="utf-8")
+            with patch.object(blind, "RUBRIC", changed_rubric):
+                self.assert_refused(scores, "current RUBRIC.md changed")
+
+    def test_boolean_relevance_labels_are_refused(self) -> None:
+        def edit(rows, key):
+            rows[1]["relevance"]["1"] = True
+            rows[1]["relevance"]["2"] = False
+        self.assert_refused(self.fill_scores(edit), "relevance labels must be 0, 1 or 2")
 
     def test_labelling_a_code_failed_option_is_refused(self) -> None:
         def edit(rows, key):

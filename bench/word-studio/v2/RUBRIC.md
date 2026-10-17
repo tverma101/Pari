@@ -1,10 +1,11 @@
 # Word Studio v2 judging rubric (#87)
 
-Claude judges every candidate's options blind, in a Claude Code session. The
-judge reads only `v2/judging/<run-id>/packets/*.md`. Model names, file paths
-and `sealed/key.json` stay closed until `scores.jsonl` is final. Changing this
-file changes its sha256, so judging that is already under way must finish
-under the old version.
+Claude judges every candidate's options blind, in a dedicated Claude session.
+The judge may read `RUBRIC.md`, `v2/judging/<run-id>/packets/*.md`, and
+`scores.template.jsonl`. Candidate names, model/run metadata, raw outputs, and
+`sealed/key.json` stay closed until `scores.jsonl` is final. Changing this file
+changes its sha256, so judging that is already under way must finish under the
+old version.
 
 ## Order of work
 
@@ -85,7 +86,7 @@ Copy `scores.template.jsonl` to `scores.jsonl` and fill it in. The first line
 is the header:
 
 ```json
-{"header": true, "judge": "claude-opus-5-5", "session": "<session id>", "blind": true, "rubric_sha256": "…", "key_sha256": "…"}
+{"header": true, "judge": "claude-opus-5-5", "session": "<session id>", "blind": true, "rubric_sha256": "…", "key_sha256": "…", "packets_index_sha256": "…"}
 ```
 
 Each other line is one output:
@@ -111,7 +112,8 @@ For each candidate:
   main metric. Ties go to usable options per task.
 - top-1 at bar, top-3 strong, usable options per task, strong share;
 - criteria means;
-- code-check fail and warn counts, output format counts, token-limit hits;
+- code-check fail and warn counts (including options past the requested count),
+  output format counts, token-limit hits;
 - latency on Kaggle T4 (Transformers fp16, so not the Mac): median and p90
   for first text, first option, third option and the whole output;
 - citations: every task id, output ref, raw output path and sha256 behind
