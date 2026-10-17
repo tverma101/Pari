@@ -1,0 +1,23 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] This model config has set a `rope_parameters['original_max_position_embeddings']` field, to be used together with `max_position_embeddings` to determine a scaling factor. Please set the `factor` field of `rope_parameters`with this ratio instead -- we recommend the use of this field over `original_max_position_embeddings`, as it is compatible with most model architectures.
+
+Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]
+Fetching 2 files:  50%|█████     | 1/2 [00:39<00:39, 39.90s/it]
+Fetching 2 files: 100%|██████████| 2/2 [00:39<00:00, 19.95s/it]
+
+Loading weights:   0%|          | 0/194 [00:00<?, ?it/s]
+Loading weights:   1%|          | 1/194 [00:01<05:55,  1.84s/it]
+Loading weights:  32%|███▏      | 63/194 [00:01<00:02, 44.94it/s]
+Loading weights:  51%|█████     | 99/194 [00:02<00:01, 50.72it/s]
+Loading weights:  62%|██████▏   | 121/194 [00:02<00:01, 52.78it/s]
+Loading weights:  71%|███████   | 137/194 [00:03<00:01, 51.69it/s]
+Loading weights:  77%|███████▋  | 149/194 [00:03<00:00, 53.62it/s]
+Loading weights:  82%|████████▏ | 159/194 [00:03<00:00, 58.13it/s]
+Loading weights:  87%|████████▋ | 169/194 [00:03<00:00, 55.04it/s]
+Loading weights:  92%|█████████▏| 178/194 [00:03<00:00, 54.15it/s]
+Loading weights:  98%|█████████▊| 190/194 [00:04<00:00, 60.61it/s]
+Loading weights: 100%|██████████| 194/194 [00:04<00:00, 47.48it/s]
+[transformers] Passing `generation_config` together with generation-related arguments=({'max_new_tokens'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+[phi4-mini-instruct] 1/2 ws2-screen-p01-academic-1 ok 5.9s options_seen=8
+[phi4-mini-instruct] 2/2 ws2-screen-p01-condense-1 ok 3.6s options_seen=8
+{"candidate": "phi4-mini-instruct", "status": "completed", "tasks": {"ok": 2, "error": 0, "failed_ids": []}}

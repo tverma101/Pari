@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p06-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "0edb3657cb51c8c414527e2f374193deaf5a52ff4392ecfa2ea1ec33c46c08f5",
+  "seed": 2934303832297020125,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"highlights\", \"highlights\", \"highlights\", \"highlights\", \"highlights\"]}\n",
+  "timing": {
+    "first_text_ms": 544.3,
+    "option_ms": [
+      914.2,
+      1159.4,
+      1404.3,
+      1646.9,
+      1891.3
+    ],
+    "total_ms": 2076.8,
+    "stream": [
+      [
+        544.3,
+        2
+      ],
+      [
+        607.3,
+        9
+      ],
+      [
+        669.2,
+        11
+      ],
+      [
+        729.4,
+        14
+      ],
+      [
+        790.4,
+        18
+      ],
+      [
+        853.7,
+        24
+      ],
+      [
+        914.2,
+        26
+      ],
+      [
+        975.3,
+        28
+      ],
+      [
+        1037.0,
+        32
+      ],
+      [
+        1097.0,
+        38
+      ],
+      [
+        1159.4,
+        40
+      ],
+      [
+        1221.7,
+        42
+      ],
+      [
+        1282.9,
+        46
+      ],
+      [
+        1343.3,
+        52
+      ],
+      [
+        1404.3,
+        54
+      ],
+      [
+        1464.5,
+        56
+      ],
+      [
+        1525.2,
+        60
+      ],
+      [
+        1586.6,
+        66
+      ],
+      [
+        1646.9,
+        68
+      ],
+      [
+        1707.1,
+        70
+      ],
+      [
+        1767.4,
+        74
+      ],
+      [
+        1828.7,
+        80
+      ],
+      [
+        1891.3,
+        83
+      ],
+      [
+        2014.5,
+        84
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSocial media has a big effect on how teenagers see themselves. On apps like Instagram and TikTok, people usually only post the best parts of their lives, like vacations and nice clothes. When teens look at these posts all day, they start to compare themselves to others and feel bad about their own lives. A survey from 2023 found that almost half of teens said social media made them feel worse about their bodies. Social media is not all bad, though, because it also helps people stay in touch with friends and find others with the same interests. Still, I believe that teens should limit how much time they spend on these apps.\n\"\"\"\n\nThe writer selected the phrase \"the best parts of their lives\" in this sentence (marked with [[ ]]):\nOn apps like Instagram and TikTok, people usually only post [[the best parts of their lives]], like vacations and nice clothes.\n\nGive 10 single words that can replace \"the best parts of their lives\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 355,
+  "new_tokens": 26,
+  "finish_reason": "stop",
+  "error": null
+}

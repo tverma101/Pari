@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p01-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "minicpm5-2b",
+  "messages_sha256": "4a84f8c4a3d2d377e44df5894b7256e2ffdb6642b1bb5320e0f4957f32deb357",
+  "seed": 6666738622828226067,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"beneficial\", \"useful\", \"wise\", \"wise\", \"smart\", \"sound\", \"reasonable\", \"sound\", \"wise\", \"beneficial\"]}",
+  "timing": {
+    "first_text_ms": 130.2,
+    "option_ms": [
+      430.1,
+      581.5,
+      732.8,
+      882.2,
+      1037.1,
+      1186.6,
+      1341.6,
+      1495.1,
+      1646.0,
+      1845.1
+    ],
+    "total_ms": 1948.1,
+    "stream": [
+      [
+        130.2,
+        2
+      ],
+      [
+        180.7,
+        9
+      ],
+      [
+        232.5,
+        11
+      ],
+      [
+        281.3,
+        14
+      ],
+      [
+        330.5,
+        18
+      ],
+      [
+        379.6,
+        24
+      ],
+      [
+        430.1,
+        26
+      ],
+      [
+        480.0,
+        28
+      ],
+      [
+        530.9,
+        34
+      ],
+      [
+        581.5,
+        36
+      ],
+      [
+        632.8,
+        38
+      ],
+      [
+        682.3,
+        42
+      ],
+      [
+        732.8,
+        44
+      ],
+      [
+        783.2,
+        46
+      ],
+      [
+        832.3,
+        50
+      ],
+      [
+        882.2,
+        52
+      ],
+      [
+        935.8,
+        54
+      ],
+      [
+        987.4,
+        59
+      ],
+      [
+        1037.1,
+        61
+      ],
+      [
+        1086.5,
+        63
+      ],
+      [
+        1135.6,
+        68
+      ],
+      [
+        1186.6,
+        70
+      ],
+      [
+        1240.2,
+        72
+      ],
+      [
+        1292.0,
+        82
+      ],
+      [
+        1341.6,
+        84
+      ],
+      [
+        1391.9,
+        86
+      ],
+      [
+        1442.4,
+        91
+      ],
+      [
+        1495.1,
+        93
+      ],
+      [
+        1545.4,
+        95
+      ],
+      [
+        1595.6,
+        99
+      ],
+      [
+        1646.0,
+        101
+      ],
+      [
+        1694.8,
+        103
+      ],
+      [
+        1745.5,
+        107
+      ],
+      [
+        1794.7,
+        113
+      ],
+      [
+        1845.1,
+        115
+      ],
+      [
+        1896.1,
+        116
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<s><|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nMany schools are thinking about banning phones during class, and I think this is a good idea. When students have their phones out, they get distracted really easily and stop listening to the teacher. A lot of kids say they only use their phones to check the time, but most of the time they are actually on social media. In my opinion, I think that a ban would help students do better on tests because they would pay attention more. Some parents are worried that they will not be able to reach their kids in an emergency. However, the school office can always call a parent if something bad happens. Overall, a phone ban is a good way to make classrooms better places to learn.\n\"\"\"\n\nThe writer tapped the word \"good\" in this sentence (marked with [[ ]]):\nMany schools are thinking about banning phones during class, and I think this is a [[good]] idea.\n\nGive 10 replacements for \"good\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"good\" without changing the rest of the sentence. Do not repeat \"good\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 371,
+  "new_tokens": 37,
+  "finish_reason": "stop",
+  "error": null
+}

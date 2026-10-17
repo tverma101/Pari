@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p03-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-2b",
+  "messages_sha256": "8927efb8c7fc346d5bd05d93c8f4fd8edf006f0b64a08cc5e9c8f137476cc9f8",
+  "seed": 6605319439625134851,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"major\", \"significant\", \"substantial\", \"important\", \"substantial\", \"considerable\", \"substantial\", \"substantial\", \"substantial\", \"substantial\"]}\n",
+  "timing": {
+    "first_text_ms": 363.1,
+    "option_ms": [
+      596.5,
+      738.4,
+      928.3,
+      1068.7,
+      1256.3,
+      1442.6,
+      1628.4,
+      1818.4,
+      2006.9,
+      2197.1
+    ],
+    "total_ms": 2341.7,
+    "stream": [
+      [
+        363.1,
+        2
+      ],
+      [
+        410.9,
+        9
+      ],
+      [
+        459.5,
+        11
+      ],
+      [
+        504.8,
+        14
+      ],
+      [
+        550.4,
+        19
+      ],
+      [
+        596.5,
+        21
+      ],
+      [
+        643.0,
+        23
+      ],
+      [
+        691.2,
+        34
+      ],
+      [
+        738.4,
+        36
+      ],
+      [
+        785.0,
+        38
+      ],
+      [
+        831.9,
+        41
+      ],
+      [
+        880.1,
+        49
+      ],
+      [
+        928.3,
+        51
+      ],
+      [
+        976.8,
+        53
+      ],
+      [
+        1022.8,
+        62
+      ],
+      [
+        1068.7,
+        64
+      ],
+      [
+        1115.3,
+        66
+      ],
+      [
+        1161.5,
+        69
+      ],
+      [
+        1208.3,
+        77
+      ],
+      [
+        1256.3,
+        79
+      ],
+      [
+        1301.3,
+        81
+      ],
+      [
+        1347.7,
+        89
+      ],
+      [
+        1394.2,
+        93
+      ],
+      [
+        1442.6,
+        95
+      ],
+      [
+        1489.9,
+        97
+      ],
+      [
+        1535.9,
+        100
+      ],
+      [
+        1582.3,
+        108
+      ],
+      [
+        1628.4,
+        110
+      ],
+      [
+        1676.3,
+        112
+      ],
+      [
+        1722.3,
+        115
+      ],
+      [
+        1769.4,
+        123
+      ],
+      [
+        1818.4,
+        125
+      ],
+      [
+        1865.7,
+        127
+      ],
+      [
+        1912.4,
+        130
+      ],
+      [
+        1961.1,
+        138
+      ],
+      [
+        2006.9,
+        140
+      ],
+      [
+        2053.8,
+        142
+      ],
+      [
+        2100.8,
+        145
+      ],
+      [
+        2149.3,
+        153
+      ],
+      [
+        2197.1,
+        156
+      ],
+      [
+        2293.6,
+        157
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe printing press was one of the most important inventions in history. Before Johannes Gutenberg built his press around 1440, books had to be copied by hand, which took a really long time. Because of this, books were very expensive and only rich people and churches could have them. After the press was invented, books could be made much faster and for a lot less money. More people started learning how to read, and new ideas spread across Europe quickly. Some historians say that the press helped cause big changes like the Reformation and the Scientific Revolution. Without it, the world we live in today would probably be very different.\n\"\"\"\n\nThe writer tapped the word \"big\" in this sentence (marked with [[ ]]):\nSome historians say that the press helped cause [[big]] changes like the Reformation and the Scientific Revolution.\n\nGive 10 replacements for \"big\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"big\" without changing the rest of the sentence. Do not repeat \"big\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 362,
+  "new_tokens": 43,
+  "finish_reason": "stop",
+  "error": null
+}

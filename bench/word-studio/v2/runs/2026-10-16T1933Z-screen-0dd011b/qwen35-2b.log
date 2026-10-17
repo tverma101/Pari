@@ -1,0 +1,51 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Loading weights:   0%|          | 0/320 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/320 [00:01<09:04,  1.71s/it]
+Loading weights:  98%|█████████▊| 312/320 [00:01<00:00, 240.12it/s]
+Loading weights: 100%|██████████| 320/320 [00:01<00:00, 176.31it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[qwen35-2b] 1/40 ws2-screen-p01-academic-1 ok 4.9s options_seen=5
+[qwen35-2b] 2/40 ws2-screen-p01-condense-1 ok 6.0s options_seen=8
+[qwen35-2b] 3/40 ws2-screen-p01-tap_word-1 ok 3.5s options_seen=13
+[qwen35-2b] 4/40 ws2-screen-p01-tap_word-2 ok 4.2s options_seen=13
+[qwen35-2b] 5/40 ws2-screen-p01-word_sentences-1 ok 17.7s options_seen=6
+[qwen35-2b] 6/40 ws2-screen-p02-academic-1 ok 5.7s options_seen=5
+[qwen35-2b] 7/40 ws2-screen-p02-paraphrase-1 ok 4.5s options_seen=5
+[qwen35-2b] 8/40 ws2-screen-p02-phrase_to_word-1 ok 2.2s options_seen=10
+[qwen35-2b] 9/40 ws2-screen-p02-tap_word-1 ok 1.7s options_seen=5
+[qwen35-2b] 10/40 ws2-screen-p02-word_sentences-1 ok 6.3s options_seen=5
+[qwen35-2b] 11/40 ws2-screen-p03-academic-1 ok 11.0s options_seen=5
+[qwen35-2b] 12/40 ws2-screen-p03-condense-1 ok 7.7s options_seen=5
+[qwen35-2b] 13/40 ws2-screen-p03-paraphrase-1 ok 6.2s options_seen=8
+[qwen35-2b] 14/40 ws2-screen-p03-tap_word-1 ok 3.7s options_seen=13
+[qwen35-2b] 15/40 ws2-screen-p03-tap_word-2 ok 2.3s options_seen=10
+[qwen35-2b] 16/40 ws2-screen-p04-condense-1 ok 6.6s options_seen=4
+[qwen35-2b] 17/40 ws2-screen-p04-paraphrase-1 ok 4.5s options_seen=5
+[qwen35-2b] 18/40 ws2-screen-p04-phrase_to_word-1 ok 2.6s options_seen=10
+[qwen35-2b] 19/40 ws2-screen-p04-tap_word-1 ok 2.9s options_seen=10
+[qwen35-2b] 20/40 ws2-screen-p04-word_sentences-1 ok 3.9s options_seen=5
+[qwen35-2b] 21/40 ws2-screen-p05-paraphrase-1 ok 5.7s options_seen=5
+[qwen35-2b] 22/40 ws2-screen-p05-phrase_to_word-1 ok 2.7s options_seen=10
+[qwen35-2b] 23/40 ws2-screen-p05-tap_word-1 ok 2.6s options_seen=10
+[qwen35-2b] 24/40 ws2-screen-p05-tap_word-2 ok 2.7s options_seen=10
+[qwen35-2b] 25/40 ws2-screen-p05-word_sentences-1 ok 6.2s options_seen=5
+[qwen35-2b] 26/40 ws2-screen-p06-academic-1 ok 6.6s options_seen=5
+[qwen35-2b] 27/40 ws2-screen-p06-condense-1 ok 4.2s options_seen=8
+[qwen35-2b] 28/40 ws2-screen-p06-phrase_to_word-1 ok 2.5s options_seen=10
+[qwen35-2b] 29/40 ws2-screen-p06-tap_word-1 ok 3.7s options_seen=13
+[qwen35-2b] 30/40 ws2-screen-p06-word_sentences-1 ok 37.1s options_seen=44
+[qwen35-2b] 31/40 ws2-screen-p07-academic-1 ok 9.0s options_seen=5
+[qwen35-2b] 32/40 ws2-screen-p07-condense-1 ok 4.4s options_seen=5
+[qwen35-2b] 33/40 ws2-screen-p07-phrase_to_word-1 ok 2.6s options_seen=10
+[qwen35-2b] 34/40 ws2-screen-p07-tap_word-1 ok 2.5s options_seen=10
+[qwen35-2b] 35/40 ws2-screen-p07-tap_word-2 ok 2.5s options_seen=10
+[qwen35-2b] 36/40 ws2-screen-p08-condense-1 ok 7.5s options_seen=8
+[qwen35-2b] 37/40 ws2-screen-p08-paraphrase-1 ok 32.5s options_seen=8
+[qwen35-2b] 38/40 ws2-screen-p08-phrase_to_word-1 ok 2.9s options_seen=11
+[qwen35-2b] 39/40 ws2-screen-p08-tap_word-1 ok 2.7s options_seen=10
+[qwen35-2b] 40/40 ws2-screen-p08-word_sentences-1 ok 4.4s options_seen=5
+{"candidate": "qwen35-2b", "status": "completed", "tasks": {"ok": 40, "error": 0, "failed_ids": []}}

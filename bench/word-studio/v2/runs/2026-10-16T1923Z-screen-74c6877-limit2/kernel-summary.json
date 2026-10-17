@@ -1,0 +1,94 @@
+{
+  "config": {
+    "candidates": [
+      "qwen35-2b",
+      "qwen35-4b",
+      "minicpm5-2b",
+      "phi4-mini-instruct",
+      "smollm3-3b",
+      "control-missing-revision"
+    ],
+    "dtype": "float16",
+    "git_sha": "74c6877fb19d9d2760f2e2a7efca0c4d35112ee3",
+    "limit": 2,
+    "per_candidate_timeout_s": 3600,
+    "pip": [
+      "transformers==5.18.0",
+      "accelerate==1.15.0"
+    ],
+    "repo_url": "https://github.com/tverma101/Pari.git",
+    "run_id": "2026-10-16T1923Z-screen-74c6877-limit2",
+    "task_set": "screen"
+  },
+  "git_head": "74c6877fb19d9d2760f2e2a7efca0c4d35112ee3",
+  "started_at": "2026-10-16T19:23:36+00:00",
+  "candidates": {
+    "qwen35-2b": {
+      "exit_code": 0,
+      "status": "completed",
+      "tasks": {
+        "ok": 2,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": null,
+      "wall_seconds": 84.9
+    },
+    "qwen35-4b": {
+      "exit_code": 0,
+      "status": "completed",
+      "tasks": {
+        "ok": 2,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": null,
+      "wall_seconds": 87.1
+    },
+    "minicpm5-2b": {
+      "exit_code": 0,
+      "status": "completed",
+      "tasks": {
+        "ok": 2,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": null,
+      "wall_seconds": 55.7
+    },
+    "phi4-mini-instruct": {
+      "exit_code": 0,
+      "status": "completed",
+      "tasks": {
+        "ok": 2,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": null,
+      "wall_seconds": 69.9
+    },
+    "smollm3-3b": {
+      "exit_code": 0,
+      "status": "completed",
+      "tasks": {
+        "ok": 2,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": null,
+      "wall_seconds": 60.3
+    },
+    "control-missing-revision": {
+      "exit_code": 2,
+      "status": "failed",
+      "tasks": {
+        "ok": 0,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": "404 Client Error. (Request ID: Root=1-6ad27b2b-2ef0b3fc5f01cec858add5c4;e2bbe6cd-de4e-420b-95d6-7abf66b07056)\n\nRevision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false&expand=false.\nInvalid rev id: 0000000000000000000000000000000000000000",
+      "wall_seconds": 12.1
+    }
+  },
+  "finished_at": "2026-10-16T19:29:48+00:00"
+}

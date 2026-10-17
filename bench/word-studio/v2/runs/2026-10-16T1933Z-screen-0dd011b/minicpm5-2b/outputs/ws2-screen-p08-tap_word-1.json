@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p08-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "minicpm5-2b",
+  "messages_sha256": "8c0d20462a607f3dbb41501b3c124c23b14e431512e76e3d9c8627db61f973db",
+  "seed": 4190926893138666741,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"frustrated\", \"annoyed\", \"irritated\", \"disappointed\", \"annoyed\", \"upset\", \"frustrated\", \"annoyed\", \"irritated\", \"disappointed\"]}",
+  "timing": {
+    "first_text_ms": 142.3,
+    "option_ms": [
+      436.5,
+      631.2,
+      878.6,
+      1075.4,
+      1268.4,
+      1469.0,
+      1668.9,
+      1866.4,
+      2114.2,
+      2306.7
+    ],
+    "total_ms": 2424.9,
+    "stream": [
+      [
+        142.3,
+        2
+      ],
+      [
+        190.2,
+        9
+      ],
+      [
+        239.2,
+        11
+      ],
+      [
+        289.3,
+        14
+      ],
+      [
+        337.9,
+        16
+      ],
+      [
+        386.5,
+        24
+      ],
+      [
+        436.5,
+        26
+      ],
+      [
+        485.5,
+        28
+      ],
+      [
+        534.3,
+        31
+      ],
+      [
+        582.8,
+        35
+      ],
+      [
+        631.2,
+        37
+      ],
+      [
+        680.6,
+        39
+      ],
+      [
+        729.5,
+        41
+      ],
+      [
+        779.4,
+        44
+      ],
+      [
+        828.8,
+        48
+      ],
+      [
+        878.6,
+        50
+      ],
+      [
+        928.5,
+        52
+      ],
+      [
+        977.5,
+        55
+      ],
+      [
+        1026.3,
+        64
+      ],
+      [
+        1075.4,
+        66
+      ],
+      [
+        1123.7,
+        68
+      ],
+      [
+        1172.0,
+        71
+      ],
+      [
+        1220.0,
+        75
+      ],
+      [
+        1268.4,
+        77
+      ],
+      [
+        1318.1,
+        79
+      ],
+      [
+        1369.7,
+        81
+      ],
+      [
+        1419.5,
+        84
+      ],
+      [
+        1469.0,
+        86
+      ],
+      [
+        1518.8,
+        88
+      ],
+      [
+        1569.3,
+        90
+      ],
+      [
+        1618.6,
+        98
+      ],
+      [
+        1668.9,
+        100
+      ],
+      [
+        1718.3,
+        102
+      ],
+      [
+        1768.7,
+        105
+      ],
+      [
+        1817.7,
+        109
+      ],
+      [
+        1866.4,
+        111
+      ],
+      [
+        1916.2,
+        113
+      ],
+      [
+        1970.7,
+        115
+      ],
+      [
+        2018.6,
+        118
+      ],
+      [
+        2067.2,
+        122
+      ],
+      [
+        2114.2,
+        124
+      ],
+      [
+        2162.4,
+        126
+      ],
+      [
+        2211.3,
+        129
+      ],
+      [
+        2259.4,
+        138
+      ],
+      [
+        2306.7,
+        140
+      ],
+      [
+        2354.8,
+        141
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<s><|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nLast summer I got my first job working at a small pizza restaurant near my house. At first I thought it would be easy, but I quickly found out that it was a lot of work. On busy nights we had to make dozens of pizzas in just a few hours, and customers got upset if their food was late. My manager, Tony, taught me how to stay calm and do one thing at a time. I also learned how to talk to people who were angry without getting angry myself. The job was tiring, but it showed me that I can handle stress better than I thought. These skills will help me in college and in any job I have in the future.\n\"\"\"\n\nThe writer tapped the word \"upset\" in this sentence (marked with [[ ]]):\nOn busy nights we had to make dozens of pizzas in just a few hours, and customers got [[upset]] if their food was late.\n\nGive 10 replacements for \"upset\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"upset\" without changing the rest of the sentence. Do not repeat \"upset\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 381,
+  "new_tokens": 47,
+  "finish_reason": "stop",
+  "error": null
+}

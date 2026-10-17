@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p05-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "0ed20b306452a74196a33db4ad417514818bf30c8ea17d5b843300c79c750116",
+  "seed": 2751814752026027083,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"challenging\", \"difficult\", \"difficult to navigate\", \"tough\", \"straining\", \"exhausting\", \"frustrating\", \"strenuous\", \"trying\", \"demanding\"]}",
+  "timing": {
+    "first_text_ms": 203.7,
+    "option_ms": [
+      518.5,
+      694.6,
+      956.0,
+      1134.1,
+      1310.9,
+      1528.7,
+      1746.4,
+      1961.6,
+      2095.6,
+      2273.4
+    ],
+    "total_ms": 2319.0,
+    "stream": [
+      [
+        203.7,
+        2
+      ],
+      [
+        250.5,
+        9
+      ],
+      [
+        295.8,
+        11
+      ],
+      [
+        340.2,
+        14
+      ],
+      [
+        385.9,
+        16
+      ],
+      [
+        429.7,
+        22
+      ],
+      [
+        473.6,
+        25
+      ],
+      [
+        518.5,
+        27
+      ],
+      [
+        562.4,
+        29
+      ],
+      [
+        606.5,
+        33
+      ],
+      [
+        651.0,
+        38
+      ],
+      [
+        694.6,
+        40
+      ],
+      [
+        738.0,
+        42
+      ],
+      [
+        782.0,
+        46
+      ],
+      [
+        824.8,
+        51
+      ],
+      [
+        869.0,
+        54
+      ],
+      [
+        911.9,
+        63
+      ],
+      [
+        956.0,
+        65
+      ],
+      [
+        1000.5,
+        67
+      ],
+      [
+        1045.5,
+        68
+      ],
+      [
+        1089.1,
+        72
+      ],
+      [
+        1134.1,
+        74
+      ],
+      [
+        1180.2,
+        76
+      ],
+      [
+        1223.3,
+        79
+      ],
+      [
+        1267.6,
+        85
+      ],
+      [
+        1310.9,
+        87
+      ],
+      [
+        1354.2,
+        89
+      ],
+      [
+        1398.1,
+        91
+      ],
+      [
+        1441.7,
+        96
+      ],
+      [
+        1484.5,
+        99
+      ],
+      [
+        1528.7,
+        101
+      ],
+      [
+        1572.7,
+        103
+      ],
+      [
+        1615.9,
+        105
+      ],
+      [
+        1659.3,
+        109
+      ],
+      [
+        1703.2,
+        114
+      ],
+      [
+        1746.4,
+        116
+      ],
+      [
+        1788.9,
+        118
+      ],
+      [
+        1832.1,
+        120
+      ],
+      [
+        1875.4,
+        123
+      ],
+      [
+        1917.9,
+        127
+      ],
+      [
+        1961.6,
+        129
+      ],
+      [
+        2005.6,
+        131
+      ],
+      [
+        2052.3,
+        137
+      ],
+      [
+        2095.6,
+        139
+      ],
+      [
+        2138.8,
+        141
+      ],
+      [
+        2184.1,
+        147
+      ],
+      [
+        2228.2,
+        150
+      ],
+      [
+        2273.4,
+        153
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 16 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nWhen my family moved to the United States, I was eleven years old and I only knew a few words in English. The first few months at school were really hard because I could not understand what the teachers were saying. I felt alone most of the time, and I was too scared to talk in class. My English teacher, Ms. Alvarez, started staying after school to help me with reading and writing. She never made me feel stupid when I made mistakes. Little by little, I started to understand more and even make some friends. Now I am the one who helps new students when they first get here, because I know how it feels.\n\"\"\"\n\nThe writer tapped the word \"hard\" in this sentence (marked with [[ ]]):\nThe first few months at school were really [[hard]] because I could not understand what the teachers were saying.\n\nGive 10 replacements for \"hard\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"hard\" without changing the rest of the sentence. Do not repeat \"hard\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 393,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

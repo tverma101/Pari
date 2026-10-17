@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p01-condense-1",
+  "kind": "condense",
+  "candidate_id": "minicpm5-2b",
+  "messages_sha256": "a01a0957f6963520d122145a8a032eae9ca8a86e0573bd50b8da95a3fc1a1474",
+  "seed": 6352882025241551183,
+  "max_new_tokens": 640,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Ban phones to help students study better.\", \"A phone ban helps students focus more.\", \"Banning phones improves test performance.\", \"Phones in class hinder learning.\", \"Keep phones out of classrooms to learn better.\"]}",
+  "timing": {
+    "first_text_ms": 121.9,
+    "option_ms": [
+      673.1,
+      1129.3,
+      1538.4,
+      1937.4,
+      2441.7
+    ],
+    "total_ms": 2545.3,
+    "stream": [
+      [
+        121.9,
+        2
+      ],
+      [
+        172.4,
+        9
+      ],
+      [
+        221.9,
+        11
+      ],
+      [
+        270.8,
+        14
+      ],
+      [
+        320.5,
+        17
+      ],
+      [
+        369.7,
+        24
+      ],
+      [
+        421.6,
+        27
+      ],
+      [
+        471.9,
+        32
+      ],
+      [
+        522.5,
+        41
+      ],
+      [
+        573.3,
+        47
+      ],
+      [
+        623.2,
+        54
+      ],
+      [
+        673.1,
+        57
+      ],
+      [
+        723.1,
+        59
+      ],
+      [
+        775.0,
+        60
+      ],
+      [
+        825.1,
+        66
+      ],
+      [
+        875.6,
+        70
+      ],
+      [
+        926.7,
+        76
+      ],
+      [
+        976.7,
+        85
+      ],
+      [
+        1028.2,
+        91
+      ],
+      [
+        1078.5,
+        96
+      ],
+      [
+        1129.3,
+        99
+      ],
+      [
+        1180.5,
+        101
+      ],
+      [
+        1230.6,
+        104
+      ],
+      [
+        1282.6,
+        108
+      ],
+      [
+        1332.0,
+        115
+      ],
+      [
+        1382.4,
+        124
+      ],
+      [
+        1434.1,
+        129
+      ],
+      [
+        1486.8,
+        141
+      ],
+      [
+        1538.4,
+        144
+      ],
+      [
+        1589.7,
+        146
+      ],
+      [
+        1640.9,
+        148
+      ],
+      [
+        1689.8,
+        152
+      ],
+      [
+        1740.7,
+        155
+      ],
+      [
+        1789.3,
+        161
+      ],
+      [
+        1839.5,
+        168
+      ],
+      [
+        1887.7,
+        177
+      ],
+      [
+        1937.4,
+        180
+      ],
+      [
+        1987.7,
+        182
+      ],
+      [
+        2037.5,
+        186
+      ],
+      [
+        2086.4,
+        193
+      ],
+      [
+        2136.6,
+        197
+      ],
+      [
+        2185.4,
+        200
+      ],
+      [
+        2234.7,
+        211
+      ],
+      [
+        2284.9,
+        214
+      ],
+      [
+        2335.9,
+        220
+      ],
+      [
+        2387.7,
+        227
+      ],
+      [
+        2441.7,
+        229
+      ],
+      [
+        2493.5,
+        231
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<s><|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nMany schools are thinking about banning phones during class, and I think this is a good idea. When students have their phones out, they get distracted really easily and stop listening to the teacher. A lot of kids say they only use their phones to check the time, but most of the time they are actually on social media. In my opinion, I think that a ban would help students do better on tests because they would pay attention more. Some parents are worried that they will not be able to reach their kids in an emergency. However, the school office can always call a parent if something bad happens. Overall, a phone ban is a good way to make classrooms better places to learn.\n\"\"\"\n\nThe writer selected this text:\n\"\"\"\nIn my opinion, I think that a ban would help students do better on tests because they would pay attention more.\n\"\"\"\n\nGive 5 different rewrites of the selected text that say the same thing in fewer words. Keep every fact, name, number and quotation, and keep the claim exactly as strong or as uncertain as it is. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 347,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

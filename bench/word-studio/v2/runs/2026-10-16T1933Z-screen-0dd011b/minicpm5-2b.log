@@ -1,0 +1,56 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Loading weights:   0%|          | 0/381 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/381 [00:00<05:45,  1.10it/s]
+Loading weights:   1%|          | 2/381 [00:01<02:53,  2.18it/s]
+Loading weights:  29%|██▉       | 112/381 [00:01<00:01, 170.11it/s]
+Loading weights:  42%|████▏     | 159/381 [00:01<00:01, 183.22it/s]
+Loading weights:  51%|█████▏    | 196/381 [00:01<00:00, 194.99it/s]
+Loading weights:  60%|█████▉    | 228/381 [00:01<00:00, 204.07it/s]
+Loading weights:  67%|██████▋   | 257/381 [00:01<00:00, 194.08it/s]
+Loading weights:  75%|███████▍  | 284/381 [00:01<00:00, 205.38it/s]
+Loading weights:  81%|████████▏ | 310/381 [00:02<00:00, 215.90it/s]
+Loading weights:  88%|████████▊ | 336/381 [00:02<00:00, 226.28it/s]
+Loading weights:  95%|█████████▌| 362/381 [00:02<00:00, 220.20it/s]
+Loading weights: 100%|██████████| 381/381 [00:02<00:00, 160.43it/s]
+[minicpm5-2b] 1/40 ws2-screen-p01-academic-1 ok 4.5s options_seen=5
+[minicpm5-2b] 2/40 ws2-screen-p01-condense-1 ok 2.5s options_seen=5
+[minicpm5-2b] 3/40 ws2-screen-p01-tap_word-1 ok 1.9s options_seen=10
+[minicpm5-2b] 4/40 ws2-screen-p01-tap_word-2 ok 1.9s options_seen=10
+[minicpm5-2b] 5/40 ws2-screen-p01-word_sentences-1 ok 3.5s options_seen=5
+[minicpm5-2b] 6/40 ws2-screen-p02-academic-1 ok 5.6s options_seen=5
+[minicpm5-2b] 7/40 ws2-screen-p02-paraphrase-1 ok 5.9s options_seen=5
+[minicpm5-2b] 8/40 ws2-screen-p02-phrase_to_word-1 ok 2.3s options_seen=10
+[minicpm5-2b] 9/40 ws2-screen-p02-tap_word-1 ok 2.6s options_seen=10
+[minicpm5-2b] 10/40 ws2-screen-p02-word_sentences-1 ok 3.6s options_seen=5
+[minicpm5-2b] 11/40 ws2-screen-p03-academic-1 ok 6.5s options_seen=5
+[minicpm5-2b] 12/40 ws2-screen-p03-condense-1 ok 3.5s options_seen=5
+[minicpm5-2b] 13/40 ws2-screen-p03-paraphrase-1 ok 5.2s options_seen=5
+[minicpm5-2b] 14/40 ws2-screen-p03-tap_word-1 ok 2.6s options_seen=10
+[minicpm5-2b] 15/40 ws2-screen-p03-tap_word-2 ok 2.0s options_seen=10
+[minicpm5-2b] 16/40 ws2-screen-p04-condense-1 ok 5.0s options_seen=5
+[minicpm5-2b] 17/40 ws2-screen-p04-paraphrase-1 ok 3.9s options_seen=5
+[minicpm5-2b] 18/40 ws2-screen-p04-phrase_to_word-1 ok 2.3s options_seen=10
+[minicpm5-2b] 19/40 ws2-screen-p04-tap_word-1 ok 2.5s options_seen=10
+[minicpm5-2b] 20/40 ws2-screen-p04-word_sentences-1 ok 3.6s options_seen=5
+[minicpm5-2b] 21/40 ws2-screen-p05-paraphrase-1 ok 3.3s options_seen=5
+[minicpm5-2b] 22/40 ws2-screen-p05-phrase_to_word-1 ok 2.3s options_seen=10
+[minicpm5-2b] 23/40 ws2-screen-p05-tap_word-1 ok 2.4s options_seen=10
+[minicpm5-2b] 24/40 ws2-screen-p05-tap_word-2 ok 2.3s options_seen=10
+[minicpm5-2b] 25/40 ws2-screen-p05-word_sentences-1 ok 3.8s options_seen=5
+[minicpm5-2b] 26/40 ws2-screen-p06-academic-1 ok 6.6s options_seen=5
+[minicpm5-2b] 27/40 ws2-screen-p06-condense-1 ok 2.4s options_seen=5
+[minicpm5-2b] 28/40 ws2-screen-p06-phrase_to_word-1 ok 1.9s options_seen=10
+[minicpm5-2b] 29/40 ws2-screen-p06-tap_word-1 ok 1.8s options_seen=10
+[minicpm5-2b] 30/40 ws2-screen-p06-word_sentences-1 ok 4.0s options_seen=5
+[minicpm5-2b] 31/40 ws2-screen-p07-academic-1 ok 6.3s options_seen=1
+[minicpm5-2b] 32/40 ws2-screen-p07-condense-1 ok 3.1s options_seen=5
+[minicpm5-2b] 33/40 ws2-screen-p07-phrase_to_word-1 ok 2.2s options_seen=10
+[minicpm5-2b] 34/40 ws2-screen-p07-tap_word-1 ok 2.3s options_seen=10
+[minicpm5-2b] 35/40 ws2-screen-p07-tap_word-2 ok 1.8s options_seen=10
+[minicpm5-2b] 36/40 ws2-screen-p08-condense-1 ok 2.1s options_seen=5
+[minicpm5-2b] 37/40 ws2-screen-p08-paraphrase-1 ok 5.4s options_seen=5
+[minicpm5-2b] 38/40 ws2-screen-p08-phrase_to_word-1 ok 2.0s options_seen=10
+[minicpm5-2b] 39/40 ws2-screen-p08-tap_word-1 ok 2.4s options_seen=10
+[minicpm5-2b] 40/40 ws2-screen-p08-word_sentences-1 ok 2.9s options_seen=5
+{"candidate": "minicpm5-2b", "status": "completed", "tasks": {"ok": 40, "error": 0, "failed_ids": []}}

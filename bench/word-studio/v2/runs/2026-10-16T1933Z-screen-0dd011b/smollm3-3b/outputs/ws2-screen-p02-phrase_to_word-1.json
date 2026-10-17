@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p02-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "59e966a1fb948eb987fb80aa529a1421df13d223f95b59c3e4a96aea45d31ba7",
+  "seed": 4499781668445513691,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"steadfast\", \"persistent\", \"determined\", \"unwavering\", \"loyal\", \"unalterable\", \"unwavering\", \"immovable\", \"unyielding\", \"unshakable\"]}",
+  "timing": {
+    "first_text_ms": 200.8,
+    "option_ms": [
+      459.5,
+      587.1,
+      758.3,
+      972.4,
+      1145.4,
+      1359.3,
+      1571.4,
+      1741.6,
+      1957.6,
+      2216.7
+    ],
+    "total_ms": 2260.5,
+    "stream": [
+      [
+        200.8,
+        2
+      ],
+      [
+        245.2,
+        9
+      ],
+      [
+        288.0,
+        11
+      ],
+      [
+        330.8,
+        14
+      ],
+      [
+        373.3,
+        19
+      ],
+      [
+        415.5,
+        23
+      ],
+      [
+        459.5,
+        25
+      ],
+      [
+        502.1,
+        27
+      ],
+      [
+        544.5,
+        37
+      ],
+      [
+        587.1,
+        39
+      ],
+      [
+        629.6,
+        41
+      ],
+      [
+        672.8,
+        42
+      ],
+      [
+        715.3,
+        51
+      ],
+      [
+        758.3,
+        53
+      ],
+      [
+        800.7,
+        55
+      ],
+      [
+        844.6,
+        57
+      ],
+      [
+        887.3,
+        60
+      ],
+      [
+        929.6,
+        65
+      ],
+      [
+        972.4,
+        67
+      ],
+      [
+        1016.2,
+        69
+      ],
+      [
+        1059.1,
+        72
+      ],
+      [
+        1102.1,
+        74
+      ],
+      [
+        1145.4,
+        76
+      ],
+      [
+        1188.0,
+        78
+      ],
+      [
+        1230.9,
+        82
+      ],
+      [
+        1273.7,
+        85
+      ],
+      [
+        1316.3,
+        89
+      ],
+      [
+        1359.3,
+        91
+      ],
+      [
+        1401.7,
+        93
+      ],
+      [
+        1444.0,
+        95
+      ],
+      [
+        1486.9,
+        98
+      ],
+      [
+        1529.0,
+        103
+      ],
+      [
+        1571.4,
+        105
+      ],
+      [
+        1613.9,
+        107
+      ],
+      [
+        1656.2,
+        110
+      ],
+      [
+        1699.2,
+        116
+      ],
+      [
+        1741.6,
+        118
+      ],
+      [
+        1783.7,
+        120
+      ],
+      [
+        1826.1,
+        122
+      ],
+      [
+        1871.2,
+        127
+      ],
+      [
+        1915.4,
+        130
+      ],
+      [
+        1957.6,
+        132
+      ],
+      [
+        2000.0,
+        134
+      ],
+      [
+        2042.0,
+        136
+      ],
+      [
+        2085.0,
+        138
+      ],
+      [
+        2129.1,
+        140
+      ],
+      [
+        2174.3,
+        144
+      ],
+      [
+        2216.7,
+        147
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 16 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nIn To Kill a Mockingbird, Atticus Finch shows that doing the right thing is not always easy. He agrees to defend Tom Robinson even though he knows that most people in Maycomb will be angry at him. Atticus is someone who never gives up on what he believes, even when his own children get bullied at school because of it. He tells Scout that you never really understand a person until you look at things from their point of view. This shows that he wants his kids to be fair to everyone, not just people who are like them. Atticus is a good example of a person who stays brave when it would be easier to stay quiet.\n\"\"\"\n\nThe writer selected the phrase \"someone who never gives up on what he believes\" in this sentence (marked with [[ ]]):\nAtticus is [[someone who never gives up on what he believes]], even when his own children get bullied at school because of it.\n\nGive 10 single words that can replace \"someone who never gives up on what he believes\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 395,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -33,7 +33,7 @@ PROTOCOL_SMOKE_TASKS = HERE / "kaggle-protocol-smoke.jsonl"
 ENGLISH_TASKS = HERE / "english-core-fixed-screen.jsonl"
 RUNTIME_DIR = Path("/kaggle/working/pari-runtimes")
 VLLM_RUNTIME = "vllm-0.30.0-cu129-linux-x86_64"
-BENCHMARK_RELEVANT_PREFIX = "open-local-phraser-v1/benchmarks/english-studio-v3"
+BENCHMARK_RELEVANT_PREFIX = K.BENCHMARK_RELEVANT_PREFIX
 
 
 def jsonl_count(path: Path) -> int:

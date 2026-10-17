@@ -1,0 +1,215 @@
+[{"stream_name":"stdout","time":5.342324996,"data":"$ git clone --quiet https://github.com/tverma101/Pari.git /tmp/Pari\n"}
+,{"stream_name":"stdout","time":11.013313941,"data":"$ git -C /tmp/Pari checkout --quiet 74c6877fb19d9d2760f2e2a7efca0c4d35112ee3\n"}
+,{"stream_name":"stdout","time":11.666630989,"data":"$ /usr/bin/python3 -m pip install --quiet transformers==5.18.0 accelerate==1.15.0\n"}
+,{"stream_name":"stdout","time":14.080866225,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.6/12.6 MB 95.8 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":14.117882125,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 394.3/394.3 kB 20.2 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":14.157031042,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 846.4/846.4 kB 37.3 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":32.069083786,"data":"=== qwen35-2b ===\n"}
+,{"stream_name":"stdout","time":60.914978398,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":97.04716622,"data":"\n"}
+,{"stream_name":"stdout","time":98.553259773,"data":"Loading weights:   0%|          | 0/320 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":98.667034229,"data":"Loading weights:   0%|          | 1/320 [00:01\u003c08:00,  1.51s/it]\n"}
+,{"stream_name":"stdout","time":98.781283042,"data":"Loading weights:  90%|████████▉ | 287/320 [00:01\u003c00:00, 245.01it/s]\n"}
+,{"stream_name":"stdout","time":98.781319368,"data":"Loading weights: 100%|██████████| 320/320 [00:01\u003c00:00, 184.28it/s]\n"}
+,{"stream_name":"stdout","time":99.058537255,"data":"[transformers] Passing `generation_config` together with generation-related arguments=({'max_new_tokens'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.\n"}
+,{"stream_name":"stdout","time":100.024295704,"data":"[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":101.424933153,"data":"[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":102.151658616,"data":"[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":102.205452355,"data":"[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":106.495624052,"data":"[qwen35-2b] 1/2 ws2-screen-p01-academic-1 ok 7.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":112.215052465,"data":"[qwen35-2b] 2/2 ws2-screen-p01-condense-1 ok 5.7s options_seen=8\n"}
+,{"stream_name":"stdout","time":112.255763718,"data":"{\"candidate\": \"qwen35-2b\", \"status\": \"completed\", \"tasks\": {\"ok\": 2, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":117.129319779,"data":"=== qwen35-4b ===\n"}
+,{"stream_name":"stdout","time":128.162729857,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":131.263142718,"data":"\n"}
+,{"stream_name":"stdout","time":179.848845837,"data":"Fetching 2 files:   0%|          | 0/2 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":183.951165796,"data":"Fetching 2 files:  50%|█████     | 1/2 [00:48\u003c00:48, 48.59s/it]\n"}
+,{"stream_name":"stdout","time":183.951746718,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:52\u003c00:00, 22.42s/it]\n"}
+,{"stream_name":"stdout","time":183.951765425,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:52\u003c00:00, 26.34s/it]\n"}
+,{"stream_name":"stdout","time":184.370001583,"data":"\n"}
+,{"stream_name":"stdout","time":186.158922597,"data":"Loading weights:   0%|          | 0/426 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":186.287104415,"data":"Loading weights:   0%|          | 1/426 [00:01\u003c12:40,  1.79s/it]\n"}
+,{"stream_name":"stdout","time":186.737284393,"data":"Loading weights:  27%|██▋       | 114/426 [00:01\u003c00:03, 82.38it/s]\n"}
+,{"stream_name":"stdout","time":187.077819438,"data":"Loading weights:  39%|███▉      | 166/426 [00:02\u003c00:02, 93.28it/s]\n"}
+,{"stream_name":"stdout","time":187.289945334,"data":"Loading weights:  47%|████▋     | 200/426 [00:02\u003c00:02, 94.56it/s]\n"}
+,{"stream_name":"stdout","time":187.432158366,"data":"Loading weights:  53%|█████▎    | 225/426 [00:02\u003c00:02, 98.89it/s]\n"}
+,{"stream_name":"stdout","time":187.638277254,"data":"Loading weights:  58%|█████▊    | 245/426 [00:03\u003c00:01, 105.16it/s]\n"}
+,{"stream_name":"stdout","time":187.793925407,"data":"Loading weights:  62%|██████▏   | 263/426 [00:03\u003c00:01, 100.94it/s]\n"}
+,{"stream_name":"stdout","time":187.955281134,"data":"Loading weights:  65%|██████▌   | 278/426 [00:03\u003c00:01, 99.99it/s] \n"}
+,{"stream_name":"stdout","time":188.060358076,"data":"Loading weights:  69%|██████▊   | 292/426 [00:03\u003c00:01, 97.24it/s]\n"}
+,{"stream_name":"stdout","time":188.171298796,"data":"Loading weights:  72%|███████▏  | 306/426 [00:03\u003c00:01, 103.25it/s]\n"}
+,{"stream_name":"stdout","time":188.299731651,"data":"Loading weights:  75%|███████▍  | 319/426 [00:03\u003c00:01, 106.17it/s]\n"}
+,{"stream_name":"stdout","time":188.407651146,"data":"Loading weights:  78%|███████▊  | 332/426 [00:03\u003c00:00, 105.11it/s]\n"}
+,{"stream_name":"stdout","time":188.552221913,"data":"Loading weights:  81%|████████  | 344/426 [00:04\u003c00:00, 106.34it/s]\n"}
+,{"stream_name":"stdout","time":188.707557141,"data":"Loading weights:  84%|████████▍ | 358/426 [00:04\u003c00:00, 104.26it/s]\n"}
+,{"stream_name":"stdout","time":188.875992055,"data":"Loading weights:  87%|████████▋ | 371/426 [00:04\u003c00:00, 96.92it/s] \n"}
+,{"stream_name":"stdout","time":189.028492979,"data":"Loading weights:  92%|█████████▏| 393/426 [00:04\u003c00:00, 107.99it/s]\n"}
+,{"stream_name":"stdout","time":189.149207012,"data":"Loading weights:  96%|█████████▌| 407/426 [00:04\u003c00:00, 103.10it/s]\n"}
+,{"stream_name":"stdout","time":189.168578976,"data":"Loading weights:  98%|█████████▊| 418/426 [00:04\u003c00:00, 100.06it/s]\n"}
+,{"stream_name":"stdout","time":189.16859784,"data":"Loading weights: 100%|██████████| 426/426 [00:04\u003c00:00, 88.78it/s] \n"}
+,{"stream_name":"stdout","time":189.368616036,"data":"[transformers] Passing `generation_config` together with generation-related arguments=({'max_new_tokens'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.\n"}
+,{"stream_name":"stdout","time":189.765837791,"data":"[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":190.158677079,"data":"[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":190.66366451,"data":"[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":190.692994166,"data":"[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":197.3339887,"data":"[qwen35-4b] 1/2 ws2-screen-p01-academic-1 ok 8.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":202.7615385,"data":"[qwen35-4b] 2/2 ws2-screen-p01-condense-1 ok 5.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":202.802144845,"data":"{\"candidate\": \"qwen35-4b\", \"status\": \"completed\", \"tasks\": {\"ok\": 2, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":204.675643995,"data":"=== minicpm5-2b ===\n"}
+,{"stream_name":"stdout","time":216.393479862,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":248.903260442,"data":"\n"}
+,{"stream_name":"stdout","time":249.849307907,"data":"Loading weights:   0%|          | 0/381 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":249.990251609,"data":"Loading weights:   0%|          | 1/381 [00:00\u003c05:59,  1.06it/s]\n"}
+,{"stream_name":"stdout","time":250.088112707,"data":"Loading weights:   1%|          | 2/381 [00:01\u003c02:57,  2.13it/s]\n"}
+,{"stream_name":"stdout","time":250.300446143,"data":"Loading weights:  30%|██▉       | 113/381 [00:01\u003c00:01, 169.52it/s]\n"}
+,{"stream_name":"stdout","time":250.493732295,"data":"Loading weights:  43%|████▎     | 163/381 [00:01\u003c00:01, 190.99it/s]\n"}
+,{"stream_name":"stdout","time":250.621246604,"data":"Loading weights:  53%|█████▎    | 203/381 [00:01\u003c00:00, 194.81it/s]\n"}
+,{"stream_name":"stdout","time":250.772756839,"data":"Loading weights:  62%|██████▏   | 236/381 [00:01\u003c00:00, 209.49it/s]\n"}
+,{"stream_name":"stdout","time":250.899818035,"data":"Loading weights:  70%|███████   | 267/381 [00:01\u003c00:00, 207.19it/s]\n"}
+,{"stream_name":"stdout","time":251.026675084,"data":"Loading weights:  77%|███████▋  | 295/381 [00:01\u003c00:00, 210.45it/s]\n"}
+,{"stream_name":"stdout","time":251.137163027,"data":"Loading weights:  84%|████████▍ | 321/381 [00:02\u003c00:00, 208.98it/s]\n"}
+,{"stream_name":"stdout","time":251.238849361,"data":"Loading weights:  91%|█████████ | 345/381 [00:02\u003c00:00, 212.14it/s]\n"}
+,{"stream_name":"stdout","time":251.265309902,"data":"Loading weights:  97%|█████████▋| 369/381 [00:02\u003c00:00, 216.67it/s]\n"}
+,{"stream_name":"stdout","time":251.265368665,"data":"Loading weights: 100%|██████████| 381/381 [00:02\u003c00:00, 161.27it/s]\n"}
+,{"stream_name":"stdout","time":251.47813407,"data":"[transformers] Passing `generation_config` together with generation-related arguments=({'max_new_tokens'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.\n"}
+,{"stream_name":"stdout","time":256.518737859,"data":"[minicpm5-2b] 1/2 ws2-screen-p01-academic-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":259.002657233,"data":"[minicpm5-2b] 2/2 ws2-screen-p01-condense-1 ok 2.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":259.042784426,"data":"{\"candidate\": \"minicpm5-2b\", \"status\": \"completed\", \"tasks\": {\"ok\": 2, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":260.621865558,"data":"=== phi4-mini-instruct ===\n"}
+,{"stream_name":"stdout","time":271.484289608,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":271.523710819,"data":"[transformers] This model config has set a `rope_parameters['original_max_position_embeddings']` field, to be used together with `max_position_embeddings` to determine a scaling factor. Please set the `factor` field of `rope_parameters`with this ratio instead -- we recommend the use of this field over `original_max_position_embeddings`, as it is compatible with most model architectures.\n"}
+,{"stream_name":"stdout","time":274.929397583,"data":"\n"}
+,{"stream_name":"stdout","time":314.828366064,"data":"Fetching 2 files:   0%|          | 0/2 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":314.829538444,"data":"Fetching 2 files:  50%|█████     | 1/2 [00:39\u003c00:39, 39.90s/it]\n"}
+,{"stream_name":"stdout","time":314.829557437,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:39\u003c00:00, 19.95s/it]\n"}
+,{"stream_name":"stdout","time":315.160228945,"data":"\n"}
+,{"stream_name":"stdout","time":317.004638349,"data":"Loading weights:   0%|          | 0/194 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":317.111239863,"data":"Loading weights:   1%|          | 1/194 [00:01\u003c05:55,  1.84s/it]\n"}
+,{"stream_name":"stdout","time":317.707301777,"data":"Loading weights:  32%|███▏      | 63/194 [00:01\u003c00:02, 44.94it/s]\n"}
+,{"stream_name":"stdout","time":318.081260285,"data":"Loading weights:  51%|█████     | 99/194 [00:02\u003c00:01, 50.72it/s]\n"}
+,{"stream_name":"stdout","time":318.412417334,"data":"Loading weights:  62%|██████▏   | 121/194 [00:02\u003c00:01, 52.78it/s]\n"}
+,{"stream_name":"stdout","time":318.601804562,"data":"Loading weights:  71%|███████   | 137/194 [00:03\u003c00:01, 51.69it/s]\n"}
+,{"stream_name":"stdout","time":318.711657515,"data":"Loading weights:  77%|███████▋  | 149/194 [00:03\u003c00:00, 53.62it/s]\n"}
+,{"stream_name":"stdout","time":318.929241922,"data":"Loading weights:  82%|████████▏ | 159/194 [00:03\u003c00:00, 58.13it/s]\n"}
+,{"stream_name":"stdout","time":319.105283048,"data":"Loading weights:  87%|████████▋ | 169/194 [00:03\u003c00:00, 55.04it/s]\n"}
+,{"stream_name":"stdout","time":319.245425839,"data":"Loading weights:  92%|█████████▏| 178/194 [00:03\u003c00:00, 54.15it/s]\n"}
+,{"stream_name":"stdout","time":319.24582961,"data":"Loading weights:  98%|█████████▊| 190/194 [00:04\u003c00:00, 60.61it/s]\n"}
+,{"stream_name":"stdout","time":319.245859983,"data":"Loading weights: 100%|██████████| 194/194 [00:04\u003c00:00, 47.48it/s]\n"}
+,{"stream_name":"stdout","time":319.549452917,"data":"[transformers] Passing `generation_config` together with generation-related arguments=({'max_new_tokens'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.\n"}
+,{"stream_name":"stdout","time":325.476846144,"data":"[phi4-mini-instruct] 1/2 ws2-screen-p01-academic-1 ok 5.9s options_seen=8\n"}
+,{"stream_name":"stdout","time":329.070460011,"data":"[phi4-mini-instruct] 2/2 ws2-screen-p01-condense-1 ok 3.6s options_seen=8\n"}
+,{"stream_name":"stdout","time":329.111474307,"data":"{\"candidate\": \"phi4-mini-instruct\", \"status\": \"completed\", \"tasks\": {\"ok\": 2, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":330.821061247,"data":"=== smollm3-3b ===\n"}
+,{"stream_name":"stdout","time":341.868041655,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":345.346687517,"data":"\n"}
+,{"stream_name":"stdout","time":356.991235099,"data":"Fetching 2 files:   0%|          | 0/2 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":375.781598528,"data":"Fetching 2 files:  50%|█████     | 1/2 [00:11\u003c00:11, 11.64s/it]\n"}
+,{"stream_name":"stdout","time":375.782119309,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:30\u003c00:00, 15.85s/it]\n"}
+,{"stream_name":"stdout","time":375.782139849,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:30\u003c00:00, 15.22s/it]\n"}
+,{"stream_name":"stdout","time":376.346594443,"data":"\n"}
+,{"stream_name":"stdout","time":377.206810821,"data":"Loading weights:   0%|          | 0/326 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":377.326163613,"data":"Loading weights:   0%|          | 1/326 [00:00\u003c04:39,  1.16it/s]\n"}
+,{"stream_name":"stdout","time":377.613131067,"data":"Loading weights:  17%|█▋        | 57/326 [00:00\u003c00:03, 78.82it/s]\n"}
+,{"stream_name":"stdout","time":377.743864637,"data":"Loading weights:  26%|██▋       | 86/326 [00:01\u003c00:02, 86.68it/s]\n"}
+,{"stream_name":"stdout","time":377.952985504,"data":"Loading weights:  33%|███▎      | 106/326 [00:01\u003c00:02, 99.31it/s]\n"}
+,{"stream_name":"stdout","time":378.126780375,"data":"Loading weights:  38%|███▊      | 125/326 [00:01\u003c00:02, 96.75it/s]\n"}
+,{"stream_name":"stdout","time":378.24916702,"data":"Loading weights:  43%|████▎     | 140/326 [00:01\u003c00:01, 93.99it/s]\n"}
+,{"stream_name":"stdout","time":378.374158133,"data":"Loading weights:  48%|████▊     | 156/326 [00:01\u003c00:01, 101.76it/s]\n"}
+,{"stream_name":"stdout","time":378.526994248,"data":"Loading weights:  52%|█████▏    | 169/326 [00:02\u003c00:01, 102.33it/s]\n"}
+,{"stream_name":"stdout","time":378.698155823,"data":"Loading weights:  56%|█████▋    | 184/326 [00:02\u003c00:01, 101.02it/s]\n"}
+,{"stream_name":"stdout","time":378.8187674,"data":"Loading weights:  62%|██████▏   | 201/326 [00:02\u003c00:01, 100.56it/s]\n"}
+,{"stream_name":"stdout","time":378.951234472,"data":"Loading weights:  67%|██████▋   | 219/326 [00:02\u003c00:00, 112.28it/s]\n"}
+,{"stream_name":"stdout","time":379.052270094,"data":"Loading weights:  71%|███████   | 232/326 [00:02\u003c00:00, 108.38it/s]\n"}
+,{"stream_name":"stdout","time":379.209752917,"data":"Loading weights:  75%|███████▌  | 246/326 [00:02\u003c00:00, 115.36it/s]\n"}
+,{"stream_name":"stdout","time":379.337629862,"data":"Loading weights:  79%|███████▉  | 259/326 [00:02\u003c00:00, 104.23it/s]\n"}
+,{"stream_name":"stdout","time":379.46998761,"data":"Loading weights:  84%|████████▎ | 273/326 [00:02\u003c00:00, 105.68it/s]\n"}
+,{"stream_name":"stdout","time":379.603878971,"data":"Loading weights:  87%|████████▋ | 284/326 [00:03\u003c00:00, 99.04it/s] \n"}
+,{"stream_name":"stdout","time":379.760604351,"data":"Loading weights:  92%|█████████▏| 300/326 [00:03\u003c00:00, 105.18it/s]\n"}
+,{"stream_name":"stdout","time":379.770553798,"data":"Loading weights:  98%|█████████▊| 318/326 [00:03\u003c00:00, 108.39it/s]\n"}
+,{"stream_name":"stdout","time":379.770575044,"data":"Loading weights: 100%|██████████| 326/326 [00:03\u003c00:00, 95.22it/s] \n"}
+,{"stream_name":"stdout","time":379.955618162,"data":"[transformers] Passing `generation_config` together with generation-related arguments=({'max_new_tokens'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.\n"}
+,{"stream_name":"stdout","time":380.742045608,"data":"[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.\n"}
+,{"stream_name":"stdout","time":385.491913401,"data":"[smollm3-3b] 1/2 ws2-screen-p01-academic-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":389.714454026,"data":"[smollm3-3b] 2/2 ws2-screen-p01-condense-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":389.756772083,"data":"{\"candidate\": \"smollm3-3b\", \"status\": \"completed\", \"tasks\": {\"ok\": 2, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":391.380759845,"data":"=== control-missing-revision ===\n"}
+,{"stream_name":"stdout","time":402.43782846,"data":"[control-missing-revision] FAILED to load: RevisionNotFoundError: 404 Client Error. (Request ID: Root=1-6ad27b2b-2ef0b3fc5f01cec858add5c4;e2bbe6cd-de4e-420b-95d6-7abf66b07056)\n"}
+,{"stream_name":"stdout","time":402.437853239,"data":"\n"}
+,{"stream_name":"stdout","time":402.437857822,"data":"Revision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false\u0026expand=false.\n"}
+,{"stream_name":"stdout","time":402.437863119,"data":"\n"}
+,{"stream_name":"stdout","time":402.437955541,"data":"{\"candidate\": \"control-missing-revision\", \"status\": \"failed\", \"tasks\": {\"ok\": 0, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":403.518206848,"data":"{\n"}
+,{"stream_name":"stdout","time":403.518236296,"data":"  \"qwen35-2b\": {\n"}
+,{"stream_name":"stdout","time":403.518240749,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":403.518244347,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":403.518248489,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":403.518252349,"data":"      \"ok\": 2,\n"}
+,{"stream_name":"stdout","time":403.518256258,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":403.518259765,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":403.51826307,"data":"    },\n"}
+,{"stream_name":"stdout","time":403.518266202,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":403.518280321,"data":"    \"wall_seconds\": 84.9\n"}
+,{"stream_name":"stdout","time":403.518283978,"data":"  },\n"}
+,{"stream_name":"stdout","time":403.518287999,"data":"  \"qwen35-4b\": {\n"}
+,{"stream_name":"stdout","time":403.518295684,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":403.518298971,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":403.518302275,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":403.518305759,"data":"      \"ok\": 2,\n"}
+,{"stream_name":"stdout","time":403.518309151,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":403.518312527,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":403.518315903,"data":"    },\n"}
+,{"stream_name":"stdout","time":403.51831942,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":403.518322954,"data":"    \"wall_seconds\": 87.1\n"}
+,{"stream_name":"stdout","time":403.518326637,"data":"  },\n"}
+,{"stream_name":"stdout","time":403.518330456,"data":"  \"minicpm5-2b\": {\n"}
+,{"stream_name":"stdout","time":403.518334378,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":403.51833819,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":403.518341796,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":403.518345883,"data":"      \"ok\": 2,\n"}
+,{"stream_name":"stdout","time":403.518349271,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":403.518353063,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":403.518356469,"data":"    },\n"}
+,{"stream_name":"stdout","time":403.518359825,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":403.518363641,"data":"    \"wall_seconds\": 55.7\n"}
+,{"stream_name":"stdout","time":403.518367377,"data":"  },\n"}
+,{"stream_name":"stdout","time":403.518370659,"data":"  \"phi4-mini-instruct\": {\n"}
+,{"stream_name":"stdout","time":403.518374398,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":403.518378479,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":403.518382415,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":403.518385817,"data":"      \"ok\": 2,\n"}
+,{"stream_name":"stdout","time":403.518389209,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":403.518392793,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":403.518396998,"data":"    },\n"}
+,{"stream_name":"stdout","time":403.518400725,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":403.518404986,"data":"    \"wall_seconds\": 69.9\n"}
+,{"stream_name":"stdout","time":403.518409244,"data":"  },\n"}
+,{"stream_name":"stdout","time":403.518413379,"data":"  \"smollm3-3b\": {\n"}
+,{"stream_name":"stdout","time":403.518417442,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":403.518421218,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":403.518425031,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":403.518429072,"data":"      \"ok\": 2,\n"}
+,{"stream_name":"stdout","time":403.518433167,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":403.518437069,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":403.518440892,"data":"    },\n"}
+,{"stream_name":"stdout","time":403.518444663,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":403.518448996,"data":"    \"wall_seconds\": 60.3\n"}
+,{"stream_name":"stdout","time":403.518453046,"data":"  },\n"}
+,{"stream_name":"stdout","time":403.518466693,"data":"  \"control-missing-revision\": {\n"}
+,{"stream_name":"stdout","time":403.518470748,"data":"    \"exit_code\": 2,\n"}
+,{"stream_name":"stdout","time":403.518474508,"data":"    \"status\": \"failed\",\n"}
+,{"stream_name":"stdout","time":403.518478826,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":403.518482503,"data":"      \"ok\": 0,\n"}
+,{"stream_name":"stdout","time":403.518486086,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":403.518489818,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":403.518494093,"data":"    },\n"}
+,{"stream_name":"stdout","time":403.518498072,"data":"    \"error\": \"404 Client Error. (Request ID: Root=1-6ad27b2b-2ef0b3fc5f01cec858add5c4;e2bbe6cd-de4e-420b-95d6-7abf66b07056)\\n\\nRevision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false\u0026expand=false.\\nInvalid rev id: 0000000000000000000000000000000000000000\",\n"}
+,{"stream_name":"stdout","time":403.518503734,"data":"    \"wall_seconds\": 12.1\n"}
+,{"stream_name":"stdout","time":403.518507274,"data":"  }\n"}
+,{"stream_name":"stdout","time":403.518511137,"data":"}\n"}
+,{"stream_name":"stderr","time":405.601713762,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":405.601746222,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":405.881528389,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":405.881554655,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":406.666022273,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":407.765040278,"data":"[NbConvertApp] Writing 303313 bytes to __results__.html\n"}
+]

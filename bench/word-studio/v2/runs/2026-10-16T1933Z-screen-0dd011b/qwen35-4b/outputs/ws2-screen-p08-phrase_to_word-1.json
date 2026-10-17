@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p08-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "74c5db912f03647508de0714ecb5ae15db54b711897693051f3513873f789c73",
+  "seed": 935646832593167479,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"learned\", \"realized\", \"discovered\", \"found\", \"knew\", \"understood\", \"saw\", \"learnt\", \"grasped\", \"noticed\"]}\n",
+  "timing": {
+    "first_text_ms": 542.4,
+    "option_ms": [
+      914.3,
+      1182.8,
+      1437.8,
+      1626.5,
+      1877.7,
+      2132.2,
+      2379.6,
+      2624.8,
+      2929.7,
+      3112.3
+    ],
+    "total_ms": 3296.2,
+    "stream": [
+      [
+        542.4,
+        2
+      ],
+      [
+        605.9,
+        9
+      ],
+      [
+        667.0,
+        11
+      ],
+      [
+        733.0,
+        14
+      ],
+      [
+        793.7,
+        19
+      ],
+      [
+        853.9,
+        21
+      ],
+      [
+        914.3,
+        23
+      ],
+      [
+        979.0,
+        25
+      ],
+      [
+        1040.3,
+        29
+      ],
+      [
+        1101.4,
+        33
+      ],
+      [
+        1182.8,
+        35
+      ],
+      [
+        1254.5,
+        37
+      ],
+      [
+        1315.7,
+        40
+      ],
+      [
+        1376.3,
+        47
+      ],
+      [
+        1437.8,
+        49
+      ],
+      [
+        1499.6,
+        51
+      ],
+      [
+        1562.5,
+        56
+      ],
+      [
+        1626.5,
+        58
+      ],
+      [
+        1689.2,
+        60
+      ],
+      [
+        1751.8,
+        61
+      ],
+      [
+        1815.0,
+        64
+      ],
+      [
+        1877.7,
+        66
+      ],
+      [
+        1941.3,
+        68
+      ],
+      [
+        2006.4,
+        73
+      ],
+      [
+        2068.8,
+        78
+      ],
+      [
+        2132.2,
+        80
+      ],
+      [
+        2196.1,
+        82
+      ],
+      [
+        2257.9,
+        83
+      ],
+      [
+        2319.1,
+        85
+      ],
+      [
+        2379.6,
+        87
+      ],
+      [
+        2441.9,
+        89
+      ],
+      [
+        2501.9,
+        93
+      ],
+      [
+        2562.7,
+        95
+      ],
+      [
+        2624.8,
+        97
+      ],
+      [
+        2685.8,
+        99
+      ],
+      [
+        2747.9,
+        101
+      ],
+      [
+        2808.6,
+        103
+      ],
+      [
+        2868.5,
+        106
+      ],
+      [
+        2929.7,
+        108
+      ],
+      [
+        2991.7,
+        110
+      ],
+      [
+        3052.7,
+        117
+      ],
+      [
+        3112.3,
+        120
+      ],
+      [
+        3233.8,
+        121
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nLast summer I got my first job working at a small pizza restaurant near my house. At first I thought it would be easy, but I quickly found out that it was a lot of work. On busy nights we had to make dozens of pizzas in just a few hours, and customers got upset if their food was late. My manager, Tony, taught me how to stay calm and do one thing at a time. I also learned how to talk to people who were angry without getting angry myself. The job was tiring, but it showed me that I can handle stress better than I thought. These skills will help me in college and in any job I have in the future.\n\"\"\"\n\nThe writer selected the phrase \"found out\" in this sentence (marked with [[ ]]):\nAt first I thought it would be easy, but I quickly [[found out]] that it was a lot of work.\n\nGive 10 single words that can replace \"found out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 354,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

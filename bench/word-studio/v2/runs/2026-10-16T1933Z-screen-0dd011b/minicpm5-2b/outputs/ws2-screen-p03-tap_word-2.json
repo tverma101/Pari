@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p03-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "minicpm5-2b",
+  "messages_sha256": "8927efb8c7fc346d5bd05d93c8f4fd8edf006f0b64a08cc5e9c8f137476cc9f8",
+  "seed": 6605319439625134851,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"vast\", \"significant\", \"major\", \"large\", \"profound\", \"substantial\", \"extended\", \"widespread\", \"extended\", \"large\"]}",
+  "timing": {
+    "first_text_ms": 139.4,
+    "option_ms": [
+      397.7,
+      552.8,
+      705.5,
+      858.8,
+      1060.9,
+      1264.8,
+      1418.9,
+      1618.9,
+      1770.9,
+      1925.2
+    ],
+    "total_ms": 2028.7,
+    "stream": [
+      [
+        139.4,
+        2
+      ],
+      [
+        191.3,
+        9
+      ],
+      [
+        243.2,
+        11
+      ],
+      [
+        294.9,
+        14
+      ],
+      [
+        345.9,
+        18
+      ],
+      [
+        397.7,
+        20
+      ],
+      [
+        450.3,
+        22
+      ],
+      [
+        501.4,
+        33
+      ],
+      [
+        552.8,
+        35
+      ],
+      [
+        604.5,
+        37
+      ],
+      [
+        655.4,
+        42
+      ],
+      [
+        705.5,
+        44
+      ],
+      [
+        756.3,
+        46
+      ],
+      [
+        806.9,
+        51
+      ],
+      [
+        858.8,
+        53
+      ],
+      [
+        909.2,
+        55
+      ],
+      [
+        959.2,
+        58
+      ],
+      [
+        1010.5,
+        63
+      ],
+      [
+        1060.9,
+        65
+      ],
+      [
+        1111.1,
+        67
+      ],
+      [
+        1162.3,
+        70
+      ],
+      [
+        1213.0,
+        78
+      ],
+      [
+        1264.8,
+        80
+      ],
+      [
+        1318.1,
+        82
+      ],
+      [
+        1368.8,
+        90
+      ],
+      [
+        1418.9,
+        92
+      ],
+      [
+        1468.9,
+        94
+      ],
+      [
+        1519.3,
+        95
+      ],
+      [
+        1569.0,
+        104
+      ],
+      [
+        1618.9,
+        106
+      ],
+      [
+        1669.3,
+        108
+      ],
+      [
+        1719.3,
+        116
+      ],
+      [
+        1770.9,
+        118
+      ],
+      [
+        1822.8,
+        120
+      ],
+      [
+        1874.2,
+        125
+      ],
+      [
+        1925.2,
+        127
+      ],
+      [
+        1976.7,
+        128
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<s><|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe printing press was one of the most important inventions in history. Before Johannes Gutenberg built his press around 1440, books had to be copied by hand, which took a really long time. Because of this, books were very expensive and only rich people and churches could have them. After the press was invented, books could be made much faster and for a lot less money. More people started learning how to read, and new ideas spread across Europe quickly. Some historians say that the press helped cause big changes like the Reformation and the Scientific Revolution. Without it, the world we live in today would probably be very different.\n\"\"\"\n\nThe writer tapped the word \"big\" in this sentence (marked with [[ ]]):\nSome historians say that the press helped cause [[big]] changes like the Reformation and the Scientific Revolution.\n\nGive 10 replacements for \"big\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"big\" without changing the rest of the sentence. Do not repeat \"big\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 357,
+  "new_tokens": 38,
+  "finish_reason": "stop",
+  "error": null
+}
