@@ -69,7 +69,7 @@ def schema():
                 }}}}}
 
 def invoke_claude(prompt, model):
-    command = ["claude", "--bare", "--print", "Grade the blinded packet on stdin.",
+    command = ["claude", "--safe-mode", "--print", "Grade the blinded packet on stdin.",
                "--model", model, "--output-format", "json", "--json-schema",
                json.dumps(schema()), "--disallowedTools", "*", "--max-turns", "1"]
     with tempfile.TemporaryDirectory(prefix="pari-blind-") as cwd:
