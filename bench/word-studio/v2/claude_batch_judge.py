@@ -80,6 +80,16 @@ def invoke_claude(prompt, model):
     envelope = json.loads(run.stdout)
     if envelope.get("is_error") or not isinstance(envelope.get("structured_output"), dict):
         raise RuntimeError("No valid Claude structured output")
+    # The CLI can silently reroute unavailable/flagged models. A blind
+    # evaluation is not comparable if even one packet used a different judge.
+    # modelUsage reports the actual model IDs, unlike --model's requested ID.
+    used_models = envelope.get("modelUsage")
+    if not isinstance(used_models, dict) or set(used_models) != {model}:
+        raise RuntimeError(
+            "Claude judge identity unverified or changed (requested "
+            + repr(model) + ", actual " + repr(sorted(used_models) if isinstance(used_models, dict) else None)
+            + "); no score recorded"
+        )
     session = envelope.get("session_id")
     if not isinstance(session, str) or not session:
         raise RuntimeError("Missing Claude session ID")
