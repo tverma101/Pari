@@ -100,6 +100,30 @@ class BlindClaudeBatchTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "commitment"):
             judge.run(self.judging, self.rubric, "claude-explicit-test", invoke=self.fake)
 
+    def test_cli_rejects_hidden_model_fallback(self):
+        from unittest.mock import patch
+        from types import SimpleNamespace
+
+        real = {
+            "is_error": False,
+            "structured_output": self.good,
+            "session_id": "real-session",
+            "modelUsage": {"claude-fallback-different": {"outputTokens": 12}},
+        }
+        with patch.object(judge.subprocess, "run", return_value=SimpleNamespace(
+            returncode=0, stderr="", stdout=json.dumps(real)
+        )):
+            with self.assertRaisesRegex(RuntimeError, "judge identity unverified"):
+                judge.invoke_claude("packet text", "claude-explicit-test")
+
+        real["modelUsage"] = {"claude-explicit-test": {"outputTokens": 12}}
+        with patch.object(judge.subprocess, "run", return_value=SimpleNamespace(
+            returncode=0, stderr="", stdout=json.dumps(real)
+        )):
+            structured, session = judge.invoke_claude("packet text", "claude-explicit-test")
+            self.assertEqual(structured, self.good)
+            self.assertEqual(session, "real-session")
+
     def test_stale_model_checkpoint_cannot_be_reused(self):
         progress = self.judging / "claude-progress"
         write(progress / "t1.json",
