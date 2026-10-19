@@ -13,6 +13,7 @@ and nothing is written. Metrics are defined in ``v2/RUBRIC.md``.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import statistics
 import sys
@@ -29,6 +30,7 @@ if str(WORD_STUDIO) not in sys.path:
 from v2 import blind, build_tasks, hard_checks, run_candidate  # noqa: E402
 
 TOP = 3
+SUPPORTED_JUDGE_EFFORT_LEVELS = {"low", "medium", "high", "xhigh", "max"}
 
 
 class VerificationError(Exception):
@@ -75,6 +77,9 @@ def verify(judging: Path, scores_path: Path) -> tuple[dict[str, Any], dict[str, 
     header, rows = rows[0], rows[1:]
     if not header.get("judge") or not header.get("session"):
         problems.append("header must name the judge and the session")
+    header_effort = header.get("effort_level")
+    if not isinstance(header_effort, str) or header_effort not in SUPPORTED_JUDGE_EFFORT_LEVELS:
+        problems.append("header must record a fixed supported judge effort level")
     if header.get("blind") is not True:
         problems.append("header must state blind: true")
     for field in ("rubric_sha256", "key_sha256"):
@@ -82,6 +87,36 @@ def verify(judging: Path, scores_path: Path) -> tuple[dict[str, Any], dict[str, 
             problems.append(f"header {field} does not match packets/index.json")
     if header.get("packets_index_sha256") != blind.sha256_file(index_path):
         problems.append("packets/index.json changed after the score template was created")
+    receipt_path = judging / "claude-session-receipt.json"
+    receipt: dict[str, Any] = {}
+    try:
+        loaded_receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        if isinstance(loaded_receipt, dict):
+            receipt = loaded_receipt
+        else:
+            problems.append("Claude session receipt must be a JSON object")
+    except (OSError, json.JSONDecodeError):
+        problems.append("Claude session receipt is missing or invalid")
+    model = receipt.get("model")
+    if not isinstance(model, str) or not model or header.get("judge") != "claude:" + model:
+        problems.append("Claude session receipt model does not match the score header")
+    effort_level = receipt.get("effort_level")
+    if not isinstance(effort_level, str) or effort_level not in SUPPORTED_JUDGE_EFFORT_LEVELS:
+        problems.append("Claude session receipt must record a fixed supported effort level")
+    if header.get("effort_level") not in (None, effort_level):
+        problems.append("score header effort level does not match the Claude session receipt")
+    sessions = receipt.get("sessions")
+    if (not isinstance(sessions, dict) or set(sessions) != set(index.get("tasks", []))
+            or any(not isinstance(value, str) or not value for value in sessions.values())):
+        problems.append("Claude session receipt must contain one session ID per judged task")
+    else:
+        session_digest = hashlib.sha256(json.dumps(sessions, sort_keys=True).encode()).hexdigest()
+        if header.get("session") != "batch:" + session_digest:
+            problems.append("Claude session receipt sessions do not match the score header")
+    if receipt.get("packet_index_sha256") != blind.sha256_file(index_path):
+        problems.append("Claude session receipt packet index hash does not match")
+    if receipt.get("scores_sha256") != blind.sha256_file(scores_path):
+        problems.append("Claude session receipt score hash does not match")
     if blind.sha256_file(blind.RUBRIC) != index["rubric_sha256"]:
         problems.append("current RUBRIC.md changed after the judging packets were built")
     packet_hashes = index.get("packet_hashes")
@@ -228,6 +263,7 @@ def candidate_metrics(items: list[dict[str, Any]]) -> dict[str, Any]:
 def aggregate(judging: Path, scores_path: Path) -> dict[str, Any]:
     index, key, verified = verify(judging, scores_path)
     header = read_jsonl(scores_path)[0]
+    receipt = json.loads((judging / "claude-session-receipt.json").read_text(encoding="utf-8"))
     per_candidate: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for item in verified:
         per_candidate[item["sealed"]["candidate_id"]].append(item)
@@ -245,14 +281,20 @@ def aggregate(judging: Path, scores_path: Path) -> dict[str, Any]:
                           "peak_memory": run.get("peak_memory")}
         candidates[cid] = metrics
     ranking = sorted(candidates, key=lambda c: (-candidates[c]["top3_at_bar"], -candidates[c]["usable_per_task"], c))
+    task_ids = [task["id"] for task in build_tasks.load_tasks(index["task_set"])]
+    task_selection = index.get("task_selection", "legacy_unspecified")
+    task_set_complete = index.get("task_set_complete", index["tasks"] == task_ids)
     return {
         "benchmark": "word-studio-v2",
         "run_id": index["run_id"],
         "task_set": index["task_set"],
+        "task_selection": task_selection,
+        "task_set_complete": task_set_complete,
         "tasks_judged": len(index["tasks"]),
-        "judge": {k: header.get(k) for k in ("judge", "session", "blind")},
+        "judge": {k: header.get(k) for k in ("judge", "session", "blind", "effort_level")},
         "sources": {
             "run_dir": key["run_dir"],
+            "claude_receipt_sha256": blind.sha256_file(judging / "claude-session-receipt.json"),
             "packets_index_sha256": blind.sha256_file(judging / "packets" / "index.json"),
             "key_sha256": index["key_sha256"],
             "scores_sha256": blind.sha256_file(scores_path),
@@ -270,8 +312,10 @@ def aggregate(judging: Path, scores_path: Path) -> dict[str, Any]:
 
 def markdown(result: dict[str, Any]) -> str:
     lines = [f"# Word Studio v2 results: {result['run_id']}", "",
-             f"Set `{result['task_set']}`, {result['tasks_judged']} tasks judged blind by "
-             f"{result['judge']['judge']} (session `{result['judge']['session']}`). "
+             f"Set `{result['task_set']}`, {result['tasks_judged']} tasks judged blind "
+             f"({result['task_selection']}; complete task set: {str(result['task_set_complete']).lower()}) by "
+             f"{result['judge']['judge']} at `{result['judge']['effort_level']}` effort "
+             f"(session `{result['judge']['session']}`). "
              f"Ranked by {result['ranking_rule']}. Latency is Kaggle T4, Transformers fp16, not the Mac.", "",
              "| Candidate | Top-3 at bar | Top-1 at bar | Top-3 strong | Usable / task | Strict JSON | "
              "First option p50 | Third option p50 | Complete set |",

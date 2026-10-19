@@ -8,12 +8,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import tempfile
 from collections import defaultdict
 from pathlib import Path
 
 CRITERIA = ("fit", "meaning", "register", "variety", "usefulness")
+EFFORT_LEVEL = "high"
 
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -73,8 +75,10 @@ def invoke_claude(prompt, model):
                "--model", model, "--output-format", "json", "--json-schema",
                json.dumps(schema()), "--disallowedTools", "*", "--max-turns", "1"]
     with tempfile.TemporaryDirectory(prefix="pari-blind-") as cwd:
+        env = os.environ.copy()
+        env["CLAUDE_CODE_EFFORT_LEVEL"] = EFFORT_LEVEL
         run = subprocess.run(command, cwd=cwd, input=prompt, capture_output=True,
-                             text=True, check=False, timeout=600)
+                             text=True, check=False, timeout=600, env=env)
     if run.returncode:
         raise RuntimeError(f"Claude failed with exit {run.returncode}: {run.stderr[-700:]}")
     envelope = json.loads(run.stdout)
@@ -137,7 +141,8 @@ def run(judging, rubric, model, invoke=invoke_claude, limit=None, dry_run=False)
             if (saved.get("packet_hash") != index["packet_hashes"][tid]
                     or saved.get("rubric_hash") != index["rubric_sha256"]
                     or saved.get("template_hash") != template_hash
-                    or saved.get("model") != model):
+                    or saved.get("model") != model
+                    or saved.get("effort_level") != EFFORT_LEVEL):
                 raise ValueError("Stale checkpoint: " + tid)
             answer, session = {"scores": saved["scores"]}, saved["session"]
         else:
@@ -158,7 +163,8 @@ def run(judging, rubric, model, invoke=invoke_claude, limit=None, dry_run=False)
         if not isinstance(session, str) or not session:
             raise ValueError("Missing session provenance")
         if not checkpoint.exists():
-            data = {"model": model, "session": session, "packet_hash": index["packet_hashes"][tid],
+            data = {"model": model, "effort_level": EFFORT_LEVEL, "session": session,
+                    "packet_hash": index["packet_hashes"][tid],
                     "template_hash": template_hash, "rubric_hash": index["rubric_sha256"],
                     "scores": [{"label": r["label"], "relevance": r["relevance"],
                                 "criteria": r["criteria"], "note": r["note"]} for r in rows]}
@@ -169,13 +175,15 @@ def run(judging, rubric, model, invoke=invoke_claude, limit=None, dry_run=False)
     if len(completed) < len(ids):
         return {"tasks": len(ids), "completed": len(completed), "wrote_scores": False}
     session_digest = hashlib.sha256(json.dumps(sessions, sort_keys=True).encode()).hexdigest()
-    result = [dict(header, judge="claude:" + model, session="batch:" + session_digest)]
+    result = [dict(header, judge="claude:" + model, session="batch:" + session_digest,
+                   effort_level=EFFORT_LEVEL)]
     result += [r for tid in ids for r in completed[tid]]
     temp = output.with_suffix(".jsonl.tmp")
     temp.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in result))
     temp.replace(output)
     (judging / "claude-session-receipt.json").write_text(json.dumps({
-        "model": model, "sessions": sessions, "packet_index_sha256": sha(index_path),
+        "model": model, "effort_level": EFFORT_LEVEL, "sessions": sessions,
+        "packet_index_sha256": sha(index_path),
         "scores_sha256": sha(output)}, indent=2) + "\n")
     return {"tasks": len(ids), "completed": len(ids), "wrote_scores": True}
 

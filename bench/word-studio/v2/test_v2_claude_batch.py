@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -68,11 +69,16 @@ class BlindClaudeBatchTests(unittest.TestCase):
                            invoke=self.fake)
         self.assertTrue(result["wrote_scores"])
         rows = judge.load_jsonl(self.judging / "scores.jsonl")
+        self.assertEqual(rows[0]["effort_level"], "high")
         self.assertEqual([r.get("label") for r in rows[1:]], ["A", "B"])
         self.assertEqual(rows[1]["output_ref"], "o-a")
         self.assertEqual(rows[1]["relevance"], {"1": 2, "2": 0})
         self.assertIsNone(rows[2]["criteria"])
-        self.assertTrue((self.judging / "claude-session-receipt.json").exists())
+        receipt = json.loads((self.judging / "claude-session-receipt.json").read_text())
+        self.assertEqual(receipt["effort_level"], "high")
+        self.assertEqual(receipt["sessions"], {"t1": "test-session"})
+        checkpoint = json.loads((self.judging / "claude-progress/t1.json").read_text())
+        self.assertEqual(checkpoint["effort_level"], "high")
         with self.assertRaises(FileExistsError):
             judge.run(self.judging, self.rubric, "claude-explicit-test", invoke=self.fake)
 
@@ -124,10 +130,42 @@ class BlindClaudeBatchTests(unittest.TestCase):
             self.assertEqual(structured, self.good)
             self.assertEqual(session, "real-session")
 
+    def test_cli_pins_high_effort_over_an_inherited_lower_value(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        envelope = {
+            "is_error": False,
+            "structured_output": self.good,
+            "session_id": "real-session",
+            "modelUsage": {"claude-explicit-test": {"outputTokens": 12}},
+        }
+        with patch.dict(os.environ, {"CLAUDE_CODE_EFFORT_LEVEL": "low"}):
+            with patch.object(judge.subprocess, "run", return_value=SimpleNamespace(
+                returncode=0, stderr="", stdout=json.dumps(envelope)
+            )) as run:
+                judge.invoke_claude("packet text", "claude-explicit-test")
+            self.assertEqual(os.environ["CLAUDE_CODE_EFFORT_LEVEL"], "low")
+        self.assertEqual(run.call_args.kwargs["env"]["CLAUDE_CODE_EFFORT_LEVEL"], "high")
+
     def test_stale_model_checkpoint_cannot_be_reused(self):
         progress = self.judging / "claude-progress"
         write(progress / "t1.json",
               json.dumps({"model": "wrong-model", "packet_hash": "x", "scores": []}))
+        with self.assertRaisesRegex(ValueError, "Stale checkpoint"):
+            judge.run(self.judging, self.rubric, "claude-explicit-test", invoke=self.fake)
+
+    def test_checkpoint_with_a_different_effort_cannot_be_reused(self):
+        index = json.loads((self.judging / "packets/index.json").read_text())
+        template_path = self.judging / "scores.template.jsonl"
+        progress = self.judging / "claude-progress"
+        write(progress / "t1.json", json.dumps({
+            "model": "claude-explicit-test", "effort_level": "low", "session": "old-session",
+            "packet_hash": index["packet_hashes"]["t1"],
+            "rubric_hash": index["rubric_sha256"],
+            "template_hash": judge.sha(template_path),
+            "scores": self.good["scores"],
+        }))
         with self.assertRaisesRegex(ValueError, "Stale checkpoint"):
             judge.run(self.judging, self.rubric, "claude-explicit-test", invoke=self.fake)
 

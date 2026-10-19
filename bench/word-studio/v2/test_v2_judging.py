@@ -1,6 +1,7 @@
 """Code checks, blind packets and citation-checked aggregation (#87)."""
 from __future__ import annotations
 
+import hashlib
 import json
 import tempfile
 import unittest
@@ -183,7 +184,10 @@ class BlindAggregateTests(unittest.TestCase):
         """Fill the template the way the judge would. Only the test reads the key to pick labels."""
         key = json.loads((self.judging / "sealed" / "key.json").read_text(encoding="utf-8"))
         rows = aggregate.read_jsonl(self.judging / "scores.template.jsonl")
-        rows[0].update(judge="claude-opus-5-5", session="test-session")
+        sessions = {task_id: "test-session-" + task_id for task_id in self.index["tasks"]}
+        session_digest = hashlib.sha256(json.dumps(sessions, sort_keys=True).encode()).hexdigest()
+        rows[0].update(judge="claude:claude-opus-5-5", session="batch:" + session_digest,
+                       effort_level="high")
         for row in rows[1:]:
             cid = key["tasks"][row["task_id"]][row["label"]]["candidate_id"]
             row["relevance"] = {k: LABELS[cid][k] for k in row["relevance"]}
@@ -193,6 +197,11 @@ class BlindAggregateTests(unittest.TestCase):
             edit(rows, key)
         path = self.judging / "scores.jsonl"
         path.write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+        index_path = self.judging / "packets" / "index.json"
+        receipt = {"model": "claude-opus-5-5", "effort_level": "high", "sessions": sessions,
+                   "packet_index_sha256": blind.sha256_file(index_path),
+                   "scores_sha256": blind.sha256_file(path)}
+        (self.judging / "claude-session-receipt.json").write_text(json.dumps(receipt), encoding="utf-8")
         return path
 
     def test_packets_are_blind(self) -> None:
@@ -211,6 +220,8 @@ class BlindAggregateTests(unittest.TestCase):
         key = json.loads((self.judging / "sealed" / "key.json").read_text(encoding="utf-8"))
         self.assertEqual([e["candidate_id"] for e in key["not_judged"]], ["cand-broken"])
         self.assertEqual(set(self.index["packet_hashes"]), set(JUDGED))
+        self.assertEqual(self.index["task_selection"], "explicit_task_ids")
+        self.assertFalse(self.index["task_set_complete"])
         header = aggregate.read_jsonl(self.judging / "scores.template.jsonl")[0]
         self.assertEqual(header["packets_index_sha256"],
                          blind.sha256_file(self.judging / "packets" / "index.json"))
@@ -229,7 +240,73 @@ class BlindAggregateTests(unittest.TestCase):
         self.assertEqual(result["not_judged"][0]["candidate_id"], "cand-broken")
         self.assertEqual(a["latency_t4"]["first_option"]["n"], 2)
         self.assertTrue(result["sources"]["rubric_unchanged_since"])
+        self.assertEqual(result["judge"]["effort_level"], "high")
+        self.assertIn("claude_receipt_sha256", result["sources"])
+        self.assertEqual(result["task_selection"], "explicit_task_ids")
+        self.assertFalse(result["task_set_complete"])
         self.assertIn("cand-b", aggregate.markdown(result))
+
+    def test_default_selection_uses_the_entire_recorded_complete_set(self) -> None:
+        judging = self.run_dir.parent / "complete-judging"
+        index = blind.build(self.run_dir, judging)
+        task_order = [task["id"] for task in build_tasks.load_tasks("screen")]
+        self.assertEqual(index["tasks"], task_order)
+        self.assertEqual(index["task_selection"], "recorded_run_tasks")
+        self.assertTrue(index["task_set_complete"])
+
+    def test_missing_output_from_a_completed_run_is_refused(self) -> None:
+        missing_task = next(task_id for task_id in TASKS if task_id not in JUDGED)
+        output = self.run_dir / "cand-a" / "outputs" / f"{missing_task}.json"
+        output.rename(output.with_suffix(".missing"))
+        with self.assertRaises(SystemExit) as caught:
+            blind.build(self.run_dir, self.judging.parent / "missing-output")
+        self.assertIn("missing outputs", str(caught.exception))
+
+    def test_smoke_run_selects_and_marks_its_recorded_prefix(self) -> None:
+        smoke_dir = self.run_dir.parent / "smoke"
+        for cid in ("cand-a", "cand-b"):
+            candidate = {"candidate_id": cid, "model_id": f"fake/{cid}", "revision": "0" * 40}
+            run_candidate.run(candidate, "screen", smoke_dir / cid, ScriptedBackend(["alpha", "beta"]),
+                              limit=2, log=lambda _: None)
+        judging = self.run_dir.parent / "smoke-judging"
+        index = blind.build(smoke_dir, judging)
+        task_order = [task["id"] for task in build_tasks.load_tasks("screen")]
+        self.assertEqual(index["tasks"], task_order[:2])
+        self.assertEqual(index["task_selection"], "recorded_run_tasks")
+        self.assertFalse(index["task_set_complete"])
+
+    def test_candidates_with_different_recorded_subsets_are_refused(self) -> None:
+        mixed_dir = self.run_dir.parent / "mixed"
+        for cid, limit in (("cand-a", 2), ("cand-b", 3)):
+            candidate = {"candidate_id": cid, "model_id": f"fake/{cid}", "revision": "0" * 40}
+            run_candidate.run(candidate, "screen", mixed_dir / cid, ScriptedBackend(["alpha", "beta"]),
+                              limit=limit, log=lambda _: None)
+        with self.assertRaises(SystemExit) as caught:
+            blind.build(mixed_dir, self.run_dir.parent / "mixed-judging")
+        self.assertIn("different task subsets", str(caught.exception))
+
+    def test_effort_receipt_is_required_and_bound(self) -> None:
+        scores = self.fill_scores()
+        receipt_path = self.judging / "claude-session-receipt.json"
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        receipt["effort_level"] = "auto"
+        receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+        self.assert_refused(scores, "fixed supported effort")
+
+    def test_legacy_index_marks_subset_as_selection_unspecified(self) -> None:
+        index_path = self.judging / "packets" / "index.json"
+        legacy_index = json.loads(index_path.read_text(encoding="utf-8"))
+        legacy_index.pop("task_selection")
+        legacy_index.pop("task_set_complete")
+        blind.write_json(index_path, legacy_index)
+        template_path = self.judging / "scores.template.jsonl"
+        template = aggregate.read_jsonl(template_path)
+        template[0]["packets_index_sha256"] = blind.sha256_file(index_path)
+        template_path.write_text("".join(json.dumps(row) + "\n" for row in template), encoding="utf-8")
+        self.index = legacy_index
+        result = aggregate.aggregate(self.judging, self.fill_scores())
+        self.assertEqual(result["task_selection"], "legacy_unspecified")
+        self.assertFalse(result["task_set_complete"])
 
     def assert_refused(self, scores: Path, fragment: str) -> None:
         with self.assertRaises(aggregate.VerificationError) as caught:

@@ -49,7 +49,8 @@ From `bench/word-studio`:
 ```bash
 # 3. Build blind packets. The judge reads RUBRIC.md, packets/*.md and scores.template.jsonl only.
 python3 -m v2.blind --run v2/runs/<run-id>
-# 4. Claude fills scores.template.jsonl in a session and saves it as scores.jsonl.
+# 4. Run the resumable Claude CLI judge; it records the pinned model and effort in scores.jsonl and its receipt.
+python3 -m v2.claude_batch_judge --judging v2/judging/<run-id> --model <versioned-claude-model-id>
 # 5. Verify citations, un-blind and write v2/results/<run-id>/.
 python3 -m v2.aggregate --judging v2/judging/<run-id>
 ```
@@ -58,6 +59,10 @@ Runs, judging folders and results are never overwritten. A new attempt gets a
 new run id (it carries the UTC launch time). The kernel slug is reused and
 Kaggle serves only its latest output, so fetch a run before launching another.
 A failed candidate is recorded with its error and gets no scores.
+Before creating packets, the builder validates each completed run's exact
+output filenames against its task limit and completion record. All judged
+candidates must have the same task set; missing outputs are never silently
+dropped. An explicit `--tasks` subset is recorded in `packets/index.json`.
 
 Start with a smoke run (`--limit 2`) of every candidate. It shows which ones
 load and generate on T4 in fp16 before the full screen spends quota.

@@ -18,6 +18,10 @@ Writes ``v2/judging/<run-id>/``:
 
 Only candidates whose run completed are judged. Failed runs are listed in the
 key as not judged, with their error.
+
+Every completed run's output filenames must match its recorded task limit and
+completion metadata. The default selection judges the same recorded task set
+for every candidate; an explicit subset is marked in the frozen index.
 """
 from __future__ import annotations
 
@@ -77,6 +81,41 @@ def load_runs(run_dir: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]
                             "error": run.get("error"), "run_json": rel(run_json),
                             "run_sha256": entry["run_sha256"]})
     return judged, skipped
+
+
+def recorded_tasks(entry: dict[str, Any], task_order: list[str]) -> list[str]:
+    """Validate a completed run's exact output set against its run receipt."""
+    run = entry["run"]
+    candidate_id = entry["candidate_id"]
+    limit = run.get("task_limit")
+    if run.get("complete_set") is True and limit is None:
+        expected = task_order
+    elif (run.get("complete_set") is False and type(limit) is int
+          and 1 <= limit <= len(task_order)):
+        expected = task_order[:limit]
+    else:
+        raise SystemExit(f"{candidate_id}: cannot verify task outputs from complete_set/task_limit metadata")
+
+    planned = run.get("tasks_planned")
+    counts = run.get("tasks")
+    if type(planned) is not int or planned != len(expected):
+        raise SystemExit(f"{candidate_id}: tasks_planned does not match its recorded task set")
+    if (not isinstance(counts, dict) or type(counts.get("ok")) is not int
+            or counts["ok"] != len(expected) or type(counts.get("error")) is not int
+            or counts["error"] != 0):
+        raise SystemExit(f"{candidate_id}: completed task counts do not match its recorded task set")
+
+    output_dir = entry["dir"] / "outputs"
+    found = {path.stem for path in output_dir.glob("*.json")}
+    missing, extra = sorted(set(expected) - found), sorted(found - set(expected))
+    if missing or extra:
+        details = []
+        if missing:
+            details.append(f"missing outputs: {missing}")
+        if extra:
+            details.append(f"unexpected outputs: {extra}")
+        raise SystemExit(f"{candidate_id}: output files do not match run metadata ({'; '.join(details)})")
+    return expected
 
 
 def instruction_of(task: dict[str, Any]) -> str:
@@ -143,11 +182,23 @@ def build(run_dir: Path, out_dir: Path, *, task_ids: list[str] | None = None) ->
     if manifest["sets"][set_name]["sha256"] != task_sha:
         raise SystemExit(f"the runs used a different {set_name} task file than v2/tasks has now; "
                          "judge them from the commit they ran at")
-    tasks = {t["id"]: t for t in build_tasks.load_tasks(set_name)}
-    have = [{p.stem for p in (e["dir"] / "outputs").glob("*.json")} for e in judged]
-    common = set.intersection(*have)
-    chosen = [t for t in tasks if t in common] if task_ids is None else task_ids
-    missing = [t for t in chosen if t not in common]
+    task_records = build_tasks.load_tasks(set_name)
+    task_order = [t["id"] for t in task_records]
+    tasks = {t["id"]: t for t in task_records}
+    candidate_task_sets = [recorded_tasks(e, task_order) for e in judged]
+    if any(ids != candidate_task_sets[0] for ids in candidate_task_sets[1:]):
+        raise SystemExit("completed candidates recorded different task subsets; refusing to intersect them")
+    available = set(candidate_task_sets[0])
+    if task_ids is None:
+        chosen = candidate_task_sets[0]
+    else:
+        if len(task_ids) != len(set(task_ids)):
+            raise SystemExit("explicit task list contains duplicate IDs")
+        unknown = [task_id for task_id in task_ids if task_id not in tasks]
+        if unknown:
+            raise SystemExit(f"unknown task IDs: {unknown}")
+        chosen = task_ids
+    missing = [t for t in chosen if t not in available]
     if missing:
         raise SystemExit(f"tasks without an output from every judged candidate: {missing}")
     secret = secrets.token_hex(16)
@@ -190,6 +241,8 @@ def build(run_dir: Path, out_dir: Path, *, task_ids: list[str] | None = None) ->
     index = {
         "run_id": run_dir.name,
         "task_set": set_name,
+        "task_selection": "recorded_run_tasks" if task_ids is None else "explicit_task_ids",
+        "task_set_complete": set(chosen) == set(task_order),
         "tasks": chosen,
         "packet_hashes": packet_hashes,
         "outputs_per_task": len(judged),
@@ -214,7 +267,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--run", type=Path, required=True, help="v2/runs/<run-id>")
     parser.add_argument("--out", type=Path, help="default: v2/judging/<run-id>")
-    parser.add_argument("--tasks", help="comma-separated task ids (default: every task all candidates ran)")
+    parser.add_argument("--tasks", help="comma-separated explicit task subset (default: the identical task set recorded by every completed candidate run)")
     args = parser.parse_args(argv)
     run_dir = args.run.resolve()
     out_dir = (args.out or HERE / "judging" / run_dir.name).resolve()
