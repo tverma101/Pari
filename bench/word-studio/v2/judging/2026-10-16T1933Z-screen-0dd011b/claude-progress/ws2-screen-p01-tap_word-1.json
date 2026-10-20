@@ -1,0 +1,128 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "54b5a7ab-b21f-4d72-8c39-e7457b51eff0",
+  "packet_hash": "d3e9353d0a0b0abc3539e76b132d6aa5a2a53e9d4387d953881dc93ab06b0169",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.078166,
+    "duration_ms": 18074,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4874,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 1935
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "5": 1,
+        "6": 1,
+        "8": 1,
+        "9": 0,
+        "10": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 2,
+        "usefulness": 3
+      },
+      "note": "Option 9 'correct' is 0: 'a correct idea' reads awkwardly and makes an opinion sound like a factual right/wrong claim. Options 4 and 7 failed the duplicate check. 'valid' at the top is weaker than 'wise' and 'sound'."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 2,
+        "10": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 3
+      },
+      "note": "No zeros. 'excellent' raises the strength of the judgement. 'effective', 'advantageous' and 'appropriate' need 'a' changed to 'an'. The best fit, 'wise', is buried at 9."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 1,
+        "10": 1
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 3,
+        "register": 3,
+        "variety": 4,
+        "usefulness": 2
+      },
+      "note": "Option 6 'favorable' is 0: 'a favorable idea' is odd and the sense is off. Option 7 'proficient' is 0: wrong sense, since it describes skill, not ideas. Option 8 'improving' is 0: wrong sense and ungrammatical in place."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 2,
+        "8": 1,
+        "9": 1,
+        "10": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 5,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 4
+      },
+      "note": "No zeros. Strong picks are near the top. 'smart' at 1 is slightly informal. 'advantageous' and 'appropriate' need 'an'."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 2,
+        "5": 1,
+        "6": 2,
+        "7": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 5,
+        "register": 4,
+        "variety": 1,
+        "usefulness": 3
+      },
+      "note": "No zeros among the judged options. Options 4, 8, 9 and 10 failed the duplicate check, so variety is very low."
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "d024f2c4-2581-42b8-8a9b-e475d0924012",
+  "packet_hash": "b59042f1392bbfa525efa3f22f42f1a60d91508324df280296e63aa511b7f2dc",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.09847,
+    "duration_ms": 27076,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5047,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 2881
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 2,
+        "4": 2,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "No zeros. Option 2: 'constant comparing' is a little awkward. Option 5 ties comparing to what teens reported, a link the paragraph does not make, so it gets 1. Options 1 and 3 are strong and come first."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 2,
+        "4": 2,
+        "5": 2
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 5,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 3
+      },
+      "note": "No zeros. Option 1 copies the paragraph's own sentence almost word for word, so it adds nothing, yet it sits first. Option 2: 'best parts of lives' needs an edit. Options 3 to 5 are strong."
+    },
+    {
+      "label": "C",
+      "relevance": {},
+      "criteria": null,
+      "note": "Unparseable output (hit the token limit). No options to judge."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 1,
+        "2": 0,
+        "3": 1,
+        "4": 0,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 2,
+        "register": 2,
+        "variety": 3,
+        "usefulness": 1
+      },
+      "note": "Casual second-person register throughout. Option 2 ('It is important to compare...') and option 4 ('We should compare...') are 0 because they urge comparing, the opposite of the paragraph's argument. Option 5 is 0 because it brings in a new idea (weighing time on apps against time spent elsewhere) that the paragraph does not contain. Option 3: 'self-image may shrink' is an odd phrase. Option 1 is weak because it presents comparing as a neutral choice."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 0,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "Option 4 is 0 for two reasons. It uses the noun 'comparison' instead of a form of 'compare', and it adds a new claim ('a distorted view of reality') that the paragraph does not make. Option 5 brings in accomplishments and being demotivated, which go a little past the paragraph's ideas, so it gets 1."
+    }
+  ]
+}

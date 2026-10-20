@@ -1,0 +1,108 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "f7131a98-29eb-42b0-a1ef-ab1bdd4885ae",
+  "packet_hash": "3445bb22c315057d128802698aab127b78881dd183bd0a97cdf9e7c8e74fe956",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.13728999999999997,
+    "duration_ms": 43175,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5502,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 4640
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 1 is 0: 'potential backlash' turns 'knows... will be angry' into a mere possibility, which changes the certainty. Option 3 is 0: 'volunteers' changes what Atticus does ('agrees' means he was asked). Options 2 and 4 hedge with 'probable', 2 is stiff ('cognizant'), and 5 drops 'most', so all three are only usable."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 1,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 3
+      },
+      "note": "Option 2 is 0: 'volunteers' changes 'agrees', so it changes what happens. Option 5 is 0: 'potential for public backlash' hedges a known outcome and drops 'most'. Option 1 adds 'willingly', and option 3 is in the passive and hedges with 'likely'. Option 4 is the best one, but it sits fourth."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 0,
+        "4": 1,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 3,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 3 is 0: 'willing to support' loses the legal sense of 'defend', and 'upset' is not more academic. Option 5 is 0: 'many' replaces 'most', 'act on behalf of' is vague, and 'angry about it' is casual. Option 1 ('is prepared to') drifts from 'agrees' and drops 'most'. Option 4 hedges with 'likely' and turns anger into 'oppose his position'."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 2,
+        "register": 2,
+        "variety": 1,
+        "usefulness": 1
+      },
+      "note": "Option 1 is 0: it drops 'knows', adds the hedge 'likely' and changes 'most' to 'many'. Option 2 is 0: it is almost a copy of the original with only will->would, so the register does not change. Option 5 is 0: it presents the anger as already there instead of foreseen, drops 'knows', and 'widespread anger of most' is redundant. Option 3 is plain and drops 'he knows' but is still usable. Option 4 failed as a duplicate and was not judged."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 5,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 5
+      },
+      "note": "All five keep the knowledge, the 'most/majority' and the certain 'will'. Option 2 is a little stiff ('harbor anger'). Option 5 is plainer ('angry at him') and loses the concessive link. The sentences are built alike, so variety is moderate."
+    }
+  ]
+}

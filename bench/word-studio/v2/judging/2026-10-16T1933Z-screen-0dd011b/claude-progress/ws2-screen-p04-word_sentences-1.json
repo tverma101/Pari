@@ -1,0 +1,109 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "a9014898-5958-4006-b5ae-99eaab7d3adc",
+  "packet_hash": "42e16a2b6fc8991e83fa41ee8e8e3616268afa1a63c6af6d1d96252ff5004663",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.11559399999999997,
+    "duration_ms": 32134,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5220,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 3668
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 0,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 3,
+        "variety": 4,
+        "usefulness": 3
+      },
+      "note": "Option 4 is 0 because it changes the scientists' finding. The paragraph says students who sleep more usually get better grades. This option makes it a claim that sleep-deprived students' grades improve if they sleep more, and the logic is muddled. Option 3 is circular: not enough sleep 'leads to' sleep deprivation. Option 5 adds 'early morning demands' as a cause."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 1,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 2,
+        "register": 2,
+        "variety": 2,
+        "usefulness": 1
+      },
+      "note": "Option 1 is 0 because it adds a trend the paragraph doesn't make ('a growing concern'). Option 2 is 0 because it is vague and off the argument ('sense of deprivation becomes clearer'), and it shifts to 'we'. Option 5 is 0 because it adds a claim that is not in the paragraph ('first step to better health'). Every option uses the stiff 'the deprivation of sleep/rest' pattern."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 2,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "There are no zeros. Options 2 and 5 are circular: insufficient sleep 'leads to' or 'contributes to' sleep deprivation. Option 4 adds 'chronic' and 'various health issues'. The best options come first."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 0,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 2,
+        "register": 2,
+        "variety": 2,
+        "usefulness": 1
+      },
+      "note": "Option 1 is 0 because it is circular and empty: lack of sleep leads to 'a significant deprivation of rest', and it adds the booster 'significant'. Option 2 is 0 because 'deprivation of the time needed for recovery' is awkward and brings in 'recovery', an idea the paragraph doesn't have. Option 4 is 0 because 'suffers a deprivation of focus' misuses the word."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "There are no zeros. Options 2 and 3 are circular: lack of sleep 'leads to' or 'results in' sleep deprivation. In option 2, 'their' has no clear antecedent. Option 5 repeats itself, and its 'leading to lower grades' is a little more causal than the paragraph's correlation."
+    }
+  ]
+}

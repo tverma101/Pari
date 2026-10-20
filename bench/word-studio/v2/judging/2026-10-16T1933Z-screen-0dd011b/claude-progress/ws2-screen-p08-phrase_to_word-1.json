@@ -1,0 +1,118 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "e52203d8-be45-4805-a6c5-6fd2bbda4564",
+  "packet_hash": "08a0aa1f16552f02d88764cc10f14da4bbd6b870a50bda4124f8f7e73d9abdba",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.083922,
+    "duration_ms": 20317,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5046,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 2154
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 4
+      },
+      "note": "Option 5 'noted' is 0: in 'quickly noted that it was a lot of work' it reads as 'remarked', not 'came to know', so the sense is wrong. Option 10 'gained' is 0: 'gained that it was' is ungrammatical. The top three are strong and in a good order."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "4": 1
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 4,
+        "register": 3,
+        "variety": 1,
+        "usefulness": 2
+      },
+      "note": "The judged options are base forms ('realize', 'discover', 'learn'), so the writer must change them to the past tense to fit 'I quickly ___ that it was'. That makes them usable, not strong. Positions 5 to 10 are duplicates or multi-word fails, so the list offers little real choice."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 5
+      },
+      "note": "Option 5 'knew' is 0: 'knew' describes a state, not coming to know something, so 'quickly knew that it was a lot of work' is odd and changes the meaning. 'learnt' is a British spelling that clashes with 'learned' later in the paragraph, so it gets 1. The top three are all strong and come first."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "4": 2,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 4,
+        "register": 4,
+        "variety": 2,
+        "usefulness": 4
+      },
+      "note": "All five judged options are at the bar, and the top three include two strong picks. Positions 6 to 11 are duplicates, multi-word phrases, an echo of the original or beyond the requested count, which lowers fit and variety."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 0,
+        "6": 1
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 4,
+        "register": 4,
+        "variety": 2,
+        "usefulness": 4
+      },
+      "note": "Option 5 'noted' is 0: in this sentence it reads as 'remarked', not 'came to know', so the sense is wrong. Positions 7 to 10 are duplicate fails. The top three are strong."
+    }
+  ]
+}

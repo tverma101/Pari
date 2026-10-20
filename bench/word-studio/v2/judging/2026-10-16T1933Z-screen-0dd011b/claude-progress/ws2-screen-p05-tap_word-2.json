@@ -1,0 +1,132 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "d291645a-4cb3-48cf-8469-9ad0021c2052",
+  "packet_hash": "72179e1132397adc96fd5b761eed79b8b7d48959d674b724ce6a2cfc5203a1d1",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.094542,
+    "duration_ms": 24608,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4801,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 2783
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "6": 1,
+        "7": 2,
+        "8": 2,
+        "9": 2
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 3
+      },
+      "note": "No judged option is labelled 0. Options 5 (echo) and 10 (duplicate) failed the code checks and were not judged. The first three options are plain near-synonyms, and the stronger picks (nervous, apprehensive, timid) come later in the list."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 1,
+        "2": 2,
+        "3": 0,
+        "4": 1,
+        "5": 2,
+        "6": 1,
+        "7": 1,
+        "8": 0,
+        "9": 1,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 3,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 3
+      },
+      "note": "Option 3 'alarmed' is 0: it means suddenly startled by an event, not a lasting fear of speaking. Option 8 'humbly' is 0: it is an adverb and ungrammatical after 'too'. Option 10 'caught' is 0: it is the wrong sense and makes no sense in the sentence."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 2,
+        "9": 1,
+        "10": 2
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 4,
+        "register": 5,
+        "variety": 4,
+        "usefulness": 5
+      },
+      "note": "No option is labelled 0. 'Uncomfortable', 'hesitant' and 'insecure' drift slightly away from fear but still suit the paragraph. 'Intimidated' and 'timid' are strong fits."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 2,
+        "6": 1,
+        "7": 1,
+        "8": 0,
+        "9": 1,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 4
+      },
+      "note": "Option 8 'distrustful' is 0: it changes the meaning from fear to suspicion of others. Option 10 'reluctant' is 0: 'too reluctant to talk' is unidiomatic and loses the fear. 'Terrified' overstates the feeling."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 1,
+        "9": 2,
+        "10": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "Option 5 'dreadful' is 0: it is the wrong sense (it means terrible, not afraid). Option 7 'panic-stricken' is 0: it badly overstates a lasting state that held 'most of the time'. 'Terrified' also overstates."
+    }
+  ]
+}

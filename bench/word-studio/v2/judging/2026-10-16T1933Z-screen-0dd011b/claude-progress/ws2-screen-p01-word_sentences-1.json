@@ -1,0 +1,108 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "08e891c0-e089-4c27-93c6-598e22524877",
+  "packet_hash": "881aa6a31ce308091c37e500abab028fd4216a78a019900b8d8abf5e5775a726",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.09995799999999999,
+    "duration_ms": 27126,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5438,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 2799
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "Option 5 gets a 0 because 'has been shown to be' claims evidence that the paragraph never gives. Options 1\u20134 all use the same 'X can be detrimental to students' Y' frame. Option 4 is generic but supported by 'better places to learn'."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 1
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 2,
+        "register": 2,
+        "variety": 1,
+        "usefulness": 1
+      },
+      "note": "Each option copies sentences straight from the paragraph instead of giving one new sentence. Option 1 gets a 0 because it copies paragraph sentences and calls 'the phone's use' a 'detrimental habit', which does not make sense. Option 2 gets a 0 because 'However' sets up a contrast that is not there, and it copies two paragraph sentences. Option 3 gets a 0 because 'used detrimentally' misuses the word, and 'Yet' sets up a contrast that does not follow from the ban conclusion. Option 4 is usable but awkward ('the phone's use') and repeats the paragraph's first sentence word for word."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 0,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 2,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 4 gets a 0 because calling a cut in phone access 'a detrimental step' turns the paragraph's argument around. Option 5 gets a 0 because it adds a claim the paragraph does not make (recognizing the impact helps 'us' focus) and moves to the 'us' perspective. Option 3 is grammatical but awkward ('losing attention')."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 5,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "No option gets a 0. In option 1, 'it' has no clear referent. Option 4 is awkward and close to circular ('detrimental for students to stop listening'). Option 5 is a little wordy. Options 2 and 3 are clean and strong."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "4": 2,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 5,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "Option 5 gets a 0 because 'a phone ban would be detrimental to the distraction' uses the word in the wrong sense, does not make sense, and seems to argue against the ban. In option 3, 'attention span' hints at a long-term effect that the paragraph does not quite claim."
+    }
+  ]
+}

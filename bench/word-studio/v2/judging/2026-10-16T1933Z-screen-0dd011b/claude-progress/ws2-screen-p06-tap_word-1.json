@@ -1,0 +1,125 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "46a2b90b-7456-44b2-8444-173d943c4449",
+  "packet_hash": "3de02ef274463772284b2c16749c44c6810bd95141e80afd226b40ae032c63e7",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.092422,
+    "duration_ms": 27374,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4896,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 2639
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 2,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 5,
+        "variety": 4,
+        "usefulness": 5
+      },
+      "note": "Option 10 'remarkable' is 0: it changes the sense from size to surprising or extraordinary, and it reads as praise for what is mostly a harmful effect. 'notable' and 'noteworthy' are about being worth noticing, not size. 'important' needs 'an' instead of 'a'. The six strong options come first."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 2,
+        "4": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 1,
+        "usefulness": 2
+      },
+      "note": "No judged option is 0. Options 5-10 are duplicates (code fail), so the list has only four distinct words. 'large' is plain. 'important' needs 'an' and changes the sense to importance."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "6": 1,
+        "7": 1,
+        "8": 2,
+        "10": 1
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 4,
+        "register": 5,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "No judged option is 0. Options 5 and 9 repeat 'considerable' (code fail). 'meaningful', 'noteworthy' and 'notable' drift from size toward significance or being worth noticing. The strong options come first."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 1,
+        "7": 1,
+        "8": 0,
+        "9": 2,
+        "10": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 5
+      },
+      "note": "Option 8 'extensive' is 0: 'an extensive effect' is an awkward pairing (extensive means wide in scope), and it also needs 'an' instead of 'a'. 'serious' adds a negative judgment the opening sentence doesn't make. 'dramatic' is a bit stronger than 'big'. 'great' can be misread as 'excellent'. The strong options come first."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 1,
+        "6": 2,
+        "7": 1,
+        "9": 1,
+        "10": 2
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 5
+      },
+      "note": "No judged option is 0. Option 8 repeats 'considerable' (code fail). 'profound' raises the strength slightly but is a standard essay word. 'deep' is a less common pairing with 'effect'. 'great' can be misread as 'excellent'. 'notable' is about being worth noticing, not size."
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "5b477c97-5a81-435c-a25e-056e1dc4e111",
+  "packet_hash": "626f5aa7e9a555069cd8b4d1908b6e3844613b39e0bfdafd6235bf94c284d349",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.098498,
+    "duration_ms": 28964,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5058,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 2878
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 0,
+        "2": 1,
+        "3": 2,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 3
+      },
+      "note": "Option 1 is 0: 'without making mistakes' adds a claim the paragraph never makes. Options 2, 4 and 5 add small ideas ('think clearly', 'customer expectations', 'with professionalism'). The strongest option, 3, is not first."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 3,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 1 is 0: it copies a sentence already in the paragraph, so it gives the writer nothing new. Option 2 is 0: 'busy work' means pointless tasks, the wrong sense here, and 'The manager' reads awkwardly. Option 5 is 0: 'future jobs in college' changes the meaning, since the paragraph names college and future jobs separately."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 0,
+        "2": 1,
+        "4": 1
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 4,
+        "register": 3,
+        "variety": 1,
+        "usefulness": 2
+      },
+      "note": "Option 1 is 0: it copies a sentence in the paragraph word for word. The judged options are near copies of one template sentence that change only the object, so variety is very low."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 0,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 3,
+        "register": 2,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 3 is 0: present-tense 'must ... carefully' turns the past account into an obligation and adds 'carefully', so it does not fit the paragraph. Options 4 and 5 need tense or referent fixes ('It' has no clear referent). The sentences are short and plain."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "5": 2
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 5
+      },
+      "note": "No zeros. Option 3 credits Tony with the lesson about angry customers, which the paragraph only loosely implies. Option 4 is somewhat generic. The strong options come first."
+    }
+  ]
+}
