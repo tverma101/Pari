@@ -16,6 +16,7 @@ The benchmark that picks Pari's base model (#85, #86, #87). It runs on Kaggle
 | `blind.py` | Builds blind judging packets and a sealed key from a fetched run. |
 | `RUBRIC.md` | The judging rubric, relevance bar, swap rule (#91) and score file format. |
 | `aggregate.py` | Verifies rubric, packet, index and raw-output hashes plus every score citation, then un-blinds and writes results. |
+| `import_t3_judgment.py` | Imports a completed GPT 6.1 Sol blind batch with its T3 task, model, effort and response-hash receipt. |
 
 ## Task kinds
 
@@ -49,11 +50,25 @@ From `bench/word-studio`:
 ```bash
 # 3. Build blind packets. The judge reads RUBRIC.md, packets/*.md and scores.template.jsonl only.
 python3 -m v2.blind --run v2/runs/<run-id>
-# 4. Run the resumable Claude CLI judge; it records the pinned model and effort in scores.jsonl and its receipt.
+# 4. Run a blind judge. Claude CLI uses v2.claude_batch_judge; an owner-directed T3 GPT 6.1 Sol batch uses v2.import_t3_judgment.
 python3 -m v2.claude_batch_judge --judging v2/judging/<run-id> --model <versioned-claude-model-id>
 # 5. Verify citations, un-blind and write v2/results/<run-id>/.
 python3 -m v2.aggregate --judging v2/judging/<run-id>
 ```
+
+The Claude judge makes one fresh `claude -p` call per task (40 for the
+screen set) with Opus at high effort, and its receipt totals the calls' tokens
+and cost ([`CLAUDE_CLI.md`](CLAUDE_CLI.md)). The T3 GPT importer is kept for the
+GPT judgment the owner ordered on 2026-10-18; see
+[`DECISIONS.md`](../../../docs/DECISIONS.md) and [`T3_GPT_JUDGE.md`](T3_GPT_JUDGE.md).
+A GPT receipt is recorded as GPT/T3 and never reported as a Claude judgment.
+
+Results carry error bars. Each candidate's top-3 at bar gets a 95% interval,
+and so does its gap to the leader, paired by task. Both use standard errors
+clustered by source paragraph, because the tasks from one paragraph are not
+independent ([Miller 2024, "Adding Error Bars to Evals"](https://arxiv.org/abs/2411.00640)).
+A gap whose interval includes 0 is marked "not separable": the task set cannot
+tell that candidate from the leader, and the full 200-task set should decide it.
 
 Runs, judging folders and results are never overwritten. A new attempt gets a
 new run id (it carries the UTC launch time). The kernel slug is reused and

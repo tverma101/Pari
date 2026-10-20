@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import statistics
 import sys
 from collections import Counter, defaultdict
@@ -30,7 +31,13 @@ if str(WORD_STUDIO) not in sys.path:
 from v2 import blind, build_tasks, hard_checks, run_candidate  # noqa: E402
 
 TOP = 3
+# Two-sided 95% Student t quantiles. Between rows the lower df is used, which
+# widens the interval slightly rather than narrowing it.
+T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306,
+       9: 2.262, 10: 2.228, 12: 2.179, 15: 2.131, 20: 2.086, 25: 2.060, 30: 2.042,
+       40: 2.021, 60: 2.000, 120: 1.980}
 SUPPORTED_JUDGE_EFFORT_LEVELS = {"low", "medium", "high", "xhigh", "max"}
+T3_GPT_MODEL = "gpt-6.1-sol"
 
 
 class VerificationError(Exception):
@@ -62,8 +69,9 @@ def latency(values: list[float]) -> dict[str, Any]:
     return {"n": len(values), "median_ms": percentile(values, 0.5), "p90_ms": percentile(values, 0.9)}
 
 
-def verify(judging: Path, scores_path: Path) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
-    """Return (index, key, verified rows) or raise VerificationError."""
+def verify(judging: Path, scores_path: Path) -> tuple[
+        dict[str, Any], dict[str, Any], list[dict[str, Any]], dict[str, Any], Path]:
+    """Return frozen index, key, verified rows, judge receipt and receipt path."""
     problems: list[str] = []
     index_path = judging / "packets" / "index.json"
     index = json.loads(index_path.read_text(encoding="utf-8"))
@@ -87,36 +95,74 @@ def verify(judging: Path, scores_path: Path) -> tuple[dict[str, Any], dict[str, 
             problems.append(f"header {field} does not match packets/index.json")
     if header.get("packets_index_sha256") != blind.sha256_file(index_path):
         problems.append("packets/index.json changed after the score template was created")
-    receipt_path = judging / "claude-session-receipt.json"
+    judge = header.get("judge")
+    if isinstance(judge, str) and judge.startswith("claude:"):
+        receipt_path = judging / "claude-session-receipt.json"
+        receipt_kind = "claude"
+    elif judge == T3_GPT_MODEL:
+        receipt_path = judging / "judge-session-receipt.json"
+        receipt_kind = "t3"
+    else:
+        receipt_path = judging / "judge-session-receipt.json"
+        receipt_kind = "unsupported"
+        problems.append(f"unsupported judge identity: {judge!r}")
     receipt: dict[str, Any] = {}
     try:
         loaded_receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
         if isinstance(loaded_receipt, dict):
             receipt = loaded_receipt
         else:
-            problems.append("Claude session receipt must be a JSON object")
+            problems.append("judge session receipt must be a JSON object")
     except (OSError, json.JSONDecodeError):
-        problems.append("Claude session receipt is missing or invalid")
+        problems.append("judge session receipt is missing or invalid")
     model = receipt.get("model")
-    if not isinstance(model, str) or not model or header.get("judge") != "claude:" + model:
-        problems.append("Claude session receipt model does not match the score header")
+    if (not isinstance(model, str) or not model
+            or (receipt_kind == "claude" and judge != "claude:" + model)
+            or (receipt_kind == "t3" and model != judge)):
+        problems.append("judge session receipt model does not match the score header")
     effort_level = receipt.get("effort_level")
     if not isinstance(effort_level, str) or effort_level not in SUPPORTED_JUDGE_EFFORT_LEVELS:
-        problems.append("Claude session receipt must record a fixed supported effort level")
+        problems.append("judge session receipt must record a fixed supported effort level")
     if header.get("effort_level") not in (None, effort_level):
-        problems.append("score header effort level does not match the Claude session receipt")
+        problems.append("score header effort level does not match the judge session receipt")
+    if receipt_kind == "t3":
+        if receipt.get("schema_version") != 1:
+            problems.append("T3 judge receipt schema version must be 1")
+        if receipt.get("provider") != "t3-code" or header.get("provider") != receipt.get("provider"):
+            problems.append("T3 judge provider does not match the score header")
+        if effort_level != "high":
+            problems.append("GPT 6.1 Sol score receipt must record high effort")
+        if receipt.get("service_tier") != "standard" or header.get("service_tier") != "standard":
+            problems.append("GPT 6.1 Sol score receipt must record standard service tier")
+        for field in ("provider_instance_id", "delegated_task_id", "child_run_id"):
+            value = receipt.get(field)
+            if not isinstance(value, str) or not value:
+                problems.append(f"T3 judge receipt must record {field}")
+            if header.get(field) != value:
+                problems.append(f"T3 judge receipt {field} does not match the score header")
+        input_hash = receipt.get("input_sha256")
+        try:
+            valid_input_hash = isinstance(input_hash, str) and len(input_hash) == 64 and int(input_hash, 16) >= 0
+        except ValueError:
+            valid_input_hash = False
+        if not valid_input_hash:
+            problems.append("T3 judge receipt must bind the original response SHA-256")
     sessions = receipt.get("sessions")
     if (not isinstance(sessions, dict) or set(sessions) != set(index.get("tasks", []))
             or any(not isinstance(value, str) or not value for value in sessions.values())):
-        problems.append("Claude session receipt must contain one session ID per judged task")
+        problems.append("judge session receipt must contain one session ID per judged task")
     else:
         session_digest = hashlib.sha256(json.dumps(sessions, sort_keys=True).encode()).hexdigest()
         if header.get("session") != "batch:" + session_digest:
-            problems.append("Claude session receipt sessions do not match the score header")
+            problems.append("judge session receipt sessions do not match the score header")
+        if receipt_kind == "t3" and any(value != receipt.get("child_run_id") for value in sessions.values()):
+            problems.append("T3 judge session IDs must match the recorded child run")
     if receipt.get("packet_index_sha256") != blind.sha256_file(index_path):
-        problems.append("Claude session receipt packet index hash does not match")
+        problems.append("judge session receipt packet index hash does not match")
     if receipt.get("scores_sha256") != blind.sha256_file(scores_path):
-        problems.append("Claude session receipt score hash does not match")
+        problems.append("judge session receipt score hash does not match")
+    if receipt_kind == "claude":
+        receipt["provider"] = "claude-code"
     if blind.sha256_file(blind.RUBRIC) != index["rubric_sha256"]:
         problems.append("current RUBRIC.md changed after the judging packets were built")
     packet_hashes = index.get("packet_hashes")
@@ -189,7 +235,59 @@ def verify(judging: Path, scores_path: Path) -> tuple[dict[str, Any], dict[str, 
                          "kind": tasks[task_id]["kind"]})
     if problems:
         raise VerificationError(problems)
-    return index, key, verified
+    return index, key, verified, receipt, receipt_path
+
+
+def top3_share(item: dict[str, Any]) -> float:
+    """One task's share of top-3 positions at the bar; its mean is ``top3_at_bar``."""
+    relevance = {int(k): v for k, v in (item["row"]["relevance"] or {}).items()}
+    return sum(relevance.get(i, 0) >= 1 for i in range(1, TOP + 1)) / TOP
+
+
+def clustered_mean(values: dict[str, float], cluster_of: dict[str, str]) -> dict[str, Any]:
+    """Mean with a cluster-robust standard error and a t-based 95% interval.
+
+    Tasks that share a source paragraph are not independent, so the error is
+    clustered by paragraph (Miller 2024, "Adding Error Bars to Evals",
+    arXiv:2411.00640), with the G/(G-1) small-sample correction and G-1
+    degrees of freedom because there are few paragraphs.
+    """
+    n = len(values)
+    mean = sum(values.values()) / n
+    sums: dict[str, float] = defaultdict(float)
+    for task_id, value in values.items():
+        sums[cluster_of[task_id]] += value - mean
+    g = len(sums)
+    out: dict[str, Any] = {"mean": round(mean, 4), "n": n, "clusters": g, "se": None, "ci95": None}
+    if g >= 2:
+        se = math.sqrt(g / (g - 1) * sum(v * v for v in sums.values())) / n
+        half = T95[max(k for k in T95 if k <= g - 1)] * se
+        out.update(se=round(se, 4), ci95=[round(mean - half, 4), round(mean + half, 4)])
+    return out
+
+
+def uncertainty(per_task: dict[str, dict[str, float]], ranking: list[str],
+                cluster_of: dict[str, str]) -> dict[str, Any]:
+    """Interval for each candidate's top-3 at bar, and the paired gap to the leader.
+
+    The gap is paired by task (each task scored for both candidates), which
+    removes task difficulty from the comparison. A gap whose interval spans 0
+    is not separable from the leader on this task set.
+    """
+    result: dict[str, Any] = {
+        "metric": "top3_at_bar",
+        "method": "per-task mean, standard error clustered by source paragraph, t interval with "
+                  "clusters-1 df (Miller 2024, arXiv:2411.00640)",
+        "candidates": {cid: clustered_mean(per_task[cid], cluster_of) for cid in ranking},
+        "leader": ranking[0] if ranking else None,
+        "gap_to_leader": {},
+    }
+    for cid in ranking[1:]:
+        shared = per_task[ranking[0]].keys() & per_task[cid].keys()
+        gap = clustered_mean({t: per_task[ranking[0]][t] - per_task[cid][t] for t in shared}, cluster_of)
+        gap["separable"] = gap["ci95"] is not None and gap["ci95"][0] > 0
+        result["gap_to_leader"][cid] = gap
+    return result
 
 
 def candidate_metrics(items: list[dict[str, Any]]) -> dict[str, Any]:
@@ -261,9 +359,8 @@ def candidate_metrics(items: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def aggregate(judging: Path, scores_path: Path) -> dict[str, Any]:
-    index, key, verified = verify(judging, scores_path)
+    index, key, verified, receipt, receipt_path = verify(judging, scores_path)
     header = read_jsonl(scores_path)[0]
-    receipt = json.loads((judging / "claude-session-receipt.json").read_text(encoding="utf-8"))
     per_candidate: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for item in verified:
         per_candidate[item["sealed"]["candidate_id"]].append(item)
@@ -281,20 +378,28 @@ def aggregate(judging: Path, scores_path: Path) -> dict[str, Any]:
                           "peak_memory": run.get("peak_memory")}
         candidates[cid] = metrics
     ranking = sorted(candidates, key=lambda c: (-candidates[c]["top3_at_bar"], -candidates[c]["usable_per_task"], c))
-    task_ids = [task["id"] for task in build_tasks.load_tasks(index["task_set"])]
+    all_tasks = build_tasks.load_tasks(index["task_set"])
+    task_ids = [task["id"] for task in all_tasks]
+    cluster_of = {task["id"]: task["paragraph_id"] for task in all_tasks}
+    per_task = {cid: {item["row"]["task_id"]: top3_share(item) for item in items}
+                for cid, items in per_candidate.items()}
     task_selection = index.get("task_selection", "legacy_unspecified")
     task_set_complete = index.get("task_set_complete", index["tasks"] == task_ids)
-    return {
+    result = {
         "benchmark": "word-studio-v2",
         "run_id": index["run_id"],
         "task_set": index["task_set"],
         "task_selection": task_selection,
         "task_set_complete": task_set_complete,
         "tasks_judged": len(index["tasks"]),
-        "judge": {k: header.get(k) for k in ("judge", "session", "blind", "effort_level")},
+        "judge": {**{k: header.get(k) for k in ("judge", "session", "blind", "effort_level")},
+                  "provider": receipt.get("provider"),
+                  "provider_instance_id": receipt.get("provider_instance_id"),
+                  "delegated_task_id": receipt.get("delegated_task_id"),
+                  "child_run_id": receipt.get("child_run_id")},
         "sources": {
             "run_dir": key["run_dir"],
-            "claude_receipt_sha256": blind.sha256_file(judging / "claude-session-receipt.json"),
+            "judge_receipt_sha256": blind.sha256_file(receipt_path),
             "packets_index_sha256": blind.sha256_file(judging / "packets" / "index.json"),
             "key_sha256": index["key_sha256"],
             "scores_sha256": blind.sha256_file(scores_path),
@@ -304,27 +409,38 @@ def aggregate(judging: Path, scores_path: Path) -> dict[str, Any]:
         },
         "ranking": ranking,
         "ranking_rule": "top3_at_bar, then usable_per_task (v2/RUBRIC.md)",
+        "uncertainty": uncertainty(per_task, ranking, cluster_of),
         "candidates": candidates,
         "not_judged": key["not_judged"],
         "aggregated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
+    if receipt_path.name == "claude-session-receipt.json":
+        result["sources"]["claude_receipt_sha256"] = result["sources"]["judge_receipt_sha256"]
+    return result
 
 
 def markdown(result: dict[str, Any]) -> str:
     lines = [f"# Word Studio v2 results: {result['run_id']}", "",
              f"Set `{result['task_set']}`, {result['tasks_judged']} tasks judged blind "
              f"({result['task_selection']}; complete task set: {str(result['task_set_complete']).lower()}) by "
-             f"{result['judge']['judge']} at `{result['judge']['effort_level']}` effort "
+             f"{result['judge']['judge']} via `{result['judge']['provider']}` "
+             f"at `{result['judge']['effort_level']}` effort "
              f"(session `{result['judge']['session']}`). "
              f"Ranked by {result['ranking_rule']}. Latency is Kaggle T4, Transformers fp16, not the Mac.", "",
-             "| Candidate | Top-3 at bar | Top-1 at bar | Top-3 strong | Usable / task | Strict JSON | "
-             "First option p50 | Third option p50 | Complete set |",
-             "|---|---|---|---|---|---|---|---|---|"]
+             "| Candidate | Top-3 at bar | 95% CI | Gap to leader (95% CI) | Top-1 at bar | Top-3 strong | "
+             "Usable / task | Strict JSON | First option p50 | Third option p50 | Complete set |",
+             "|---|---|---|---|---|---|---|---|---|---|---|"]
+    spread = result["uncertainty"]
+    pct = lambda pair: "—" if pair is None else f"{pair[0]:.1%} to {pair[1]:.1%}"  # noqa: E731
     for cid in result["ranking"]:
         m = result["candidates"][cid]
         lat = m["latency_t4"]
         ms = lambda v: "—" if v is None else f"{v / 1000:.1f} s"  # noqa: E731
-        lines.append(f"| {cid} | {m['top3_at_bar']:.1%} | {m['top1_at_bar']:.1%} | {m['top3_strong']:.1%} | "
+        gap = spread["gap_to_leader"].get(cid)
+        gap_text = "leader" if gap is None else (
+            f"{gap['mean']:+.1%} ({pct(gap['ci95'])}){'' if gap['separable'] else ', not separable'}")
+        lines.append(f"| {cid} | {m['top3_at_bar']:.1%} | {pct(spread['candidates'][cid]['ci95'])} | {gap_text} | "
+                     f"{m['top1_at_bar']:.1%} | {m['top3_strong']:.1%} | "
                      f"{m['usable_per_task']} | {m['formats'].get('strict', 0)}/{m['tasks']} | "
                      f"{ms(lat['first_option']['median_ms'])} | {ms(lat['third_option']['median_ms'])} | "
                      f"{'yes' if m['run']['complete_set'] else 'no'} |")
@@ -334,6 +450,8 @@ def markdown(result: dict[str, Any]) -> str:
             message = ((entry.get("error") or {}).get("message") or "").splitlines()[0][:160] if entry.get(
                 "error") else ""
             lines.append(f"- {entry['candidate_id']}: {entry['status']} at {entry.get('stage')}: {message}")
+    lines += ["", f"Intervals: {spread['method']}. \"Not separable\" means the paired gap's interval "
+              "includes 0, so this task set cannot tell that candidate from the leader."]
     lines += ["", "Every number above traces to `results.json`, which lists each task id, output ref, raw output "
               "path and sha256 it came from.", ""]
     return "\n".join(lines)

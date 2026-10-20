@@ -246,6 +246,55 @@ class BlindAggregateTests(unittest.TestCase):
         self.assertFalse(result["task_set_complete"])
         self.assertIn("cand-b", aggregate.markdown(result))
 
+    def test_aggregate_verifies_t3_gpt_receipt(self) -> None:
+        scores_path = self.fill_scores()
+        rows = aggregate.read_jsonl(scores_path)
+        child_run_id = "t3-child-run"
+        sessions = {task_id: child_run_id for task_id in self.index["tasks"]}
+        session_digest = hashlib.sha256(json.dumps(sessions, sort_keys=True).encode()).hexdigest()
+        rows[0].update(judge="gpt-6.1-sol", provider="t3-code", provider_instance_id="provider-test",
+                       delegated_task_id="delegated-task-test", child_run_id=child_run_id,
+                       session="batch:" + session_digest, effort_level="high", service_tier="standard")
+        scores_path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        index_path = self.judging / "packets" / "index.json"
+        receipt = {"schema_version": 1, "provider": "t3-code", "provider_instance_id": "provider-test",
+                   "model": "gpt-6.1-sol", "effort_level": "high", "delegated_task_id": "delegated-task-test",
+                   "service_tier": "standard", "child_run_id": child_run_id, "sessions": sessions,
+                   "input_sha256": "d" * 64,
+                   "packet_index_sha256": blind.sha256_file(index_path),
+                   "scores_sha256": blind.sha256_file(scores_path)}
+        receipt_path = self.judging / "judge-session-receipt.json"
+        receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+        result = aggregate.aggregate(self.judging, scores_path)
+        self.assertEqual(result["judge"]["judge"], "gpt-6.1-sol")
+        self.assertEqual(result["judge"]["provider"], "t3-code")
+        self.assertEqual(result["judge"]["delegated_task_id"], "delegated-task-test")
+        self.assertEqual(result["sources"]["judge_receipt_sha256"], blind.sha256_file(receipt_path))
+        self.assertIn("gpt-6.1-sol via `t3-code`", aggregate.markdown(result))
+
+        receipt["child_run_id"] = "changed-child-run"
+        receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+        with self.assertRaises(aggregate.VerificationError) as caught:
+            aggregate.aggregate(self.judging, scores_path)
+        self.assertTrue(any("child_run_id" in problem or "session IDs" in problem
+                            for problem in caught.exception.problems), caught.exception.problems)
+
+    def test_uncertainty_clusters_by_paragraph_and_pairs_by_task(self) -> None:
+        cluster_of = {"a": "p1", "b": "p1", "c": "p2", "d": "p2"}
+        spread = aggregate.clustered_mean({"a": 1.0, "b": 0.0, "c": 1.0, "d": 1.0}, cluster_of)
+        # Residual sums per paragraph are -0.5 and +0.5: se = sqrt(2/1 * 0.5) / 4.
+        self.assertEqual((spread["mean"], spread["se"], spread["clusters"]), (0.75, 0.25, 2))
+        self.assertEqual(spread["ci95"], [round(0.75 - 12.706 * 0.25, 4), round(0.75 + 12.706 * 0.25, 4)])
+        per_task = {"lead": dict.fromkeys(cluster_of, 1.0), "worse": dict.fromkeys(cluster_of, 0.0),
+                    "tied": dict.fromkeys(cluster_of, 1.0)}
+        result = aggregate.uncertainty(per_task, ["lead", "tied", "worse"], cluster_of)
+        self.assertEqual(result["leader"], "lead")
+        self.assertTrue(result["gap_to_leader"]["worse"]["separable"])
+        self.assertEqual(result["gap_to_leader"]["worse"]["ci95"], [1.0, 1.0])
+        self.assertFalse(result["gap_to_leader"]["tied"]["separable"])
+        one_cluster = aggregate.clustered_mean({"a": 1.0, "b": 0.0}, cluster_of)
+        self.assertIsNone(one_cluster["ci95"])
+
     def test_default_selection_uses_the_entire_recorded_complete_set(self) -> None:
         judging = self.run_dir.parent / "complete-judging"
         index = blind.build(self.run_dir, judging)

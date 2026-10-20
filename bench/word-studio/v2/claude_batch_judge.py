@@ -16,6 +16,8 @@ from pathlib import Path
 
 CRITERIA = ("fit", "meaning", "register", "variety", "usefulness")
 EFFORT_LEVEL = "high"
+USAGE_TOKENS = ("input_tokens", "cache_creation_input_tokens",
+                "cache_read_input_tokens", "output_tokens")
 
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -71,16 +73,26 @@ def schema():
                 }}}}}
 
 def invoke_claude(prompt, model):
-    command = ["claude", "--safe-mode", "--print", "Grade the blinded packet on stdin.",
+    # --tools "" and --strict-mcp-config leave the judge one tool, the
+    # StructuredOutput call that --json-schema adds; denying "*" would block it
+    # too. Returning that call takes a second turn.
+    command = ["claude", "--safe-mode", "--strict-mcp-config", "--tools", "",
+               "--print", "Grade the blinded packet on stdin.",
                "--model", model, "--output-format", "json", "--json-schema",
-               json.dumps(schema()), "--disallowedTools", "*", "--max-turns", "1"]
+               json.dumps(schema()), "--max-turns", "2"]
     with tempfile.TemporaryDirectory(prefix="pari-blind-") as cwd:
         env = os.environ.copy()
         env["CLAUDE_CODE_EFFORT_LEVEL"] = EFFORT_LEVEL
         run = subprocess.run(command, cwd=cwd, input=prompt, capture_output=True,
                              text=True, check=False, timeout=600, env=env)
     if run.returncode:
-        raise RuntimeError(f"Claude failed with exit {run.returncode}: {run.stderr[-700:]}")
+        # With --output-format json the CLI reports its own errors on stdout.
+        try:
+            reported = json.loads(run.stdout)
+            reported = f"{reported.get('subtype')} {reported.get('errors')}"
+        except (json.JSONDecodeError, AttributeError):
+            reported = run.stdout[-300:]
+        raise RuntimeError(f"Claude failed with exit {run.returncode}: {run.stderr[-700:]} {reported}")
     envelope = json.loads(run.stdout)
     if envelope.get("is_error") or not isinstance(envelope.get("structured_output"), dict):
         raise RuntimeError("No valid Claude structured output")
@@ -97,7 +109,18 @@ def invoke_claude(prompt, model):
     session = envelope.get("session_id")
     if not isinstance(session, str) or not session:
         raise RuntimeError("Missing Claude session ID")
-    return envelope["structured_output"], session
+    return envelope["structured_output"], session, call_usage(envelope)
+
+def call_usage(envelope):
+    """What one judge call cost, as the CLI reports it; kept for the receipt."""
+    tokens = envelope.get("usage") if isinstance(envelope.get("usage"), dict) else {}
+    usage = {k: envelope.get(k) for k in ("total_cost_usd", "duration_ms", "num_turns")}
+    usage.update({k: tokens.get(k) for k in USAGE_TOKENS})
+    return {k: v for k, v in usage.items() if isinstance(v, (int, float))}
+
+def usage_total(usages):
+    keys = sorted({k for u in usages for k in u})
+    return {"calls": len(usages), **{k: round(sum(u.get(k, 0) for u in usages), 4) for k in keys}}
 
 def run(judging, rubric, model, invoke=invoke_claude, limit=None, dry_run=False):
     judging, rubric = Path(judging), Path(rubric)
@@ -131,7 +154,7 @@ def run(judging, rubric, model, invoke=invoke_claude, limit=None, dry_run=False)
         raise FileExistsError("Refusing to overwrite final judged evidence")
     progress = judging / "claude-progress"
     progress.mkdir(exist_ok=True)
-    completed, sessions = {}, {}
+    completed, sessions, usages = {}, {}, []
     template_hash = sha(template_path)
     rubric_text = rubric.read_text()
     for tid in ids:
@@ -145,6 +168,7 @@ def run(judging, rubric, model, invoke=invoke_claude, limit=None, dry_run=False)
                     or saved.get("effort_level") != EFFORT_LEVEL):
                 raise ValueError("Stale checkpoint: " + tid)
             answer, session = {"scores": saved["scores"]}, saved["session"]
+            usage = saved.get("usage")
         else:
             if limit is not None and len(completed) >= limit:
                 break
@@ -158,7 +182,9 @@ def run(judging, rubric, model, invoke=invoke_claude, limit=None, dry_run=False)
                       "zero in a note. Never guess identities.\n\nRUBRIC:\n"
                       + rubric_text + "\n\nPACKET:\n" + packet
                       + "\n\nREQUIRED LABELS AND INDICES:\n" + json.dumps(slots))
-            answer, session = invoke(prompt, model)
+            reply = invoke(prompt, model)
+            answer, session = reply[0], reply[1]
+            usage = reply[2] if len(reply) > 2 else None
         rows = validate(answer, groups[tid])
         if not isinstance(session, str) or not session:
             raise ValueError("Missing session provenance")
@@ -166,14 +192,18 @@ def run(judging, rubric, model, invoke=invoke_claude, limit=None, dry_run=False)
             data = {"model": model, "effort_level": EFFORT_LEVEL, "session": session,
                     "packet_hash": index["packet_hashes"][tid],
                     "template_hash": template_hash, "rubric_hash": index["rubric_sha256"],
+                    "usage": usage,
                     "scores": [{"label": r["label"], "relevance": r["relevance"],
                                 "criteria": r["criteria"], "note": r["note"]} for r in rows]}
             temp = checkpoint.with_suffix(".tmp")
             temp.write_text(json.dumps(data, indent=2) + "\n")
             temp.replace(checkpoint)
         completed[tid], sessions[tid] = rows, session
+        if isinstance(usage, dict):
+            usages.append(usage)
     if len(completed) < len(ids):
-        return {"tasks": len(ids), "completed": len(completed), "wrote_scores": False}
+        return {"tasks": len(ids), "completed": len(completed), "wrote_scores": False,
+                "usage_so_far": usage_total(usages)}
     session_digest = hashlib.sha256(json.dumps(sessions, sort_keys=True).encode()).hexdigest()
     result = [dict(header, judge="claude:" + model, session="batch:" + session_digest,
                    effort_level=EFFORT_LEVEL)]
@@ -183,6 +213,7 @@ def run(judging, rubric, model, invoke=invoke_claude, limit=None, dry_run=False)
     temp.replace(output)
     (judging / "claude-session-receipt.json").write_text(json.dumps({
         "model": model, "effort_level": EFFORT_LEVEL, "sessions": sessions,
+        "usage_total": usage_total(usages),
         "packet_index_sha256": sha(index_path),
         "scores_sha256": sha(output)}, indent=2) + "\n")
     return {"tasks": len(ids), "completed": len(ids), "wrote_scores": True}

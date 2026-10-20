@@ -76,6 +76,7 @@ class BlindClaudeBatchTests(unittest.TestCase):
         self.assertIsNone(rows[2]["criteria"])
         receipt = json.loads((self.judging / "claude-session-receipt.json").read_text())
         self.assertEqual(receipt["effort_level"], "high")
+        self.assertEqual(receipt["usage_total"], {"calls": 0})
         self.assertEqual(receipt["sessions"], {"t1": "test-session"})
         checkpoint = json.loads((self.judging / "claude-progress/t1.json").read_text())
         self.assertEqual(checkpoint["effort_level"], "high")
@@ -123,12 +124,16 @@ class BlindClaudeBatchTests(unittest.TestCase):
                 judge.invoke_claude("packet text", "claude-explicit-test")
 
         real["modelUsage"] = {"claude-explicit-test": {"outputTokens": 12}}
+        real.update(total_cost_usd=0.25, duration_ms=9000, num_turns=1,
+                    usage={"input_tokens": 40, "output_tokens": 900, "server_tool_use": {}})
         with patch.object(judge.subprocess, "run", return_value=SimpleNamespace(
             returncode=0, stderr="", stdout=json.dumps(real)
         )):
-            structured, session = judge.invoke_claude("packet text", "claude-explicit-test")
+            structured, session, usage = judge.invoke_claude("packet text", "claude-explicit-test")
             self.assertEqual(structured, self.good)
             self.assertEqual(session, "real-session")
+            self.assertEqual(usage, {"total_cost_usd": 0.25, "duration_ms": 9000, "num_turns": 1,
+                                     "input_tokens": 40, "output_tokens": 900})
 
     def test_cli_pins_high_effort_over_an_inherited_lower_value(self):
         from types import SimpleNamespace
@@ -147,6 +152,24 @@ class BlindClaudeBatchTests(unittest.TestCase):
                 judge.invoke_claude("packet text", "claude-explicit-test")
             self.assertEqual(os.environ["CLAUDE_CODE_EFFORT_LEVEL"], "low")
         self.assertEqual(run.call_args.kwargs["env"]["CLAUDE_CODE_EFFORT_LEVEL"], "high")
+        command = run.call_args.args[0]
+        # No built-in or MCP tools; StructuredOutput must stay reachable.
+        self.assertEqual(command[command.index("--tools") + 1], "")
+        self.assertIn("--strict-mcp-config", command)
+        self.assertNotIn("--disallowedTools", command)
+        self.assertEqual(command[command.index("--max-turns") + 1], "2")
+
+    def test_cli_error_reports_the_reason_from_stdout(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        failed = {"is_error": True, "subtype": "error_max_turns",
+                  "errors": ["Reached maximum number of turns (1)"]}
+        with patch.object(judge.subprocess, "run", return_value=SimpleNamespace(
+            returncode=1, stderr="", stdout=json.dumps(failed)
+        )):
+            with self.assertRaisesRegex(RuntimeError, "error_max_turns"):
+                judge.invoke_claude("packet text", "claude-explicit-test")
 
     def test_stale_model_checkpoint_cannot_be_reused(self):
         progress = self.judging / "claude-progress"
