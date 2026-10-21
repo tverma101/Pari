@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {}, "criteria": null, "note": "unparseable output, no options"},
+{"label": "B", "relevance": {"1": 2, "2": 0, "3": 1, "4": 1, "5": 1}, "criteria": {"fit": 4, "meaning": 3, "register": 4, "variety": 3, "usefulness": 3}, "note": "option 2 says 'the entire soccer season' when the paragraph says the rest of the season (changes a fact); option 3 'resilience' and option 4 'made me realize' stretch the paragraph; option 5 calls a setback 'a difficult period' and adds that it motivated me"},
+{"label": "C", "relevance": {"1": 1, "2": 1, "3": 1, "4": 2, "5": 2}, "criteria": {"fit": 4, "meaning": 4, "register": 4, "variety": 3, "usefulness": 4}, "note": "option 1 is slightly clunky; option 2 'soccer career' and option 3 'soccer dreams' add mild framing; the best sentences sit at 4 and 5"}
+]}

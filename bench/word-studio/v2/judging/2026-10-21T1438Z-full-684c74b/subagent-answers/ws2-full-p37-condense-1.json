@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 1, "2": 1, "3": 1, "4": 1, "5": 1}, "criteria": {"fit": 3, "meaning": 3, "register": 3, "variety": 3, "usefulness": 3}, "note": "all shift to past tense against the present-tense paragraph; options 1, 2 'soon' drifts from 'over time'; options 1, 2, 5 lose the self-granting sense; 'perks' is casual; option 3 'rights' is not quite 'privileges'; option 4 is closest but needs a tense edit"},
+{"label": "B", "relevance": {"2": 0, "3": 1, "4": 1}, "criteria": {"fit": 3, "meaning": 3, "register": 2, "variety": 3, "usefulness": 2}, "note": "option 2 'treats' and 'booze' are too casual for an essay; option 3 is barely shorter; option 4 drops 'special privileges' and the self-granting idea"},
+{"label": "C", "relevance": {"1": 1, "2": 1, "3": 1, "4": 1, "5": 1}, "criteria": {"fit": 3, "meaning": 3, "register": 3, "variety": 2, "usefulness": 2}, "note": "all drop 'over time' (the gradual change) and most lose the self-granting sense; options 2 and 4 lack 'The'; option 4 'alcohol consumption' is stiff; option 5 has awkward word order"}
+]}

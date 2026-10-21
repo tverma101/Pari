@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 2, "2": 2, "3": 2, "4": 2, "5": 2, "6": 0, "7": 0, "9": 1}, "criteria": {"fit": 4, "meaning": 4, "register": 5, "variety": 3, "usefulness": 5}, "note": "6 'erroneously' is odd for animals eating; 7 'involuntarily' means without will/reflexively, wrong sense; 9 ambiguous"},
+{"label": "B", "relevance": {"1": 2, "2": 2, "3": 2, "4": 2, "5": 0, "6": 0, "7": 0, "8": 0, "9": 0, "10": 0}, "criteria": {"fit": 2, "meaning": 2, "register": 3, "variety": 3, "usefulness": 4}, "note": "5 'incidentally' wrong sense; 6 'casually' wrong meaning; 7 'blunderingly' too odd; 8 'carelessly' adds blame; 9 'unintended' is an adjective, ungrammatical; 10 'serendipitously' implies good fortune"},
+{"label": "C", "relevance": {"1": 2, "2": 2, "4": 2, "5": 0, "6": 2}, "criteria": {"fit": 4, "meaning": 4, "register": 5, "variety": 3, "usefulness": 4}, "note": "5 'carelessly' adds blame, wrong meaning"}
+]}

@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 0, "2": 0, "3": 1, "4": 0, "5": 0}, "criteria": {"fit": 4, "meaning": 2, "register": 4, "variety": 2, "usefulness": 2}, "note": "1, 2, 4, 5 drop 'did not seem to', stating as fact that prayers failed, which strengthens the claim; 3 keeps 'seemed' but drops 'a lot of'"},
+{"label": "B", "relevance": {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0}, "criteria": {"fit": 3, "meaning": 1, "register": 3, "variety": 3, "usefulness": 1}, "note": "all five drop 'did not seem to' and assert prayers failed, strengthening the claim; 3 also uses a contraction and vague 'it'; 5 changes 'question the church' to 'undermined faith'"},
+{"label": "C", "relevance": {"1": 1, "2": 0, "3": 0, "4": 1, "5": 0}, "criteria": {"fit": 3, "meaning": 3, "register": 4, "variety": 4, "usefulness": 2}, "note": "2 and 3 drop the 'seem' hedge and assert prayers failed (3 also drops the plague); 5 changes the claim to doubts about the church's ability to protect people and drops 'many' and the hedge; 1 is barely shorter"}
+]}

@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 1, "2": 1, "3": 1, "4": 1, "5": 0, "6": 2, "10": 0}, "criteria": {"fit": 3, "meaning": 3, "register": 4, "variety": 2, "usefulness": 3}, "note": "5 'progress' is uncountable, ungrammatical after 'Every'; 10 'triumph' overstates and contradicts 'small'; 1-4 fit but lose the 'small' nuance; three duplicates"},
+{"label": "B", "relevance": {"1": 1, "2": 1, "3": 0, "4": 1, "5": 0, "6": 2, "7": 1, "9": 1, "10": 0}, "criteria": {"fit": 3, "meaning": 3, "register": 4, "variety": 2, "usefulness": 3}, "note": "3 'triumph' and 10 'feat' overstate and contradict 'small'; 5 'progress' is uncountable, ungrammatical after 'Every'; 9 'win' just repeats part of the phrase"},
+{"label": "C", "relevance": {"1": 1, "2": 1, "3": 1, "4": 0, "5": 0, "6": 2, "7": 0, "8": 1, "9": 0, "10": 1}, "criteria": {"fit": 3, "meaning": 3, "register": 4, "variety": 4, "usefulness": 3}, "note": "4 'progress', 5 'momentum' and 7 'gains' are ungrammatical after 'Every'; 9 'feat' overstates and contradicts 'small'; 6 'step' keeps the small-increment sense"}
+]}

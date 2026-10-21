@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 2, "2": 2, "3": 1, "4": 0, "5": 1}, "criteria": {"fit": 4, "meaning": 4, "register": 5, "variety": 4, "usefulness": 4}, "note": "4 'far less clear' boosts the claim beyond 'not as clear'; 3 dangling 'revealing'; 5 'rigid' shifts the sense from clarity"},
+{"label": "B", "relevance": {"1": 1, "2": 2, "3": 1, "4": 2, "5": 2}, "criteria": {"fit": 5, "meaning": 4, "register": 5, "variety": 4, "usefulness": 4}, "note": "1 drops the conversations as cause and is redundant (distinction less distinct); 3 loses 'these'"},
+{"label": "C", "relevance": {"1": 2, "2": 0, "3": 1, "4": 0, "5": 0}, "criteria": {"fit": 3, "meaning": 2, "register": 4, "variety": 4, "usefulness": 2}, "note": "2 loses the claim into vague 'complexities'; 4 says he 'established' boundaries and only reconsiders, changing meaning; 5 replaces the claim with a new idea (shared humanity)"}
+]}

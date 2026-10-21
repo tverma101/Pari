@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 2, "2": 1, "3": 2, "4": 1, "5": 1, "6": 0, "7": 0, "8": 1, "9": 0, "10": 1}, "criteria": {"fit": 3, "meaning": 3, "register": 3, "variety": 4, "usefulness": 4}, "note": "6 'fear' is ungrammatical in place (wrong direction); 7 'horrorize' is not a word; 9 'dissuade' means persuade, not frighten"},
+{"label": "B", "relevance": {"1": 1, "2": 2, "3": 1, "4": 1, "5": 1, "6": 0, "7": 0, "8": 1, "9": 0}, "criteria": {"fit": 3, "meaning": 3, "register": 4, "variety": 3, "usefulness": 3}, "note": "6 'hinder' and 7 'dishearten' are the wrong sense (not fear); 9 'chill' is too odd in this sense; 4 discourage and 5 deter weaken the fear idea"},
+{"label": "C", "relevance": {"1": 2, "2": 1, "3": 1, "4": 2, "5": 2, "6": 1, "7": 0, "8": 1, "9": 1, "10": 0}, "criteria": {"fit": 4, "meaning": 4, "register": 4, "variety": 3, "usefulness": 4}, "note": "7 'intimidate with' and 10 'make afraid of' are ungrammatical in place; 8 duplicates the idea of 5"}
+]}

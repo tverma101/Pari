@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0}, "criteria": {"fit": 3, "meaning": 2, "register": 4, "variety": 2, "usefulness": 1}, "note": "all 5 drop the fact that Socs are 'the rich kids from the west side', which the paragraph needs for Cherry's 'rich kids have troubles too'; 2, 3, 4 also drop 'perfect lives'"},
+{"label": "B", "relevance": {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0}, "criteria": {"fit": 3, "meaning": 2, "register": 4, "variety": 2, "usefulness": 1}, "note": "all 5 drop the fact that Socs are 'the rich kids from the west side', which the paragraph needs for the rich-kids contrast later"},
+{"label": "C", "relevance": {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0}, "criteria": {"fit": 3, "meaning": 1, "register": 3, "variety": 3, "usefulness": 1}, "note": "all 5 drop that Socs are 'the rich kids from the west side'; 1-4 also drop 'perfect lives' and 5 drops 'no problems'"}
+]}

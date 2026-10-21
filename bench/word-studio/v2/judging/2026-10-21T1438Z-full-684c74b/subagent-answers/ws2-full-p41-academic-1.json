@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 2, "2": 2, "3": 1, "4": 1}, "criteria": {"fit": 5, "meaning": 4, "register": 4, "variety": 3, "usefulness": 4}, "note": "3 wordy impersonal frame; 4 'confirmed' slightly raises certainty"},
+{"label": "B", "relevance": {"1": 2, "2": 2, "3": 1, "4": 1}, "criteria": {"fit": 5, "meaning": 4, "register": 4, "variety": 3, "usefulness": 4}, "note": "3 'studies have confirmed' slight booster; 4 wordy frame"},
+{"label": "C", "relevance": {"1": 1, "2": 2, "3": 1, "4": 1, "5": 1}, "criteria": {"fit": 4, "meaning": 4, "register": 4, "variety": 3, "usefulness": 3}, "note": "1 and 5 awkward trailing agent phrases; 3 'confirmed' booster; 4 plain"}
+]}

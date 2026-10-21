@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 2, "2": 1, "3": 0, "4": 1, "5": 2}, "criteria": {"fit": 4, "meaning": 4, "register": 4, "variety": 4, "usefulness": 4}, "note": "3 dangling participle makes scientists the ones 'contaminating'; 4 'food source' is a mild extrapolation"},
+{"label": "B", "relevance": {"1": 1, "2": 1, "3": 1, "4": 0, "5": 1}, "criteria": {"fit": 3, "meaning": 3, "register": 3, "variety": 2, "usefulness": 2}, "note": "4 'contaminates the quality' misuses the word; others are generic and add vague claims (food chain, multitude of concerns), 2 has a pronoun agreement slip"},
+{"label": "C", "relevance": {"1": 2, "2": 2, "3": 0, "4": 0, "5": 2}, "criteria": {"fit": 4, "meaning": 3, "register": 4, "variety": 3, "usefulness": 3}, "note": "3 invents a scientific finding about fish we eat; 4 subject-verb error 'waste ... contaminate'"}
+]}

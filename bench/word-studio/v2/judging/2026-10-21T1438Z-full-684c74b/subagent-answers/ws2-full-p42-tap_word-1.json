@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 2, "2": 2, "3": 1, "4": 0, "5": 2, "6": 1, "7": 1, "8": 1, "9": 1}, "criteria": {"fit": 4, "meaning": 4, "register": 4, "variety": 4, "usefulness": 4}, "note": "4 'idealized lives' shifts the idealizing onto the lives and reads oddly after 'believes'; 6 redundant with 'no problems'; 7 plain; 8 leans to the moral sense"},
+{"label": "B", "relevance": {"1": 0, "2": 2, "3": 2, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0, "9": 0, "10": 0}, "criteria": {"fit": 2, "meaning": 2, "register": 3, "variety": 3, "usefulness": 2}, "note": "1 'inherently good' is the moral sense; 4 'untainted', 5 'undefiled', 6 'untouched', 7 'pure' are purity senses, wrong meaning; 8, 9, 10 are post-modifiers that are ungrammatical before 'lives'"},
+{"label": "C", "relevance": {"1": 2, "2": 2, "3": 1, "4": 0, "5": 1, "6": 1, "7": 0, "8": 0, "9": 0, "10": 0}, "criteria": {"fit": 3, "meaning": 3, "register": 4, "variety": 2, "usefulness": 3}, "note": "4 'exemplary' means worthy of imitation, wrong sense; 7 'pristine', 8 'unsoiled', 9 'spotless' are cleanliness senses; 10 'unsullied' is the reputation sense and too rare"}
+]}

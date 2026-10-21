@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 1, "2": 2, "3": 0, "4": 1, "5": 1, "6": 1, "7": 0, "8": 0, "9": 0, "10": 0}, "criteria": {"fit": 2, "meaning": 2, "register": 3, "variety": 3, "usefulness": 2}, "note": "3 'lonely' is a different feeling the paragraph never states; 7 'disenfranchised' and 9 'wistful' are the wrong sense; 8 'depressed' adds a stronger, clinical-sounding claim; 10 'disenheartened' is not a word; 1, 4-6 shift toward sadness rather than loss of identity or direction"},
+{"label": "B", "relevance": {"1": 1, "2": 1, "3": 2, "4": 1, "5": 2, "7": 1, "8": 1, "9": 1, "10": 1}, "criteria": {"fit": 4, "meaning": 4, "register": 4, "variety": 4, "usefulness": 4}, "note": "option 6 echoes 'lost'; adrift and directionless are the strongest but sit at 3 and 5"},
+{"label": "C", "relevance": {"1": 1, "2": 1, "3": 1, "4": 2, "5": 0, "6": 1, "7": 1}, "criteria": {"fit": 3, "meaning": 3, "register": 4, "variety": 2, "usefulness": 3}, "note": "5 'isolated' changes the meaning to being cut off from others; three duplicates at the end"}
+]}

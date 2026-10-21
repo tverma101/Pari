@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 0, "2": 0, "3": 1, "4": 0, "5": 0}, "criteria": {"fit": 3, "meaning": 2, "register": 4, "variety": 2, "usefulness": 2}, "note": "1, 2, 4, 5 drop 'about', so the estimate becomes exact; 2 also has a dangling modifier; 5 'a large number of sea life' is ungrammatical; 3 'their loss' is ambiguous"},
+{"label": "B", "relevance": {"1": 2, "2": 2, "3": 0, "4": 1, "5": 0}, "criteria": {"fit": 4, "meaning": 3, "register": 4, "variety": 3, "usefulness": 4}, "note": "3 says the reefs would suffer, not sea life, which changes the meaning; 5 is awkward ('being a home') and drops 'about'; 4 'devastate' overstates"},
+{"label": "C", "relevance": {"1": 0, "2": 1, "3": 1, "4": 1, "5": 0}, "criteria": {"fit": 3, "meaning": 2, "register": 3, "variety": 3, "usefulness": 2}, "note": "1 'one-quarter of every marine creature' is nonsensical and changes species to creatures; 5 'a quarter of every ocean species' is ungrammatical; 3 shifts species to 'ocean life'; 4 'residence' is stiff"}
+]}

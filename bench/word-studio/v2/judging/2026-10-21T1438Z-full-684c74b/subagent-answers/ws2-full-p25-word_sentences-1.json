@@ -1,0 +1,3 @@
+{"scores": [{"label": "A", "relevance": {"1": 1, "2": 1, "3": 1, "4": 2, "5": 0}, "criteria": {"fit": 4, "meaning": 4, "register": 4, "variety": 3, "usefulness": 3}, "note": "option 5 invents a claim (animals could not find food); paragraph only says animals got sick"},
+{"label": "B", "relevance": {"1": 1, "5": 0}, "criteria": {"fit": 2, "meaning": 3, "register": 2, "variety": 1, "usefulness": 1}, "note": "option 1 just copies the paragraph; option 5 'dried all things out' is unidiomatic"},
+{"label": "C", "relevance": {"1": 1, "2": 2, "3": 2, "4": 2, "5": 0}, "criteria": {"fit": 4, "meaning": 4, "register": 5, "variety": 4, "usefulness": 4}, "note": "option 5 adds 'widespread hunger', a claim not in the paragraph"}]}

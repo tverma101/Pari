@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 2, "2": 1}, "criteria": {"fit": 5, "meaning": 5, "register": 4, "variety": 1, "usefulness": 2}, "note": "only one-word swaps; 2 'fed up' is casual; the rest are duplicates"},
+{"label": "B", "relevance": {"1": 1, "2": 1, "3": 1, "4": 1, "5": 0}, "criteria": {"fit": 3, "meaning": 3, "register": 4, "variety": 4, "usefulness": 2}, "note": "5 'boredom' is the wrong meaning of tired of fighting; 1 and 3 add 'constant/perpetual' and 3 shifts to frustration; 2 'disputes' softens fighting; 4 'tiredness of' is unidiomatic"},
+{"label": "C", "relevance": {"1": 1, "2": 1, "3": 1, "4": 1, "5": 1}, "criteria": {"fit": 4, "meaning": 3, "register": 4, "variety": 3, "usefulness": 3}, "note": "2-5 drop 'Later', which sequences the paragraph; 1 shifts tired to frustration; 3 is shorter and generic"}
+]}

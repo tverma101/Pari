@@ -1,0 +1,3 @@
+{"scores": [{"label": "A", "relevance": {"1": 2, "2": 2, "3": 1, "4": 1, "5": 0}, "criteria": {"fit": 4, "meaning": 4, "register": 4, "variety": 3, "usefulness": 4}, "note": "option 5 adds a new idea (building a supportive society) not in the paragraph"},
+{"label": "B", "relevance": {"1": 1, "2": 1, "3": 1, "4": 2}, "criteria": {"fit": 4, "meaning": 4, "register": 3, "variety": 2, "usefulness": 3}, "note": "options 1 and 2 mostly copy paragraph sentences with 'with compassion' tacked on; option 1 is ambiguous; option 3 overgeneralizes the dinner detail"},
+{"label": "C", "relevance": {"1": 2, "2": 2, "3": 2, "4": 1, "5": 1}, "criteria": {"fit": 5, "meaning": 5, "register": 4, "variety": 4, "usefulness": 4}, "note": "option 5 is vague"}]}

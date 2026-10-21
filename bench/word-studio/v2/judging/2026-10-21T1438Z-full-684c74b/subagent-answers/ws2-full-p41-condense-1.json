@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 1, "2": 1, "3": 0, "4": 1, "5": 2}, "criteria": {"fit": 4, "meaning": 3, "register": 3, "variety": 3, "usefulness": 3}, "note": "3 drops what is unknown (health effects) and is casual; 1 shifts 'we' to scientists; 2 and 4 drop 'some', overgeneralizing studies"},
+{"label": "B", "relevance": {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0}, "criteria": {"fit": 2, "meaning": 2, "register": 2, "variety": 3, "usefulness": 1}, "note": "1 and 4 drop 'some studies suggest', turning a reported finding into the writer's own claim; 2, 3, 5 are verbless fragments, and 3 'unknown' overstates"},
+{"label": "C", "relevance": {"1": 1, "2": 2, "3": 1, "4": 2, "5": 1}, "criteria": {"fit": 5, "meaning": 4, "register": 4, "variety": 3, "usefulness": 4}, "note": "1 and 3 drop 'some'; 5 'unknown' slightly overstates the uncertainty"}
+]}

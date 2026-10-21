@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 1, "2": 1, "3": 1, "4": 1, "5": 1}, "criteria": {"fit": 4, "meaning": 4, "register": 3, "variety": 2, "usefulness": 2}, "note": "every sentence copies a paragraph sentence and tacks on 'corrupt(s)'; option 1 is the paragraph's own first sentence; option 5 is long and run-on"},
+{"label": "B", "relevance": {"1": 1, "2": 1, "3": 0, "4": 1, "5": 2}, "criteria": {"fit": 4, "meaning": 3, "register": 4, "variety": 3, "usefulness": 3}, "note": "option 3 adds a claim that the other animals find it unacceptable, which the paragraph does not say; options 1 and 4 use 'corruption' rather than 'corrupt'; option 2 'corrupt nature of power' muddles the claim that power corrupts"},
+{"label": "C", "relevance": {"1": 1, "2": 0, "3": 1, "4": 0, "5": 1}, "criteria": {"fit": 3, "meaning": 2, "register": 4, "variety": 2, "usefulness": 2}, "note": "option 2 says corruption was rampant among the animals (changes who is corrupt); option 4 adds a new idea (losing trust in the revolution); options 2-5 use 'corruption' rather than 'corrupt'; option 1 is awkward"}
+]}

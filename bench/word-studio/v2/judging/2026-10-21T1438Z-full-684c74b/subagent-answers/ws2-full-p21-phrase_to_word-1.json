@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 2, "2": 2, "3": 2, "4": 0, "5": 0, "6": 1, "7": 0, "8": 0, "9": 0, "10": 0}, "criteria": {"fit": 2, "meaning": 3, "register": 3, "variety": 3, "usefulness": 3}, "note": "4 plead, 5 beg, 8 petition and 9 call need 'for' and are ungrammatical in place (beg is also the wrong tone); 7 entreat takes a person as object; 10 urge means advocate, not ask for oneself"},
+{"label": "B", "relevance": {"1": 2, "2": 2, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0, "9": 0}, "criteria": {"fit": 1, "meaning": 2, "register": 2, "variety": 2, "usefulness": 2}, "note": "3 seeking, 4 pleading, 5 sought, 8 pleaded, 9 solicited are the wrong verb form after 'could'; 6 beg needs 'for' and is the wrong tone; 7 cried is the wrong sense and form"},
+{"label": "C", "relevance": {"1": 2, "2": 2, "3": 1, "8": 0, "10": 0}, "criteria": {"fit": 3, "meaning": 3, "register": 4, "variety": 2, "usefulness": 3}, "note": "8 propose means suggest, not ask for; 10 assert is the wrong meaning"}
+]}

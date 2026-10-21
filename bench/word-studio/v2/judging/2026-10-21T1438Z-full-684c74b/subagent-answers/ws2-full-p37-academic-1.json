@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 2, "2": 2, "3": 2, "4": 1, "5": 1}, "criteria": {"fit": 5, "meaning": 5, "register": 4, "variety": 3, "usefulness": 5}, "note": "option 4 'incapable' slightly implies inherent inability; option 5 'At the conclusion' is a bit awkward"},
+{"label": "B", "relevance": {"1": 2, "2": 1, "3": 1, "4": 1, "5": 2}, "criteria": {"fit": 4, "meaning": 4, "register": 4, "variety": 4, "usefulness": 4}, "note": "options 2-3 drop 'other'; option 3 barely more academic; option 4 shifts the end state to a gradual process"},
+{"label": "C", "relevance": {"1": 1, "2": 0, "3": 0, "4": 0, "5": 0}, "criteria": {"fit": 2, "meaning": 2, "register": 3, "variety": 3, "usefulness": 2}, "note": "option 1 shifts to past tense; option 2 adds 'oppressors' (new idea); option 3 adds 'human predecessors' and 'increasingly' (new idea, changed claim); option 4 'eroded significantly' weakens certainty; option 5 'In conclusion' is a wrong connective mid-paragraph and redundant with 'by the end'"}
+]}

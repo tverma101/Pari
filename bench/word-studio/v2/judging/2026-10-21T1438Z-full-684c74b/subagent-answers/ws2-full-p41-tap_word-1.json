@@ -1,0 +1,5 @@
+{"scores": [
+{"label": "A", "relevance": {}, "criteria": null, "note": "unparseable, no options"},
+{"label": "B", "relevance": {"1": 1, "2": 2, "3": 2, "4": 0, "5": 1, "6": 0, "7": 0, "8": 0, "9": 0}, "criteria": {"fit": 3, "meaning": 2, "register": 4, "variety": 3, "usefulness": 3}, "note": "4 'miniscule' is a misspelling; 6 'insignificant', 8 'negligible', 9 'inconsequential' are the importance sense, not size; 7 'infinitesimal' exaggerates and is too rare"},
+{"label": "C", "relevance": {"1": 2, "2": 1, "3": 0, "4": 2, "5": 2, "6": 0, "7": 1, "8": 0, "9": 0}, "criteria": {"fit": 3, "meaning": 3, "register": 3, "variety": 2, "usefulness": 3}, "note": "3, 6, 9 include a noun and read 'fragments/pieces pieces' in place, ungrammatical; 8 'microlight' is not a size word"}
+]}
