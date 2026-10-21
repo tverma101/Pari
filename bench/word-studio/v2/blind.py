@@ -168,7 +168,40 @@ def template_row(task_id: str, entry: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def build(run_dir: Path, out_dir: Path, *, task_ids: list[str] | None = None) -> dict[str, Any]:
+def load_anchor_pool(anchors_from: Path, set_name: str, task_sha: str, exclude: set[str]) -> dict[str, list[dict]]:
+    """Already-judged outputs another judging folder can lend as anchors, by task.
+
+    An anchor is an output whose score already exists. Judging it again among
+    new outputs measures judge drift, so a new candidate can be judged alone and
+    compared with candidates judged earlier (``v2.leaderboard``).
+    """
+    key_path = anchors_from / "sealed" / "key.json"
+    index = json.loads((anchors_from / "packets" / "index.json").read_text(encoding="utf-8"))
+    if sha256_file(key_path) != index["key_sha256"] or not (anchors_from / "scores.jsonl").is_file():
+        raise SystemExit(f"{anchors_from} is not a sealed, judged folder")
+    if index["task_set"] != set_name:
+        raise SystemExit(f"anchors come from the {index['task_set']} set, this run is {set_name}")
+    key = json.loads(key_path.read_text(encoding="utf-8"))
+    pool: dict[str, list[dict]] = {}
+    for task_id, labels in key["tasks"].items():
+        for label, sealed in sorted(labels.items()):
+            if sealed["candidate_id"] in exclude or sealed.get("anchor"):
+                continue
+            run = json.loads((REPO_ROOT / key["candidates"][sealed["candidate_id"]]["run_json"]).read_text(
+                encoding="utf-8"))
+            if run["task_file_sha256"] != task_sha:
+                raise SystemExit(f"{anchors_from} judged a different {set_name} task file")
+            path = REPO_ROOT / sealed["raw_output"]
+            if sha256_file(path) != sealed["output_sha256"]:
+                raise SystemExit(f"anchor {sealed['raw_output']} changed after it was judged")
+            pool.setdefault(task_id, []).append({"path": path, "candidate_id": sealed["candidate_id"],
+                                                  "anchor": {"judging": rel(anchors_from), "task_id": task_id,
+                                                             "label": label}})
+    return pool
+
+
+def build(run_dir: Path, out_dir: Path, *, task_ids: list[str] | None = None,
+          anchors_from: Path | None = None, anchor_tasks: int = 0) -> dict[str, Any]:
     if (out_dir / "sealed" / "key.json").exists():
         raise SystemExit(f"{out_dir} already has a key; never overwrite judging evidence")
     judged, skipped = load_runs(run_dir)
@@ -202,6 +235,16 @@ def build(run_dir: Path, out_dir: Path, *, task_ids: list[str] | None = None) ->
     if missing:
         raise SystemExit(f"tasks without an output from every judged candidate: {missing}")
     secret = secrets.token_hex(16)
+    anchors: dict[str, dict] = {}
+    if anchor_tasks:
+        if anchors_from is None:
+            raise SystemExit("--anchor-tasks needs --anchors-from")
+        pool = load_anchor_pool(anchors_from, set_name, task_sha, {e["candidate_id"] for e in judged})
+        eligible = [t for t in chosen if pool.get(t)]
+        if len(eligible) < anchor_tasks:
+            raise SystemExit(f"only {len(eligible)} tasks have an anchor in {anchors_from}")
+        rng = random.Random(int(digest(secret, "anchors")[:16], 16))
+        anchors = {t: rng.choice(pool[t]) for t in sorted(rng.sample(eligible, anchor_tasks), key=chosen.index)}
     key: dict[str, Any] = {
         "run_dir": rel(run_dir),
         "task_set": set_name,
@@ -214,24 +257,28 @@ def build(run_dir: Path, out_dir: Path, *, task_ids: list[str] | None = None) ->
     template: list[dict[str, Any]] = []
     for task_id in chosen:
         task = tasks[task_id]
-        order = list(judged)
+        order = [{"path": e["dir"] / "outputs" / f"{task_id}.json", "candidate_id": e["candidate_id"]}
+                 for e in judged] + ([anchors[task_id]] if task_id in anchors else [])
         random.Random(int(digest(secret, task_id)[:16], 16)).shuffle(order)
         entries = []
         for label, e in zip(string.ascii_uppercase, order):
-            path = e["dir"] / "outputs" / f"{task_id}.json"
+            path = e["path"]
             output = json.loads(path.read_text(encoding="utf-8"))
+            ref_parts = [e["candidate_id"], task_id] + (["anchor"] if "anchor" in e else [])
             entries.append({
                 "label": label,
                 "candidate_id": e["candidate_id"],
-                "output_ref": "o-" + digest(secret, e["candidate_id"], task_id)[:12],
+                "output_ref": "o-" + digest(secret, *ref_parts)[:12],
                 "output_sha256": sha256_file(path),
                 "raw_output": rel(path),
                 "checked": hard_checks.check(task, output),
+                **({"anchor": e["anchor"]} if "anchor" in e else {}),
             })
         (out_dir / "packets").mkdir(parents=True, exist_ok=True)
         (out_dir / "packets" / f"{task_id}.md").write_text(render_packet(task, entries), encoding="utf-8")
         key["tasks"][task_id] = {e["label"]: {k: e[k] for k in ("candidate_id", "output_ref", "output_sha256",
-                                                                  "raw_output")} for e in entries}
+                                                                  "raw_output", "anchor") if k in e}
+                                 for e in entries}
         template += [template_row(task_id, e) for e in entries]
     write_json(out_dir / "sealed" / "key.json", key)
     packet_hashes = {
@@ -246,6 +293,9 @@ def build(run_dir: Path, out_dir: Path, *, task_ids: list[str] | None = None) ->
         "tasks": chosen,
         "packet_hashes": packet_hashes,
         "outputs_per_task": len(judged),
+        # Tasks that carry one extra, already-judged output (a drift anchor).
+        "anchor_tasks": list(anchors),
+        "anchors_from": rel(anchors_from) if anchors else None,
         "checks_version": hard_checks.CHECKS_VERSION,
         "rubric_sha256": sha256_file(RUBRIC),
         "key_sha256": sha256_file(out_dir / "sealed" / "key.json"),
@@ -268,11 +318,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--run", type=Path, required=True, help="v2/runs/<run-id>")
     parser.add_argument("--out", type=Path, help="default: v2/judging/<run-id>")
     parser.add_argument("--tasks", help="comma-separated explicit task subset (default: the identical task set recorded by every completed candidate run)")
+    parser.add_argument("--anchors-from", type=Path,
+                        help="a judged v2/judging/<run-id> on the same set whose outputs are mixed in as drift anchors")
+    parser.add_argument("--anchor-tasks", type=int, default=0,
+                        help="how many tasks get one anchor output (default 0)")
     args = parser.parse_args(argv)
     run_dir = args.run.resolve()
     out_dir = (args.out or HERE / "judging" / run_dir.name).resolve()
     task_ids = [t.strip() for t in args.tasks.split(",") if t.strip()] if args.tasks else None
-    index = build(run_dir, out_dir, task_ids=task_ids)
+    index = build(run_dir, out_dir, task_ids=task_ids,
+                  anchors_from=args.anchors_from.resolve() if args.anchors_from else None,
+                  anchor_tasks=args.anchor_tasks)
     print(json.dumps({"out": rel(out_dir), "tasks": len(index["tasks"]),
                       "outputs_per_task": index["outputs_per_task"]}, indent=2))
     return 0

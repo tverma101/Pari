@@ -2,6 +2,21 @@
 
 Newest first. Each entry says what was decided, by whom, and why.
 
+## 2026-10-21: full set on the finalists, subagent judge, models added one at a time (owner)
+
+- The screen could not separate qwen35-4b, smollm3-3b and phi4-mini-instruct,
+  so those three run the 200-task `full` set on Kaggle, along with the broken
+  control.
+- The `claude` CLI in the cloud session has no API key, so the owner directed
+  judging by Claude subagents in the session (`v2.subagent_judge`). The
+  prompts and validation are the CLI judge's. The receipt names this as
+  `claude-code-subagent` and records that the model was not verified per call.
+- Newer models keep coming, and the benchmark has to absorb them without
+  re-judging every earlier model. A new model is run and judged alone, with
+  about 10 already-judged anchor outputs mixed in blind to measure judge drift.
+  `v2.leaderboard` then pools it with the earlier verified judgings. Pooling is
+  refused across rubric or code-check versions.
+
 ## 2026-10-20: Claude Opus judges the #87 screen (owner)
 
 - The owner allowed Claude Opus at high effort for the blind judging, with a

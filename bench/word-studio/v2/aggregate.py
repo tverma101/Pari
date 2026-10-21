@@ -38,6 +38,8 @@ T95 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8:
        40: 2.021, 60: 2.000, 120: 1.980}
 SUPPORTED_JUDGE_EFFORT_LEVELS = {"low", "medium", "high", "xhigh", "max"}
 T3_GPT_MODEL = "gpt-6.1-sol"
+SUBAGENT_PREFIX = "claude-subagent:"
+SUBAGENT_PROVIDER = "claude-code-subagent"
 
 
 class VerificationError(Exception):
@@ -99,6 +101,9 @@ def verify(judging: Path, scores_path: Path) -> tuple[
     if isinstance(judge, str) and judge.startswith("claude:"):
         receipt_path = judging / "claude-session-receipt.json"
         receipt_kind = "claude"
+    elif isinstance(judge, str) and judge.startswith(SUBAGENT_PREFIX):
+        receipt_path = judging / "judge-session-receipt.json"
+        receipt_kind = "claude_subagent"
     elif judge == T3_GPT_MODEL:
         receipt_path = judging / "judge-session-receipt.json"
         receipt_kind = "t3"
@@ -118,8 +123,22 @@ def verify(judging: Path, scores_path: Path) -> tuple[
     model = receipt.get("model")
     if (not isinstance(model, str) or not model
             or (receipt_kind == "claude" and judge != "claude:" + model)
+            or (receipt_kind == "claude_subagent" and judge != SUBAGENT_PREFIX + model)
             or (receipt_kind == "t3" and model != judge)):
         problems.append("judge session receipt model does not match the score header")
+    if receipt_kind == "claude_subagent":
+        if receipt.get("provider") != SUBAGENT_PROVIDER or header.get("provider") != SUBAGENT_PROVIDER:
+            problems.append("subagent judge provider does not match the score header")
+        if not isinstance(receipt.get("model_verified"), bool):
+            problems.append("subagent judge receipt must say whether the model was verified")
+        answers = receipt.get("answers_sha256")
+        if not isinstance(answers, dict) or set(answers) != set(index.get("tasks", [])):
+            problems.append("subagent judge receipt must hash one saved answer per judged task")
+        else:
+            for task_id, digest in sorted(answers.items()):
+                path = judging / "subagent-answers" / f"{task_id}.json"
+                if not path.is_file() or blind.sha256_file(path) != digest:
+                    problems.append(f"subagent answer for {task_id} is missing or changed")
     effort_level = receipt.get("effort_level")
     if not isinstance(effort_level, str) or effort_level not in SUPPORTED_JUDGE_EFFORT_LEVELS:
         problems.append("judge session receipt must record a fixed supported effort level")
@@ -358,26 +377,78 @@ def candidate_metrics(items: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def by_candidate(verified: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    """Judged outputs per candidate. Anchors are re-judged old outputs, so they never count."""
+    per_candidate: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for item in verified:
+        if not item["sealed"].get("anchor"):
+            per_candidate[item["sealed"]["candidate_id"]].append(item)
+    return per_candidate
+
+
+def candidate_result(items: list[dict[str, Any]], meta: dict[str, Any]) -> dict[str, Any]:
+    if blind.sha256_file(resolve(meta["run_json"])) != meta["run_sha256"]:
+        raise VerificationError([f"{meta['run_json']} changed after packets were built"])
+    run = json.loads(resolve(meta["run_json"]).read_text(encoding="utf-8"))
+    metrics = candidate_metrics(items)
+    metrics["run"] = {"status": run["status"], "complete_set": run.get("complete_set"),
+                      "run_json": meta["run_json"], "run_sha256": meta["run_sha256"],
+                      "model_id": run["candidate"].get("model_id"), "revision": run["candidate"].get("revision"),
+                      "load_seconds": (run.get("load") or {}).get("load_seconds"),
+                      "peak_memory": run.get("peak_memory")}
+    return metrics
+
+
+def rank(candidates: dict[str, dict[str, Any]]) -> list[str]:
+    return sorted(candidates, key=lambda c: (-candidates[c]["top3_at_bar"], -candidates[c]["usable_per_task"], c))
+
+
+def anchor_agreement(verified: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """How this judging's labels on anchors compare with their original judging.
+
+    Low agreement means scores from the two judgings should not be pooled
+    (``v2.leaderboard``) without re-judging.
+    """
+    anchors = [item for item in verified if item["sealed"].get("anchor")]
+    if not anchors:
+        return None
+    originals: dict[str, dict[tuple[str, str], dict[str, Any]]] = {}
+    options = same_label = same_bar = 0
+    shifts, citations = [], []
+    for item in anchors:
+        source = item["sealed"]["anchor"]
+        if source["judging"] not in originals:
+            judging = resolve(source["judging"])
+            original_rows = verify(judging, judging / "scores.jsonl")[2]
+            originals[source["judging"]] = {(i["row"]["task_id"], i["row"]["label"]): i for i in original_rows}
+        original = originals[source["judging"]].get((source["task_id"], source["label"]))
+        if original is None or original["sealed"]["output_sha256"] != item["sealed"]["output_sha256"]:
+            raise VerificationError([f"anchor {item['row']['task_id']} {item['row']['label']} does not match "
+                                     f"its original in {source['judging']}"])
+        new, old = item["row"]["relevance"] or {}, original["row"]["relevance"] or {}
+        for option, label in new.items():
+            options += 1
+            same_label += label == old.get(option)
+            same_bar += (label >= 1) == ((old.get(option) or 0) >= 1)
+        shifts.append(top3_share(item) - top3_share(original))
+        citations.append({"task_id": item["row"]["task_id"], "label": item["row"]["label"],
+                          "original": source, "sha256": item["sealed"]["output_sha256"]})
+    return {
+        "anchors": len(anchors),
+        "options": options,
+        "label_agreement": round(same_label / options, 4) if options else None,
+        "bar_agreement": round(same_bar / options, 4) if options else None,
+        "top3_shift_mean": round(sum(shifts) / len(shifts), 4),
+        "citations": citations,
+    }
+
+
 def aggregate(judging: Path, scores_path: Path) -> dict[str, Any]:
     index, key, verified, receipt, receipt_path = verify(judging, scores_path)
     header = read_jsonl(scores_path)[0]
-    per_candidate: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for item in verified:
-        per_candidate[item["sealed"]["candidate_id"]].append(item)
-    candidates = {}
-    for cid, items in sorted(per_candidate.items()):
-        meta = key["candidates"][cid]
-        if blind.sha256_file(resolve(meta["run_json"])) != meta["run_sha256"]:
-            raise VerificationError([f"{meta['run_json']} changed after packets were built"])
-        run = json.loads(resolve(meta["run_json"]).read_text(encoding="utf-8"))
-        metrics = candidate_metrics(items)
-        metrics["run"] = {"status": run["status"], "complete_set": run.get("complete_set"),
-                          "run_json": meta["run_json"], "run_sha256": meta["run_sha256"],
-                          "model_id": run["candidate"].get("model_id"), "revision": run["candidate"].get("revision"),
-                          "load_seconds": (run.get("load") or {}).get("load_seconds"),
-                          "peak_memory": run.get("peak_memory")}
-        candidates[cid] = metrics
-    ranking = sorted(candidates, key=lambda c: (-candidates[c]["top3_at_bar"], -candidates[c]["usable_per_task"], c))
+    per_candidate = by_candidate(verified)
+    candidates = {cid: candidate_result(items, key["candidates"][cid]) for cid, items in sorted(per_candidate.items())}
+    ranking = rank(candidates)
     all_tasks = build_tasks.load_tasks(index["task_set"])
     task_ids = [task["id"] for task in all_tasks]
     cluster_of = {task["id"]: task["paragraph_id"] for task in all_tasks}
@@ -394,9 +465,11 @@ def aggregate(judging: Path, scores_path: Path) -> dict[str, Any]:
         "tasks_judged": len(index["tasks"]),
         "judge": {**{k: header.get(k) for k in ("judge", "session", "blind", "effort_level")},
                   "provider": receipt.get("provider"),
+                  "model_verified": receipt.get("model_verified", receipt.get("provider") == "claude-code"),
                   "provider_instance_id": receipt.get("provider_instance_id"),
                   "delegated_task_id": receipt.get("delegated_task_id"),
                   "child_run_id": receipt.get("child_run_id")},
+        "anchor_agreement": anchor_agreement(verified),
         "sources": {
             "run_dir": key["run_dir"],
             "judge_receipt_sha256": blind.sha256_file(receipt_path),
@@ -423,7 +496,8 @@ def markdown(result: dict[str, Any]) -> str:
     lines = [f"# Word Studio v2 results: {result['run_id']}", "",
              f"Set `{result['task_set']}`, {result['tasks_judged']} tasks judged blind "
              f"({result['task_selection']}; complete task set: {str(result['task_set_complete']).lower()}) by "
-             f"{result['judge']['judge']} via `{result['judge']['provider']}` "
+             f"{result['judge']['judge']} via `{result['judge']['provider']}`"
+             f"{'' if result['judge'].get('model_verified', True) else ' (model not verified per call)'} "
              f"at `{result['judge']['effort_level']}` effort "
              f"(session `{result['judge']['session']}`). "
              f"Ranked by {result['ranking_rule']}. Latency is Kaggle T4, Transformers fp16, not the Mac.", "",
@@ -450,6 +524,12 @@ def markdown(result: dict[str, Any]) -> str:
             message = ((entry.get("error") or {}).get("message") or "").splitlines()[0][:160] if entry.get(
                 "error") else ""
             lines.append(f"- {entry['candidate_id']}: {entry['status']} at {entry.get('stage')}: {message}")
+    anchors = result.get("anchor_agreement")
+    if anchors:
+        lines += ["", f"Drift anchors: {anchors['anchors']} already-judged outputs were judged again blind. "
+                  f"Same label on {anchors['label_agreement']:.1%} of {anchors['options']} options, same side of "
+                  f"the bar on {anchors['bar_agreement']:.1%}; top-3 at bar moved {anchors['top3_shift_mean']:+.1%} "
+                  "on average."]
     lines += ["", f"Intervals: {spread['method']}. \"Not separable\" means the paired gap's interval "
               "includes 0, so this task set cannot tell that candidate from the leader."]
     lines += ["", "Every number above traces to `results.json`, which lists each task id, output ref, raw output "

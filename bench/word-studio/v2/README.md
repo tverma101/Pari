@@ -16,6 +16,8 @@ The benchmark that picks Pari's base model (#85, #86, #87). It runs on Kaggle
 | `blind.py` | Builds blind judging packets and a sealed key from a fetched run. |
 | `RUBRIC.md` | The judging rubric, relevance bar, swap rule (#91) and score file format. |
 | `aggregate.py` | Verifies rubric, packet, index and raw-output hashes plus every score citation, then un-blinds and writes results. |
+| `subagent_judge.py` | Blind judging by Claude subagents inside a Claude Code session, for when the `claude` CLI cannot run. |
+| `leaderboard.py` | Pools every verified judging folder of one task set into one ranking, so a new model is judged alone. |
 | `import_t3_judgment.py` | Imports a completed GPT 6.1 Sol blind batch with its T3 task, model, effort and response-hash receipt. |
 
 ## Task kinds
@@ -81,6 +83,50 @@ dropped. An explicit `--tasks` subset is recorded in `packets/index.json`.
 
 Start with a smoke run (`--limit 2`) of every candidate. It shows which ones
 load and generate on T4 in fp16 before the full screen spends quota.
+
+## Judging with subagents
+
+When the `claude` CLI has no login or API key of its own (for example in a
+cloud session), a Claude Code session judges with subagents instead:
+
+```bash
+python3 -m v2.subagent_judge prepare --judging v2/judging/<run-id> --work <scratch>/judge
+# Give each subagent one batch from <scratch>/judge/plan.json. It reads only
+# prompts/<task>.md, writes answers/<task>.json, and runs `check` on each answer.
+python3 -m v2.subagent_judge collect --judging v2/judging/<run-id> --work <scratch>/judge --model <model>
+python3 -m v2.aggregate --judging v2/judging/<run-id>
+```
+
+The prompts are the CLI judge's prompts, and the answers go through the same
+validation. The work folder has no key, run metadata or raw output. The
+receipt (`judge-session-receipt.json`) names the agents and hashes every saved
+answer. It also records `model_verified: false`, because unlike the CLI's
+`modelUsage`, a subagent's model can't be checked per call.
+
+## Adding a new model
+
+New models keep coming, so a new one is judged alone and never forces a
+re-judge of the others. The cost is its own 40 screen outputs, plus 200 only
+if it reaches the top group.
+
+1. Add it to `bench/candidates.json` with a pinned revision.
+2. Smoke test it, then run the screen on Kaggle for that model alone:
+   `launch.py --set screen --candidates <new-id>`, then `fetch.py`.
+3. Build packets with drift anchors: about 10 outputs that were already
+   judged, mixed in blind:
+   `python3 -m v2.blind --run v2/runs/<run-id> --anchors-from v2/judging/<earlier screen> --anchor-tasks 10`
+4. Judge (CLI or subagents), then `python3 -m v2.aggregate --judging v2/judging/<run-id>`.
+   `results.md` shows how far the anchors moved from their original labels.
+5. Rank it with everything judged before: `python3 -m v2.leaderboard --set screen`.
+   Folders judged by different judge setups are pooled only with
+   `--allow-mixed-judges`, after checking the anchor agreement.
+6. Only if its gap to the leader is not separable, repeat 2–5 on the `full`
+   set with anchors from the earlier full judging.
+
+Pooling works because the rubric gives absolute labels to each option, not a
+ranking within a packet. A change to the rubric, the code checks or the prompts
+breaks that, so `v2.leaderboard` refuses to pool across rubrics. Old outputs
+then have to be judged again under the new version.
 
 ## Rebuilding the tasks
 
