@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p23-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "011f3794ed3eb3f54d858dd7c7d2d3c7870a0982a9211565c631747d7351a007",
+  "seed": 932090507419526519,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"wise\", \"developed\", \"experienced\", \"sophisticated\", \"responsible\", \"prudent\", \"knowledgeable\", \"seasoned\", \"judicious\", \"informed\"]}",
+  "timing": {
+    "first_text_ms": 187.5,
+    "option_ms": [
+      417.2,
+      596.5,
+      732.0,
+      957.2,
+      1138.0,
+      1317.8,
+      1499.1,
+      1680.5,
+      1863.3,
+      2068.1
+    ],
+    "total_ms": 2159.4,
+    "stream": [
+      [
+        187.5,
+        2
+      ],
+      [
+        235.2,
+        9
+      ],
+      [
+        281.6,
+        11
+      ],
+      [
+        327.1,
+        14
+      ],
+      [
+        372.0,
+        18
+      ],
+      [
+        417.2,
+        20
+      ],
+      [
+        462.2,
+        22
+      ],
+      [
+        506.9,
+        29
+      ],
+      [
+        551.4,
+        31
+      ],
+      [
+        596.5,
+        33
+      ],
+      [
+        641.6,
+        35
+      ],
+      [
+        687.2,
+        46
+      ],
+      [
+        732.0,
+        48
+      ],
+      [
+        776.7,
+        50
+      ],
+      [
+        822.0,
+        51
+      ],
+      [
+        867.1,
+        54
+      ],
+      [
+        911.9,
+        63
+      ],
+      [
+        957.2,
+        65
+      ],
+      [
+        1002.8,
+        67
+      ],
+      [
+        1048.2,
+        74
+      ],
+      [
+        1093.3,
+        78
+      ],
+      [
+        1138.0,
+        80
+      ],
+      [
+        1183.0,
+        82
+      ],
+      [
+        1228.2,
+        84
+      ],
+      [
+        1273.1,
+        89
+      ],
+      [
+        1317.8,
+        91
+      ],
+      [
+        1362.6,
+        93
+      ],
+      [
+        1408.5,
+        102
+      ],
+      [
+        1453.9,
+        106
+      ],
+      [
+        1499.1,
+        108
+      ],
+      [
+        1544.0,
+        110
+      ],
+      [
+        1589.4,
+        116
+      ],
+      [
+        1634.8,
+        118
+      ],
+      [
+        1680.5,
+        120
+      ],
+      [
+        1728.2,
+        122
+      ],
+      [
+        1773.1,
+        125
+      ],
+      [
+        1818.3,
+        131
+      ],
+      [
+        1863.3,
+        133
+      ],
+      [
+        1909.3,
+        135
+      ],
+      [
+        1955.1,
+        137
+      ],
+      [
+        2006.9,
+        143
+      ],
+      [
+        2068.1,
+        145
+      ],
+      [
+        2112.7,
+        146
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nSome people believe the voting age should be lowered from 18 to 16. At sixteen, many teenagers already have jobs, pay taxes, and can drive a car. Laws about schools, the environment, and the economy will affect young people for the rest of their lives, so they should have a say in them. Critics argue that sixteen-year-olds are not mature enough to make good choices about politics. However, studies of places like Austria, where sixteen-year-olds can vote, show that young voters make choices that are just as thought-out as older voters.\n\"\"\"\n\nThe writer tapped the word \"mature\" in this sentence (marked with [[ ]]):\nCritics argue that sixteen-year-olds are not [[mature]] enough to make good choices about politics.\n\nGive 10 replacements for \"mature\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"mature\" without changing the rest of the sentence. Do not repeat \"mature\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 331,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

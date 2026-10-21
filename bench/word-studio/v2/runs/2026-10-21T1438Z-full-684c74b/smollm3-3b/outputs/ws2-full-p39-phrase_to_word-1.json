@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p39-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "a5bf675caf8fe7ed89a07996d26297a82128df0842717c97d68aed3f1b1894b8",
+  "seed": 977015631930530294,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"targeted at\", \"focused on\", \"directed towards\", \"intended for\", \"aimed at\", \"targeting\", \"targeted\", \"directed at\", \"intended for\", \"aimed at\"]}",
+  "timing": {
+    "first_text_ms": 166.6,
+    "option_ms": [
+      455.2,
+      620.8,
+      825.1,
+      1028.8,
+      1230.9,
+      1392.5,
+      1558.1,
+      1762.8,
+      1965.8,
+      2169.6
+    ],
+    "total_ms": 2210.9,
+    "stream": [
+      [
+        166.6,
+        2
+      ],
+      [
+        208.2,
+        9
+      ],
+      [
+        249.9,
+        11
+      ],
+      [
+        290.6,
+        14
+      ],
+      [
+        331.5,
+        20
+      ],
+      [
+        372.2,
+        22
+      ],
+      [
+        413.9,
+        25
+      ],
+      [
+        455.2,
+        27
+      ],
+      [
+        496.3,
+        29
+      ],
+      [
+        537.4,
+        36
+      ],
+      [
+        579.6,
+        39
+      ],
+      [
+        620.8,
+        41
+      ],
+      [
+        661.9,
+        43
+      ],
+      [
+        702.8,
+        49
+      ],
+      [
+        743.5,
+        51
+      ],
+      [
+        784.4,
+        59
+      ],
+      [
+        825.1,
+        61
+      ],
+      [
+        865.1,
+        63
+      ],
+      [
+        905.9,
+        66
+      ],
+      [
+        946.1,
+        71
+      ],
+      [
+        987.1,
+        75
+      ],
+      [
+        1028.8,
+        77
+      ],
+      [
+        1069.0,
+        79
+      ],
+      [
+        1109.6,
+        82
+      ],
+      [
+        1149.7,
+        84
+      ],
+      [
+        1189.8,
+        87
+      ],
+      [
+        1230.9,
+        89
+      ],
+      [
+        1271.0,
+        91
+      ],
+      [
+        1311.3,
+        97
+      ],
+      [
+        1352.2,
+        100
+      ],
+      [
+        1392.5,
+        102
+      ],
+      [
+        1433.9,
+        104
+      ],
+      [
+        1475.0,
+        110
+      ],
+      [
+        1516.7,
+        112
+      ],
+      [
+        1558.1,
+        114
+      ],
+      [
+        1598.8,
+        116
+      ],
+      [
+        1640.0,
+        122
+      ],
+      [
+        1680.6,
+        124
+      ],
+      [
+        1722.0,
+        127
+      ],
+      [
+        1762.8,
+        129
+      ],
+      [
+        1803.1,
+        131
+      ],
+      [
+        1843.5,
+        134
+      ],
+      [
+        1884.1,
+        139
+      ],
+      [
+        1924.9,
+        143
+      ],
+      [
+        1965.8,
+        145
+      ],
+      [
+        2005.8,
+        147
+      ],
+      [
+        2048.1,
+        150
+      ],
+      [
+        2088.3,
+        152
+      ],
+      [
+        2129.3,
+        155
+      ],
+      [
+        2169.6,
+        158
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nFast food companies spend billions of dollars every year on ads that are aimed at children. These commercials often use cartoon characters, bright colors, and free toys to make kids want to eat there. Young children cannot always tell the difference between an ad and a regular TV show, so they believe what the ads say. This is a problem because eating too much fast food can lead to health issues like obesity and diabetes. I believe the government should put stronger limits on food ads that target kids, the same way it does for cigarette ads.\n\"\"\"\n\nThe writer selected the phrase \"are aimed at\" in this sentence (marked with [[ ]]):\nFast food companies spend billions of dollars every year on ads that [[are aimed at]] children.\n\nGive 10 single words that can replace \"are aimed at\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 348,
+  "new_tokens": 51,
+  "finish_reason": "stop",
+  "error": null
+}

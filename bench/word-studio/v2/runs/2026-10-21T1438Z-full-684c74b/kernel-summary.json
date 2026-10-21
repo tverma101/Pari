@@ -1,0 +1,70 @@
+{
+  "config": {
+    "candidates": [
+      "qwen35-4b",
+      "smollm3-3b",
+      "phi4-mini-instruct",
+      "control-missing-revision"
+    ],
+    "dtype": "float16",
+    "git_sha": "684c74b56994f3081070699cc07d068ad1129ad7",
+    "limit": null,
+    "per_candidate_timeout_s": 5400,
+    "pip": [
+      "transformers==5.18.0",
+      "accelerate==1.15.0"
+    ],
+    "repo_url": "https://github.com/tverma101/Pari.git",
+    "run_id": "2026-10-21T1438Z-full-684c74b",
+    "task_set": "full"
+  },
+  "git_head": "684c74b56994f3081070699cc07d068ad1129ad7",
+  "started_at": "2026-10-21T14:42:40+00:00",
+  "candidates": {
+    "qwen35-4b": {
+      "exit_code": 0,
+      "status": "completed",
+      "tasks": {
+        "ok": 200,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": null,
+      "wall_seconds": 1182.3
+    },
+    "smollm3-3b": {
+      "exit_code": 0,
+      "status": "completed",
+      "tasks": {
+        "ok": 200,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": null,
+      "wall_seconds": 885.5
+    },
+    "phi4-mini-instruct": {
+      "exit_code": 0,
+      "status": "completed",
+      "tasks": {
+        "ok": 200,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": null,
+      "wall_seconds": 870.0
+    },
+    "control-missing-revision": {
+      "exit_code": 2,
+      "status": "failed",
+      "tasks": {
+        "ok": 0,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": "404 Client Error. (Request ID: Root=1-6ad8dae5-0507c56b2ddc39e8567e6098;ec39195d-413c-438a-b01a-cd28561b3112)\n\nRevision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false&expand=false.\nInvalid rev id: 0000000000000000000000000000000000000000",
+      "wall_seconds": 11.9
+    }
+  },
+  "finished_at": "2026-10-21T15:31:50+00:00"
+}

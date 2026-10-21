@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p35-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "8113c1031cbcee49c5b60cc78815f579398cf165379a4c90f597edd14b28df9b",
+  "seed": 7888109819201837268,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"collaborate\", \"unite\", \"join forces\", \"coordinate\", \"team up\", \"join\", \"participate\", \"contribute\", \"cooperate\", \"combine\"]}",
+  "timing": {
+    "first_text_ms": 162.0,
+    "option_ms": [
+      455.0,
+      619.8,
+      784.6,
+      907.1,
+      1072.6,
+      1197.2,
+      1401.0,
+      1568.7,
+      1735.5,
+      1860.8
+    ],
+    "total_ms": 1903.1,
+    "stream": [
+      [
+        162.0,
+        2
+      ],
+      [
+        204.6,
+        9
+      ],
+      [
+        245.6,
+        11
+      ],
+      [
+        287.1,
+        14
+      ],
+      [
+        328.4,
+        18
+      ],
+      [
+        369.7,
+        22
+      ],
+      [
+        411.2,
+        25
+      ],
+      [
+        455.0,
+        27
+      ],
+      [
+        496.6,
+        29
+      ],
+      [
+        537.6,
+        31
+      ],
+      [
+        579.0,
+        34
+      ],
+      [
+        619.8,
+        36
+      ],
+      [
+        661.1,
+        38
+      ],
+      [
+        702.8,
+        42
+      ],
+      [
+        743.7,
+        49
+      ],
+      [
+        784.6,
+        51
+      ],
+      [
+        825.3,
+        53
+      ],
+      [
+        866.0,
+        63
+      ],
+      [
+        907.1,
+        65
+      ],
+      [
+        948.5,
+        67
+      ],
+      [
+        989.9,
+        71
+      ],
+      [
+        1031.6,
+        74
+      ],
+      [
+        1072.6,
+        76
+      ],
+      [
+        1113.5,
+        78
+      ],
+      [
+        1155.9,
+        82
+      ],
+      [
+        1197.2,
+        84
+      ],
+      [
+        1238.0,
+        86
+      ],
+      [
+        1279.8,
+        90
+      ],
+      [
+        1320.5,
+        94
+      ],
+      [
+        1360.8,
+        97
+      ],
+      [
+        1401.0,
+        99
+      ],
+      [
+        1443.9,
+        101
+      ],
+      [
+        1485.6,
+        104
+      ],
+      [
+        1527.4,
+        111
+      ],
+      [
+        1568.7,
+        113
+      ],
+      [
+        1610.3,
+        115
+      ],
+      [
+        1652.2,
+        117
+      ],
+      [
+        1694.2,
+        124
+      ],
+      [
+        1735.5,
+        126
+      ],
+      [
+        1777.7,
+        128
+      ],
+      [
+        1819.2,
+        135
+      ],
+      [
+        1860.8,
+        138
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nOn July 20, 1969, Neil Armstrong became the first person to walk on the moon. The Apollo 11 mission was the result of years of hard work by thousands of scientists, engineers, and astronauts. The United States wanted to beat the Soviet Union in the space race, which was part of the larger Cold War. Millions of people around the world watched the landing live on television. The mission showed what humans can do when they work together toward a big goal. It also led to new technologies that we still use today.\n\"\"\"\n\nThe writer selected the phrase \"work together\" in this sentence (marked with [[ ]]):\nThe mission showed what humans can do when they [[work together]] toward a big goal.\n\nGive 10 single words that can replace \"work together\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 347,
+  "new_tokens": 43,
+  "finish_reason": "stop",
+  "error": null
+}

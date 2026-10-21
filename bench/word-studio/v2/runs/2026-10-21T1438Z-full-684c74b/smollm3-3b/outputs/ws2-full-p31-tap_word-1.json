@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p31-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "5fc125c416a9149645945558e677b3c799a73824c0890d20e9ce22a5262cfe49",
+  "seed": 6415932056619010764,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"beneficial\", \"educational\", \"valuable\", \"useful\", \"productive\", \"advantageous\", \"benefiting\", \"advantageous\", \"beneficial\", \"enriching\"]}",
+  "timing": {
+    "first_text_ms": 166.7,
+    "option_ms": [
+      414.0,
+      577.6,
+      740.4,
+      903.5,
+      1025.7,
+      1230.5,
+      1395.5,
+      1599.3,
+      1775.3,
+      1980.6
+    ],
+    "total_ms": 2022.0,
+    "stream": [
+      [
+        166.7,
+        2
+      ],
+      [
+        208.3,
+        9
+      ],
+      [
+        249.7,
+        11
+      ],
+      [
+        291.5,
+        14
+      ],
+      [
+        332.2,
+        19
+      ],
+      [
+        373.2,
+        24
+      ],
+      [
+        414.0,
+        26
+      ],
+      [
+        454.5,
+        28
+      ],
+      [
+        496.1,
+        32
+      ],
+      [
+        537.0,
+        39
+      ],
+      [
+        577.6,
+        41
+      ],
+      [
+        618.4,
+        43
+      ],
+      [
+        659.8,
+        46
+      ],
+      [
+        700.4,
+        51
+      ],
+      [
+        740.4,
+        53
+      ],
+      [
+        781.3,
+        55
+      ],
+      [
+        822.5,
+        58
+      ],
+      [
+        863.3,
+        61
+      ],
+      [
+        903.5,
+        63
+      ],
+      [
+        944.4,
+        65
+      ],
+      [
+        984.8,
+        75
+      ],
+      [
+        1025.7,
+        77
+      ],
+      [
+        1066.4,
+        79
+      ],
+      [
+        1106.5,
+        82
+      ],
+      [
+        1149.3,
+        88
+      ],
+      [
+        1190.4,
+        91
+      ],
+      [
+        1230.5,
+        93
+      ],
+      [
+        1271.6,
+        95
+      ],
+      [
+        1313.4,
+        100
+      ],
+      [
+        1354.5,
+        105
+      ],
+      [
+        1395.5,
+        107
+      ],
+      [
+        1436.2,
+        109
+      ],
+      [
+        1476.5,
+        112
+      ],
+      [
+        1517.6,
+        118
+      ],
+      [
+        1558.7,
+        121
+      ],
+      [
+        1599.3,
+        123
+      ],
+      [
+        1640.5,
+        125
+      ],
+      [
+        1686.7,
+        130
+      ],
+      [
+        1732.4,
+        135
+      ],
+      [
+        1775.3,
+        137
+      ],
+      [
+        1817.3,
+        139
+      ],
+      [
+        1859.1,
+        141
+      ],
+      [
+        1899.4,
+        145
+      ],
+      [
+        1940.2,
+        148
+      ],
+      [
+        1980.6,
+        151
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nMany students say they have too much homework, and I agree that it can sometimes do more harm than good. After a full day of classes, students still have to spend three or four hours on assignments every night. This leaves them with very little time for sports, family, or sleep. Some homework is helpful because it lets students practice what they learned in class. But when teachers give busywork just to fill time, students get tired and stop caring about learning. Schools should set limits on homework so that it is useful and not overwhelming.\n\"\"\"\n\nThe writer tapped the word \"helpful\" in this sentence (marked with [[ ]]):\nSome homework is [[helpful]] because it lets students practice what they learned in class.\n\nGive 10 replacements for \"helpful\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"helpful\" without changing the rest of the sentence. Do not repeat \"helpful\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 371,
+  "new_tokens": 46,
+  "finish_reason": "stop",
+  "error": null
+}

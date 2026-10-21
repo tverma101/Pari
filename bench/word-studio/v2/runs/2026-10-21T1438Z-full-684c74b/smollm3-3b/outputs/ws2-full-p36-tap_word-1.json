@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p36-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "58003f1b9eb500adb1871c38460f5d6bcc1b3593fa98dc9e13acbddca3d540d6",
+  "seed": 5982655142342881986,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"decreased\", \"fallen\", \"plummeted\", \"sunk\", \"declined\", \"slumped\", \"dropped\", \"waned\", \"lessened\", \"decreased\"]}",
+  "timing": {
+    "first_text_ms": 206.9,
+    "option_ms": [
+      492.5,
+      656.3,
+      896.5,
+      1057.9,
+      1218.9,
+      1381.1,
+      1542.0,
+      1705.3,
+      1869.0,
+      2071.6
+    ],
+    "total_ms": 2113.0,
+    "stream": [
+      [
+        206.9,
+        2
+      ],
+      [
+        248.4,
+        9
+      ],
+      [
+        289.1,
+        11
+      ],
+      [
+        330.1,
+        14
+      ],
+      [
+        370.9,
+        16
+      ],
+      [
+        411.4,
+        19
+      ],
+      [
+        452.0,
+        23
+      ],
+      [
+        492.5,
+        25
+      ],
+      [
+        533.3,
+        27
+      ],
+      [
+        573.6,
+        31
+      ],
+      [
+        614.1,
+        33
+      ],
+      [
+        656.3,
+        35
+      ],
+      [
+        696.1,
+        37
+      ],
+      [
+        736.1,
+        39
+      ],
+      [
+        776.6,
+        41
+      ],
+      [
+        816.9,
+        44
+      ],
+      [
+        856.7,
+        46
+      ],
+      [
+        896.5,
+        48
+      ],
+      [
+        936.8,
+        50
+      ],
+      [
+        977.5,
+        51
+      ],
+      [
+        1017.9,
+        54
+      ],
+      [
+        1057.9,
+        56
+      ],
+      [
+        1098.0,
+        58
+      ],
+      [
+        1138.2,
+        62
+      ],
+      [
+        1178.7,
+        66
+      ],
+      [
+        1218.9,
+        68
+      ],
+      [
+        1259.2,
+        70
+      ],
+      [
+        1299.0,
+        72
+      ],
+      [
+        1339.9,
+        77
+      ],
+      [
+        1381.1,
+        79
+      ],
+      [
+        1421.7,
+        81
+      ],
+      [
+        1461.9,
+        84
+      ],
+      [
+        1501.9,
+        88
+      ],
+      [
+        1542.0,
+        90
+      ],
+      [
+        1582.5,
+        92
+      ],
+      [
+        1623.1,
+        93
+      ],
+      [
+        1665.3,
+        97
+      ],
+      [
+        1705.3,
+        99
+      ],
+      [
+        1745.7,
+        101
+      ],
+      [
+        1788.1,
+        105
+      ],
+      [
+        1828.8,
+        109
+      ],
+      [
+        1869.0,
+        111
+      ],
+      [
+        1909.3,
+        113
+      ],
+      [
+        1949.7,
+        115
+      ],
+      [
+        1990.8,
+        118
+      ],
+      [
+        2031.2,
+        122
+      ],
+      [
+        2071.6,
+        125
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nRenewable energy comes from sources that do not run out, like the sun, wind, and water. Unlike coal and oil, these sources do not release a lot of greenhouse gases when they make electricity. In the last ten years, the cost of solar panels has dropped so much that solar power is now cheaper than coal in many places. One problem is that the sun does not always shine and the wind does not always blow, so we need better batteries to store the energy. Even with these challenges, switching to renewable energy is one of the best ways to slow down climate change.\n\"\"\"\n\nThe writer tapped the word \"dropped\" in this sentence (marked with [[ ]]):\nIn the last ten years, the cost of solar panels has [[dropped]] so much that solar power is now cheaper than coal in many places.\n\nGive 10 replacements for \"dropped\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"dropped\" without changing the rest of the sentence. Do not repeat \"dropped\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 393,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

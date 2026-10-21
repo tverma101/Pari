@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p22-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "f8b72b78847e55911c1ac3da1f704136da228e452d212602e80e158b1ba8d0d1",
+  "seed": 922061132896454358,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Reduce\", \"Minimize\", \"Lower\", \"Cut\", \"Decrease\", \"Limit\", \"Cut back\", \"Cut off\", \"Lessen\", \"Diminish\"]}",
+  "timing": {
+    "first_text_ms": 165.5,
+    "option_ms": [
+      368.3,
+      531.4,
+      653.4,
+      774.7,
+      938.2,
+      1060.6,
+      1222.8,
+      1385.1,
+      1548.4,
+      1711.8
+    ],
+    "total_ms": 1752.9,
+    "stream": [
+      [
+        165.5,
+        2
+      ],
+      [
+        207.0,
+        9
+      ],
+      [
+        247.6,
+        11
+      ],
+      [
+        288.3,
+        14
+      ],
+      [
+        328.2,
+        20
+      ],
+      [
+        368.3,
+        22
+      ],
+      [
+        409.2,
+        24
+      ],
+      [
+        449.5,
+        27
+      ],
+      [
+        490.9,
+        32
+      ],
+      [
+        531.4,
+        34
+      ],
+      [
+        573.0,
+        36
+      ],
+      [
+        613.2,
+        41
+      ],
+      [
+        653.4,
+        43
+      ],
+      [
+        693.8,
+        45
+      ],
+      [
+        734.5,
+        48
+      ],
+      [
+        774.7,
+        50
+      ],
+      [
+        817.1,
+        52
+      ],
+      [
+        857.5,
+        57
+      ],
+      [
+        898.1,
+        60
+      ],
+      [
+        938.2,
+        62
+      ],
+      [
+        978.4,
+        64
+      ],
+      [
+        1019.5,
+        69
+      ],
+      [
+        1060.6,
+        71
+      ],
+      [
+        1101.4,
+        73
+      ],
+      [
+        1141.8,
+        76
+      ],
+      [
+        1182.2,
+        81
+      ],
+      [
+        1222.8,
+        83
+      ],
+      [
+        1263.7,
+        85
+      ],
+      [
+        1303.7,
+        88
+      ],
+      [
+        1344.3,
+        92
+      ],
+      [
+        1385.1,
+        94
+      ],
+      [
+        1425.3,
+        96
+      ],
+      [
+        1466.7,
+        100
+      ],
+      [
+        1507.7,
+        102
+      ],
+      [
+        1548.4,
+        104
+      ],
+      [
+        1589.4,
+        106
+      ],
+      [
+        1629.7,
+        109
+      ],
+      [
+        1670.7,
+        114
+      ],
+      [
+        1711.8,
+        117
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nCoral reefs are some of the most beautiful places on Earth, but they are in serious trouble. When the ocean gets too warm, corals push out the tiny algae that live inside them and give them their color. This is called coral bleaching, and if the water stays hot for too long, the coral can die. Reefs are home to about a quarter of all ocean species, so losing them would hurt a lot of sea life. They also protect coastlines from big waves during storms. Cutting down on pollution and greenhouse gases is the best way to give reefs a chance to recover.\n\"\"\"\n\nThe writer selected the phrase \"Cutting down on\" in this sentence (marked with [[ ]]):\n[[Cutting down on]] pollution and greenhouse gases is the best way to give reefs a chance to recover.\n\nGive 10 single words that can replace \"Cutting down on\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 367,
+  "new_tokens": 40,
+  "finish_reason": "stop",
+  "error": null
+}

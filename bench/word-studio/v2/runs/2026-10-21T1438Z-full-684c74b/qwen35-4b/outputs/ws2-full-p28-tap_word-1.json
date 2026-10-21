@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p28-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "732545a73efaa5888000371c81ba75280546cfe94c237236474d8ca5d05958a4",
+  "seed": 6898003309659700954,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"exciting\", \"entertaining\", \"enjoyable\", \"pleasing\", \"enthralling\", \"captivating\", \"stimulating\", \"adventurous\", \"thrilling\", \"delightful\"]}\n",
+  "timing": {
+    "first_text_ms": 537.7,
+    "option_ms": [
+      923.5,
+      1229.1,
+      1530.9,
+      1770.8,
+      2076.2,
+      2320.8,
+      2565.1,
+      2870.5,
+      3119.7,
+      3428.3
+    ],
+    "total_ms": 3612.3,
+    "stream": [
+      [
+        537.7,
+        2
+      ],
+      [
+        604.2,
+        9
+      ],
+      [
+        669.9,
+        11
+      ],
+      [
+        733.2,
+        14
+      ],
+      [
+        798.0,
+        17
+      ],
+      [
+        862.2,
+        22
+      ],
+      [
+        923.5,
+        24
+      ],
+      [
+        984.2,
+        26
+      ],
+      [
+        1044.6,
+        29
+      ],
+      [
+        1106.3,
+        32
+      ],
+      [
+        1167.6,
+        38
+      ],
+      [
+        1229.1,
+        40
+      ],
+      [
+        1289.5,
+        42
+      ],
+      [
+        1349.4,
+        44
+      ],
+      [
+        1409.7,
+        47
+      ],
+      [
+        1470.0,
+        51
+      ],
+      [
+        1530.9,
+        53
+      ],
+      [
+        1590.9,
+        55
+      ],
+      [
+        1650.3,
+        58
+      ],
+      [
+        1710.4,
+        63
+      ],
+      [
+        1770.8,
+        65
+      ],
+      [
+        1831.7,
+        67
+      ],
+      [
+        1894.6,
+        70
+      ],
+      [
+        1955.6,
+        72
+      ],
+      [
+        2016.0,
+        78
+      ],
+      [
+        2076.2,
+        80
+      ],
+      [
+        2136.9,
+        82
+      ],
+      [
+        2197.4,
+        86
+      ],
+      [
+        2259.6,
+        93
+      ],
+      [
+        2320.8,
+        95
+      ],
+      [
+        2381.9,
+        97
+      ],
+      [
+        2443.4,
+        101
+      ],
+      [
+        2505.0,
+        108
+      ],
+      [
+        2565.1,
+        110
+      ],
+      [
+        2625.6,
+        112
+      ],
+      [
+        2685.9,
+        114
+      ],
+      [
+        2745.7,
+        118
+      ],
+      [
+        2807.1,
+        123
+      ],
+      [
+        2870.5,
+        125
+      ],
+      [
+        2929.9,
+        127
+      ],
+      [
+        2990.1,
+        130
+      ],
+      [
+        3050.4,
+        136
+      ],
+      [
+        3119.7,
+        138
+      ],
+      [
+        3184.3,
+        140
+      ],
+      [
+        3244.8,
+        143
+      ],
+      [
+        3305.7,
+        147
+      ],
+      [
+        3367.3,
+        150
+      ],
+      [
+        3428.3,
+        153
+      ],
+      [
+        3551.4,
+        154
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Lord of the Flies, a group of boys stranded on an island slowly lose their sense of right and wrong. At first, they choose Ralph as their leader and try to follow rules, like only speaking when they hold the conch shell. As time goes on, Jack becomes more interested in hunting than in keeping the signal fire going. More and more boys join Jack's tribe because it seems more fun than doing chores. By the end, the boys have turned violent, and two of them are dead. Golding uses the story to suggest that people can quickly become savage when there are no rules to control them.\n\"\"\"\n\nThe writer tapped the word \"fun\" in this sentence (marked with [[ ]]):\nMore and more boys join Jack's tribe because it seems more [[fun]] than doing chores.\n\nGive 10 replacements for \"fun\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"fun\" without changing the rest of the sentence. Do not repeat \"fun\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 357,
+  "new_tokens": 51,
+  "finish_reason": "stop",
+  "error": null
+}

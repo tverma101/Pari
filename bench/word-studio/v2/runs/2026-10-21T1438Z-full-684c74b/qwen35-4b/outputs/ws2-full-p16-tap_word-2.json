@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p16-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "b6ab349f37fbf0147b9f38e8261fd1dc5164f7b2f944b0a048d0a6bdddc23359",
+  "seed": 2386472839697562874,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"damaged\", \"harmed\", \"disrupted\", \"weakened\", \"affected\", \"struck\", \"impacted\", \"disadvantaged\", \"negatively influenced\", \"caused trouble\"]}\n",
+  "timing": {
+    "first_text_ms": 534.3,
+    "option_ms": [
+      900.0,
+      1143.1,
+      1385.7,
+      1688.7,
+      1872.8,
+      2118.7,
+      2363.6,
+      2670.3,
+      2976.1,
+      3280.9
+    ],
+    "total_ms": 3464.7,
+    "stream": [
+      [
+        534.3,
+        2
+      ],
+      [
+        597.3,
+        9
+      ],
+      [
+        657.7,
+        11
+      ],
+      [
+        718.6,
+        14
+      ],
+      [
+        778.8,
+        17
+      ],
+      [
+        839.3,
+        21
+      ],
+      [
+        900.0,
+        23
+      ],
+      [
+        961.3,
+        25
+      ],
+      [
+        1021.6,
+        28
+      ],
+      [
+        1082.1,
+        31
+      ],
+      [
+        1143.1,
+        33
+      ],
+      [
+        1202.7,
+        35
+      ],
+      [
+        1263.5,
+        38
+      ],
+      [
+        1324.8,
+        44
+      ],
+      [
+        1385.7,
+        46
+      ],
+      [
+        1446.6,
+        48
+      ],
+      [
+        1507.5,
+        50
+      ],
+      [
+        1568.1,
+        54
+      ],
+      [
+        1628.1,
+        56
+      ],
+      [
+        1688.7,
+        58
+      ],
+      [
+        1748.8,
+        60
+      ],
+      [
+        1811.6,
+        68
+      ],
+      [
+        1872.8,
+        70
+      ],
+      [
+        1934.9,
+        72
+      ],
+      [
+        1996.3,
+        75
+      ],
+      [
+        2057.5,
+        78
+      ],
+      [
+        2118.7,
+        80
+      ],
+      [
+        2179.6,
+        82
+      ],
+      [
+        2240.0,
+        85
+      ],
+      [
+        2301.8,
+        90
+      ],
+      [
+        2363.6,
+        92
+      ],
+      [
+        2426.8,
+        94
+      ],
+      [
+        2488.1,
+        97
+      ],
+      [
+        2549.3,
+        100
+      ],
+      [
+        2609.5,
+        107
+      ],
+      [
+        2670.3,
+        109
+      ],
+      [
+        2730.9,
+        111
+      ],
+      [
+        2792.2,
+        114
+      ],
+      [
+        2853.7,
+        121
+      ],
+      [
+        2913.9,
+        132
+      ],
+      [
+        2976.1,
+        134
+      ],
+      [
+        3037.3,
+        136
+      ],
+      [
+        3097.9,
+        138
+      ],
+      [
+        3160.4,
+        142
+      ],
+      [
+        3220.9,
+        150
+      ],
+      [
+        3280.9,
+        153
+      ],
+      [
+        3403.3,
+        154
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Montgomery Bus Boycott was a key event in the civil rights movement. It started in December 1955 when Rosa Parks was arrested for refusing to give up her seat to a white passenger. In response, Black residents of Montgomery stopped riding the city buses for more than a year. Many people walked miles to work every day or set up carpools so that they would not have to use the buses. The boycott hurt the bus company because it lost most of its riders. In 1956, the Supreme Court ruled that segregation on buses was unconstitutional, and the boycott ended in victory.\n\"\"\"\n\nThe writer tapped the word \"hurt\" in this sentence (marked with [[ ]]):\nThe boycott [[hurt]] the bus company because it lost most of its riders.\n\nGive 10 replacements for \"hurt\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"hurt\" without changing the rest of the sentence. Do not repeat \"hurt\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 351,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

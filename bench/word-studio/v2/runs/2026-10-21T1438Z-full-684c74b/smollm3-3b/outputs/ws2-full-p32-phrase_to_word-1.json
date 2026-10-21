@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p32-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "74768dd167e5e6c3a68479a7cdf1d84b8fe0d6185c6d7d0c5fb48c4f21a2ff22",
+  "seed": 8799529331159653492,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"speak\", \"say\", \"blurt\", \"declare\", \"advocate\", \"assert\", \"pronounce\", \"declare\", \"out\", \"announce\"]}",
+  "timing": {
+    "first_text_ms": 170.7,
+    "option_ms": [
+      421.4,
+      545.7,
+      711.5,
+      836.8,
+      1003.5,
+      1126.7,
+      1296.2,
+      1420.6,
+      1546.9,
+      1672.2
+    ],
+    "total_ms": 1714.6,
+    "stream": [
+      [
+        170.7,
+        2
+      ],
+      [
+        214.2,
+        9
+      ],
+      [
+        256.2,
+        11
+      ],
+      [
+        297.3,
+        14
+      ],
+      [
+        338.3,
+        15
+      ],
+      [
+        379.5,
+        19
+      ],
+      [
+        421.4,
+        21
+      ],
+      [
+        462.5,
+        23
+      ],
+      [
+        504.3,
+        26
+      ],
+      [
+        545.7,
+        28
+      ],
+      [
+        587.2,
+        30
+      ],
+      [
+        628.8,
+        32
+      ],
+      [
+        669.9,
+        35
+      ],
+      [
+        711.5,
+        37
+      ],
+      [
+        753.3,
+        39
+      ],
+      [
+        795.4,
+        46
+      ],
+      [
+        836.8,
+        48
+      ],
+      [
+        878.3,
+        50
+      ],
+      [
+        920.5,
+        53
+      ],
+      [
+        962.1,
+        58
+      ],
+      [
+        1003.5,
+        60
+      ],
+      [
+        1044.5,
+        62
+      ],
+      [
+        1085.5,
+        68
+      ],
+      [
+        1126.7,
+        70
+      ],
+      [
+        1168.4,
+        72
+      ],
+      [
+        1211.5,
+        76
+      ],
+      [
+        1254.2,
+        81
+      ],
+      [
+        1296.2,
+        83
+      ],
+      [
+        1337.6,
+        85
+      ],
+      [
+        1378.4,
+        92
+      ],
+      [
+        1420.6,
+        94
+      ],
+      [
+        1462.0,
+        96
+      ],
+      [
+        1505.0,
+        99
+      ],
+      [
+        1546.9,
+        101
+      ],
+      [
+        1589.5,
+        103
+      ],
+      [
+        1631.0,
+        111
+      ],
+      [
+        1672.2,
+        114
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nIn The Crucible, Arthur Miller shows how fear can make a whole town turn against itself. When a group of girls in Salem start accusing people of witchcraft, the adults believe them without asking for proof. Anyone who disagrees with the court is in danger of being accused too. John Proctor knows the girls are lying, but at first he is afraid to speak up because he has his own secret. In the end, he chooses to die rather than sign a false confession. Miller wrote the play in the 1950s to criticize the way people were being accused of being communists without real evidence.\n\"\"\"\n\nThe writer selected the phrase \"speak up\" in this sentence (marked with [[ ]]):\nJohn Proctor knows the girls are lying, but at first he is afraid to [[speak up]] because he has his own secret.\n\nGive 10 single words that can replace \"speak up\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 373,
+  "new_tokens": 38,
+  "finish_reason": "stop",
+  "error": null
+}

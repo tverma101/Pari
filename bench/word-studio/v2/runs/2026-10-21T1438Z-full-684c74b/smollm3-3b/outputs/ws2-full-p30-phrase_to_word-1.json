@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p30-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "23120722e2fcdc096d3f32538ee9c4fe6c3e42f067b7b6a6bb970e49f552167c",
+  "seed": 5004485449003589131,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"eradicated\", \"eliminated\", \"banned\", \"abolished\", \"cured\", \"extinguished\", \"overcome\", \"removed\", \"destroyed\", \"erased\"]}",
+  "timing": {
+    "first_text_ms": 162.6,
+    "option_ms": [
+      447.3,
+      615.0,
+      780.4,
+      948.8,
+      1113.5,
+      1320.5,
+      1484.5,
+      1609.3,
+      1775.1,
+      1938.5
+    ],
+    "total_ms": 1980.2,
+    "stream": [
+      [
+        162.6,
+        2
+      ],
+      [
+        204.0,
+        9
+      ],
+      [
+        244.8,
+        11
+      ],
+      [
+        285.3,
+        14
+      ],
+      [
+        325.7,
+        16
+      ],
+      [
+        366.3,
+        18
+      ],
+      [
+        407.0,
+        24
+      ],
+      [
+        447.3,
+        26
+      ],
+      [
+        489.2,
+        28
+      ],
+      [
+        530.5,
+        32
+      ],
+      [
+        571.8,
+        38
+      ],
+      [
+        615.0,
+        40
+      ],
+      [
+        657.0,
+        42
+      ],
+      [
+        698.1,
+        43
+      ],
+      [
+        739.8,
+        48
+      ],
+      [
+        780.4,
+        50
+      ],
+      [
+        823.5,
+        52
+      ],
+      [
+        865.4,
+        56
+      ],
+      [
+        907.8,
+        61
+      ],
+      [
+        948.8,
+        63
+      ],
+      [
+        989.9,
+        65
+      ],
+      [
+        1030.9,
+        66
+      ],
+      [
+        1072.1,
+        70
+      ],
+      [
+        1113.5,
+        72
+      ],
+      [
+        1155.9,
+        74
+      ],
+      [
+        1197.4,
+        77
+      ],
+      [
+        1238.4,
+        81
+      ],
+      [
+        1279.6,
+        86
+      ],
+      [
+        1320.5,
+        88
+      ],
+      [
+        1361.4,
+        90
+      ],
+      [
+        1403.2,
+        94
+      ],
+      [
+        1444.0,
+        98
+      ],
+      [
+        1484.5,
+        100
+      ],
+      [
+        1525.5,
+        102
+      ],
+      [
+        1566.7,
+        109
+      ],
+      [
+        1609.3,
+        111
+      ],
+      [
+        1650.5,
+        113
+      ],
+      [
+        1692.2,
+        120
+      ],
+      [
+        1733.7,
+        122
+      ],
+      [
+        1775.1,
+        124
+      ],
+      [
+        1815.5,
+        126
+      ],
+      [
+        1856.4,
+        128
+      ],
+      [
+        1897.6,
+        132
+      ],
+      [
+        1938.5,
+        135
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nVaccines work by teaching the immune system how to fight a disease before a person ever gets sick. They contain a weak or harmless piece of a germ, which the body learns to recognize. If the real germ shows up later, the immune system can attack it quickly. Thanks to vaccines, diseases like smallpox have been wiped out, and polio is almost gone. When enough people in a community are vaccinated, it also protects those who cannot get the shot, like newborn babies. This is called herd immunity.\n\"\"\"\n\nThe writer selected the phrase \"wiped out\" in this sentence (marked with [[ ]]):\nThanks to vaccines, diseases like smallpox have been [[wiped out]], and polio is almost gone.\n\nGive 10 single words that can replace \"wiped out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 351,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

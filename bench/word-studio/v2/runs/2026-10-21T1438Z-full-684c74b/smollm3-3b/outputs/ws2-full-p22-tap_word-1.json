@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p22-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "d26db77db5ce2e9ae3f4da956b2cc9a2502e6d9bb122c9e63f776aa1551bc5ef",
+  "seed": 1321899144294498034,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"dire\", \"critical\", \"grave\", \"urgent\", \"imminent\", \"severe\", \"direst\", \"horrific\", \"crucial\", \"vital\"]}",
+  "timing": {
+    "first_text_ms": 173.3,
+    "option_ms": [
+      379.7,
+      500.5,
+      622.5,
+      743.5,
+      904.4,
+      1067.7,
+      1230.1,
+      1432.9,
+      1634.6,
+      1810.9
+    ],
+    "total_ms": 1853.1,
+    "stream": [
+      [
+        173.3,
+        2
+      ],
+      [
+        216.0,
+        9
+      ],
+      [
+        257.8,
+        11
+      ],
+      [
+        298.1,
+        14
+      ],
+      [
+        339.3,
+        18
+      ],
+      [
+        379.7,
+        20
+      ],
+      [
+        420.3,
+        22
+      ],
+      [
+        460.5,
+        30
+      ],
+      [
+        500.5,
+        32
+      ],
+      [
+        541.3,
+        34
+      ],
+      [
+        582.2,
+        39
+      ],
+      [
+        622.5,
+        41
+      ],
+      [
+        663.5,
+        43
+      ],
+      [
+        703.5,
+        49
+      ],
+      [
+        743.5,
+        51
+      ],
+      [
+        783.9,
+        53
+      ],
+      [
+        824.3,
+        55
+      ],
+      [
+        864.2,
+        61
+      ],
+      [
+        904.4,
+        63
+      ],
+      [
+        944.6,
+        65
+      ],
+      [
+        985.3,
+        67
+      ],
+      [
+        1025.4,
+        71
+      ],
+      [
+        1067.7,
+        73
+      ],
+      [
+        1109.0,
+        75
+      ],
+      [
+        1149.1,
+        79
+      ],
+      [
+        1189.6,
+        81
+      ],
+      [
+        1230.1,
+        83
+      ],
+      [
+        1271.5,
+        85
+      ],
+      [
+        1312.1,
+        86
+      ],
+      [
+        1352.4,
+        89
+      ],
+      [
+        1392.6,
+        93
+      ],
+      [
+        1432.9,
+        95
+      ],
+      [
+        1472.9,
+        97
+      ],
+      [
+        1513.4,
+        99
+      ],
+      [
+        1553.3,
+        101
+      ],
+      [
+        1594.4,
+        104
+      ],
+      [
+        1634.6,
+        106
+      ],
+      [
+        1681.0,
+        108
+      ],
+      [
+        1724.5,
+        109
+      ],
+      [
+        1769.6,
+        113
+      ],
+      [
+        1810.9,
+        116
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nCoral reefs are some of the most beautiful places on Earth, but they are in serious trouble. When the ocean gets too warm, corals push out the tiny algae that live inside them and give them their color. This is called coral bleaching, and if the water stays hot for too long, the coral can die. Reefs are home to about a quarter of all ocean species, so losing them would hurt a lot of sea life. They also protect coastlines from big waves during storms. Cutting down on pollution and greenhouse gases is the best way to give reefs a chance to recover.\n\"\"\"\n\nThe writer tapped the word \"serious\" in this sentence (marked with [[ ]]):\nCoral reefs are some of the most beautiful places on Earth, but they are in [[serious]] trouble.\n\nGive 10 replacements for \"serious\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"serious\" without changing the rest of the sentence. Do not repeat \"serious\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 383,
+  "new_tokens": 42,
+  "finish_reason": "stop",
+  "error": null
+}

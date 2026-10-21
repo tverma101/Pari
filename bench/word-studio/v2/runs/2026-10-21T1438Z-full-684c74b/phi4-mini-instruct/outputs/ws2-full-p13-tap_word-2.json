@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p13-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "3dbd38895cb52a254ade8cb2b77a085a5da62a0f8d7b767427dc89127db8b5e1",
+  "seed": 4281182706199989944,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\n  \"options\": [\"immense\", \"massive\", \"large\", \"extensive\", \"bountiful\", \"copious\", \"vast\", \"generous\", \"substantial\", \"considerable\"]\n}",
+  "timing": {
+    "first_text_ms": 206.2,
+    "option_ms": [
+      301.4,
+      2190.4,
+      2236.3,
+      2236.3,
+      2236.3,
+      2236.3,
+      2236.3,
+      2236.3,
+      2236.3,
+      2236.3
+    ],
+    "total_ms": 2282.6,
+    "stream": [
+      [
+        206.2,
+        2
+      ],
+      [
+        253.7,
+        3
+      ],
+      [
+        301.4,
+        5
+      ],
+      [
+        348.2,
+        12
+      ],
+      [
+        394.4,
+        14
+      ],
+      [
+        440.6,
+        17
+      ],
+      [
+        486.4,
+        20
+      ],
+      [
+        532.0,
+        24
+      ],
+      [
+        577.5,
+        26
+      ],
+      [
+        623.6,
+        28
+      ],
+      [
+        669.8,
+        32
+      ],
+      [
+        715.8,
+        35
+      ],
+      [
+        761.8,
+        37
+      ],
+      [
+        808.2,
+        39
+      ],
+      [
+        854.3,
+        44
+      ],
+      [
+        900.1,
+        46
+      ],
+      [
+        945.5,
+        48
+      ],
+      [
+        991.8,
+        51
+      ],
+      [
+        1037.8,
+        57
+      ],
+      [
+        1083.7,
+        59
+      ],
+      [
+        1129.2,
+        61
+      ],
+      [
+        1175.4,
+        62
+      ],
+      [
+        1221.6,
+        66
+      ],
+      [
+        1267.3,
+        70
+      ],
+      [
+        1313.3,
+        72
+      ],
+      [
+        1359.2,
+        74
+      ],
+      [
+        1404.9,
+        77
+      ],
+      [
+        1450.4,
+        81
+      ],
+      [
+        1496.8,
+        83
+      ],
+      [
+        1543.2,
+        85
+      ],
+      [
+        1589.4,
+        89
+      ],
+      [
+        1635.3,
+        91
+      ],
+      [
+        1681.7,
+        93
+      ],
+      [
+        1728.0,
+        98
+      ],
+      [
+        1774.1,
+        101
+      ],
+      [
+        1820.6,
+        103
+      ],
+      [
+        1866.9,
+        105
+      ],
+      [
+        1913.1,
+        108
+      ],
+      [
+        1958.9,
+        116
+      ],
+      [
+        2005.6,
+        118
+      ],
+      [
+        2051.9,
+        120
+      ],
+      [
+        2097.9,
+        128
+      ],
+      [
+        2144.2,
+        132
+      ],
+      [
+        2190.4,
+        135
+      ],
+      [
+        2236.3,
+        136
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nMy grandmother is the person who has had the biggest impact on my life. She grew up on a farm in Mexico and never got the chance to finish school, but she is one of the smartest people I know. Every Sunday she cooks a huge meal for the whole family, and she makes everyone put their phones away so we can actually talk. She taught me that being kind is more important than being right. When I was having a hard time in middle school, she was the one who listened to me without judging. I want to be the kind of person who makes others feel welcome, just like she does.\n\"\"\"\n\nThe writer tapped the word \"huge\" in this sentence (marked with [[ ]]):\nEvery Sunday she cooks a [[huge]] meal for the whole family, and she makes everyone put their phones away so we can actually talk.\n\nGive 10 replacements for \"huge\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"huge\" without changing the rest of the sentence. Do not repeat \"huge\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 350,
+  "new_tokens": 46,
+  "finish_reason": "stop",
+  "error": null
+}

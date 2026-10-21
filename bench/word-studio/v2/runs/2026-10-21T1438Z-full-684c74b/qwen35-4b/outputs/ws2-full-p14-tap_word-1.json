@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p14-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "af34449d558439256a62f59dd842c09202251b5d7a77e64b62737cea6ebdf980",
+  "seed": 928106111486740317,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"prepared\", [\"well\", \"prepared\"], \"eager\", \"motivated\", \"focused\", \"engaged\", \"thirsty\", \"anxious\", \"determined\"]}\n",
+  "timing": {
+    "first_text_ms": 527.9,
+    "option_ms": [
+      841.6,
+      1471.4,
+      1743.6,
+      1923.9,
+      2165.9,
+      2467.4,
+      2712.7,
+      2955.0
+    ],
+    "total_ms": 3136.1,
+    "stream": [
+      [
+        527.9,
+        2
+      ],
+      [
+        592.8,
+        9
+      ],
+      [
+        656.6,
+        11
+      ],
+      [
+        717.9,
+        14
+      ],
+      [
+        779.5,
+        22
+      ],
+      [
+        841.6,
+        24
+      ],
+      [
+        902.3,
+        27
+      ],
+      [
+        963.2,
+        31
+      ],
+      [
+        1026.6,
+        33
+      ],
+      [
+        1087.5,
+        35
+      ],
+      [
+        1148.8,
+        43
+      ],
+      [
+        1209.4,
+        46
+      ],
+      [
+        1270.5,
+        48
+      ],
+      [
+        1349.1,
+        49
+      ],
+      [
+        1410.9,
+        53
+      ],
+      [
+        1471.4,
+        55
+      ],
+      [
+        1533.6,
+        57
+      ],
+      [
+        1616.6,
+        60
+      ],
+      [
+        1683.5,
+        66
+      ],
+      [
+        1743.6,
+        68
+      ],
+      [
+        1804.1,
+        70
+      ],
+      [
+        1863.5,
+        77
+      ],
+      [
+        1923.9,
+        79
+      ],
+      [
+        1984.8,
+        81
+      ],
+      [
+        2046.2,
+        84
+      ],
+      [
+        2105.8,
+        88
+      ],
+      [
+        2165.9,
+        90
+      ],
+      [
+        2225.6,
+        92
+      ],
+      [
+        2286.2,
+        94
+      ],
+      [
+        2346.6,
+        98
+      ],
+      [
+        2406.9,
+        99
+      ],
+      [
+        2467.4,
+        101
+      ],
+      [
+        2528.6,
+        103
+      ],
+      [
+        2590.8,
+        105
+      ],
+      [
+        2651.4,
+        110
+      ],
+      [
+        2712.7,
+        112
+      ],
+      [
+        2772.8,
+        114
+      ],
+      [
+        2833.8,
+        115
+      ],
+      [
+        2894.6,
+        124
+      ],
+      [
+        2955.0,
+        127
+      ],
+      [
+        3076.0,
+        128
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSome school districts have switched to a four-day school week to save money and give students more time to rest. Supporters say that teachers are less tired and students come to school more ready to learn. The extra day off can also be used for doctor appointments, jobs, or family time. However, the longer school days can be hard for younger kids who have trouble focusing for that long. Working parents might also have to pay for childcare on the fifth day, which could be a problem for families without much money. Before more districts make this change, they should look closely at how it affects students' learning.\n\"\"\"\n\nThe writer tapped the word \"ready\" in this sentence (marked with [[ ]]):\nSupporters say that teachers are less tired and students come to school more [[ready]] to learn.\n\nGive 10 replacements for \"ready\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"ready\" without changing the rest of the sentence. Do not repeat \"ready\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 354,
+  "new_tokens": 43,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p26-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "a976ef6823272c141891ac098c014e851365f80b4e672a5f2c2f5c04b0ede9b7",
+  "seed": 3443118851807205749,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"poor\", \"in need\", \"afflicted\", \"needy\", \"hard pressed\", \"on the brink\", \"burdened\", \"facing difficulty\", \"in distress\", \"in need\"]}",
+  "timing": {
+    "first_text_ms": 202.6,
+    "option_ms": [
+      447.4,
+      610.2,
+      771.3,
+      935.2,
+      1096.9,
+      1301.6,
+      1504.2,
+      1707.3,
+      1869.3,
+      2031.9
+    ],
+    "total_ms": 2072.9,
+    "stream": [
+      [
+        202.6,
+        2
+      ],
+      [
+        244.6,
+        9
+      ],
+      [
+        285.3,
+        11
+      ],
+      [
+        326.4,
+        14
+      ],
+      [
+        366.9,
+        16
+      ],
+      [
+        407.4,
+        18
+      ],
+      [
+        447.4,
+        20
+      ],
+      [
+        487.7,
+        22
+      ],
+      [
+        529.3,
+        24
+      ],
+      [
+        569.9,
+        29
+      ],
+      [
+        610.2,
+        31
+      ],
+      [
+        650.1,
+        33
+      ],
+      [
+        690.2,
+        36
+      ],
+      [
+        731.0,
+        42
+      ],
+      [
+        771.3,
+        44
+      ],
+      [
+        812.9,
+        46
+      ],
+      [
+        853.2,
+        48
+      ],
+      [
+        894.0,
+        51
+      ],
+      [
+        935.2,
+        53
+      ],
+      [
+        975.5,
+        55
+      ],
+      [
+        1016.4,
+        59
+      ],
+      [
+        1057.1,
+        67
+      ],
+      [
+        1096.9,
+        69
+      ],
+      [
+        1138.2,
+        71
+      ],
+      [
+        1180.2,
+        73
+      ],
+      [
+        1220.3,
+        77
+      ],
+      [
+        1260.8,
+        83
+      ],
+      [
+        1301.6,
+        85
+      ],
+      [
+        1341.7,
+        87
+      ],
+      [
+        1382.2,
+        90
+      ],
+      [
+        1422.5,
+        93
+      ],
+      [
+        1463.3,
+        95
+      ],
+      [
+        1504.2,
+        97
+      ],
+      [
+        1544.8,
+        99
+      ],
+      [
+        1585.1,
+        100
+      ],
+      [
+        1625.6,
+        105
+      ],
+      [
+        1666.2,
+        116
+      ],
+      [
+        1707.3,
+        118
+      ],
+      [
+        1747.5,
+        120
+      ],
+      [
+        1788.2,
+        122
+      ],
+      [
+        1829.1,
+        131
+      ],
+      [
+        1869.3,
+        133
+      ],
+      [
+        1909.4,
+        135
+      ],
+      [
+        1950.3,
+        137
+      ],
+      [
+        1990.8,
+        142
+      ],
+      [
+        2031.9,
+        145
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nEvery Saturday for the past two years, I have volunteered at a food bank in my neighborhood. At first, I only went because I needed community service hours for school. But after a few weeks, I started to really care about the people who came in. Many of them were working parents who just did not have enough money at the end of the month. One woman told me that the food we gave her was the only reason her kids had dinner that week. Hearing that made me realize how many people in my own town are struggling. Now I want to study social work so I can help families like hers.\n\"\"\"\n\nThe writer tapped the word \"struggling\" in this sentence (marked with [[ ]]):\nHearing that made me realize how many people in my own town are [[struggling]].\n\nGive 10 replacements for \"struggling\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"struggling\" without changing the rest of the sentence. Do not repeat \"struggling\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 387,
+  "new_tokens": 47,
+  "finish_reason": "stop",
+  "error": null
+}

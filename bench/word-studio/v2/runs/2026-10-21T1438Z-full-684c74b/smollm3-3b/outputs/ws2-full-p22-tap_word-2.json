@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p22-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "64df63d7d4b6d1a6cb1f9a6138ea366c85cd3936e71cd06e676567d2abf66652",
+  "seed": 1045229549841620170,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"damage\", \"impact\", \"threaten\", \"influence\", \"disrupt\", \"affect\", \"compromise\", \"negatively affect\", \"suffer\", \"encourage decline\"]}",
+  "timing": {
+    "first_text_ms": 199.9,
+    "option_ms": [
+      412.2,
+      534.2,
+      696.3,
+      862.7,
+      1032.4,
+      1199.4,
+      1388.6,
+      1595.7,
+      1758.5,
+      1966.2
+    ],
+    "total_ms": 2007.2,
+    "stream": [
+      [
+        199.9,
+        2
+      ],
+      [
+        243.3,
+        9
+      ],
+      [
+        284.6,
+        11
+      ],
+      [
+        326.1,
+        14
+      ],
+      [
+        368.3,
+        20
+      ],
+      [
+        412.2,
+        22
+      ],
+      [
+        452.8,
+        24
+      ],
+      [
+        493.4,
+        30
+      ],
+      [
+        534.2,
+        32
+      ],
+      [
+        574.6,
+        34
+      ],
+      [
+        615.1,
+        40
+      ],
+      [
+        656.0,
+        42
+      ],
+      [
+        696.3,
+        44
+      ],
+      [
+        737.3,
+        46
+      ],
+      [
+        778.3,
+        48
+      ],
+      [
+        821.2,
+        55
+      ],
+      [
+        862.7,
+        57
+      ],
+      [
+        903.4,
+        59
+      ],
+      [
+        944.7,
+        62
+      ],
+      [
+        989.5,
+        66
+      ],
+      [
+        1032.4,
+        68
+      ],
+      [
+        1074.4,
+        70
+      ],
+      [
+        1115.1,
+        71
+      ],
+      [
+        1155.7,
+        76
+      ],
+      [
+        1199.4,
+        78
+      ],
+      [
+        1243.3,
+        80
+      ],
+      [
+        1299.8,
+        84
+      ],
+      [
+        1346.2,
+        90
+      ],
+      [
+        1388.6,
+        92
+      ],
+      [
+        1431.0,
+        94
+      ],
+      [
+        1472.4,
+        97
+      ],
+      [
+        1512.9,
+        104
+      ],
+      [
+        1555.0,
+        111
+      ],
+      [
+        1595.7,
+        113
+      ],
+      [
+        1636.4,
+        115
+      ],
+      [
+        1677.3,
+        116
+      ],
+      [
+        1718.2,
+        121
+      ],
+      [
+        1758.5,
+        123
+      ],
+      [
+        1800.7,
+        125
+      ],
+      [
+        1841.6,
+        128
+      ],
+      [
+        1882.5,
+        134
+      ],
+      [
+        1923.4,
+        142
+      ],
+      [
+        1966.2,
+        145
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nCoral reefs are some of the most beautiful places on Earth, but they are in serious trouble. When the ocean gets too warm, corals push out the tiny algae that live inside them and give them their color. This is called coral bleaching, and if the water stays hot for too long, the coral can die. Reefs are home to about a quarter of all ocean species, so losing them would hurt a lot of sea life. They also protect coastlines from big waves during storms. Cutting down on pollution and greenhouse gases is the best way to give reefs a chance to recover.\n\"\"\"\n\nThe writer tapped the word \"hurt\" in this sentence (marked with [[ ]]):\nReefs are home to about a quarter of all ocean species, so losing them would [[hurt]] a lot of sea life.\n\nGive 10 replacements for \"hurt\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"hurt\" without changing the rest of the sentence. Do not repeat \"hurt\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 392,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

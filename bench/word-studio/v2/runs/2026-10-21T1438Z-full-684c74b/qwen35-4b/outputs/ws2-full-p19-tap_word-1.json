@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p19-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "a61ec81d30dbe54c23c5ac4920bfd64dad575fb491c730bfe7c551e13bed0c19",
+  "seed": 4975093315820536332,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"assess\", \"determine\", \"evaluate\", \"judge\", \"gauge\", \"estimate\", \"predict\", \"indicate\", \"show\", \"reflect\"]}\n",
+  "timing": {
+    "first_text_ms": 536.4,
+    "option_ms": [
+      910.7,
+      1187.4,
+      1368.7,
+      1550.5,
+      1797.6,
+      1980.0,
+      2160.2,
+      2403.9,
+      2586.6,
+      2768.5
+    ],
+    "total_ms": 2953.2,
+    "stream": [
+      [
+        536.4,
+        2
+      ],
+      [
+        598.5,
+        9
+      ],
+      [
+        660.1,
+        11
+      ],
+      [
+        726.0,
+        14
+      ],
+      [
+        787.2,
+        17
+      ],
+      [
+        850.2,
+        20
+      ],
+      [
+        910.7,
+        22
+      ],
+      [
+        996.1,
+        24
+      ],
+      [
+        1065.6,
+        25
+      ],
+      [
+        1126.7,
+        33
+      ],
+      [
+        1187.4,
+        35
+      ],
+      [
+        1247.4,
+        37
+      ],
+      [
+        1307.6,
+        45
+      ],
+      [
+        1368.7,
+        47
+      ],
+      [
+        1429.4,
+        49
+      ],
+      [
+        1489.7,
+        54
+      ],
+      [
+        1550.5,
+        56
+      ],
+      [
+        1611.1,
+        58
+      ],
+      [
+        1673.4,
+        59
+      ],
+      [
+        1735.2,
+        63
+      ],
+      [
+        1797.6,
+        65
+      ],
+      [
+        1859.2,
+        67
+      ],
+      [
+        1919.3,
+        75
+      ],
+      [
+        1980.0,
+        77
+      ],
+      [
+        2040.6,
+        79
+      ],
+      [
+        2101.0,
+        86
+      ],
+      [
+        2160.2,
+        88
+      ],
+      [
+        2220.1,
+        90
+      ],
+      [
+        2281.9,
+        93
+      ],
+      [
+        2342.6,
+        98
+      ],
+      [
+        2403.9,
+        100
+      ],
+      [
+        2465.6,
+        102
+      ],
+      [
+        2525.6,
+        106
+      ],
+      [
+        2586.6,
+        108
+      ],
+      [
+        2647.0,
+        110
+      ],
+      [
+        2707.5,
+        117
+      ],
+      [
+        2768.5,
+        120
+      ],
+      [
+        2891.7,
+        121
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nStandardized tests like the SAT are supposed to measure how ready students are for college, but they do not tell the whole story. A student's score can depend a lot on whether their family could pay for tutoring and practice books. Some students are also very nervous test-takers, so their scores do not show what they actually know. Because of this, more than 1,800 colleges have made the SAT optional. I think colleges should look at grades, essays, and activities instead of focusing on one test score.\n\"\"\"\n\nThe writer tapped the word \"measure\" in this sentence (marked with [[ ]]):\nStandardized tests like the SAT are supposed to [[measure]] how ready students are for college, but they do not tell the whole story.\n\nGive 10 replacements for \"measure\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"measure\" without changing the rest of the sentence. Do not repeat \"measure\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 347,
+  "new_tokens": 40,
+  "finish_reason": "stop",
+  "error": null
+}

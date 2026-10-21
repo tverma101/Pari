@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p37-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "dee11e7038c532f71505d2be72176db652023f5cd765220e215d52e7d9c0bbcb",
+  "seed": 6358009208534829154,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"frighten\", \"intimidate\", \"terrorize\", \"discourage\", \"deter\", \"hinder\", \"dishearten\", \"daunt\", \"chill\", \"dishearten\"]}",
+  "timing": {
+    "first_text_ms": 201.3,
+    "option_ms": [
+      487.0,
+      688.0,
+      848.7,
+      1012.8,
+      1175.3,
+      1337.4,
+      1539.8,
+      1701.6,
+      1862.8,
+      2065.7
+    ],
+    "total_ms": 2107.0,
+    "stream": [
+      [
+        201.3,
+        2
+      ],
+      [
+        242.7,
+        9
+      ],
+      [
+        284.4,
+        11
+      ],
+      [
+        324.5,
+        14
+      ],
+      [
+        365.8,
+        15
+      ],
+      [
+        405.9,
+        20
+      ],
+      [
+        446.5,
+        22
+      ],
+      [
+        487.0,
+        24
+      ],
+      [
+        526.8,
+        26
+      ],
+      [
+        566.7,
+        29
+      ],
+      [
+        607.3,
+        33
+      ],
+      [
+        647.6,
+        36
+      ],
+      [
+        688.0,
+        38
+      ],
+      [
+        728.0,
+        40
+      ],
+      [
+        768.1,
+        46
+      ],
+      [
+        808.8,
+        49
+      ],
+      [
+        848.7,
+        51
+      ],
+      [
+        888.8,
+        53
+      ],
+      [
+        929.1,
+        57
+      ],
+      [
+        969.6,
+        63
+      ],
+      [
+        1012.8,
+        65
+      ],
+      [
+        1053.2,
+        67
+      ],
+      [
+        1093.7,
+        68
+      ],
+      [
+        1134.8,
+        72
+      ],
+      [
+        1175.3,
+        74
+      ],
+      [
+        1215.9,
+        76
+      ],
+      [
+        1256.5,
+        77
+      ],
+      [
+        1297.2,
+        82
+      ],
+      [
+        1337.4,
+        84
+      ],
+      [
+        1379.7,
+        86
+      ],
+      [
+        1419.5,
+        89
+      ],
+      [
+        1459.5,
+        94
+      ],
+      [
+        1499.7,
+        96
+      ],
+      [
+        1539.8,
+        98
+      ],
+      [
+        1579.8,
+        100
+      ],
+      [
+        1619.9,
+        102
+      ],
+      [
+        1660.1,
+        105
+      ],
+      [
+        1701.6,
+        107
+      ],
+      [
+        1741.7,
+        109
+      ],
+      [
+        1782.0,
+        111
+      ],
+      [
+        1822.2,
+        114
+      ],
+      [
+        1862.8,
+        116
+      ],
+      [
+        1903.0,
+        118
+      ],
+      [
+        1943.1,
+        121
+      ],
+      [
+        1984.2,
+        126
+      ],
+      [
+        2025.7,
+        128
+      ],
+      [
+        2065.7,
+        131
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Animal Farm, George Orwell uses a story about farm animals to show how power can corrupt leaders. After the animals take over the farm, they promise that all animals will be treated the same. Over time, the pigs start giving themselves special privileges, like sleeping in beds and drinking alcohol. Napoleon uses his dogs to scare anyone who questions him, and he changes the rules whenever it helps him. By the end, the other animals cannot tell the difference between the pigs and the humans. Orwell was warning readers that a revolution can end up with the same problems it was trying to fix.\n\"\"\"\n\nThe writer tapped the word \"scare\" in this sentence (marked with [[ ]]):\nNapoleon uses his dogs to [[scare]] anyone who questions him, and he changes the rules whenever it helps him.\n\nGive 10 replacements for \"scare\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"scare\" without changing the rest of the sentence. Do not repeat \"scare\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 388,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

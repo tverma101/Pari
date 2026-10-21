@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p16-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "fdd1aa3eb15128583ee7bd921070d734313cf51e7099b7811b0bd454b88786c1",
+  "seed": 1748411019333496666,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"central\", \"crucial\", \"important\", \"major\", \"significant\", \"vital\", \"fundamental\", \"critical\", \"essential\", \"core\"]}",
+  "timing": {
+    "first_text_ms": 170.8,
+    "option_ms": [
+      386.8,
+      596.0,
+      722.7,
+      851.0,
+      975.3,
+      1141.9,
+      1316.5,
+      1442.0,
+      1594.2,
+      1725.6
+    ],
+    "total_ms": 1768.1,
+    "stream": [
+      [
+        170.8,
+        2
+      ],
+      [
+        214.2,
+        9
+      ],
+      [
+        257.2,
+        11
+      ],
+      [
+        298.8,
+        14
+      ],
+      [
+        341.8,
+        21
+      ],
+      [
+        386.8,
+        23
+      ],
+      [
+        428.9,
+        25
+      ],
+      [
+        470.8,
+        27
+      ],
+      [
+        512.2,
+        29
+      ],
+      [
+        553.9,
+        32
+      ],
+      [
+        596.0,
+        34
+      ],
+      [
+        638.8,
+        36
+      ],
+      [
+        680.9,
+        45
+      ],
+      [
+        722.7,
+        47
+      ],
+      [
+        764.8,
+        49
+      ],
+      [
+        809.5,
+        54
+      ],
+      [
+        851.0,
+        56
+      ],
+      [
+        892.3,
+        58
+      ],
+      [
+        933.7,
+        69
+      ],
+      [
+        975.3,
+        71
+      ],
+      [
+        1017.4,
+        73
+      ],
+      [
+        1058.7,
+        74
+      ],
+      [
+        1100.7,
+        78
+      ],
+      [
+        1141.9,
+        80
+      ],
+      [
+        1183.7,
+        82
+      ],
+      [
+        1225.7,
+        86
+      ],
+      [
+        1272.9,
+        93
+      ],
+      [
+        1316.5,
+        95
+      ],
+      [
+        1358.8,
+        97
+      ],
+      [
+        1400.5,
+        105
+      ],
+      [
+        1442.0,
+        107
+      ],
+      [
+        1484.0,
+        109
+      ],
+      [
+        1527.1,
+        118
+      ],
+      [
+        1594.2,
+        120
+      ],
+      [
+        1642.1,
+        122
+      ],
+      [
+        1684.1,
+        126
+      ],
+      [
+        1725.6,
+        129
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Montgomery Bus Boycott was a key event in the civil rights movement. It started in December 1955 when Rosa Parks was arrested for refusing to give up her seat to a white passenger. In response, Black residents of Montgomery stopped riding the city buses for more than a year. Many people walked miles to work every day or set up carpools so that they would not have to use the buses. The boycott hurt the bus company because it lost most of its riders. In 1956, the Supreme Court ruled that segregation on buses was unconstitutional, and the boycott ended in victory.\n\"\"\"\n\nThe writer tapped the word \"key\" in this sentence (marked with [[ ]]):\nThe Montgomery Bus Boycott was a [[key]] event in the civil rights movement.\n\nGive 10 replacements for \"key\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"key\" without changing the rest of the sentence. Do not repeat \"key\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 376,
+  "new_tokens": 38,
+  "finish_reason": "stop",
+  "error": null
+}

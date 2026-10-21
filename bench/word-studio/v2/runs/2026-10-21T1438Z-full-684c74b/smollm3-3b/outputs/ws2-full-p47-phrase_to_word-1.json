@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p47-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "004fd90a7bfec0b5ad7371385365f8b9720d703e4c340973120d51cb0af1f67a",
+  "seed": 7008465794620737166,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"submitting\", \"completing\", \"filling\", \"issuing\", \"generating\", \"processing\", \"issuing\", \"submitting\", \"filling\", \"completing\"]}",
+  "timing": {
+    "first_text_ms": 169.9,
+    "option_ms": [
+      417.7,
+      623.6,
+      788.4,
+      954.5,
+      1119.3,
+      1246.1,
+      1412.6,
+      1576.5,
+      1742.5,
+      1949.6
+    ],
+    "total_ms": 1992.2,
+    "stream": [
+      [
+        169.9,
+        2
+      ],
+      [
+        212.5,
+        9
+      ],
+      [
+        254.0,
+        11
+      ],
+      [
+        294.8,
+        14
+      ],
+      [
+        335.6,
+        20
+      ],
+      [
+        376.8,
+        24
+      ],
+      [
+        417.7,
+        26
+      ],
+      [
+        458.7,
+        28
+      ],
+      [
+        499.4,
+        31
+      ],
+      [
+        540.4,
+        34
+      ],
+      [
+        582.4,
+        38
+      ],
+      [
+        623.6,
+        40
+      ],
+      [
+        664.6,
+        42
+      ],
+      [
+        706.4,
+        46
+      ],
+      [
+        747.5,
+        49
+      ],
+      [
+        788.4,
+        51
+      ],
+      [
+        831.3,
+        53
+      ],
+      [
+        872.1,
+        56
+      ],
+      [
+        913.3,
+        60
+      ],
+      [
+        954.5,
+        62
+      ],
+      [
+        995.4,
+        64
+      ],
+      [
+        1036.1,
+        69
+      ],
+      [
+        1076.6,
+        74
+      ],
+      [
+        1119.3,
+        76
+      ],
+      [
+        1161.9,
+        78
+      ],
+      [
+        1203.7,
+        88
+      ],
+      [
+        1246.1,
+        90
+      ],
+      [
+        1287.6,
+        92
+      ],
+      [
+        1329.9,
+        95
+      ],
+      [
+        1371.3,
+        99
+      ],
+      [
+        1412.6,
+        101
+      ],
+      [
+        1453.9,
+        103
+      ],
+      [
+        1494.7,
+        109
+      ],
+      [
+        1535.9,
+        113
+      ],
+      [
+        1576.5,
+        115
+      ],
+      [
+        1618.0,
+        117
+      ],
+      [
+        1660.5,
+        121
+      ],
+      [
+        1701.3,
+        124
+      ],
+      [
+        1742.5,
+        126
+      ],
+      [
+        1783.4,
+        128
+      ],
+      [
+        1826.7,
+        131
+      ],
+      [
+        1867.6,
+        134
+      ],
+      [
+        1908.9,
+        138
+      ],
+      [
+        1949.6,
+        141
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nI will be the first person in my family to go to college, and that comes with a lot of pressure. My parents did not have the chance to continue their education because they had to start working when they were teenagers. They have always told me that school is the key to a better life. Filling out applications was confusing because no one at home had done it before, so I had to ask my counselor for help with almost every step. Even though the process was hard, it made me more determined to succeed. I want to make my parents proud and show my younger cousins that college is possible for them too.\n\"\"\"\n\nThe writer selected the phrase \"Filling out\" in this sentence (marked with [[ ]]):\n[[Filling out]] applications was confusing because no one at home had done it before, so I had to ask my counselor for help with almost every step.\n\nGive 10 single words that can replace \"Filling out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 380,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

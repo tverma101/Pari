@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p14-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "79d892355ade996a1cc7b31cbc0428118e7f7725f49c82e8bf2cb3e582ee0aa1",
+  "seed": 7925739300849127310,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"concern\", \"issue\", \"challenge\", \"complication\", \"dilemma\", \"obstacle\", \"difficulty\", \"burden\", \"hurdle\", \"setback\"]}",
+  "timing": {
+    "first_text_ms": 193.0,
+    "option_ms": [
+      468.0,
+      603.7,
+      739.1,
+      920.2,
+      1146.4,
+      1328.0,
+      1463.5,
+      1644.9,
+      1872.4,
+      2055.0
+    ],
+    "total_ms": 2146.4,
+    "stream": [
+      [
+        193.0,
+        2
+      ],
+      [
+        240.1,
+        9
+      ],
+      [
+        286.2,
+        11
+      ],
+      [
+        332.1,
+        14
+      ],
+      [
+        377.9,
+        18
+      ],
+      [
+        423.0,
+        21
+      ],
+      [
+        468.0,
+        23
+      ],
+      [
+        512.9,
+        25
+      ],
+      [
+        558.5,
+        30
+      ],
+      [
+        603.7,
+        32
+      ],
+      [
+        648.6,
+        34
+      ],
+      [
+        693.5,
+        43
+      ],
+      [
+        739.1,
+        45
+      ],
+      [
+        784.3,
+        47
+      ],
+      [
+        829.4,
+        51
+      ],
+      [
+        874.2,
+        59
+      ],
+      [
+        920.2,
+        61
+      ],
+      [
+        965.8,
+        63
+      ],
+      [
+        1010.9,
+        64
+      ],
+      [
+        1055.8,
+        67
+      ],
+      [
+        1100.8,
+        70
+      ],
+      [
+        1146.4,
+        72
+      ],
+      [
+        1191.8,
+        74
+      ],
+      [
+        1237.1,
+        76
+      ],
+      [
+        1282.4,
+        82
+      ],
+      [
+        1328.0,
+        84
+      ],
+      [
+        1373.2,
+        86
+      ],
+      [
+        1418.5,
+        96
+      ],
+      [
+        1463.5,
+        98
+      ],
+      [
+        1509.2,
+        100
+      ],
+      [
+        1554.7,
+        103
+      ],
+      [
+        1599.8,
+        106
+      ],
+      [
+        1644.9,
+        108
+      ],
+      [
+        1690.8,
+        110
+      ],
+      [
+        1736.4,
+        111
+      ],
+      [
+        1781.7,
+        114
+      ],
+      [
+        1826.9,
+        116
+      ],
+      [
+        1872.4,
+        118
+      ],
+      [
+        1918.8,
+        120
+      ],
+      [
+        1964.2,
+        123
+      ],
+      [
+        2009.4,
+        127
+      ],
+      [
+        2055.0,
+        129
+      ],
+      [
+        2100.6,
+        130
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nSome school districts have switched to a four-day school week to save money and give students more time to rest. Supporters say that teachers are less tired and students come to school more ready to learn. The extra day off can also be used for doctor appointments, jobs, or family time. However, the longer school days can be hard for younger kids who have trouble focusing for that long. Working parents might also have to pay for childcare on the fifth day, which could be a problem for families without much money. Before more districts make this change, they should look closely at how it affects students' learning.\n\"\"\"\n\nThe writer tapped the word \"problem\" in this sentence (marked with [[ ]]):\nWorking parents might also have to pay for childcare on the fifth day, which could be a [[problem]] for families without much money.\n\nGive 10 replacements for \"problem\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"problem\" without changing the rest of the sentence. Do not repeat \"problem\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 343,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

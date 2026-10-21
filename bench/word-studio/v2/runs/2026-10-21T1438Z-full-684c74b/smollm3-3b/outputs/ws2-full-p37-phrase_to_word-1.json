@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p37-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "d8b5bb96a91e7014a60730c1d2f81b5caeeb44d80b138b4ac3414aa5204ac9b8",
+  "seed": 8095936638657752021,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"seize\", \"capture\", \"acquire\", \"possess\", \"govern\", \"control\", \"occupy\", \"hold\", \"claim\", \"assume\"]}",
+  "timing": {
+    "first_text_ms": 166.5,
+    "option_ms": [
+      414.7,
+      538.2,
+      702.4,
+      870.0,
+      1037.8,
+      1162.6,
+      1326.8,
+      1452.2,
+      1576.7,
+      1699.8
+    ],
+    "total_ms": 1743.7,
+    "stream": [
+      [
+        166.5,
+        2
+      ],
+      [
+        208.2,
+        9
+      ],
+      [
+        250.0,
+        11
+      ],
+      [
+        291.0,
+        14
+      ],
+      [
+        332.1,
+        16
+      ],
+      [
+        373.3,
+        19
+      ],
+      [
+        414.7,
+        21
+      ],
+      [
+        456.2,
+        23
+      ],
+      [
+        496.8,
+        30
+      ],
+      [
+        538.2,
+        32
+      ],
+      [
+        579.4,
+        34
+      ],
+      [
+        619.9,
+        36
+      ],
+      [
+        661.7,
+        41
+      ],
+      [
+        702.4,
+        43
+      ],
+      [
+        745.7,
+        45
+      ],
+      [
+        786.7,
+        49
+      ],
+      [
+        828.1,
+        52
+      ],
+      [
+        870.0,
+        54
+      ],
+      [
+        911.9,
+        56
+      ],
+      [
+        954.5,
+        57
+      ],
+      [
+        996.5,
+        62
+      ],
+      [
+        1037.8,
+        64
+      ],
+      [
+        1079.1,
+        66
+      ],
+      [
+        1121.1,
+        73
+      ],
+      [
+        1162.6,
+        75
+      ],
+      [
+        1203.8,
+        77
+      ],
+      [
+        1244.6,
+        82
+      ],
+      [
+        1285.5,
+        83
+      ],
+      [
+        1326.8,
+        85
+      ],
+      [
+        1368.7,
+        87
+      ],
+      [
+        1410.3,
+        91
+      ],
+      [
+        1452.2,
+        93
+      ],
+      [
+        1493.4,
+        95
+      ],
+      [
+        1535.6,
+        100
+      ],
+      [
+        1576.7,
+        102
+      ],
+      [
+        1618.0,
+        104
+      ],
+      [
+        1659.1,
+        110
+      ],
+      [
+        1699.8,
+        113
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Animal Farm, George Orwell uses a story about farm animals to show how power can corrupt leaders. After the animals take over the farm, they promise that all animals will be treated the same. Over time, the pigs start giving themselves special privileges, like sleeping in beds and drinking alcohol. Napoleon uses his dogs to scare anyone who questions him, and he changes the rules whenever it helps him. By the end, the other animals cannot tell the difference between the pigs and the humans. Orwell was warning readers that a revolution can end up with the same problems it was trying to fix.\n\"\"\"\n\nThe writer selected the phrase \"take over\" in this sentence (marked with [[ ]]):\nAfter the animals [[take over]] the farm, they promise that all animals will be treated the same.\n\nGive 10 single words that can replace \"take over\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 359,
+  "new_tokens": 39,
+  "finish_reason": "stop",
+  "error": null
+}

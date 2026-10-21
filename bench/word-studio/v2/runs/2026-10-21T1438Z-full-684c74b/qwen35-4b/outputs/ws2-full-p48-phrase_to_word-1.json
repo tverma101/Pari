@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p48-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "95434e98f6a28554233b9c27c8037e7d17bd6a09c226de922cd864461fa0d1e5",
+  "seed": 6735827742434317104,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"backing\", \"funding\", \"aiding\", \"fostering\", \"sustaining\", \"upholding\", \"maintaining\", \"advocating\", \"defending\", \"promoting\"]}\n",
+  "timing": {
+    "first_text_ms": 505.4,
+    "option_ms": [
+      870.8,
+      1147.7,
+      1389.6,
+      1693.2,
+      1999.2,
+      2240.5,
+      2483.7,
+      2785.4,
+      3032.1,
+      3275.2
+    ],
+    "total_ms": 3455.5,
+    "stream": [
+      [
+        505.4,
+        2
+      ],
+      [
+        567.0,
+        9
+      ],
+      [
+        626.9,
+        11
+      ],
+      [
+        687.8,
+        14
+      ],
+      [
+        747.5,
+        18
+      ],
+      [
+        807.2,
+        21
+      ],
+      [
+        870.8,
+        23
+      ],
+      [
+        940.8,
+        25
+      ],
+      [
+        1012.2,
+        26
+      ],
+      [
+        1081.3,
+        32
+      ],
+      [
+        1147.7,
+        34
+      ],
+      [
+        1209.0,
+        36
+      ],
+      [
+        1269.8,
+        39
+      ],
+      [
+        1329.9,
+        42
+      ],
+      [
+        1389.6,
+        44
+      ],
+      [
+        1450.5,
+        46
+      ],
+      [
+        1511.1,
+        47
+      ],
+      [
+        1571.6,
+        50
+      ],
+      [
+        1632.3,
+        55
+      ],
+      [
+        1693.2,
+        57
+      ],
+      [
+        1753.5,
+        59
+      ],
+      [
+        1815.8,
+        60
+      ],
+      [
+        1877.0,
+        63
+      ],
+      [
+        1937.7,
+        69
+      ],
+      [
+        1999.2,
+        71
+      ],
+      [
+        2060.0,
+        73
+      ],
+      [
+        2120.2,
+        75
+      ],
+      [
+        2181.4,
+        82
+      ],
+      [
+        2240.5,
+        84
+      ],
+      [
+        2302.2,
+        86
+      ],
+      [
+        2362.7,
+        91
+      ],
+      [
+        2423.3,
+        97
+      ],
+      [
+        2483.7,
+        99
+      ],
+      [
+        2543.9,
+        101
+      ],
+      [
+        2604.4,
+        104
+      ],
+      [
+        2665.5,
+        106
+      ],
+      [
+        2726.2,
+        111
+      ],
+      [
+        2785.4,
+        113
+      ],
+      [
+        2847.6,
+        115
+      ],
+      [
+        2909.3,
+        118
+      ],
+      [
+        2970.0,
+        124
+      ],
+      [
+        3032.1,
+        126
+      ],
+      [
+        3095.3,
+        128
+      ],
+      [
+        3155.9,
+        132
+      ],
+      [
+        3215.5,
+        137
+      ],
+      [
+        3275.2,
+        140
+      ],
+      [
+        3395.2,
+        141
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSome people think public libraries are not needed anymore because everything is online, but I strongly disagree. Libraries give free internet and computers to people who cannot afford them at home. They also offer programs like reading groups for kids, job help for adults, and English classes for immigrants. For many people, the library is one of the only safe and quiet places where they can study. If cities cut library funding, the people who would be hurt the most are the ones who already have the least. That is why we should keep supporting our libraries.\n\"\"\"\n\nThe writer selected the phrase \"keep supporting\" in this sentence (marked with [[ ]]):\nThat is why we should [[keep supporting]] our libraries.\n\nGive 10 single words that can replace \"keep supporting\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 313,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

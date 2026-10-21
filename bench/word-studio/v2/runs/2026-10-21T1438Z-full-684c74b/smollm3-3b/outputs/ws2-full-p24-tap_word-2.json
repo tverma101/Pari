@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p24-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "43f3d003db05b066f685a5f3af9a6acd815f9dbccd844e39157b9109ba882f1e",
+  "seed": 4133009799703256966,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"frightened\", \"terrified\", \"alarmed\", \"dismayed\", \"shocked\", \"startled\", \"appalled\", \"aghast\", \"astounded\", \"apprehensive\"]}",
+  "timing": {
+    "first_text_ms": 171.4,
+    "option_ms": [
+      457.2,
+      618.0,
+      781.6,
+      987.5,
+      1149.9,
+      1310.4,
+      1471.9,
+      1635.1,
+      1798.8,
+      2002.4
+    ],
+    "total_ms": 2043.4,
+    "stream": [
+      [
+        171.4,
+        2
+      ],
+      [
+        214.0,
+        9
+      ],
+      [
+        254.7,
+        11
+      ],
+      [
+        294.9,
+        14
+      ],
+      [
+        335.4,
+        15
+      ],
+      [
+        376.0,
+        20
+      ],
+      [
+        416.8,
+        24
+      ],
+      [
+        457.2,
+        26
+      ],
+      [
+        497.2,
+        28
+      ],
+      [
+        537.1,
+        32
+      ],
+      [
+        577.3,
+        37
+      ],
+      [
+        618.0,
+        39
+      ],
+      [
+        659.0,
+        41
+      ],
+      [
+        699.4,
+        45
+      ],
+      [
+        739.8,
+        48
+      ],
+      [
+        781.6,
+        50
+      ],
+      [
+        822.3,
+        52
+      ],
+      [
+        862.6,
+        53
+      ],
+      [
+        905.1,
+        56
+      ],
+      [
+        946.3,
+        60
+      ],
+      [
+        987.5,
+        62
+      ],
+      [
+        1028.3,
+        64
+      ],
+      [
+        1068.9,
+        66
+      ],
+      [
+        1109.0,
+        71
+      ],
+      [
+        1149.9,
+        73
+      ],
+      [
+        1190.1,
+        75
+      ],
+      [
+        1230.2,
+        80
+      ],
+      [
+        1270.3,
+        83
+      ],
+      [
+        1310.4,
+        85
+      ],
+      [
+        1350.5,
+        87
+      ],
+      [
+        1391.0,
+        90
+      ],
+      [
+        1431.4,
+        95
+      ],
+      [
+        1471.9,
+        97
+      ],
+      [
+        1512.4,
+        99
+      ],
+      [
+        1553.8,
+        102
+      ],
+      [
+        1593.8,
+        105
+      ],
+      [
+        1635.1,
+        107
+      ],
+      [
+        1676.5,
+        109
+      ],
+      [
+        1717.0,
+        112
+      ],
+      [
+        1757.3,
+        118
+      ],
+      [
+        1798.8,
+        120
+      ],
+      [
+        1839.6,
+        122
+      ],
+      [
+        1879.9,
+        125
+      ],
+      [
+        1921.9,
+        128
+      ],
+      [
+        1962.2,
+        134
+      ],
+      [
+        2002.4,
+        137
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Frankenstein, Mary Shelley shows that the creature becomes a monster because of how he is treated. When he is first created, the creature is gentle and wants to be loved. However, every person who sees him is scared of his appearance and attacks him or runs away. Even Victor Frankenstein, the man who made him, abandons him right after bringing him to life. The creature says, \"I was benevolent and good; misery made me a fiend.\" This line shows that his anger comes from being rejected over and over, not from his nature.\n\"\"\"\n\nThe writer tapped the word \"scared\" in this sentence (marked with [[ ]]):\nHowever, every person who sees him is [[scared]] of his appearance and attacks him or runs away.\n\nGive 10 replacements for \"scared\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"scared\" without changing the rest of the sentence. Do not repeat \"scared\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 382,
+  "new_tokens": 47,
+  "finish_reason": "stop",
+  "error": null
+}

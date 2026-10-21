@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p21-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "5cc60e95e3ee40c93d4785a39ae99a4e79ab4527639627255ba2ea9a42349453",
+  "seed": 1881228759248682705,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"demand\", \"request\", \"seeking\", \"pleading\", \"sought\", \"beg\", \"cried\", \"pleaded\", \"solicited\", \"pleading\"]}",
+  "timing": {
+    "first_text_ms": 196.0,
+    "option_ms": [
+      468.3,
+      601.9,
+      781.5,
+      959.7,
+      1139.3,
+      1274.3,
+      1468.2,
+      1647.1,
+      1902.8,
+      2081.9
+    ],
+    "total_ms": 2173.1,
+    "stream": [
+      [
+        196.0,
+        2
+      ],
+      [
+        243.1,
+        9
+      ],
+      [
+        289.3,
+        11
+      ],
+      [
+        334.7,
+        14
+      ],
+      [
+        379.3,
+        15
+      ],
+      [
+        423.3,
+        20
+      ],
+      [
+        468.3,
+        22
+      ],
+      [
+        513.0,
+        24
+      ],
+      [
+        557.5,
+        31
+      ],
+      [
+        601.9,
+        33
+      ],
+      [
+        646.3,
+        35
+      ],
+      [
+        692.0,
+        37
+      ],
+      [
+        736.7,
+        42
+      ],
+      [
+        781.5,
+        44
+      ],
+      [
+        825.9,
+        46
+      ],
+      [
+        870.4,
+        49
+      ],
+      [
+        915.0,
+        54
+      ],
+      [
+        959.7,
+        56
+      ],
+      [
+        1004.2,
+        58
+      ],
+      [
+        1048.7,
+        59
+      ],
+      [
+        1094.1,
+        64
+      ],
+      [
+        1139.3,
+        66
+      ],
+      [
+        1184.1,
+        68
+      ],
+      [
+        1228.8,
+        71
+      ],
+      [
+        1274.3,
+        73
+      ],
+      [
+        1319.4,
+        75
+      ],
+      [
+        1366.1,
+        77
+      ],
+      [
+        1423.3,
+        80
+      ],
+      [
+        1468.2,
+        82
+      ],
+      [
+        1512.2,
+        84
+      ],
+      [
+        1556.8,
+        87
+      ],
+      [
+        1602.3,
+        91
+      ],
+      [
+        1647.1,
+        93
+      ],
+      [
+        1717.9,
+        95
+      ],
+      [
+        1769.3,
+        98
+      ],
+      [
+        1813.1,
+        100
+      ],
+      [
+        1857.5,
+        104
+      ],
+      [
+        1902.8,
+        106
+      ],
+      [
+        1947.9,
+        108
+      ],
+      [
+        1992.7,
+        111
+      ],
+      [
+        2037.3,
+        116
+      ],
+      [
+        2081.9,
+        118
+      ],
+      [
+        2127.4,
+        119
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nThe Black Death was a plague that spread across Europe starting in 1347. It was carried by fleas that lived on rats, and it moved quickly along trade routes and through crowded cities. Within just a few years, it killed somewhere between a third and half of Europe's population. Because so many workers died, the people who survived could ask for higher pay, which made the old feudal system weaker. The plague also made a lot of people question the church, since prayers did not seem to stop the disease.\n\"\"\"\n\nThe writer selected the phrase \"ask for\" in this sentence (marked with [[ ]]):\nBecause so many workers died, the people who survived could [[ask for]] higher pay, which made the old feudal system weaker.\n\nGive 10 single words that can replace \"ask for\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 304,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

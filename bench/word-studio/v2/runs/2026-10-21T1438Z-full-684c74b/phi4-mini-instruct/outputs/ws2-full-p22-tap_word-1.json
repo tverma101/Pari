@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p22-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "d26db77db5ce2e9ae3f4da956b2cc9a2502e6d9bb122c9e63f776aa1551bc5ef",
+  "seed": 1321899144294498034,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"grave\", \"critical\", \"severe\", \"serious\", \"critical\", \"complicated\", \"serious\", \"urgent\", \"serious\", \"significant\"]}",
+  "timing": {
+    "first_text_ms": 195.6,
+    "option_ms": [
+      424.0,
+      558.8,
+      739.5,
+      921.3,
+      1056.2,
+      1254.5,
+      1436.1,
+      1572.5,
+      1753.7,
+      1934.9
+    ],
+    "total_ms": 2026.4,
+    "stream": [
+      [
+        195.6,
+        2
+      ],
+      [
+        242.5,
+        9
+      ],
+      [
+        288.6,
+        11
+      ],
+      [
+        334.2,
+        14
+      ],
+      [
+        379.2,
+        19
+      ],
+      [
+        424.0,
+        21
+      ],
+      [
+        469.0,
+        23
+      ],
+      [
+        514.0,
+        31
+      ],
+      [
+        558.8,
+        33
+      ],
+      [
+        603.5,
+        35
+      ],
+      [
+        648.2,
+        37
+      ],
+      [
+        693.6,
+        41
+      ],
+      [
+        739.5,
+        43
+      ],
+      [
+        784.4,
+        45
+      ],
+      [
+        831.8,
+        48
+      ],
+      [
+        876.6,
+        52
+      ],
+      [
+        921.3,
+        54
+      ],
+      [
+        966.1,
+        56
+      ],
+      [
+        1010.7,
+        64
+      ],
+      [
+        1056.2,
+        66
+      ],
+      [
+        1106.0,
+        68
+      ],
+      [
+        1165.1,
+        72
+      ],
+      [
+        1209.9,
+        79
+      ],
+      [
+        1254.5,
+        81
+      ],
+      [
+        1300.4,
+        83
+      ],
+      [
+        1345.8,
+        86
+      ],
+      [
+        1391.1,
+        90
+      ],
+      [
+        1436.1,
+        92
+      ],
+      [
+        1482.0,
+        94
+      ],
+      [
+        1527.4,
+        100
+      ],
+      [
+        1572.5,
+        102
+      ],
+      [
+        1617.3,
+        104
+      ],
+      [
+        1662.8,
+        107
+      ],
+      [
+        1708.3,
+        111
+      ],
+      [
+        1753.7,
+        113
+      ],
+      [
+        1798.7,
+        115
+      ],
+      [
+        1844.2,
+        119
+      ],
+      [
+        1889.6,
+        126
+      ],
+      [
+        1934.9,
+        128
+      ],
+      [
+        1980.3,
+        129
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nCoral reefs are some of the most beautiful places on Earth, but they are in serious trouble. When the ocean gets too warm, corals push out the tiny algae that live inside them and give them their color. This is called coral bleaching, and if the water stays hot for too long, the coral can die. Reefs are home to about a quarter of all ocean species, so losing them would hurt a lot of sea life. They also protect coastlines from big waves during storms. Cutting down on pollution and greenhouse gases is the best way to give reefs a chance to recover.\n\"\"\"\n\nThe writer tapped the word \"serious\" in this sentence (marked with [[ ]]):\nCoral reefs are some of the most beautiful places on Earth, but they are in [[serious]] trouble.\n\nGive 10 replacements for \"serious\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"serious\" without changing the rest of the sentence. Do not repeat \"serious\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 340,
+  "new_tokens": 41,
+  "finish_reason": "stop",
+  "error": null
+}

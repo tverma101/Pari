@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p42-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "d6b91a34d74574ba60bbf61019971e1e0b9cefa1f4d1b5b33f7c6713b93acabc",
+  "seed": 5934758415511678892,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"inherently good\", \"ideal\", \"flawless\", \"untainted\", \"undefiled\", \"untouched\", \"pure\", \"without flaws\", \"without imperfections\", \"without problems\"]}",
+  "timing": {
+    "first_text_ms": 208.5,
+    "option_ms": [
+      542.4,
+      664.2,
+      867.0,
+      1030.9,
+      1200.7,
+      1362.1,
+      1485.5,
+      1653.1,
+      1862.4,
+      2027.0
+    ],
+    "total_ms": 2068.9,
+    "stream": [
+      [
+        208.5,
+        2
+      ],
+      [
+        250.8,
+        9
+      ],
+      [
+        291.6,
+        11
+      ],
+      [
+        332.3,
+        14
+      ],
+      [
+        375.3,
+        16
+      ],
+      [
+        416.1,
+        19
+      ],
+      [
+        458.0,
+        24
+      ],
+      [
+        500.2,
+        29
+      ],
+      [
+        542.4,
+        31
+      ],
+      [
+        583.4,
+        33
+      ],
+      [
+        623.8,
+        38
+      ],
+      [
+        664.2,
+        40
+      ],
+      [
+        704.3,
+        42
+      ],
+      [
+        746.2,
+        44
+      ],
+      [
+        786.7,
+        46
+      ],
+      [
+        826.7,
+        50
+      ],
+      [
+        867.0,
+        52
+      ],
+      [
+        907.1,
+        54
+      ],
+      [
+        947.9,
+        57
+      ],
+      [
+        988.2,
+        63
+      ],
+      [
+        1030.9,
+        65
+      ],
+      [
+        1072.5,
+        67
+      ],
+      [
+        1114.9,
+        72
+      ],
+      [
+        1159.4,
+        76
+      ],
+      [
+        1200.7,
+        78
+      ],
+      [
+        1241.3,
+        80
+      ],
+      [
+        1282.1,
+        83
+      ],
+      [
+        1322.1,
+        89
+      ],
+      [
+        1362.1,
+        91
+      ],
+      [
+        1402.2,
+        93
+      ],
+      [
+        1442.9,
+        97
+      ],
+      [
+        1485.5,
+        99
+      ],
+      [
+        1527.0,
+        101
+      ],
+      [
+        1568.9,
+        108
+      ],
+      [
+        1610.2,
+        114
+      ],
+      [
+        1653.1,
+        116
+      ],
+      [
+        1694.3,
+        118
+      ],
+      [
+        1736.2,
+        125
+      ],
+      [
+        1778.2,
+        131
+      ],
+      [
+        1820.9,
+        139
+      ],
+      [
+        1862.4,
+        141
+      ],
+      [
+        1903.6,
+        143
+      ],
+      [
+        1944.3,
+        150
+      ],
+      [
+        1985.3,
+        159
+      ],
+      [
+        2027.0,
+        162
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nIn The Outsiders, Ponyboy learns that people are more alike than they seem. At the start of the novel, he believes that the Socs, the rich kids from the west side, have perfect lives with no problems. Then he meets Cherry Valance, a Soc girl who tells him that rich kids have troubles too. Later, Randy, another Soc, admits that he is tired of all the fighting between the two groups. These conversations make Ponyboy realize that the line between Greasers and Socs is not as clear as he thought. S. E. Hinton shows that judging people by their group keeps us from seeing who they really are.\n\"\"\"\n\nThe writer tapped the word \"perfect\" in this sentence (marked with [[ ]]):\nAt the start of the novel, he believes that the Socs, the rich kids from the west side, have [[perfect]] lives with no problems.\n\nGive 10 replacements for \"perfect\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"perfect\" without changing the rest of the sentence. Do not repeat \"perfect\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 404,
+  "new_tokens": 46,
+  "finish_reason": "stop",
+  "error": null
+}

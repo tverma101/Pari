@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p28-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "443462fd23d218f58e5a5f1bf5e888dd3d8b6b24c4bd66be737c197214add38f",
+  "seed": 3020687074474777931,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"moral compass\", \"ethics\", \"principles\", \"values\", \"conscience\", \"righteousness\", \"virtue\", \"morality\", \"judgment\", \"code\"]}",
+  "timing": {
+    "first_text_ms": 173.0,
+    "option_ms": [
+      460.3,
+      627.9,
+      834.5,
+      958.1,
+      1126.8,
+      1333.9,
+      1499.9,
+      1664.9,
+      1829.5,
+      1953.0
+    ],
+    "total_ms": 1995.2,
+    "stream": [
+      [
+        173.0,
+        2
+      ],
+      [
+        215.0,
+        9
+      ],
+      [
+        256.1,
+        11
+      ],
+      [
+        297.3,
+        14
+      ],
+      [
+        338.2,
+        15
+      ],
+      [
+        379.0,
+        19
+      ],
+      [
+        419.4,
+        27
+      ],
+      [
+        460.3,
+        29
+      ],
+      [
+        501.5,
+        31
+      ],
+      [
+        542.4,
+        34
+      ],
+      [
+        584.9,
+        37
+      ],
+      [
+        627.9,
+        39
+      ],
+      [
+        670.2,
+        41
+      ],
+      [
+        711.5,
+        43
+      ],
+      [
+        752.8,
+        48
+      ],
+      [
+        793.7,
+        51
+      ],
+      [
+        834.5,
+        53
+      ],
+      [
+        876.4,
+        55
+      ],
+      [
+        917.0,
+        61
+      ],
+      [
+        958.1,
+        63
+      ],
+      [
+        999.6,
+        65
+      ],
+      [
+        1040.4,
+        68
+      ],
+      [
+        1083.5,
+        75
+      ],
+      [
+        1126.8,
+        77
+      ],
+      [
+        1168.4,
+        79
+      ],
+      [
+        1209.6,
+        84
+      ],
+      [
+        1251.1,
+        88
+      ],
+      [
+        1293.1,
+        92
+      ],
+      [
+        1333.9,
+        94
+      ],
+      [
+        1375.5,
+        96
+      ],
+      [
+        1416.7,
+        100
+      ],
+      [
+        1457.7,
+        102
+      ],
+      [
+        1499.9,
+        104
+      ],
+      [
+        1540.8,
+        106
+      ],
+      [
+        1582.5,
+        109
+      ],
+      [
+        1623.8,
+        114
+      ],
+      [
+        1664.9,
+        116
+      ],
+      [
+        1705.9,
+        118
+      ],
+      [
+        1747.4,
+        121
+      ],
+      [
+        1788.6,
+        126
+      ],
+      [
+        1829.5,
+        128
+      ],
+      [
+        1870.5,
+        130
+      ],
+      [
+        1911.4,
+        134
+      ],
+      [
+        1953.0,
+        137
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Lord of the Flies, a group of boys stranded on an island slowly lose their sense of right and wrong. At first, they choose Ralph as their leader and try to follow rules, like only speaking when they hold the conch shell. As time goes on, Jack becomes more interested in hunting than in keeping the signal fire going. More and more boys join Jack's tribe because it seems more fun than doing chores. By the end, the boys have turned violent, and two of them are dead. Golding uses the story to suggest that people can quickly become savage when there are no rules to control them.\n\"\"\"\n\nThe writer selected the phrase \"sense of right and wrong\" in this sentence (marked with [[ ]]):\nIn Lord of the Flies, a group of boys stranded on an island slowly lose their [[sense of right and wrong]].\n\nGive 10 single words that can replace \"sense of right and wrong\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 378,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

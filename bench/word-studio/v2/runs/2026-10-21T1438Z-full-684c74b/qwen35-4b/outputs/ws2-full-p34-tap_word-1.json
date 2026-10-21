@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p34-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "dc5625e300a7d93193e8bad8dea7a882b39561744bb87d8b3c9912dbbe11d5c5",
+  "seed": 5191440529107450231,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"justifiable\", \"equitable\", \"reasonable\", \"balanced\", \"just\", \"appropriate\", \"sound\", \"prudent\", \"equitable\", \"deserved\"]}\n",
+  "timing": {
+    "first_text_ms": 533.5,
+    "option_ms": [
+      926.4,
+      1171.3,
+      1353.0,
+      1534.0,
+      1718.6,
+      1899.4,
+      2081.8,
+      2324.3,
+      2567.3,
+      2810.7
+    ],
+    "total_ms": 2992.1,
+    "stream": [
+      [
+        533.5,
+        2
+      ],
+      [
+        595.0,
+        9
+      ],
+      [
+        655.5,
+        11
+      ],
+      [
+        740.1,
+        14
+      ],
+      [
+        803.7,
+        18
+      ],
+      [
+        865.1,
+        25
+      ],
+      [
+        926.4,
+        27
+      ],
+      [
+        987.0,
+        29
+      ],
+      [
+        1048.2,
+        32
+      ],
+      [
+        1109.1,
+        38
+      ],
+      [
+        1171.3,
+        40
+      ],
+      [
+        1233.1,
+        42
+      ],
+      [
+        1293.5,
+        52
+      ],
+      [
+        1353.0,
+        54
+      ],
+      [
+        1413.0,
+        56
+      ],
+      [
+        1473.5,
+        64
+      ],
+      [
+        1534.0,
+        66
+      ],
+      [
+        1594.6,
+        68
+      ],
+      [
+        1655.3,
+        72
+      ],
+      [
+        1718.6,
+        74
+      ],
+      [
+        1778.7,
+        76
+      ],
+      [
+        1838.6,
+        87
+      ],
+      [
+        1899.4,
+        89
+      ],
+      [
+        1960.1,
+        91
+      ],
+      [
+        2020.6,
+        96
+      ],
+      [
+        2081.8,
+        98
+      ],
+      [
+        2142.1,
+        100
+      ],
+      [
+        2203.8,
+        102
+      ],
+      [
+        2264.2,
+        107
+      ],
+      [
+        2324.3,
+        109
+      ],
+      [
+        2383.7,
+        111
+      ],
+      [
+        2445.4,
+        114
+      ],
+      [
+        2506.9,
+        120
+      ],
+      [
+        2567.3,
+        122
+      ],
+      [
+        2627.8,
+        124
+      ],
+      [
+        2688.8,
+        127
+      ],
+      [
+        2750.3,
+        132
+      ],
+      [
+        2810.7,
+        135
+      ],
+      [
+        2930.5,
+        136
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nCollege athletes bring in millions of dollars for their schools, but for a long time they were not allowed to earn any of it. Big football and basketball programs sell tickets, jerseys, and TV rights, while the players who make it all possible get nothing except a scholarship. Many athletes spend more than forty hours a week on their sport, which makes it hard to keep a part-time job. In 2021, new rules finally let athletes make money from their name and image. I think this was a fair change, and schools should go even further by sharing some of their profits with players.\n\"\"\"\n\nThe writer tapped the word \"fair\" in this sentence (marked with [[ ]]):\nI think this was a [[fair]] change, and schools should go even further by sharing some of their profits with players.\n\nGive 10 replacements for \"fair\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"fair\" without changing the rest of the sentence. Do not repeat \"fair\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 359,
+  "new_tokens": 41,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p43-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "f4f0360791b96243c257ee7cd05ec7d9749a758c911711ae8804afdc7236289a",
+  "seed": 3355963886366091736,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"drag\", \"involve\", \"draw\", \"engage\", \"draw in\", \"enlist\", \"recruit\", \"gather\", \"bring in\", \"entail\"]}\n",
+  "timing": {
+    "first_text_ms": 524.5,
+    "option_ms": [
+      837.5,
+      1084.9,
+      1265.7,
+      1446.8,
+      1695.5,
+      1938.0,
+      2199.8,
+      2382.4,
+      2625.5,
+      2868.7
+    ],
+    "total_ms": 3052.3,
+    "stream": [
+      [
+        524.5,
+        2
+      ],
+      [
+        586.1,
+        9
+      ],
+      [
+        649.7,
+        11
+      ],
+      [
+        713.4,
+        14
+      ],
+      [
+        776.5,
+        18
+      ],
+      [
+        837.5,
+        20
+      ],
+      [
+        898.9,
+        22
+      ],
+      [
+        960.1,
+        25
+      ],
+      [
+        1021.6,
+        29
+      ],
+      [
+        1084.9,
+        31
+      ],
+      [
+        1144.9,
+        33
+      ],
+      [
+        1205.4,
+        37
+      ],
+      [
+        1265.7,
+        39
+      ],
+      [
+        1325.7,
+        41
+      ],
+      [
+        1385.9,
+        47
+      ],
+      [
+        1446.8,
+        49
+      ],
+      [
+        1510.6,
+        51
+      ],
+      [
+        1572.7,
+        55
+      ],
+      [
+        1635.0,
+        58
+      ],
+      [
+        1695.5,
+        60
+      ],
+      [
+        1757.2,
+        62
+      ],
+      [
+        1817.6,
+        64
+      ],
+      [
+        1877.6,
+        68
+      ],
+      [
+        1938.0,
+        70
+      ],
+      [
+        2006.9,
+        72
+      ],
+      [
+        2075.5,
+        75
+      ],
+      [
+        2138.8,
+        79
+      ],
+      [
+        2199.8,
+        81
+      ],
+      [
+        2260.2,
+        83
+      ],
+      [
+        2320.0,
+        89
+      ],
+      [
+        2382.4,
+        91
+      ],
+      [
+        2442.4,
+        93
+      ],
+      [
+        2503.0,
+        98
+      ],
+      [
+        2563.0,
+        101
+      ],
+      [
+        2625.5,
+        103
+      ],
+      [
+        2686.3,
+        105
+      ],
+      [
+        2747.7,
+        108
+      ],
+      [
+        2808.4,
+        111
+      ],
+      [
+        2868.7,
+        114
+      ],
+      [
+        2991.2,
+        115
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nWorld War I had many causes, but the event that started it was the assassination of Archduke Franz Ferdinand in 1914. Before that, the major powers of Europe had already been building up their armies and making alliances with each other. These alliances meant that a fight between two countries could quickly pull in many others. When Austria-Hungary declared war on Serbia, Russia came to Serbia's defense, and then Germany, France, and Britain joined in. Nationalism also played a big role, because many people were proud of their countries and eager to prove their strength.\n\"\"\"\n\nThe writer tapped the word \"pull\" in this sentence (marked with [[ ]]):\nThese alliances meant that a fight between two countries could quickly [[pull]] in many others.\n\nGive 10 replacements for \"pull\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"pull\" without changing the rest of the sentence. Do not repeat \"pull\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 349,
+  "new_tokens": 42,
+  "finish_reason": "stop",
+  "error": null
+}

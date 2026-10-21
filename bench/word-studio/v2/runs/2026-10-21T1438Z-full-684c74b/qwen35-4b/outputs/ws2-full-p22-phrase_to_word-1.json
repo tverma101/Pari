@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p22-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "f8b72b78847e55911c1ac3da1f704136da228e452d212602e80e158b1ba8d0d1",
+  "seed": 922061132896454358,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Reducing\", \"Cutting\", \"Lowering\", \"Decreasing\", \"Minimizing\", \"Lessening\", \"Diminishing\", \"Tackling\", \"Addressing\", \"Stopping\"]}\n",
+  "timing": {
+    "first_text_ms": 520.9,
+    "option_ms": [
+      896.7,
+      1137.5,
+      1381.3,
+      1628.8,
+      1931.3,
+      2173.3,
+      2484.0,
+      2790.3,
+      3032.3,
+      3213.8
+    ],
+    "total_ms": 3397.4,
+    "stream": [
+      [
+        520.9,
+        2
+      ],
+      [
+        585.8,
+        9
+      ],
+      [
+        648.4,
+        11
+      ],
+      [
+        711.0,
+        14
+      ],
+      [
+        773.2,
+        19
+      ],
+      [
+        836.7,
+        22
+      ],
+      [
+        896.7,
+        24
+      ],
+      [
+        957.9,
+        26
+      ],
+      [
+        1017.7,
+        29
+      ],
+      [
+        1078.2,
+        33
+      ],
+      [
+        1137.5,
+        35
+      ],
+      [
+        1198.1,
+        37
+      ],
+      [
+        1258.3,
+        42
+      ],
+      [
+        1318.2,
+        45
+      ],
+      [
+        1381.3,
+        47
+      ],
+      [
+        1445.6,
+        49
+      ],
+      [
+        1507.7,
+        54
+      ],
+      [
+        1568.3,
+        59
+      ],
+      [
+        1628.8,
+        61
+      ],
+      [
+        1689.2,
+        63
+      ],
+      [
+        1749.5,
+        66
+      ],
+      [
+        1809.3,
+        68
+      ],
+      [
+        1870.3,
+        73
+      ],
+      [
+        1931.3,
+        75
+      ],
+      [
+        1991.6,
+        77
+      ],
+      [
+        2051.7,
+        81
+      ],
+      [
+        2112.3,
+        86
+      ],
+      [
+        2173.3,
+        88
+      ],
+      [
+        2233.8,
+        90
+      ],
+      [
+        2294.6,
+        93
+      ],
+      [
+        2355.8,
+        95
+      ],
+      [
+        2420.6,
+        101
+      ],
+      [
+        2484.0,
+        103
+      ],
+      [
+        2546.3,
+        105
+      ],
+      [
+        2607.7,
+        106
+      ],
+      [
+        2668.7,
+        109
+      ],
+      [
+        2729.4,
+        113
+      ],
+      [
+        2790.3,
+        115
+      ],
+      [
+        2850.8,
+        117
+      ],
+      [
+        2911.1,
+        124
+      ],
+      [
+        2972.6,
+        127
+      ],
+      [
+        3032.3,
+        129
+      ],
+      [
+        3092.2,
+        131
+      ],
+      [
+        3153.8,
+        139
+      ],
+      [
+        3213.8,
+        142
+      ],
+      [
+        3334.5,
+        143
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nCoral reefs are some of the most beautiful places on Earth, but they are in serious trouble. When the ocean gets too warm, corals push out the tiny algae that live inside them and give them their color. This is called coral bleaching, and if the water stays hot for too long, the coral can die. Reefs are home to about a quarter of all ocean species, so losing them would hurt a lot of sea life. They also protect coastlines from big waves during storms. Cutting down on pollution and greenhouse gases is the best way to give reefs a chance to recover.\n\"\"\"\n\nThe writer selected the phrase \"Cutting down on\" in this sentence (marked with [[ ]]):\n[[Cutting down on]] pollution and greenhouse gases is the best way to give reefs a chance to recover.\n\nGive 10 single words that can replace \"Cutting down on\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 339,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

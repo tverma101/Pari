@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p09-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "cade2be45e4b60e54f2cb9feb68d0fccedbcf47fd8a0d666ce3d4637b24a284b",
+  "seed": 2412731590358485180,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"select\", \"choose\", \"decide\", \"determine\", \"opt\", \"pick\", \"pick out\", \"choose out\", \"select out\", \"decide out\"]}",
+  "timing": {
+    "first_text_ms": 177.5,
+    "option_ms": [
+      399.9,
+      531.0,
+      705.7,
+      879.6,
+      1011.5,
+      1142.4,
+      1317.9,
+      1493.7,
+      1668.6,
+      1888.6
+    ],
+    "total_ms": 1977.3,
+    "stream": [
+      [
+        177.5,
+        2
+      ],
+      [
+        223.9,
+        9
+      ],
+      [
+        268.7,
+        11
+      ],
+      [
+        312.5,
+        14
+      ],
+      [
+        356.3,
+        20
+      ],
+      [
+        399.9,
+        22
+      ],
+      [
+        443.5,
+        24
+      ],
+      [
+        487.8,
+        30
+      ],
+      [
+        531.0,
+        32
+      ],
+      [
+        574.5,
+        34
+      ],
+      [
+        618.1,
+        37
+      ],
+      [
+        662.2,
+        40
+      ],
+      [
+        705.7,
+        42
+      ],
+      [
+        749.3,
+        44
+      ],
+      [
+        792.7,
+        47
+      ],
+      [
+        836.2,
+        53
+      ],
+      [
+        879.6,
+        55
+      ],
+      [
+        923.7,
+        57
+      ],
+      [
+        967.7,
+        60
+      ],
+      [
+        1011.5,
+        62
+      ],
+      [
+        1055.1,
+        64
+      ],
+      [
+        1098.7,
+        68
+      ],
+      [
+        1142.4,
+        70
+      ],
+      [
+        1186.4,
+        72
+      ],
+      [
+        1230.4,
+        76
+      ],
+      [
+        1274.1,
+        80
+      ],
+      [
+        1317.9,
+        82
+      ],
+      [
+        1361.5,
+        84
+      ],
+      [
+        1405.0,
+        90
+      ],
+      [
+        1449.2,
+        94
+      ],
+      [
+        1493.7,
+        96
+      ],
+      [
+        1537.4,
+        98
+      ],
+      [
+        1581.2,
+        104
+      ],
+      [
+        1624.9,
+        108
+      ],
+      [
+        1668.6,
+        110
+      ],
+      [
+        1712.7,
+        112
+      ],
+      [
+        1756.9,
+        115
+      ],
+      [
+        1800.8,
+        118
+      ],
+      [
+        1844.7,
+        122
+      ],
+      [
+        1888.6,
+        124
+      ],
+      [
+        1932.3,
+        125
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nSome people think school uniforms are a bad idea, but I think they help students in many ways. First, uniforms make it harder for kids to judge each other based on how much their clothes cost. When everyone wears the same thing, students from poor families do not stand out as much. Second, uniforms save time in the morning because students do not have to pick out an outfit every day. Critics say that uniforms take away students' freedom to express themselves. However, students can still show who they are through their hobbies, their writing, and the way they treat others.\n\"\"\"\n\nThe writer selected the phrase \"pick out\" in this sentence (marked with [[ ]]):\nSecond, uniforms save time in the morning because students do not have to [[pick out]] an outfit every day.\n\nGive 10 single words that can replace \"pick out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 312,
+  "new_tokens": 42,
+  "finish_reason": "stop",
+  "error": null
+}

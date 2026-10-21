@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p20-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "c0347854700b53c5888dbcd6b190494f580de02e0cd97f68c55c2695b70af4eb",
+  "seed": 4869795597917343665,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"cautions\", \"advises\", \"tells\", \"reminds\", \"alerts\", \"urges\", \"speaks\", \"states\", \"says\", \"notices\"]}\n",
+  "timing": {
+    "first_text_ms": 546.0,
+    "option_ms": [
+      929.1,
+      1238.2,
+      1490.5,
+      1735.6,
+      1918.0,
+      2158.7,
+      2402.4,
+      2588.9,
+      2769.2,
+      3008.5
+    ],
+    "total_ms": 3188.5,
+    "stream": [
+      [
+        546.0,
+        2
+      ],
+      [
+        623.8,
+        9
+      ],
+      [
+        685.3,
+        11
+      ],
+      [
+        747.0,
+        14
+      ],
+      [
+        807.6,
+        16
+      ],
+      [
+        868.5,
+        22
+      ],
+      [
+        929.1,
+        24
+      ],
+      [
+        989.3,
+        26
+      ],
+      [
+        1049.2,
+        28
+      ],
+      [
+        1109.9,
+        31
+      ],
+      [
+        1170.3,
+        33
+      ],
+      [
+        1238.2,
+        35
+      ],
+      [
+        1302.5,
+        37
+      ],
+      [
+        1364.4,
+        38
+      ],
+      [
+        1425.5,
+        42
+      ],
+      [
+        1490.5,
+        44
+      ],
+      [
+        1551.9,
+        46
+      ],
+      [
+        1614.0,
+        49
+      ],
+      [
+        1674.8,
+        53
+      ],
+      [
+        1735.6,
+        55
+      ],
+      [
+        1796.3,
+        57
+      ],
+      [
+        1857.5,
+        63
+      ],
+      [
+        1918.0,
+        65
+      ],
+      [
+        1978.4,
+        67
+      ],
+      [
+        2039.2,
+        69
+      ],
+      [
+        2099.0,
+        72
+      ],
+      [
+        2158.7,
+        74
+      ],
+      [
+        2218.9,
+        76
+      ],
+      [
+        2279.3,
+        79
+      ],
+      [
+        2339.9,
+        82
+      ],
+      [
+        2402.4,
+        84
+      ],
+      [
+        2464.2,
+        86
+      ],
+      [
+        2526.0,
+        92
+      ],
+      [
+        2588.9,
+        94
+      ],
+      [
+        2648.8,
+        96
+      ],
+      [
+        2708.6,
+        100
+      ],
+      [
+        2769.2,
+        102
+      ],
+      [
+        2828.8,
+        104
+      ],
+      [
+        2888.1,
+        107
+      ],
+      [
+        2948.2,
+        111
+      ],
+      [
+        3008.5,
+        114
+      ],
+      [
+        3128.1,
+        115
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nRomeo and Juliet is often called a love story, but it is also a story about how acting too fast can lead to disaster. Romeo and Juliet meet, fall in love, and get married in less than a week. Neither of them stops to think about what their families will do when they find out. Friar Laurence even warns Romeo that \"they stumble that run fast,\" but Romeo does not listen. When Romeo hears that Juliet is dead, he kills himself right away instead of waiting to learn the truth. If the two young lovers had slowed down, the play might have had a happy ending.\n\"\"\"\n\nThe writer tapped the word \"warns\" in this sentence (marked with [[ ]]):\nFriar Laurence even [[warns]] Romeo that \"they stumble that run fast,\" but Romeo does not listen.\n\nGive 10 replacements for \"warns\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"warns\" without changing the rest of the sentence. Do not repeat \"warns\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 364,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

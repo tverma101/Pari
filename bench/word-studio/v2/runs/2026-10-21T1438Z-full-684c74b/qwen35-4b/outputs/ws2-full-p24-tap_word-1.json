@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p24-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "8c02504667cbd9a7444d21f16bd4ffe19c6e5f41957c04549b214c39f154372e",
+  "seed": 2857985773180242796,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"kind\", [\"mild\", \"kind\", \"harmless\", \"tender\", \"innocent\", \"peaceful\", \"humble\", \"pure\", \"affectionate\"]]}}\n",
+  "timing": {
+    "first_text_ms": 519.0,
+    "option_ms": [
+      826.0
+    ],
+    "total_ms": 3343.7,
+    "stream": [
+      [
+        519.0,
+        2
+      ],
+      [
+        581.3,
+        9
+      ],
+      [
+        642.4,
+        11
+      ],
+      [
+        703.8,
+        14
+      ],
+      [
+        764.9,
+        18
+      ],
+      [
+        826.0,
+        20
+      ],
+      [
+        887.8,
+        23
+      ],
+      [
+        948.4,
+        24
+      ],
+      [
+        1009.2,
+        27
+      ],
+      [
+        1073.1,
+        29
+      ],
+      [
+        1135.7,
+        31
+      ],
+      [
+        1197.3,
+        35
+      ],
+      [
+        1258.6,
+        37
+      ],
+      [
+        1320.5,
+        39
+      ],
+      [
+        1380.7,
+        40
+      ],
+      [
+        1441.7,
+        43
+      ],
+      [
+        1503.1,
+        47
+      ],
+      [
+        1565.5,
+        49
+      ],
+      [
+        1626.8,
+        51
+      ],
+      [
+        1689.4,
+        52
+      ],
+      [
+        1752.0,
+        57
+      ],
+      [
+        1815.8,
+        59
+      ],
+      [
+        1878.5,
+        61
+      ],
+      [
+        1940.5,
+        64
+      ],
+      [
+        2000.6,
+        66
+      ],
+      [
+        2060.1,
+        69
+      ],
+      [
+        2122.7,
+        71
+      ],
+      [
+        2183.3,
+        73
+      ],
+      [
+        2244.5,
+        78
+      ],
+      [
+        2305.8,
+        81
+      ],
+      [
+        2366.1,
+        83
+      ],
+      [
+        2426.5,
+        85
+      ],
+      [
+        2486.4,
+        86
+      ],
+      [
+        2547.1,
+        91
+      ],
+      [
+        2607.0,
+        93
+      ],
+      [
+        2666.7,
+        95
+      ],
+      [
+        2726.2,
+        99
+      ],
+      [
+        2786.7,
+        101
+      ],
+      [
+        2847.2,
+        103
+      ],
+      [
+        2907.5,
+        106
+      ],
+      [
+        2967.8,
+        112
+      ],
+      [
+        3028.4,
+        115
+      ],
+      [
+        3091.3,
+        118
+      ],
+      [
+        3154.7,
+        120
+      ],
+      [
+        3280.0,
+        121
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Frankenstein, Mary Shelley shows that the creature becomes a monster because of how he is treated. When he is first created, the creature is gentle and wants to be loved. However, every person who sees him is scared of his appearance and attacks him or runs away. Even Victor Frankenstein, the man who made him, abandons him right after bringing him to life. The creature says, \"I was benevolent and good; misery made me a fiend.\" This line shows that his anger comes from being rejected over and over, not from his nature.\n\"\"\"\n\nThe writer tapped the word \"gentle\" in this sentence (marked with [[ ]]):\nWhen he is first created, the creature is [[gentle]] and wants to be loved.\n\nGive 10 replacements for \"gentle\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"gentle\" without changing the rest of the sentence. Do not repeat \"gentle\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 350,
+  "new_tokens": 47,
+  "finish_reason": "stop",
+  "error": null
+}

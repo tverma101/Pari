@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p29-condense-1",
+  "kind": "condense",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "a79aa94866b182a09b652257541ccd9dc939a343bf61f4cf163135ea84fa7c3b",
+  "seed": 1975304744545650551,
+  "max_new_tokens": 640,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Suffragists delivered speeches, paraded, and faced imprisonment for years.\"]}",
+  "timing": {
+    "first_text_ms": 183.2,
+    "option_ms": [
+      1082.2
+    ],
+    "total_ms": 1172.0,
+    "stream": [
+      [
+        183.2,
+        2
+      ],
+      [
+        231.0,
+        9
+      ],
+      [
+        277.1,
+        11
+      ],
+      [
+        322.2,
+        14
+      ],
+      [
+        366.8,
+        15
+      ],
+      [
+        411.9,
+        18
+      ],
+      [
+        456.6,
+        21
+      ],
+      [
+        501.0,
+        25
+      ],
+      [
+        545.2,
+        35
+      ],
+      [
+        589.6,
+        44
+      ],
+      [
+        634.7,
+        45
+      ],
+      [
+        679.4,
+        49
+      ],
+      [
+        724.0,
+        53
+      ],
+      [
+        768.3,
+        54
+      ],
+      [
+        813.2,
+        58
+      ],
+      [
+        858.0,
+        64
+      ],
+      [
+        902.7,
+        77
+      ],
+      [
+        947.4,
+        81
+      ],
+      [
+        991.8,
+        87
+      ],
+      [
+        1037.2,
+        88
+      ],
+      [
+        1082.2,
+        90
+      ],
+      [
+        1126.8,
+        91
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nThe fight for women's right to vote in the United States lasted for more than seventy years. It officially began at the Seneca Falls Convention in 1848, where activists like Elizabeth Cady Stanton demanded equal rights for women. For decades, suffragists gave speeches, marched in parades, and even went to jail for their cause. Many people at the time thought that women were too emotional to make decisions about politics. Finally, in 1920, the 19th Amendment was passed, which gave women the right to vote. This victory showed that ordinary people can change the law if they keep pushing for it.\n\"\"\"\n\nThe writer selected this text:\n\"\"\"\nFor decades, suffragists gave speeches, marched in parades, and even went to jail for their cause.\n\"\"\"\n\nGive 5 different rewrites of the selected text that say the same thing in fewer words. Keep every fact, name, number and quotation, and keep the claim exactly as strong or as uncertain as it is. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 316,
+  "new_tokens": 23,
+  "finish_reason": "stop",
+  "error": null
+}

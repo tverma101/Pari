@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p27-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "d8ce5f89b114a08faf7e5310d908656cca768834c84341a0207b078028432c68",
+  "seed": 7470528727183042615,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"inexpensive\", \"affordable\", \"low cost\", \"cost-effective\", \"budget-friendly\", \"economical\", \"affordable\", \"low-priced\", \"inexpensive\", \"cost-efficient\"]}\n",
+  "timing": {
+    "first_text_ms": 525.3,
+    "option_ms": [
+      977.5,
+      1242.7,
+      1484.0,
+      1727.3,
+      1969.4,
+      2212.0,
+      2454.5,
+      2712.7,
+      3024.4,
+      3272.8
+    ],
+    "total_ms": 3456.8,
+    "stream": [
+      [
+        525.3,
+        2
+      ],
+      [
+        590.1,
+        9
+      ],
+      [
+        655.9,
+        11
+      ],
+      [
+        723.0,
+        14
+      ],
+      [
+        789.6,
+        16
+      ],
+      [
+        855.7,
+        19
+      ],
+      [
+        917.8,
+        25
+      ],
+      [
+        977.5,
+        27
+      ],
+      [
+        1038.5,
+        29
+      ],
+      [
+        1101.8,
+        32
+      ],
+      [
+        1181.6,
+        39
+      ],
+      [
+        1242.7,
+        41
+      ],
+      [
+        1303.5,
+        43
+      ],
+      [
+        1365.5,
+        46
+      ],
+      [
+        1425.1,
+        51
+      ],
+      [
+        1484.0,
+        53
+      ],
+      [
+        1546.1,
+        55
+      ],
+      [
+        1605.8,
+        59
+      ],
+      [
+        1666.7,
+        69
+      ],
+      [
+        1727.3,
+        71
+      ],
+      [
+        1786.7,
+        73
+      ],
+      [
+        1847.6,
+        79
+      ],
+      [
+        1908.2,
+        88
+      ],
+      [
+        1969.4,
+        90
+      ],
+      [
+        2029.6,
+        92
+      ],
+      [
+        2089.4,
+        98
+      ],
+      [
+        2150.9,
+        102
+      ],
+      [
+        2212.0,
+        104
+      ],
+      [
+        2272.4,
+        106
+      ],
+      [
+        2333.8,
+        109
+      ],
+      [
+        2394.1,
+        116
+      ],
+      [
+        2454.5,
+        118
+      ],
+      [
+        2515.4,
+        120
+      ],
+      [
+        2577.8,
+        123
+      ],
+      [
+        2646.1,
+        130
+      ],
+      [
+        2712.7,
+        132
+      ],
+      [
+        2776.5,
+        134
+      ],
+      [
+        2838.2,
+        136
+      ],
+      [
+        2900.5,
+        139
+      ],
+      [
+        2962.8,
+        145
+      ],
+      [
+        3024.4,
+        147
+      ],
+      [
+        3085.5,
+        149
+      ],
+      [
+        3149.0,
+        153
+      ],
+      [
+        3210.2,
+        163
+      ],
+      [
+        3272.8,
+        166
+      ],
+      [
+        3395.7,
+        167
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nPlastic bags are cheap and easy to use, but they cause big problems for the environment. Most of them are only used once before they get thrown away. Because they are so light, they often blow out of trash cans and end up in rivers and oceans, where animals like sea turtles mistake them for food. A plastic bag can take hundreds of years to break down. Several states, such as California and New York, have already banned single-use plastic bags. I think every state should do the same and encourage people to bring reusable bags to the store.\n\"\"\"\n\nThe writer tapped the word \"cheap\" in this sentence (marked with [[ ]]):\nPlastic bags are [[cheap]] and easy to use, but they cause big problems for the environment.\n\nGive 10 replacements for \"cheap\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"cheap\" without changing the rest of the sentence. Do not repeat \"cheap\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 346,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

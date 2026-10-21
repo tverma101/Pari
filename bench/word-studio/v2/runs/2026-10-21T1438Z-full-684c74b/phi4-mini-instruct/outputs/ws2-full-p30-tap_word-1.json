@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p30-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "8caee6a9bfd6276e3fe6fc690e89fbc2ddd88cfedb987ded0bf9e83674a61d4a",
+  "seed": 4739111265502464618,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"frail\", \"insubstantial\", \"mild\", \"diminished\", \"subdued\", \"scant\", \"modest\", \"vulnerable\", \"inconsequential\", \"minor\"]}",
+  "timing": {
+    "first_text_ms": 186.4,
+    "option_ms": [
+      461.2,
+      684.6,
+      863.0,
+      1086.7,
+      1266.5,
+      1445.8,
+      1626.7,
+      1852.3,
+      2124.4,
+      2259.9
+    ],
+    "total_ms": 2350.6,
+    "stream": [
+      [
+        186.4,
+        2
+      ],
+      [
+        234.4,
+        9
+      ],
+      [
+        280.7,
+        11
+      ],
+      [
+        326.2,
+        14
+      ],
+      [
+        371.6,
+        17
+      ],
+      [
+        416.5,
+        19
+      ],
+      [
+        461.2,
+        21
+      ],
+      [
+        505.6,
+        23
+      ],
+      [
+        550.2,
+        26
+      ],
+      [
+        595.2,
+        28
+      ],
+      [
+        640.1,
+        36
+      ],
+      [
+        684.6,
+        38
+      ],
+      [
+        728.8,
+        40
+      ],
+      [
+        773.4,
+        41
+      ],
+      [
+        818.4,
+        44
+      ],
+      [
+        863.0,
+        46
+      ],
+      [
+        907.6,
+        48
+      ],
+      [
+        952.1,
+        49
+      ],
+      [
+        996.7,
+        53
+      ],
+      [
+        1041.9,
+        58
+      ],
+      [
+        1086.7,
+        60
+      ],
+      [
+        1131.7,
+        62
+      ],
+      [
+        1176.2,
+        65
+      ],
+      [
+        1221.3,
+        69
+      ],
+      [
+        1266.5,
+        71
+      ],
+      [
+        1311.4,
+        73
+      ],
+      [
+        1356.1,
+        75
+      ],
+      [
+        1400.6,
+        78
+      ],
+      [
+        1445.8,
+        80
+      ],
+      [
+        1490.6,
+        82
+      ],
+      [
+        1535.4,
+        85
+      ],
+      [
+        1580.6,
+        88
+      ],
+      [
+        1626.7,
+        90
+      ],
+      [
+        1671.8,
+        92
+      ],
+      [
+        1716.8,
+        93
+      ],
+      [
+        1761.6,
+        98
+      ],
+      [
+        1806.7,
+        102
+      ],
+      [
+        1852.3,
+        104
+      ],
+      [
+        1898.7,
+        106
+      ],
+      [
+        1943.7,
+        108
+      ],
+      [
+        1988.5,
+        111
+      ],
+      [
+        2034.2,
+        113
+      ],
+      [
+        2079.4,
+        121
+      ],
+      [
+        2124.4,
+        123
+      ],
+      [
+        2169.2,
+        125
+      ],
+      [
+        2214.4,
+        130
+      ],
+      [
+        2259.9,
+        132
+      ],
+      [
+        2304.8,
+        133
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nVaccines work by teaching the immune system how to fight a disease before a person ever gets sick. They contain a weak or harmless piece of a germ, which the body learns to recognize. If the real germ shows up later, the immune system can attack it quickly. Thanks to vaccines, diseases like smallpox have been wiped out, and polio is almost gone. When enough people in a community are vaccinated, it also protects those who cannot get the shot, like newborn babies. This is called herd immunity.\n\"\"\"\n\nThe writer tapped the word \"weak\" in this sentence (marked with [[ ]]):\nThey contain a [[weak]] or harmless piece of a germ, which the body learns to recognize.\n\nGive 10 replacements for \"weak\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"weak\" without changing the rest of the sentence. Do not repeat \"weak\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 317,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

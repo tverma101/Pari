@@ -1,0 +1,749 @@
+[{"stream_name":"stdout","time":4.370129749,"data":"$ git clone --quiet https://github.com/tverma101/Pari.git /tmp/Pari\n"}
+,{"stream_name":"stdout","time":9.387892369,"data":"$ git -C /tmp/Pari checkout --quiet 684c74b56994f3081070699cc07d068ad1129ad7\n"}
+,{"stream_name":"stdout","time":10.036221169,"data":"$ /usr/bin/python3 -m pip install --quiet transformers==5.18.0 accelerate==1.15.0\n"}
+,{"stream_name":"stdout","time":12.335446028,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.6/12.6 MB 92.8 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":12.369566589,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 394.3/394.3 kB 17.6 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":12.402396164,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 846.4/846.4 kB 41.1 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":29.119564049,"data":"=== qwen35-4b ===\n"}
+,{"stream_name":"stdout","time":53.539961594,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":56.492599452,"data":"\n"}
+,{"stream_name":"stdout","time":93.101700064,"data":"Fetching 2 files:   0%|          | 0/2 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":105.004816995,"data":"Fetching 2 files:  50%|█████     | 1/2 [00:36\u003c00:36, 36.61s/it]\n"}
+,{"stream_name":"stdout","time":105.005309095,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:48\u003c00:00, 22.08s/it]\n"}
+,{"stream_name":"stdout","time":105.005325272,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:48\u003c00:00, 24.26s/it]\n"}
+,{"stream_name":"stdout","time":105.542225346,"data":"\n"}
+,{"stream_name":"stdout","time":107.591981888,"data":"Loading weights:   0%|          | 0/426 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":107.697103998,"data":"Loading weights:   0%|          | 1/426 [00:02\u003c14:32,  2.05s/it]\n"}
+,{"stream_name":"stdout","time":108.41994874,"data":"Loading weights:  31%|███       | 132/426 [00:02\u003c00:03, 85.44it/s]\n"}
+,{"stream_name":"stdout","time":108.735105445,"data":"Loading weights:  48%|████▊     | 206/426 [00:02\u003c00:02, 92.23it/s]\n"}
+,{"stream_name":"stdout","time":109.074398807,"data":"Loading weights:  59%|█████▉    | 251/426 [00:03\u003c00:01, 102.38it/s]\n"}
+,{"stream_name":"stdout","time":109.351849086,"data":"Loading weights:  67%|██████▋   | 284/426 [00:03\u003c00:01, 101.14it/s]\n"}
+,{"stream_name":"stdout","time":109.486988294,"data":"Loading weights:  73%|███████▎  | 309/426 [00:03\u003c00:01, 98.76it/s] \n"}
+,{"stream_name":"stdout","time":109.703956602,"data":"Loading weights:  77%|███████▋  | 329/426 [00:03\u003c00:00, 105.18it/s]\n"}
+,{"stream_name":"stdout","time":109.865761177,"data":"Loading weights:  81%|████████▏ | 347/426 [00:04\u003c00:00, 100.07it/s]\n"}
+,{"stream_name":"stdout","time":110.018573884,"data":"Loading weights:  85%|████████▍ | 362/426 [00:04\u003c00:00, 98.62it/s] \n"}
+,{"stream_name":"stdout","time":110.186559688,"data":"Loading weights:  89%|████████▉ | 379/426 [00:04\u003c00:00, 101.40it/s]\n"}
+,{"stream_name":"stdout","time":110.358688631,"data":"Loading weights:  93%|█████████▎| 397/426 [00:04\u003c00:00, 102.69it/s]\n"}
+,{"stream_name":"stdout","time":110.445793623,"data":"Loading weights:  96%|█████████▋| 411/426 [00:04\u003c00:00, 97.00it/s] \n"}
+,{"stream_name":"stdout","time":110.445846538,"data":"Loading weights: 100%|██████████| 426/426 [00:04\u003c00:00, 86.84it/s]\n"}
+,{"stream_name":"stdout","time":111.44733543,"data":"[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":112.502030796,"data":"[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":113.057790863,"data":"[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":113.106961989,"data":"[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.\n"}
+,{"stream_name":"stdout","time":118.431850029,"data":"[qwen35-4b] 1/200 ws2-full-p09-academic-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":124.56319377,"data":"[qwen35-4b] 2/200 ws2-full-p09-paraphrase-1 ok 6.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":127.245800766,"data":"[qwen35-4b] 3/200 ws2-full-p09-phrase_to_word-1 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":130.538438529,"data":"[qwen35-4b] 4/200 ws2-full-p09-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":133.973166776,"data":"[qwen35-4b] 5/200 ws2-full-p09-tap_word-2 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":142.291931851,"data":"[qwen35-4b] 6/200 ws2-full-p10-academic-1 ok 8.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":148.836314817,"data":"[qwen35-4b] 7/200 ws2-full-p10-condense-1 ok 6.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":156.753387967,"data":"[qwen35-4b] 8/200 ws2-full-p10-paraphrase-1 ok 7.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":160.514742262,"data":"[qwen35-4b] 9/200 ws2-full-p10-tap_word-1 ok 3.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":164.663920101,"data":"[qwen35-4b] 10/200 ws2-full-p10-tap_word-2 ok 4.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":171.777491036,"data":"[qwen35-4b] 11/200 ws2-full-p11-academic-1 ok 7.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":175.560578981,"data":"[qwen35-4b] 12/200 ws2-full-p11-condense-1 ok 3.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":178.496850373,"data":"[qwen35-4b] 13/200 ws2-full-p11-phrase_to_word-1 ok 2.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":182.335798923,"data":"[qwen35-4b] 14/200 ws2-full-p11-tap_word-1 ok 3.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":185.703188514,"data":"[qwen35-4b] 15/200 ws2-full-p11-tap_word-2 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":192.419246993,"data":"[qwen35-4b] 16/200 ws2-full-p12-condense-1 ok 6.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":198.283697575,"data":"[qwen35-4b] 17/200 ws2-full-p12-paraphrase-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":201.769430505,"data":"[qwen35-4b] 18/200 ws2-full-p12-phrase_to_word-1 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":204.565927142,"data":"[qwen35-4b] 19/200 ws2-full-p12-tap_word-1 ok 2.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":207.589848235,"data":"[qwen35-4b] 20/200 ws2-full-p12-tap_word-2 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":213.772268281,"data":"[qwen35-4b] 21/200 ws2-full-p13-academic-1 ok 6.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":218.675283218,"data":"[qwen35-4b] 22/200 ws2-full-p13-paraphrase-1 ok 4.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":222.64050517,"data":"[qwen35-4b] 23/200 ws2-full-p13-tap_word-1 ok 4.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":225.812109717,"data":"[qwen35-4b] 24/200 ws2-full-p13-tap_word-2 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":229.924981655,"data":"[qwen35-4b] 25/200 ws2-full-p13-word_sentences-1 ok 4.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":236.79799036,"data":"[qwen35-4b] 26/200 ws2-full-p14-academic-1 ok 6.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":239.786785334,"data":"[qwen35-4b] 27/200 ws2-full-p14-phrase_to_word-1 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":242.923874342,"data":"[qwen35-4b] 28/200 ws2-full-p14-tap_word-1 ok 3.1s options_seen=8\n"}
+,{"stream_name":"stdout","time":246.079052055,"data":"[qwen35-4b] 29/200 ws2-full-p14-tap_word-2 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":254.052906641,"data":"[qwen35-4b] 30/200 ws2-full-p14-word_sentences-1 ok 8.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":262.417702383,"data":"[qwen35-4b] 31/200 ws2-full-p15-paraphrase-1 ok 8.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":265.88011889,"data":"[qwen35-4b] 32/200 ws2-full-p15-phrase_to_word-1 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":269.160781556,"data":"[qwen35-4b] 33/200 ws2-full-p15-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":272.523775072,"data":"[qwen35-4b] 34/200 ws2-full-p15-tap_word-2 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":286.131396158,"data":"[qwen35-4b] 35/200 ws2-full-p15-word_sentences-1 ok 13.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":296.166863981,"data":"[qwen35-4b] 36/200 ws2-full-p16-academic-1 ok 10.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":300.770199156,"data":"[qwen35-4b] 37/200 ws2-full-p16-condense-1 ok 4.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":304.062256403,"data":"[qwen35-4b] 38/200 ws2-full-p16-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":307.52814663,"data":"[qwen35-4b] 39/200 ws2-full-p16-tap_word-2 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":315.260385647,"data":"[qwen35-4b] 40/200 ws2-full-p16-word_sentences-1 ok 7.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":322.535825419,"data":"[qwen35-4b] 41/200 ws2-full-p17-condense-1 ok 7.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":328.875941198,"data":"[qwen35-4b] 42/200 ws2-full-p17-paraphrase-1 ok 6.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":331.96124972,"data":"[qwen35-4b] 43/200 ws2-full-p17-tap_word-1 ok 3.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":335.566555377,"data":"[qwen35-4b] 44/200 ws2-full-p17-tap_word-2 ok 3.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":340.714478934,"data":"[qwen35-4b] 45/200 ws2-full-p17-word_sentences-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":345.521998225,"data":"[qwen35-4b] 46/200 ws2-full-p18-condense-1 ok 4.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":348.494669618,"data":"[qwen35-4b] 47/200 ws2-full-p18-phrase_to_word-1 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":351.842846061,"data":"[qwen35-4b] 48/200 ws2-full-p18-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":355.299893896,"data":"[qwen35-4b] 49/200 ws2-full-p18-tap_word-2 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":361.568969852,"data":"[qwen35-4b] 50/200 ws2-full-p18-word_sentences-1 ok 6.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":370.661032129,"data":"[qwen35-4b] 51/200 ws2-full-p19-academic-1 ok 9.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":377.604461185,"data":"[qwen35-4b] 52/200 ws2-full-p19-paraphrase-1 ok 6.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":380.406661512,"data":"[qwen35-4b] 53/200 ws2-full-p19-phrase_to_word-1 ok 2.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":383.360867069,"data":"[qwen35-4b] 54/200 ws2-full-p19-tap_word-1 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":386.990415579,"data":"[qwen35-4b] 55/200 ws2-full-p19-tap_word-2 ok 3.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":395.019908583,"data":"[qwen35-4b] 56/200 ws2-full-p20-academic-1 ok 8.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":400.096459698,"data":"[qwen35-4b] 57/200 ws2-full-p20-condense-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":407.571291942,"data":"[qwen35-4b] 58/200 ws2-full-p20-paraphrase-1 ok 7.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":410.820328474,"data":"[qwen35-4b] 59/200 ws2-full-p20-tap_word-1 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":414.009866515,"data":"[qwen35-4b] 60/200 ws2-full-p20-tap_word-2 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":422.034875138,"data":"[qwen35-4b] 61/200 ws2-full-p21-academic-1 ok 8.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":428.440033412,"data":"[qwen35-4b] 62/200 ws2-full-p21-condense-1 ok 6.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":431.325817703,"data":"[qwen35-4b] 63/200 ws2-full-p21-phrase_to_word-1 ok 2.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":435.080724546,"data":"[qwen35-4b] 64/200 ws2-full-p21-tap_word-1 ok 3.8s options_seen=9\n"}
+,{"stream_name":"stdout","time":438.722856438,"data":"[qwen35-4b] 65/200 ws2-full-p21-tap_word-2 ok 3.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":445.117076878,"data":"[qwen35-4b] 66/200 ws2-full-p22-condense-1 ok 6.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":453.011801808,"data":"[qwen35-4b] 67/200 ws2-full-p22-paraphrase-1 ok 7.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":456.410359917,"data":"[qwen35-4b] 68/200 ws2-full-p22-phrase_to_word-1 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":459.527981047,"data":"[qwen35-4b] 69/200 ws2-full-p22-tap_word-1 ok 3.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":462.718326914,"data":"[qwen35-4b] 70/200 ws2-full-p22-tap_word-2 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":469.239108105,"data":"[qwen35-4b] 71/200 ws2-full-p23-academic-1 ok 6.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":476.866741217,"data":"[qwen35-4b] 72/200 ws2-full-p23-paraphrase-1 ok 7.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":480.126802676,"data":"[qwen35-4b] 73/200 ws2-full-p23-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":485.647326874,"data":"[qwen35-4b] 74/200 ws2-full-p23-tap_word-2 ok 5.5s options_seen=1\n"}
+,{"stream_name":"stdout","time":493.849458463,"data":"[qwen35-4b] 75/200 ws2-full-p23-word_sentences-1 ok 8.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":500.912150646,"data":"[qwen35-4b] 76/200 ws2-full-p24-academic-1 ok 7.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":504.48595132,"data":"[qwen35-4b] 77/200 ws2-full-p24-phrase_to_word-1 ok 3.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":507.830700975,"data":"[qwen35-4b] 78/200 ws2-full-p24-tap_word-1 ok 3.3s options_seen=1\n"}
+,{"stream_name":"stdout","time":511.543172816,"data":"[qwen35-4b] 79/200 ws2-full-p24-tap_word-2 ok 3.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":519.804268272,"data":"[qwen35-4b] 80/200 ws2-full-p24-word_sentences-1 ok 8.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":527.593922619,"data":"[qwen35-4b] 81/200 ws2-full-p25-paraphrase-1 ok 7.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":529.653122481,"data":"[qwen35-4b] 82/200 ws2-full-p25-phrase_to_word-1 ok 2.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":532.8596277,"data":"[qwen35-4b] 83/200 ws2-full-p25-tap_word-1 ok 3.2s options_seen=9\n"}
+,{"stream_name":"stdout","time":536.20346025,"data":"[qwen35-4b] 84/200 ws2-full-p25-tap_word-2 ok 3.3s options_seen=1\n"}
+,{"stream_name":"stdout","time":539.571947987,"data":"[qwen35-4b] 85/200 ws2-full-p25-word_sentences-1 ok 3.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":546.411236941,"data":"[qwen35-4b] 86/200 ws2-full-p26-academic-1 ok 6.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":551.469715661,"data":"[qwen35-4b] 87/200 ws2-full-p26-condense-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":555.352764931,"data":"[qwen35-4b] 88/200 ws2-full-p26-tap_word-1 ok 3.9s options_seen=1\n"}
+,{"stream_name":"stdout","time":558.753054865,"data":"[qwen35-4b] 89/200 ws2-full-p26-tap_word-2 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":565.316075818,"data":"[qwen35-4b] 90/200 ws2-full-p26-word_sentences-1 ok 6.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":573.542537478,"data":"[qwen35-4b] 91/200 ws2-full-p27-condense-1 ok 8.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":580.246412526,"data":"[qwen35-4b] 92/200 ws2-full-p27-paraphrase-1 ok 6.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":583.704256695,"data":"[qwen35-4b] 93/200 ws2-full-p27-tap_word-1 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":586.908270184,"data":"[qwen35-4b] 94/200 ws2-full-p27-tap_word-2 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":595.595117097,"data":"[qwen35-4b] 95/200 ws2-full-p27-word_sentences-1 ok 8.7s options_seen=8\n"}
+,{"stream_name":"stdout","time":599.838375763,"data":"[qwen35-4b] 96/200 ws2-full-p28-condense-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":602.975081235,"data":"[qwen35-4b] 97/200 ws2-full-p28-phrase_to_word-1 ok 3.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":606.588486854,"data":"[qwen35-4b] 98/200 ws2-full-p28-tap_word-1 ok 3.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":610.064916592,"data":"[qwen35-4b] 99/200 ws2-full-p28-tap_word-2 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":618.51141399,"data":"[qwen35-4b] 100/200 ws2-full-p28-word_sentences-1 ok 8.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":627.673813598,"data":"[qwen35-4b] 101/200 ws2-full-p29-academic-1 ok 9.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":634.107887592,"data":"[qwen35-4b] 102/200 ws2-full-p29-condense-1 ok 6.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":640.2524479,"data":"[qwen35-4b] 103/200 ws2-full-p29-paraphrase-1 ok 6.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":643.532376722,"data":"[qwen35-4b] 104/200 ws2-full-p29-phrase_to_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":646.85432602,"data":"[qwen35-4b] 105/200 ws2-full-p29-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":654.592781144,"data":"[qwen35-4b] 106/200 ws2-full-p30-academic-1 ok 7.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":660.511072957,"data":"[qwen35-4b] 107/200 ws2-full-p30-paraphrase-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":664.010708936,"data":"[qwen35-4b] 108/200 ws2-full-p30-phrase_to_word-1 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":667.322737845,"data":"[qwen35-4b] 109/200 ws2-full-p30-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":674.104375171,"data":"[qwen35-4b] 110/200 ws2-full-p30-word_sentences-1 ok 6.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":681.005790748,"data":"[qwen35-4b] 111/200 ws2-full-p31-academic-1 ok 6.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":686.794698753,"data":"[qwen35-4b] 112/200 ws2-full-p31-condense-1 ok 5.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":694.688316406,"data":"[qwen35-4b] 113/200 ws2-full-p31-paraphrase-1 ok 7.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":698.028325595,"data":"[qwen35-4b] 114/200 ws2-full-p31-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":704.542032224,"data":"[qwen35-4b] 115/200 ws2-full-p31-word_sentences-1 ok 6.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":714.006609715,"data":"[qwen35-4b] 116/200 ws2-full-p32-academic-1 ok 9.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":720.300076217,"data":"[qwen35-4b] 117/200 ws2-full-p32-condense-1 ok 6.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":723.495238567,"data":"[qwen35-4b] 118/200 ws2-full-p32-phrase_to_word-1 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":727.003635232,"data":"[qwen35-4b] 119/200 ws2-full-p32-tap_word-1 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":737.025041779,"data":"[qwen35-4b] 120/200 ws2-full-p32-word_sentences-1 ok 10.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":745.646733681,"data":"[qwen35-4b] 121/200 ws2-full-p33-condense-1 ok 8.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":752.149657663,"data":"[qwen35-4b] 122/200 ws2-full-p33-paraphrase-1 ok 6.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":755.360875256,"data":"[qwen35-4b] 123/200 ws2-full-p33-phrase_to_word-1 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":758.652256594,"data":"[qwen35-4b] 124/200 ws2-full-p33-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":765.083445909,"data":"[qwen35-4b] 125/200 ws2-full-p33-word_sentences-1 ok 6.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":772.599973293,"data":"[qwen35-4b] 126/200 ws2-full-p34-academic-1 ok 7.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":779.974207345,"data":"[qwen35-4b] 127/200 ws2-full-p34-condense-1 ok 7.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":787.934955756,"data":"[qwen35-4b] 128/200 ws2-full-p34-paraphrase-1 ok 8.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":790.673099413,"data":"[qwen35-4b] 129/200 ws2-full-p34-phrase_to_word-1 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":793.666533861,"data":"[qwen35-4b] 130/200 ws2-full-p34-tap_word-1 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":802.943324571,"data":"[qwen35-4b] 131/200 ws2-full-p35-academic-1 ok 9.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":808.496349374,"data":"[qwen35-4b] 132/200 ws2-full-p35-paraphrase-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":811.557749122,"data":"[qwen35-4b] 133/200 ws2-full-p35-phrase_to_word-1 ok 3.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":814.976419881,"data":"[qwen35-4b] 134/200 ws2-full-p35-tap_word-1 ok 3.4s options_seen=1\n"}
+,{"stream_name":"stdout","time":820.620735162,"data":"[qwen35-4b] 135/200 ws2-full-p35-word_sentences-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":828.30708542,"data":"[qwen35-4b] 136/200 ws2-full-p36-academic-1 ok 7.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":834.47304719,"data":"[qwen35-4b] 137/200 ws2-full-p36-condense-1 ok 6.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":841.434020476,"data":"[qwen35-4b] 138/200 ws2-full-p36-paraphrase-1 ok 7.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":844.920444544,"data":"[qwen35-4b] 139/200 ws2-full-p36-tap_word-1 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":850.979868677,"data":"[qwen35-4b] 140/200 ws2-full-p36-word_sentences-1 ok 6.1s options_seen=1\n"}
+,{"stream_name":"stdout","time":857.565250533,"data":"[qwen35-4b] 141/200 ws2-full-p37-academic-1 ok 6.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":863.006685568,"data":"[qwen35-4b] 142/200 ws2-full-p37-condense-1 ok 5.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":866.02604966,"data":"[qwen35-4b] 143/200 ws2-full-p37-phrase_to_word-1 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":869.858360804,"data":"[qwen35-4b] 144/200 ws2-full-p37-tap_word-1 ok 3.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":880.718903174,"data":"[qwen35-4b] 145/200 ws2-full-p37-word_sentences-1 ok 10.9s options_seen=8\n"}
+,{"stream_name":"stdout","time":889.098507759,"data":"[qwen35-4b] 146/200 ws2-full-p38-condense-1 ok 8.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":897.414420335,"data":"[qwen35-4b] 147/200 ws2-full-p38-paraphrase-1 ok 8.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":900.46429586,"data":"[qwen35-4b] 148/200 ws2-full-p38-phrase_to_word-1 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":903.842440963,"data":"[qwen35-4b] 149/200 ws2-full-p38-tap_word-1 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":911.333670769,"data":"[qwen35-4b] 150/200 ws2-full-p38-word_sentences-1 ok 7.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":919.006663006,"data":"[qwen35-4b] 151/200 ws2-full-p39-academic-1 ok 7.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":926.026239176,"data":"[qwen35-4b] 152/200 ws2-full-p39-condense-1 ok 7.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":934.841667115,"data":"[qwen35-4b] 153/200 ws2-full-p39-paraphrase-1 ok 8.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":938.014670099,"data":"[qwen35-4b] 154/200 ws2-full-p39-phrase_to_word-1 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":941.581240198,"data":"[qwen35-4b] 155/200 ws2-full-p39-tap_word-1 ok 3.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":950.879778336,"data":"[qwen35-4b] 156/200 ws2-full-p40-academic-1 ok 9.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":958.923243109,"data":"[qwen35-4b] 157/200 ws2-full-p40-paraphrase-1 ok 8.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":962.118491341,"data":"[qwen35-4b] 158/200 ws2-full-p40-phrase_to_word-1 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":965.589849683,"data":"[qwen35-4b] 159/200 ws2-full-p40-tap_word-1 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":974.674405078,"data":"[qwen35-4b] 160/200 ws2-full-p40-word_sentences-1 ok 9.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":981.289086765,"data":"[qwen35-4b] 161/200 ws2-full-p41-academic-1 ok 6.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":987.122954912,"data":"[qwen35-4b] 162/200 ws2-full-p41-condense-1 ok 5.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":990.968230428,"data":"[qwen35-4b] 163/200 ws2-full-p41-phrase_to_word-1 ok 3.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":994.826567412,"data":"[qwen35-4b] 164/200 ws2-full-p41-tap_word-1 ok 3.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":1001.296740798,"data":"[qwen35-4b] 165/200 ws2-full-p41-word_sentences-1 ok 6.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":1010.570980361,"data":"[qwen35-4b] 166/200 ws2-full-p42-academic-1 ok 9.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1016.185990088,"data":"[qwen35-4b] 167/200 ws2-full-p42-condense-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1023.900081947,"data":"[qwen35-4b] 168/200 ws2-full-p42-paraphrase-1 ok 7.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1027.237680307,"data":"[qwen35-4b] 169/200 ws2-full-p42-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1036.143291687,"data":"[qwen35-4b] 170/200 ws2-full-p42-word_sentences-1 ok 8.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1042.039154379,"data":"[qwen35-4b] 171/200 ws2-full-p43-condense-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1049.980604052,"data":"[qwen35-4b] 172/200 ws2-full-p43-paraphrase-1 ok 7.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1053.391814326,"data":"[qwen35-4b] 173/200 ws2-full-p43-phrase_to_word-1 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":1056.445027258,"data":"[qwen35-4b] 174/200 ws2-full-p43-tap_word-1 ok 3.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1064.459720379,"data":"[qwen35-4b] 175/200 ws2-full-p43-word_sentences-1 ok 8.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1073.351102233,"data":"[qwen35-4b] 176/200 ws2-full-p44-academic-1 ok 8.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1079.583844688,"data":"[qwen35-4b] 177/200 ws2-full-p44-condense-1 ok 6.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1085.906461702,"data":"[qwen35-4b] 178/200 ws2-full-p44-paraphrase-1 ok 6.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1089.581501056,"data":"[qwen35-4b] 179/200 ws2-full-p44-phrase_to_word-1 ok 3.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1092.621072148,"data":"[qwen35-4b] 180/200 ws2-full-p44-tap_word-1 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1104.774479677,"data":"[qwen35-4b] 181/200 ws2-full-p45-academic-1 ok 12.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1112.156379191,"data":"[qwen35-4b] 182/200 ws2-full-p45-paraphrase-1 ok 7.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1115.577666507,"data":"[qwen35-4b] 183/200 ws2-full-p45-phrase_to_word-1 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":1119.53579731,"data":"[qwen35-4b] 184/200 ws2-full-p45-tap_word-1 ok 4.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1128.121791217,"data":"[qwen35-4b] 185/200 ws2-full-p45-word_sentences-1 ok 8.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1134.112820553,"data":"[qwen35-4b] 186/200 ws2-full-p46-academic-1 ok 6.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1140.014258976,"data":"[qwen35-4b] 187/200 ws2-full-p46-condense-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1144.514281404,"data":"[qwen35-4b] 188/200 ws2-full-p46-paraphrase-1 ok 4.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":1147.704928932,"data":"[qwen35-4b] 189/200 ws2-full-p46-tap_word-1 ok 3.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1153.252269724,"data":"[qwen35-4b] 190/200 ws2-full-p46-word_sentences-1 ok 5.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":1160.599595194,"data":"[qwen35-4b] 191/200 ws2-full-p47-academic-1 ok 7.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1166.502898212,"data":"[qwen35-4b] 192/200 ws2-full-p47-condense-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1169.34350145,"data":"[qwen35-4b] 193/200 ws2-full-p47-phrase_to_word-1 ok 2.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":1173.109618197,"data":"[qwen35-4b] 194/200 ws2-full-p47-tap_word-1 ok 3.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":1180.205511949,"data":"[qwen35-4b] 195/200 ws2-full-p47-word_sentences-1 ok 7.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1186.053108541,"data":"[qwen35-4b] 196/200 ws2-full-p48-condense-1 ok 5.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1193.482431786,"data":"[qwen35-4b] 197/200 ws2-full-p48-paraphrase-1 ok 7.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1196.938982822,"data":"[qwen35-4b] 198/200 ws2-full-p48-phrase_to_word-1 ok 3.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":1200.212931394,"data":"[qwen35-4b] 199/200 ws2-full-p48-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1207.431672944,"data":"[qwen35-4b] 200/200 ws2-full-p48-word_sentences-1 ok 7.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1207.47469435,"data":"{\"candidate\": \"qwen35-4b\", \"status\": \"completed\", \"tasks\": {\"ok\": 200, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":1211.792369107,"data":"=== smollm3-3b ===\n"}
+,{"stream_name":"stdout","time":1222.698450102,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":1225.598401416,"data":"\n"}
+,{"stream_name":"stdout","time":1236.01444114,"data":"Fetching 2 files:   0%|          | 0/2 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":1257.36334906,"data":"Fetching 2 files:  50%|█████     | 1/2 [00:10\u003c00:10, 10.42s/it]\n"}
+,{"stream_name":"stdout","time":1257.363896678,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:31\u003c00:00, 16.85s/it]\n"}
+,{"stream_name":"stdout","time":1257.363915491,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:31\u003c00:00, 15.88s/it]\n"}
+,{"stream_name":"stdout","time":1258.03806707,"data":"\n"}
+,{"stream_name":"stdout","time":1258.402980996,"data":"Loading weights:   0%|          | 0/326 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":1258.504365128,"data":"Loading weights:   0%|          | 1/326 [00:00\u003c01:58,  2.74it/s]\n"}
+,{"stream_name":"stdout","time":1258.668460249,"data":"Loading weights:   9%|▉         | 30/326 [00:00\u003c00:03, 83.31it/s]\n"}
+,{"stream_name":"stdout","time":1258.8433147,"data":"Loading weights:  15%|█▍        | 48/326 [00:00\u003c00:02, 93.74it/s]\n"}
+,{"stream_name":"stdout","time":1258.961057196,"data":"Loading weights:  20%|██        | 66/326 [00:00\u003c00:02, 97.20it/s]\n"}
+,{"stream_name":"stdout","time":1259.08453163,"data":"Loading weights:  26%|██▌       | 84/326 [00:00\u003c00:02, 112.00it/s]\n"}
+,{"stream_name":"stdout","time":1259.224993086,"data":"Loading weights:  30%|███       | 98/326 [00:01\u003c00:02, 112.92it/s]\n"}
+,{"stream_name":"stdout","time":1259.372680903,"data":"Loading weights:  34%|███▍      | 111/326 [00:01\u003c00:02, 105.96it/s]\n"}
+,{"stream_name":"stdout","time":1259.518568096,"data":"Loading weights:  38%|███▊      | 123/326 [00:01\u003c00:02, 98.11it/s] \n"}
+,{"stream_name":"stdout","time":1259.727166707,"data":"Loading weights:  42%|████▏     | 138/326 [00:01\u003c00:01, 99.60it/s]\n"}
+,{"stream_name":"stdout","time":1259.831615186,"data":"Loading weights:  48%|████▊     | 156/326 [00:01\u003c00:01, 94.46it/s]\n"}
+,{"stream_name":"stdout","time":1259.933297922,"data":"Loading weights:  53%|█████▎    | 174/326 [00:01\u003c00:01, 111.25it/s]\n"}
+,{"stream_name":"stdout","time":1260.068721882,"data":"Loading weights:  57%|█████▋    | 187/326 [00:01\u003c00:01, 115.11it/s]\n"}
+,{"stream_name":"stdout","time":1260.230540178,"data":"Loading weights:  61%|██████▏   | 200/326 [00:02\u003c00:01, 109.26it/s]\n"}
+,{"stream_name":"stdout","time":1260.400645852,"data":"Loading weights:  65%|██████▌   | 212/326 [00:02\u003c00:01, 97.65it/s] \n"}
+,{"stream_name":"stdout","time":1260.511322954,"data":"Loading weights:  70%|██████▉   | 228/326 [00:02\u003c00:01, 96.02it/s]\n"}
+,{"stream_name":"stdout","time":1260.67301372,"data":"Loading weights:  75%|███████▌  | 246/326 [00:02\u003c00:00, 111.98it/s]\n"}
+,{"stream_name":"stdout","time":1260.780574497,"data":"Loading weights:  81%|████████  | 264/326 [00:02\u003c00:00, 111.77it/s]\n"}
+,{"stream_name":"stdout","time":1260.918774815,"data":"Loading weights:  85%|████████▍ | 276/326 [00:02\u003c00:00, 112.62it/s]\n"}
+,{"stream_name":"stdout","time":1261.027376343,"data":"Loading weights:  88%|████████▊ | 288/326 [00:02\u003c00:00, 103.93it/s]\n"}
+,{"stream_name":"stdout","time":1261.169689868,"data":"Loading weights:  92%|█████████▏| 301/326 [00:02\u003c00:00, 107.88it/s]\n"}
+,{"stream_name":"stdout","time":1261.212789053,"data":"Loading weights:  96%|█████████▌| 313/326 [00:03\u003c00:00, 100.25it/s]\n"}
+,{"stream_name":"stdout","time":1261.212878962,"data":"Loading weights: 100%|██████████| 326/326 [00:03\u003c00:00, 102.69it/s]\n"}
+,{"stream_name":"stdout","time":1262.032413181,"data":"[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.\n"}
+,{"stream_name":"stdout","time":1269.864325044,"data":"[smollm3-3b] 1/200 ws2-full-p09-academic-1 ok 7.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1275.483382359,"data":"[smollm3-3b] 2/200 ws2-full-p09-paraphrase-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1277.089356787,"data":"[smollm3-3b] 3/200 ws2-full-p09-phrase_to_word-1 ok 1.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":1279.393970141,"data":"[smollm3-3b] 4/200 ws2-full-p09-tap_word-1 ok 2.3s options_seen=11\n"}
+,{"stream_name":"stdout","time":1281.619844863,"data":"[smollm3-3b] 5/200 ws2-full-p09-tap_word-2 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1287.513121384,"data":"[smollm3-3b] 6/200 ws2-full-p10-academic-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1292.653639959,"data":"[smollm3-3b] 7/200 ws2-full-p10-condense-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1299.341713163,"data":"[smollm3-3b] 8/200 ws2-full-p10-paraphrase-1 ok 6.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1301.63033983,"data":"[smollm3-3b] 9/200 ws2-full-p10-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1304.197236805,"data":"[smollm3-3b] 10/200 ws2-full-p10-tap_word-2 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":1309.112378991,"data":"[smollm3-3b] 11/200 ws2-full-p11-academic-1 ok 4.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1311.410425601,"data":"[smollm3-3b] 12/200 ws2-full-p11-condense-1 ok 2.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1313.282429067,"data":"[smollm3-3b] 13/200 ws2-full-p11-phrase_to_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":1315.428085494,"data":"[smollm3-3b] 14/200 ws2-full-p11-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1317.557894439,"data":"[smollm3-3b] 15/200 ws2-full-p11-tap_word-2 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1322.206852168,"data":"[smollm3-3b] 16/200 ws2-full-p12-condense-1 ok 4.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1327.779850837,"data":"[smollm3-3b] 17/200 ws2-full-p12-paraphrase-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1329.902472785,"data":"[smollm3-3b] 18/200 ws2-full-p12-phrase_to_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1331.590723108,"data":"[smollm3-3b] 19/200 ws2-full-p12-tap_word-1 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1333.258959694,"data":"[smollm3-3b] 20/200 ws2-full-p12-tap_word-2 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1338.266403028,"data":"[smollm3-3b] 21/200 ws2-full-p13-academic-1 ok 5.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1342.97182787,"data":"[smollm3-3b] 22/200 ws2-full-p13-paraphrase-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1345.17223075,"data":"[smollm3-3b] 23/200 ws2-full-p13-tap_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1354.227392001,"data":"[smollm3-3b] 24/200 ws2-full-p13-tap_word-2 ok 9.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1358.502550737,"data":"[smollm3-3b] 25/200 ws2-full-p13-word_sentences-1 ok 4.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1363.656873489,"data":"[smollm3-3b] 26/200 ws2-full-p14-academic-1 ok 5.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1365.476492101,"data":"[smollm3-3b] 27/200 ws2-full-p14-phrase_to_word-1 ok 1.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":1378.865105095,"data":"[smollm3-3b] 28/200 ws2-full-p14-tap_word-1 ok 13.4s options_seen=12\n"}
+,{"stream_name":"stdout","time":1392.353598607,"data":"[smollm3-3b] 29/200 ws2-full-p14-tap_word-2 ok 13.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":1396.334782001,"data":"[smollm3-3b] 30/200 ws2-full-p14-word_sentences-1 ok 4.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1405.884671754,"data":"[smollm3-3b] 31/200 ws2-full-p15-paraphrase-1 ok 9.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":1408.041321627,"data":"[smollm3-3b] 32/200 ws2-full-p15-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1410.429511097,"data":"[smollm3-3b] 33/200 ws2-full-p15-tap_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":1412.635484143,"data":"[smollm3-3b] 34/200 ws2-full-p15-tap_word-2 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1418.367329539,"data":"[smollm3-3b] 35/200 ws2-full-p15-word_sentences-1 ok 5.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1425.080304017,"data":"[smollm3-3b] 36/200 ws2-full-p16-academic-1 ok 6.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1429.810990484,"data":"[smollm3-3b] 37/200 ws2-full-p16-condense-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1431.580139168,"data":"[smollm3-3b] 38/200 ws2-full-p16-tap_word-1 ok 1.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":1433.616196069,"data":"[smollm3-3b] 39/200 ws2-full-p16-tap_word-2 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1437.50586563,"data":"[smollm3-3b] 40/200 ws2-full-p16-word_sentences-1 ok 3.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1442.901015566,"data":"[smollm3-3b] 41/200 ws2-full-p17-condense-1 ok 5.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1447.134374055,"data":"[smollm3-3b] 42/200 ws2-full-p17-paraphrase-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1448.808881595,"data":"[smollm3-3b] 43/200 ws2-full-p17-tap_word-1 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1455.590475723,"data":"[smollm3-3b] 44/200 ws2-full-p17-tap_word-2 ok 6.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":1459.432073728,"data":"[smollm3-3b] 45/200 ws2-full-p17-word_sentences-1 ok 3.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1462.974999104,"data":"[smollm3-3b] 46/200 ws2-full-p18-condense-1 ok 3.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":1464.691721661,"data":"[smollm3-3b] 47/200 ws2-full-p18-phrase_to_word-1 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1466.776270588,"data":"[smollm3-3b] 48/200 ws2-full-p18-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1468.751260774,"data":"[smollm3-3b] 49/200 ws2-full-p18-tap_word-2 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1472.122901062,"data":"[smollm3-3b] 50/200 ws2-full-p18-word_sentences-1 ok 3.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1480.000982971,"data":"[smollm3-3b] 51/200 ws2-full-p19-academic-1 ok 7.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1484.701355689,"data":"[smollm3-3b] 52/200 ws2-full-p19-paraphrase-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1486.380952004,"data":"[smollm3-3b] 53/200 ws2-full-p19-phrase_to_word-1 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1488.147406847,"data":"[smollm3-3b] 54/200 ws2-full-p19-tap_word-1 ok 1.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":1490.575108493,"data":"[smollm3-3b] 55/200 ws2-full-p19-tap_word-2 ok 2.4s options_seen=9\n"}
+,{"stream_name":"stdout","time":1495.605944444,"data":"[smollm3-3b] 56/200 ws2-full-p20-academic-1 ok 5.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1500.988817033,"data":"[smollm3-3b] 57/200 ws2-full-p20-condense-1 ok 5.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1506.35566261,"data":"[smollm3-3b] 58/200 ws2-full-p20-paraphrase-1 ok 5.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1508.674706012,"data":"[smollm3-3b] 59/200 ws2-full-p20-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1511.00527882,"data":"[smollm3-3b] 60/200 ws2-full-p20-tap_word-2 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1516.937107407,"data":"[smollm3-3b] 61/200 ws2-full-p21-academic-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1520.606075939,"data":"[smollm3-3b] 62/200 ws2-full-p21-condense-1 ok 3.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1522.546488144,"data":"[smollm3-3b] 63/200 ws2-full-p21-phrase_to_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":1524.872728667,"data":"[smollm3-3b] 64/200 ws2-full-p21-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1527.126865134,"data":"[smollm3-3b] 65/200 ws2-full-p21-tap_word-2 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1531.502720739,"data":"[smollm3-3b] 66/200 ws2-full-p22-condense-1 ok 4.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1536.494342922,"data":"[smollm3-3b] 67/200 ws2-full-p22-paraphrase-1 ok 5.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1538.248260319,"data":"[smollm3-3b] 68/200 ws2-full-p22-phrase_to_word-1 ok 1.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":1540.102370016,"data":"[smollm3-3b] 69/200 ws2-full-p22-tap_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":1542.110592014,"data":"[smollm3-3b] 70/200 ws2-full-p22-tap_word-2 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1547.4088367,"data":"[smollm3-3b] 71/200 ws2-full-p23-academic-1 ok 5.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1551.615177754,"data":"[smollm3-3b] 72/200 ws2-full-p23-paraphrase-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1554.244383772,"data":"[smollm3-3b] 73/200 ws2-full-p23-tap_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":1556.344449585,"data":"[smollm3-3b] 74/200 ws2-full-p23-tap_word-2 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1564.300686385,"data":"[smollm3-3b] 75/200 ws2-full-p23-word_sentences-1 ok 8.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1569.356229218,"data":"[smollm3-3b] 76/200 ws2-full-p24-academic-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1571.635659605,"data":"[smollm3-3b] 77/200 ws2-full-p24-phrase_to_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1573.671078882,"data":"[smollm3-3b] 78/200 ws2-full-p24-tap_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1575.715528825,"data":"[smollm3-3b] 79/200 ws2-full-p24-tap_word-2 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1579.054297195,"data":"[smollm3-3b] 80/200 ws2-full-p24-word_sentences-1 ok 3.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1585.250211814,"data":"[smollm3-3b] 81/200 ws2-full-p25-paraphrase-1 ok 6.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1587.575126148,"data":"[smollm3-3b] 82/200 ws2-full-p25-phrase_to_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1600.976453905,"data":"[smollm3-3b] 83/200 ws2-full-p25-tap_word-1 ok 13.4s options_seen=11\n"}
+,{"stream_name":"stdout","time":1614.530122252,"data":"[smollm3-3b] 84/200 ws2-full-p25-tap_word-2 ok 13.6s options_seen=11\n"}
+,{"stream_name":"stdout","time":1619.259364902,"data":"[smollm3-3b] 85/200 ws2-full-p25-word_sentences-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1624.270383832,"data":"[smollm3-3b] 86/200 ws2-full-p26-academic-1 ok 5.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1626.560445736,"data":"[smollm3-3b] 87/200 ws2-full-p26-condense-1 ok 2.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1628.634368138,"data":"[smollm3-3b] 88/200 ws2-full-p26-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1632.637654335,"data":"[smollm3-3b] 89/200 ws2-full-p26-tap_word-2 ok 4.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1641.771300819,"data":"[smollm3-3b] 90/200 ws2-full-p26-word_sentences-1 ok 9.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1647.416061787,"data":"[smollm3-3b] 91/200 ws2-full-p27-condense-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1651.36073251,"data":"[smollm3-3b] 92/200 ws2-full-p27-paraphrase-1 ok 3.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1664.775411214,"data":"[smollm3-3b] 93/200 ws2-full-p27-tap_word-1 ok 13.4s options_seen=11\n"}
+,{"stream_name":"stdout","time":1666.472133802,"data":"[smollm3-3b] 94/200 ws2-full-p27-tap_word-2 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1670.66981086,"data":"[smollm3-3b] 95/200 ws2-full-p27-word_sentences-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1673.782134018,"data":"[smollm3-3b] 96/200 ws2-full-p28-condense-1 ok 3.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1675.778477165,"data":"[smollm3-3b] 97/200 ws2-full-p28-phrase_to_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1677.882858887,"data":"[smollm3-3b] 98/200 ws2-full-p28-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1679.968427898,"data":"[smollm3-3b] 99/200 ws2-full-p28-tap_word-2 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1684.234406491,"data":"[smollm3-3b] 100/200 ws2-full-p28-word_sentences-1 ok 4.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1689.582816952,"data":"[smollm3-3b] 101/200 ws2-full-p29-academic-1 ok 5.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1694.442182107,"data":"[smollm3-3b] 102/200 ws2-full-p29-condense-1 ok 4.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1701.183935964,"data":"[smollm3-3b] 103/200 ws2-full-p29-paraphrase-1 ok 6.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1702.894031972,"data":"[smollm3-3b] 104/200 ws2-full-p29-phrase_to_word-1 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1706.48545837,"data":"[smollm3-3b] 105/200 ws2-full-p29-tap_word-1 ok 3.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":1712.134680489,"data":"[smollm3-3b] 106/200 ws2-full-p30-academic-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1715.378255273,"data":"[smollm3-3b] 107/200 ws2-full-p30-paraphrase-1 ok 3.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1717.359687562,"data":"[smollm3-3b] 108/200 ws2-full-p30-phrase_to_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1719.24755204,"data":"[smollm3-3b] 109/200 ws2-full-p30-tap_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":1723.008376665,"data":"[smollm3-3b] 110/200 ws2-full-p30-word_sentences-1 ok 3.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1727.718735632,"data":"[smollm3-3b] 111/200 ws2-full-p31-academic-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1731.315117419,"data":"[smollm3-3b] 112/200 ws2-full-p31-condense-1 ok 3.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1735.898256274,"data":"[smollm3-3b] 113/200 ws2-full-p31-paraphrase-1 ok 4.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1737.921317951,"data":"[smollm3-3b] 114/200 ws2-full-p31-tap_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1741.456714826,"data":"[smollm3-3b] 115/200 ws2-full-p31-word_sentences-1 ok 3.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":1747.524975506,"data":"[smollm3-3b] 116/200 ws2-full-p32-academic-1 ok 6.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1751.875281861,"data":"[smollm3-3b] 117/200 ws2-full-p32-condense-1 ok 4.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1753.591043767,"data":"[smollm3-3b] 118/200 ws2-full-p32-phrase_to_word-1 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1755.927315316,"data":"[smollm3-3b] 119/200 ws2-full-p32-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":1759.423912105,"data":"[smollm3-3b] 120/200 ws2-full-p32-word_sentences-1 ok 3.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":1765.345050519,"data":"[smollm3-3b] 121/200 ws2-full-p33-condense-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1768.963456462,"data":"[smollm3-3b] 122/200 ws2-full-p33-paraphrase-1 ok 3.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":1771.32291931,"data":"[smollm3-3b] 123/200 ws2-full-p33-phrase_to_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":1773.50901659,"data":"[smollm3-3b] 124/200 ws2-full-p33-tap_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1777.249310075,"data":"[smollm3-3b] 125/200 ws2-full-p33-word_sentences-1 ok 3.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1781.943054267,"data":"[smollm3-3b] 126/200 ws2-full-p34-academic-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1787.10412596,"data":"[smollm3-3b] 127/200 ws2-full-p34-condense-1 ok 5.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1793.013496492,"data":"[smollm3-3b] 128/200 ws2-full-p34-paraphrase-1 ok 5.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1794.661403853,"data":"[smollm3-3b] 129/200 ws2-full-p34-phrase_to_word-1 ok 1.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":1796.21497093,"data":"[smollm3-3b] 130/200 ws2-full-p34-tap_word-1 ok 1.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":1803.968138014,"data":"[smollm3-3b] 131/200 ws2-full-p35-academic-1 ok 7.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1807.086591745,"data":"[smollm3-3b] 132/200 ws2-full-p35-paraphrase-1 ok 3.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1808.990820519,"data":"[smollm3-3b] 133/200 ws2-full-p35-phrase_to_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":1810.998106451,"data":"[smollm3-3b] 134/200 ws2-full-p35-tap_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1815.035981098,"data":"[smollm3-3b] 135/200 ws2-full-p35-word_sentences-1 ok 4.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1819.693155198,"data":"[smollm3-3b] 136/200 ws2-full-p36-academic-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1824.745480864,"data":"[smollm3-3b] 137/200 ws2-full-p36-condense-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1828.641434105,"data":"[smollm3-3b] 138/200 ws2-full-p36-paraphrase-1 ok 3.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1830.755520296,"data":"[smollm3-3b] 139/200 ws2-full-p36-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1843.724986256,"data":"[smollm3-3b] 140/200 ws2-full-p36-word_sentences-1 ok 13.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1848.445448572,"data":"[smollm3-3b] 141/200 ws2-full-p37-academic-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1854.628054329,"data":"[smollm3-3b] 142/200 ws2-full-p37-condense-1 ok 6.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1856.372754748,"data":"[smollm3-3b] 143/200 ws2-full-p37-phrase_to_word-1 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1858.480883741,"data":"[smollm3-3b] 144/200 ws2-full-p37-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1862.681101499,"data":"[smollm3-3b] 145/200 ws2-full-p37-word_sentences-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1867.781648765,"data":"[smollm3-3b] 146/200 ws2-full-p38-condense-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1872.646706622,"data":"[smollm3-3b] 147/200 ws2-full-p38-paraphrase-1 ok 4.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":1874.381226064,"data":"[smollm3-3b] 148/200 ws2-full-p38-phrase_to_word-1 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1876.602241413,"data":"[smollm3-3b] 149/200 ws2-full-p38-tap_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1886.673275599,"data":"[smollm3-3b] 150/200 ws2-full-p38-word_sentences-1 ok 10.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1892.00664953,"data":"[smollm3-3b] 151/200 ws2-full-p39-academic-1 ok 5.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1896.224798868,"data":"[smollm3-3b] 152/200 ws2-full-p39-condense-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1902.935818804,"data":"[smollm3-3b] 153/200 ws2-full-p39-paraphrase-1 ok 6.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1905.147796026,"data":"[smollm3-3b] 154/200 ws2-full-p39-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1907.296540848,"data":"[smollm3-3b] 155/200 ws2-full-p39-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1914.095999714,"data":"[smollm3-3b] 156/200 ws2-full-p40-academic-1 ok 6.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1919.186462974,"data":"[smollm3-3b] 157/200 ws2-full-p40-paraphrase-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1920.851033006,"data":"[smollm3-3b] 158/200 ws2-full-p40-phrase_to_word-1 ok 1.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":1928.433402242,"data":"[smollm3-3b] 159/200 ws2-full-p40-tap_word-1 ok 7.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":1936.675995982,"data":"[smollm3-3b] 160/200 ws2-full-p40-word_sentences-1 ok 8.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1940.969212092,"data":"[smollm3-3b] 161/200 ws2-full-p41-academic-1 ok 4.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1944.465395423,"data":"[smollm3-3b] 162/200 ws2-full-p41-condense-1 ok 3.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":1946.66050121,"data":"[smollm3-3b] 163/200 ws2-full-p41-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":1948.759849475,"data":"[smollm3-3b] 164/200 ws2-full-p41-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1952.893400994,"data":"[smollm3-3b] 165/200 ws2-full-p41-word_sentences-1 ok 4.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":1957.874210087,"data":"[smollm3-3b] 166/200 ws2-full-p42-academic-1 ok 5.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":1961.721878882,"data":"[smollm3-3b] 167/200 ws2-full-p42-condense-1 ok 3.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1966.523499941,"data":"[smollm3-3b] 168/200 ws2-full-p42-paraphrase-1 ok 4.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":1968.59350926,"data":"[smollm3-3b] 169/200 ws2-full-p42-tap_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":1973.812493962,"data":"[smollm3-3b] 170/200 ws2-full-p42-word_sentences-1 ok 5.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":1979.106898421,"data":"[smollm3-3b] 171/200 ws2-full-p43-condense-1 ok 5.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":1984.760390068,"data":"[smollm3-3b] 172/200 ws2-full-p43-paraphrase-1 ok 5.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":1986.795271794,"data":"[smollm3-3b] 173/200 ws2-full-p43-phrase_to_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":1988.703937262,"data":"[smollm3-3b] 174/200 ws2-full-p43-tap_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":1992.074237892,"data":"[smollm3-3b] 175/200 ws2-full-p43-word_sentences-1 ok 3.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":1997.3015065,"data":"[smollm3-3b] 176/200 ws2-full-p44-academic-1 ok 5.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":2002.132063296,"data":"[smollm3-3b] 177/200 ws2-full-p44-condense-1 ok 4.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":2006.357725385,"data":"[smollm3-3b] 178/200 ws2-full-p44-paraphrase-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":2009.027034856,"data":"[smollm3-3b] 179/200 ws2-full-p44-phrase_to_word-1 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":2012.104590138,"data":"[smollm3-3b] 180/200 ws2-full-p44-tap_word-1 ok 3.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":2019.971148137,"data":"[smollm3-3b] 181/200 ws2-full-p45-academic-1 ok 7.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":2024.527641619,"data":"[smollm3-3b] 182/200 ws2-full-p45-paraphrase-1 ok 4.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":2026.884614675,"data":"[smollm3-3b] 183/200 ws2-full-p45-phrase_to_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2029.098467761,"data":"[smollm3-3b] 184/200 ws2-full-p45-tap_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2034.046019693,"data":"[smollm3-3b] 185/200 ws2-full-p45-word_sentences-1 ok 4.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":2038.698231477,"data":"[smollm3-3b] 186/200 ws2-full-p46-academic-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2042.211786914,"data":"[smollm3-3b] 187/200 ws2-full-p46-condense-1 ok 3.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":2047.111517769,"data":"[smollm3-3b] 188/200 ws2-full-p46-paraphrase-1 ok 4.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":2050.770051702,"data":"[smollm3-3b] 189/200 ws2-full-p46-tap_word-1 ok 3.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":2054.487738814,"data":"[smollm3-3b] 190/200 ws2-full-p46-word_sentences-1 ok 3.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2060.214365721,"data":"[smollm3-3b] 191/200 ws2-full-p47-academic-1 ok 5.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2063.850292554,"data":"[smollm3-3b] 192/200 ws2-full-p47-condense-1 ok 3.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":2065.843731301,"data":"[smollm3-3b] 193/200 ws2-full-p47-phrase_to_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2067.873626463,"data":"[smollm3-3b] 194/200 ws2-full-p47-tap_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2072.261599936,"data":"[smollm3-3b] 195/200 ws2-full-p47-word_sentences-1 ok 4.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":2082.520404924,"data":"[smollm3-3b] 196/200 ws2-full-p48-condense-1 ok 10.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":2086.587092137,"data":"[smollm3-3b] 197/200 ws2-full-p48-paraphrase-1 ok 4.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":2088.872389059,"data":"[smollm3-3b] 198/200 ws2-full-p48-phrase_to_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":2090.730594046,"data":"[smollm3-3b] 199/200 ws2-full-p48-tap_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":2095.83220493,"data":"[smollm3-3b] 200/200 ws2-full-p48-word_sentences-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":2095.874313521,"data":"{\"candidate\": \"smollm3-3b\", \"status\": \"completed\", \"tasks\": {\"ok\": 200, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":2097.540761625,"data":"=== phi4-mini-instruct ===\n"}
+,{"stream_name":"stdout","time":2108.362369806,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":2108.382799201,"data":"[transformers] This model config has set a `rope_parameters['original_max_position_embeddings']` field, to be used together with `max_position_embeddings` to determine a scaling factor. Please set the `factor` field of `rope_parameters`with this ratio instead -- we recommend the use of this field over `original_max_position_embeddings`, as it is compatible with most model architectures.\n"}
+,{"stream_name":"stdout","time":2111.208969782,"data":"\n"}
+,{"stream_name":"stdout","time":2141.931764088,"data":"Fetching 2 files:   0%|          | 0/2 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":2150.632479736,"data":"Fetching 2 files:  50%|█████     | 1/2 [00:30\u003c00:30, 30.72s/it]\n"}
+,{"stream_name":"stdout","time":2150.633063832,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:39\u003c00:00, 17.77s/it]\n"}
+,{"stream_name":"stdout","time":2150.633087081,"data":"Fetching 2 files: 100%|██████████| 2/2 [00:39\u003c00:00, 19.71s/it]\n"}
+,{"stream_name":"stdout","time":2150.974080751,"data":"\n"}
+,{"stream_name":"stdout","time":2152.894080658,"data":"Loading weights:   0%|          | 0/194 [00:00\u003c?, ?it/s]\n"}
+,{"stream_name":"stdout","time":2153.020590239,"data":"Loading weights:   1%|          | 1/194 [00:01\u003c06:10,  1.92s/it]\n"}
+,{"stream_name":"stdout","time":2153.502097418,"data":"Loading weights:  32%|███▏      | 63/194 [00:02\u003c00:03, 42.74it/s]\n"}
+,{"stream_name":"stdout","time":2153.842755793,"data":"Loading weights:  48%|████▊     | 93/194 [00:02\u003c00:02, 48.88it/s]\n"}
+,{"stream_name":"stdout","time":2154.060371601,"data":"Loading weights:  58%|█████▊    | 112/194 [00:02\u003c00:01, 50.58it/s]\n"}
+,{"stream_name":"stdout","time":2154.219833713,"data":"Loading weights:  65%|██████▍   | 126/194 [00:03\u003c00:01, 53.05it/s]\n"}
+,{"stream_name":"stdout","time":2154.448410814,"data":"Loading weights:  71%|███████   | 138/194 [00:03\u003c00:00, 56.60it/s]\n"}
+,{"stream_name":"stdout","time":2154.551928673,"data":"Loading weights:  76%|███████▋  | 148/194 [00:03\u003c00:00, 53.45it/s]\n"}
+,{"stream_name":"stdout","time":2154.759401434,"data":"Loading weights:  81%|████████  | 157/194 [00:03\u003c00:00, 58.03it/s]\n"}
+,{"stream_name":"stdout","time":2154.889361708,"data":"Loading weights:  86%|████████▌ | 166/194 [00:03\u003c00:00, 53.90it/s]\n"}
+,{"stream_name":"stdout","time":2155.029374385,"data":"Loading weights:  91%|█████████ | 177/194 [00:03\u003c00:00, 60.10it/s]\n"}
+,{"stream_name":"stdout","time":2155.119604041,"data":"Loading weights:  95%|█████████▌| 185/194 [00:04\u003c00:00, 59.43it/s]\n"}
+,{"stream_name":"stdout","time":2155.119643765,"data":"Loading weights: 100%|██████████| 194/194 [00:04\u003c00:00, 46.80it/s]\n"}
+,{"stream_name":"stdout","time":2160.604006572,"data":"[phi4-mini-instruct] 1/200 ws2-full-p09-academic-1 ok 4.6s options_seen=8\n"}
+,{"stream_name":"stdout","time":2164.808526556,"data":"[phi4-mini-instruct] 2/200 ws2-full-p09-paraphrase-1 ok 4.2s options_seen=8\n"}
+,{"stream_name":"stdout","time":2166.786954466,"data":"[phi4-mini-instruct] 3/200 ws2-full-p09-phrase_to_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2169.491061928,"data":"[phi4-mini-instruct] 4/200 ws2-full-p09-tap_word-1 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":2172.373433989,"data":"[phi4-mini-instruct] 5/200 ws2-full-p09-tap_word-2 ok 2.9s options_seen=11\n"}
+,{"stream_name":"stdout","time":2178.943491862,"data":"[phi4-mini-instruct] 6/200 ws2-full-p10-academic-1 ok 6.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":2183.682804979,"data":"[phi4-mini-instruct] 7/200 ws2-full-p10-condense-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2188.998518881,"data":"[phi4-mini-instruct] 8/200 ws2-full-p10-paraphrase-1 ok 5.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":2191.603794385,"data":"[phi4-mini-instruct] 9/200 ws2-full-p10-tap_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":2195.511222139,"data":"[phi4-mini-instruct] 10/200 ws2-full-p10-tap_word-2 ok 3.9s options_seen=11\n"}
+,{"stream_name":"stdout","time":2200.839326187,"data":"[phi4-mini-instruct] 11/200 ws2-full-p11-academic-1 ok 5.3s options_seen=8\n"}
+,{"stream_name":"stdout","time":2204.097791126,"data":"[phi4-mini-instruct] 12/200 ws2-full-p11-condense-1 ok 3.3s options_seen=8\n"}
+,{"stream_name":"stdout","time":2206.123286268,"data":"[phi4-mini-instruct] 13/200 ws2-full-p11-phrase_to_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2208.576837979,"data":"[phi4-mini-instruct] 14/200 ws2-full-p11-tap_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":2210.934433292,"data":"[phi4-mini-instruct] 15/200 ws2-full-p11-tap_word-2 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2214.632899226,"data":"[phi4-mini-instruct] 16/200 ws2-full-p12-condense-1 ok 3.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2218.677439357,"data":"[phi4-mini-instruct] 17/200 ws2-full-p12-paraphrase-1 ok 4.0s options_seen=8\n"}
+,{"stream_name":"stdout","time":2220.908040998,"data":"[phi4-mini-instruct] 18/200 ws2-full-p12-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2222.86326705,"data":"[phi4-mini-instruct] 19/200 ws2-full-p12-tap_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2225.1901183,"data":"[phi4-mini-instruct] 20/200 ws2-full-p12-tap_word-2 ok 2.3s options_seen=11\n"}
+,{"stream_name":"stdout","time":2230.622373771,"data":"[phi4-mini-instruct] 21/200 ws2-full-p13-academic-1 ok 5.4s options_seen=8\n"}
+,{"stream_name":"stdout","time":2234.045029914,"data":"[phi4-mini-instruct] 22/200 ws2-full-p13-paraphrase-1 ok 3.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":2236.560831052,"data":"[phi4-mini-instruct] 23/200 ws2-full-p13-tap_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":2238.844419331,"data":"[phi4-mini-instruct] 24/200 ws2-full-p13-tap_word-2 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":2242.837291111,"data":"[phi4-mini-instruct] 25/200 ws2-full-p13-word_sentences-1 ok 4.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":2248.122417083,"data":"[phi4-mini-instruct] 26/200 ws2-full-p14-academic-1 ok 5.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":2250.998166604,"data":"[phi4-mini-instruct] 27/200 ws2-full-p14-phrase_to_word-1 ok 2.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":2253.623402835,"data":"[phi4-mini-instruct] 28/200 ws2-full-p14-tap_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":2255.770881149,"data":"[phi4-mini-instruct] 29/200 ws2-full-p14-tap_word-2 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":2261.458216038,"data":"[phi4-mini-instruct] 30/200 ws2-full-p14-word_sentences-1 ok 5.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2266.417427835,"data":"[phi4-mini-instruct] 31/200 ws2-full-p15-paraphrase-1 ok 5.0s options_seen=8\n"}
+,{"stream_name":"stdout","time":2268.959374657,"data":"[phi4-mini-instruct] 32/200 ws2-full-p15-phrase_to_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":2271.148253829,"data":"[phi4-mini-instruct] 33/200 ws2-full-p15-tap_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2273.405865574,"data":"[phi4-mini-instruct] 34/200 ws2-full-p15-tap_word-2 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":2277.987632712,"data":"[phi4-mini-instruct] 35/200 ws2-full-p15-word_sentences-1 ok 4.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":2285.953489794,"data":"[phi4-mini-instruct] 36/200 ws2-full-p16-academic-1 ok 8.0s options_seen=8\n"}
+,{"stream_name":"stdout","time":2289.607409695,"data":"[phi4-mini-instruct] 37/200 ws2-full-p16-condense-1 ok 3.7s options_seen=8\n"}
+,{"stream_name":"stdout","time":2291.84063289,"data":"[phi4-mini-instruct] 38/200 ws2-full-p16-tap_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2295.098059858,"data":"[phi4-mini-instruct] 39/200 ws2-full-p16-tap_word-2 ok 3.3s options_seen=13\n"}
+,{"stream_name":"stdout","time":2299.491868657,"data":"[phi4-mini-instruct] 40/200 ws2-full-p16-word_sentences-1 ok 4.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":2305.015379077,"data":"[phi4-mini-instruct] 41/200 ws2-full-p17-condense-1 ok 5.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":2309.790861145,"data":"[phi4-mini-instruct] 42/200 ws2-full-p17-paraphrase-1 ok 4.8s options_seen=8\n"}
+,{"stream_name":"stdout","time":2312.356288883,"data":"[phi4-mini-instruct] 43/200 ws2-full-p17-tap_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":2315.739513644,"data":"[phi4-mini-instruct] 44/200 ws2-full-p17-tap_word-2 ok 3.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2320.304054362,"data":"[phi4-mini-instruct] 45/200 ws2-full-p17-word_sentences-1 ok 4.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":2323.601256004,"data":"[phi4-mini-instruct] 46/200 ws2-full-p18-condense-1 ok 3.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":2325.742769741,"data":"[phi4-mini-instruct] 47/200 ws2-full-p18-phrase_to_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":2328.383576007,"data":"[phi4-mini-instruct] 48/200 ws2-full-p18-tap_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":2330.561874739,"data":"[phi4-mini-instruct] 49/200 ws2-full-p18-tap_word-2 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2335.74468873,"data":"[phi4-mini-instruct] 50/200 ws2-full-p18-word_sentences-1 ok 5.2s options_seen=8\n"}
+,{"stream_name":"stdout","time":2343.726594517,"data":"[phi4-mini-instruct] 51/200 ws2-full-p19-academic-1 ok 8.0s options_seen=8\n"}
+,{"stream_name":"stdout","time":2348.426806409,"data":"[phi4-mini-instruct] 52/200 ws2-full-p19-paraphrase-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2350.281797167,"data":"[phi4-mini-instruct] 53/200 ws2-full-p19-phrase_to_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":2352.704366258,"data":"[phi4-mini-instruct] 54/200 ws2-full-p19-tap_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2367.985947583,"data":"[phi4-mini-instruct] 55/200 ws2-full-p19-tap_word-2 ok 15.3s options_seen=73\n"}
+,{"stream_name":"stdout","time":2375.038157421,"data":"[phi4-mini-instruct] 56/200 ws2-full-p20-academic-1 ok 7.1s options_seen=8\n"}
+,{"stream_name":"stdout","time":2377.454623048,"data":"[phi4-mini-instruct] 57/200 ws2-full-p20-condense-1 ok 2.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":2383.558454941,"data":"[phi4-mini-instruct] 58/200 ws2-full-p20-paraphrase-1 ok 6.1s options_seen=8\n"}
+,{"stream_name":"stdout","time":2386.073081573,"data":"[phi4-mini-instruct] 59/200 ws2-full-p20-tap_word-1 ok 2.5s options_seen=11\n"}
+,{"stream_name":"stdout","time":2388.909460317,"data":"[phi4-mini-instruct] 60/200 ws2-full-p20-tap_word-2 ok 2.8s options_seen=13\n"}
+,{"stream_name":"stdout","time":2395.386761142,"data":"[phi4-mini-instruct] 61/200 ws2-full-p21-academic-1 ok 6.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":2399.68306349,"data":"[phi4-mini-instruct] 62/200 ws2-full-p21-condense-1 ok 4.3s options_seen=8\n"}
+,{"stream_name":"stdout","time":2401.857299712,"data":"[phi4-mini-instruct] 63/200 ws2-full-p21-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2404.578869292,"data":"[phi4-mini-instruct] 64/200 ws2-full-p21-tap_word-1 ok 2.7s options_seen=11\n"}
+,{"stream_name":"stdout","time":2407.850809704,"data":"[phi4-mini-instruct] 65/200 ws2-full-p21-tap_word-2 ok 3.3s options_seen=13\n"}
+,{"stream_name":"stdout","time":2411.77833501,"data":"[phi4-mini-instruct] 66/200 ws2-full-p22-condense-1 ok 3.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":2417.86390958,"data":"[phi4-mini-instruct] 67/200 ws2-full-p22-paraphrase-1 ok 6.1s options_seen=8\n"}
+,{"stream_name":"stdout","time":2420.257404956,"data":"[phi4-mini-instruct] 68/200 ws2-full-p22-phrase_to_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2422.284933095,"data":"[phi4-mini-instruct] 69/200 ws2-full-p22-tap_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2424.791623112,"data":"[phi4-mini-instruct] 70/200 ws2-full-p22-tap_word-2 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":2430.041226224,"data":"[phi4-mini-instruct] 71/200 ws2-full-p23-academic-1 ok 5.2s options_seen=8\n"}
+,{"stream_name":"stdout","time":2435.360399005,"data":"[phi4-mini-instruct] 72/200 ws2-full-p23-paraphrase-1 ok 5.3s options_seen=8\n"}
+,{"stream_name":"stdout","time":2439.357925235,"data":"[phi4-mini-instruct] 73/200 ws2-full-p23-tap_word-1 ok 4.0s options_seen=20\n"}
+,{"stream_name":"stdout","time":2441.518539221,"data":"[phi4-mini-instruct] 74/200 ws2-full-p23-tap_word-2 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2447.653527134,"data":"[phi4-mini-instruct] 75/200 ws2-full-p23-word_sentences-1 ok 6.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":2452.446923446,"data":"[phi4-mini-instruct] 76/200 ws2-full-p24-academic-1 ok 4.8s options_seen=8\n"}
+,{"stream_name":"stdout","time":2454.895776622,"data":"[phi4-mini-instruct] 77/200 ws2-full-p24-phrase_to_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2457.390181812,"data":"[phi4-mini-instruct] 78/200 ws2-full-p24-tap_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":2462.542972244,"data":"[phi4-mini-instruct] 79/200 ws2-full-p24-tap_word-2 ok 5.2s options_seen=20\n"}
+,{"stream_name":"stdout","time":2467.594581043,"data":"[phi4-mini-instruct] 80/200 ws2-full-p24-word_sentences-1 ok 5.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":2473.777279647,"data":"[phi4-mini-instruct] 81/200 ws2-full-p25-paraphrase-1 ok 6.2s options_seen=8\n"}
+,{"stream_name":"stdout","time":2476.316592386,"data":"[phi4-mini-instruct] 82/200 ws2-full-p25-phrase_to_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":2478.490894079,"data":"[phi4-mini-instruct] 83/200 ws2-full-p25-tap_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2480.636055169,"data":"[phi4-mini-instruct] 84/200 ws2-full-p25-tap_word-2 ok 2.1s options_seen=11\n"}
+,{"stream_name":"stdout","time":2485.937562326,"data":"[phi4-mini-instruct] 85/200 ws2-full-p25-word_sentences-1 ok 5.3s options_seen=8\n"}
+,{"stream_name":"stdout","time":2492.443391894,"data":"[phi4-mini-instruct] 86/200 ws2-full-p26-academic-1 ok 6.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":2495.071631629,"data":"[phi4-mini-instruct] 87/200 ws2-full-p26-condense-1 ok 2.6s options_seen=8\n"}
+,{"stream_name":"stdout","time":2498.914794497,"data":"[phi4-mini-instruct] 88/200 ws2-full-p26-tap_word-1 ok 3.8s options_seen=10\n"}
+,{"stream_name":"stdout","time":2501.202374666,"data":"[phi4-mini-instruct] 89/200 ws2-full-p26-tap_word-2 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":2505.48593794,"data":"[phi4-mini-instruct] 90/200 ws2-full-p26-word_sentences-1 ok 4.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":2512.239636611,"data":"[phi4-mini-instruct] 91/200 ws2-full-p27-condense-1 ok 6.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":2517.178376328,"data":"[phi4-mini-instruct] 92/200 ws2-full-p27-paraphrase-1 ok 4.9s options_seen=8\n"}
+,{"stream_name":"stdout","time":2519.762967883,"data":"[phi4-mini-instruct] 93/200 ws2-full-p27-tap_word-1 ok 2.6s options_seen=10\n"}
+,{"stream_name":"stdout","time":2521.930848683,"data":"[phi4-mini-instruct] 94/200 ws2-full-p27-tap_word-2 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2526.106025755,"data":"[phi4-mini-instruct] 95/200 ws2-full-p27-word_sentences-1 ok 4.2s options_seen=8\n"}
+,{"stream_name":"stdout","time":2529.282451777,"data":"[phi4-mini-instruct] 96/200 ws2-full-p28-condense-1 ok 3.2s options_seen=8\n"}
+,{"stream_name":"stdout","time":2531.994265598,"data":"[phi4-mini-instruct] 97/200 ws2-full-p28-phrase_to_word-1 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":2534.725855593,"data":"[phi4-mini-instruct] 98/200 ws2-full-p28-tap_word-1 ok 2.7s options_seen=11\n"}
+,{"stream_name":"stdout","time":2537.191587598,"data":"[phi4-mini-instruct] 99/200 ws2-full-p28-tap_word-2 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":2542.926969612,"data":"[phi4-mini-instruct] 100/200 ws2-full-p28-word_sentences-1 ok 5.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2548.394542344,"data":"[phi4-mini-instruct] 101/200 ws2-full-p29-academic-1 ok 5.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":2549.567590269,"data":"[phi4-mini-instruct] 102/200 ws2-full-p29-condense-1 ok 1.2s options_seen=1\n"}
+,{"stream_name":"stdout","time":2553.671444016,"data":"[phi4-mini-instruct] 103/200 ws2-full-p29-paraphrase-1 ok 4.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":2555.841459838,"data":"[phi4-mini-instruct] 104/200 ws2-full-p29-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2558.54387189,"data":"[phi4-mini-instruct] 105/200 ws2-full-p29-tap_word-1 ok 2.7s options_seen=14\n"}
+,{"stream_name":"stdout","time":2565.810946446,"data":"[phi4-mini-instruct] 106/200 ws2-full-p30-academic-1 ok 7.3s options_seen=8\n"}
+,{"stream_name":"stdout","time":2570.093570947,"data":"[phi4-mini-instruct] 107/200 ws2-full-p30-paraphrase-1 ok 4.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":2572.522036267,"data":"[phi4-mini-instruct] 108/200 ws2-full-p30-phrase_to_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2574.873774226,"data":"[phi4-mini-instruct] 109/200 ws2-full-p30-tap_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2578.680098431,"data":"[phi4-mini-instruct] 110/200 ws2-full-p30-word_sentences-1 ok 3.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":2584.971278363,"data":"[phi4-mini-instruct] 111/200 ws2-full-p31-academic-1 ok 6.3s options_seen=8\n"}
+,{"stream_name":"stdout","time":2588.454502862,"data":"[phi4-mini-instruct] 112/200 ws2-full-p31-condense-1 ok 3.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":2593.973294638,"data":"[phi4-mini-instruct] 113/200 ws2-full-p31-paraphrase-1 ok 5.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":2596.928370295,"data":"[phi4-mini-instruct] 114/200 ws2-full-p31-tap_word-1 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2602.137491902,"data":"[phi4-mini-instruct] 115/200 ws2-full-p31-word_sentences-1 ok 5.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":2609.055240627,"data":"[phi4-mini-instruct] 116/200 ws2-full-p32-academic-1 ok 6.9s options_seen=8\n"}
+,{"stream_name":"stdout","time":2613.022387901,"data":"[phi4-mini-instruct] 117/200 ws2-full-p32-condense-1 ok 4.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":2615.021682257,"data":"[phi4-mini-instruct] 118/200 ws2-full-p32-phrase_to_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2618.094815207,"data":"[phi4-mini-instruct] 119/200 ws2-full-p32-tap_word-1 ok 3.1s options_seen=11\n"}
+,{"stream_name":"stdout","time":2622.9146935,"data":"[phi4-mini-instruct] 120/200 ws2-full-p32-word_sentences-1 ok 4.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":2627.776644868,"data":"[phi4-mini-instruct] 121/200 ws2-full-p33-condense-1 ok 4.9s options_seen=8\n"}
+,{"stream_name":"stdout","time":2632.597141921,"data":"[phi4-mini-instruct] 122/200 ws2-full-p33-paraphrase-1 ok 4.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":2635.305728195,"data":"[phi4-mini-instruct] 123/200 ws2-full-p33-phrase_to_word-1 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":2638.317139031,"data":"[phi4-mini-instruct] 124/200 ws2-full-p33-tap_word-1 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2642.475885302,"data":"[phi4-mini-instruct] 125/200 ws2-full-p33-word_sentences-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":2648.490823782,"data":"[phi4-mini-instruct] 126/200 ws2-full-p34-academic-1 ok 6.0s options_seen=8\n"}
+,{"stream_name":"stdout","time":2653.09596079,"data":"[phi4-mini-instruct] 127/200 ws2-full-p34-condense-1 ok 4.6s options_seen=8\n"}
+,{"stream_name":"stdout","time":2659.584003892,"data":"[phi4-mini-instruct] 128/200 ws2-full-p34-paraphrase-1 ok 6.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":2661.50331032,"data":"[phi4-mini-instruct] 129/200 ws2-full-p34-phrase_to_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":2663.421354869,"data":"[phi4-mini-instruct] 130/200 ws2-full-p34-tap_word-1 ok 1.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":2670.58474659,"data":"[phi4-mini-instruct] 131/200 ws2-full-p35-academic-1 ok 7.2s options_seen=8\n"}
+,{"stream_name":"stdout","time":2674.03038797,"data":"[phi4-mini-instruct] 132/200 ws2-full-p35-paraphrase-1 ok 3.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":2676.467398413,"data":"[phi4-mini-instruct] 133/200 ws2-full-p35-phrase_to_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2678.648492278,"data":"[phi4-mini-instruct] 134/200 ws2-full-p35-tap_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2684.605832487,"data":"[phi4-mini-instruct] 135/200 ws2-full-p35-word_sentences-1 ok 6.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":2690.582889859,"data":"[phi4-mini-instruct] 136/200 ws2-full-p36-academic-1 ok 6.0s options_seen=8\n"}
+,{"stream_name":"stdout","time":2694.407930941,"data":"[phi4-mini-instruct] 137/200 ws2-full-p36-condense-1 ok 3.8s options_seen=8\n"}
+,{"stream_name":"stdout","time":2699.365749441,"data":"[phi4-mini-instruct] 138/200 ws2-full-p36-paraphrase-1 ok 5.0s options_seen=8\n"}
+,{"stream_name":"stdout","time":2701.544184566,"data":"[phi4-mini-instruct] 139/200 ws2-full-p36-tap_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2705.542394646,"data":"[phi4-mini-instruct] 140/200 ws2-full-p36-word_sentences-1 ok 4.0s options_seen=8\n"}
+,{"stream_name":"stdout","time":2710.188882961,"data":"[phi4-mini-instruct] 141/200 ws2-full-p37-academic-1 ok 4.6s options_seen=8\n"}
+,{"stream_name":"stdout","time":2714.894513386,"data":"[phi4-mini-instruct] 142/200 ws2-full-p37-condense-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2717.668029405,"data":"[phi4-mini-instruct] 143/200 ws2-full-p37-phrase_to_word-1 ok 2.8s options_seen=13\n"}
+,{"stream_name":"stdout","time":2719.995058439,"data":"[phi4-mini-instruct] 144/200 ws2-full-p37-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":2725.417615467,"data":"[phi4-mini-instruct] 145/200 ws2-full-p37-word_sentences-1 ok 5.4s options_seen=5\n"}
+,{"stream_name":"stdout","time":2731.941538707,"data":"[phi4-mini-instruct] 146/200 ws2-full-p38-condense-1 ok 6.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":2738.747395362,"data":"[phi4-mini-instruct] 147/200 ws2-full-p38-paraphrase-1 ok 6.8s options_seen=8\n"}
+,{"stream_name":"stdout","time":2740.734410429,"data":"[phi4-mini-instruct] 148/200 ws2-full-p38-phrase_to_word-1 ok 2.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2744.003158448,"data":"[phi4-mini-instruct] 149/200 ws2-full-p38-tap_word-1 ok 3.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":2748.992500773,"data":"[phi4-mini-instruct] 150/200 ws2-full-p38-word_sentences-1 ok 5.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":2753.88393007,"data":"[phi4-mini-instruct] 151/200 ws2-full-p39-academic-1 ok 4.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":2758.184454311,"data":"[phi4-mini-instruct] 152/200 ws2-full-p39-condense-1 ok 4.3s options_seen=8\n"}
+,{"stream_name":"stdout","time":2763.772562643,"data":"[phi4-mini-instruct] 153/200 ws2-full-p39-paraphrase-1 ok 5.6s options_seen=8\n"}
+,{"stream_name":"stdout","time":2766.445857637,"data":"[phi4-mini-instruct] 154/200 ws2-full-p39-phrase_to_word-1 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":2768.896366193,"data":"[phi4-mini-instruct] 155/200 ws2-full-p39-tap_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2776.569458014,"data":"[phi4-mini-instruct] 156/200 ws2-full-p40-academic-1 ok 7.7s options_seen=8\n"}
+,{"stream_name":"stdout","time":2782.414703523,"data":"[phi4-mini-instruct] 157/200 ws2-full-p40-paraphrase-1 ok 5.8s options_seen=5\n"}
+,{"stream_name":"stdout","time":2784.583096699,"data":"[phi4-mini-instruct] 158/200 ws2-full-p40-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2786.944076978,"data":"[phi4-mini-instruct] 159/200 ws2-full-p40-tap_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2791.943251261,"data":"[phi4-mini-instruct] 160/200 ws2-full-p40-word_sentences-1 ok 5.0s options_seen=5\n"}
+,{"stream_name":"stdout","time":2797.588732992,"data":"[phi4-mini-instruct] 161/200 ws2-full-p41-academic-1 ok 5.6s options_seen=8\n"}
+,{"stream_name":"stdout","time":2802.137101129,"data":"[phi4-mini-instruct] 162/200 ws2-full-p41-condense-1 ok 4.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":2804.857037199,"data":"[phi4-mini-instruct] 163/200 ws2-full-p41-phrase_to_word-1 ok 2.7s options_seen=10\n"}
+,{"stream_name":"stdout","time":2807.124748902,"data":"[phi4-mini-instruct] 164/200 ws2-full-p41-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":2812.634935924,"data":"[phi4-mini-instruct] 165/200 ws2-full-p41-word_sentences-1 ok 5.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":2820.433188615,"data":"[phi4-mini-instruct] 166/200 ws2-full-p42-academic-1 ok 7.8s options_seen=8\n"}
+,{"stream_name":"stdout","time":2823.941490193,"data":"[phi4-mini-instruct] 167/200 ws2-full-p42-condense-1 ok 3.5s options_seen=5\n"}
+,{"stream_name":"stdout","time":2830.265554882,"data":"[phi4-mini-instruct] 168/200 ws2-full-p42-paraphrase-1 ok 6.3s options_seen=5\n"}
+,{"stream_name":"stdout","time":2834.162735142,"data":"[phi4-mini-instruct] 169/200 ws2-full-p42-tap_word-1 ok 3.9s options_seen=16\n"}
+,{"stream_name":"stdout","time":2839.906301348,"data":"[phi4-mini-instruct] 170/200 ws2-full-p42-word_sentences-1 ok 5.7s options_seen=8\n"}
+,{"stream_name":"stdout","time":2844.073836264,"data":"[phi4-mini-instruct] 171/200 ws2-full-p43-condense-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":2849.967892015,"data":"[phi4-mini-instruct] 172/200 ws2-full-p43-paraphrase-1 ok 5.9s options_seen=8\n"}
+,{"stream_name":"stdout","time":2852.255900988,"data":"[phi4-mini-instruct] 173/200 ws2-full-p43-phrase_to_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":2854.805744383,"data":"[phi4-mini-instruct] 174/200 ws2-full-p43-tap_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":2859.002455871,"data":"[phi4-mini-instruct] 175/200 ws2-full-p43-word_sentences-1 ok 4.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":2866.414085269,"data":"[phi4-mini-instruct] 176/200 ws2-full-p44-academic-1 ok 7.4s options_seen=8\n"}
+,{"stream_name":"stdout","time":2871.095389611,"data":"[phi4-mini-instruct] 177/200 ws2-full-p44-condense-1 ok 4.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2876.586599326,"data":"[phi4-mini-instruct] 178/200 ws2-full-p44-paraphrase-1 ok 5.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":2879.680040886,"data":"[phi4-mini-instruct] 179/200 ws2-full-p44-phrase_to_word-1 ok 3.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":2882.584131339,"data":"[phi4-mini-instruct] 180/200 ws2-full-p44-tap_word-1 ok 2.9s options_seen=10\n"}
+,{"stream_name":"stdout","time":2890.611437202,"data":"[phi4-mini-instruct] 181/200 ws2-full-p45-academic-1 ok 8.0s options_seen=8\n"}
+,{"stream_name":"stdout","time":2896.417619595,"data":"[phi4-mini-instruct] 182/200 ws2-full-p45-paraphrase-1 ok 5.8s options_seen=8\n"}
+,{"stream_name":"stdout","time":2898.788305795,"data":"[phi4-mini-instruct] 183/200 ws2-full-p45-phrase_to_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2901.258866376,"data":"[phi4-mini-instruct] 184/200 ws2-full-p45-tap_word-1 ok 2.5s options_seen=10\n"}
+,{"stream_name":"stdout","time":2907.924751132,"data":"[phi4-mini-instruct] 185/200 ws2-full-p45-word_sentences-1 ok 6.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2913.750450627,"data":"[phi4-mini-instruct] 186/200 ws2-full-p46-academic-1 ok 5.8s options_seen=8\n"}
+,{"stream_name":"stdout","time":2917.223449818,"data":"[phi4-mini-instruct] 187/200 ws2-full-p46-condense-1 ok 3.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":2920.142766148,"data":"[phi4-mini-instruct] 188/200 ws2-full-p46-paraphrase-1 ok 2.9s options_seen=5\n"}
+,{"stream_name":"stdout","time":2923.15852341,"data":"[phi4-mini-instruct] 189/200 ws2-full-p46-tap_word-1 ok 3.0s options_seen=10\n"}
+,{"stream_name":"stdout","time":2927.764438717,"data":"[phi4-mini-instruct] 190/200 ws2-full-p46-word_sentences-1 ok 4.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":2933.497722931,"data":"[phi4-mini-instruct] 191/200 ws2-full-p47-academic-1 ok 5.7s options_seen=5\n"}
+,{"stream_name":"stdout","time":2937.586527821,"data":"[phi4-mini-instruct] 192/200 ws2-full-p47-condense-1 ok 4.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":2939.678828809,"data":"[phi4-mini-instruct] 193/200 ws2-full-p47-phrase_to_word-1 ok 2.1s options_seen=10\n"}
+,{"stream_name":"stdout","time":2942.096310023,"data":"[phi4-mini-instruct] 194/200 ws2-full-p47-tap_word-1 ok 2.4s options_seen=10\n"}
+,{"stream_name":"stdout","time":2947.73188925,"data":"[phi4-mini-instruct] 195/200 ws2-full-p47-word_sentences-1 ok 5.6s options_seen=5\n"}
+,{"stream_name":"stdout","time":2951.868817242,"data":"[phi4-mini-instruct] 196/200 ws2-full-p48-condense-1 ok 4.1s options_seen=5\n"}
+,{"stream_name":"stdout","time":2956.356940563,"data":"[phi4-mini-instruct] 197/200 ws2-full-p48-paraphrase-1 ok 4.5s options_seen=8\n"}
+,{"stream_name":"stdout","time":2958.524192559,"data":"[phi4-mini-instruct] 198/200 ws2-full-p48-phrase_to_word-1 ok 2.2s options_seen=10\n"}
+,{"stream_name":"stdout","time":2960.846586118,"data":"[phi4-mini-instruct] 199/200 ws2-full-p48-tap_word-1 ok 2.3s options_seen=10\n"}
+,{"stream_name":"stdout","time":2966.022922166,"data":"[phi4-mini-instruct] 200/200 ws2-full-p48-word_sentences-1 ok 5.2s options_seen=5\n"}
+,{"stream_name":"stdout","time":2966.065349477,"data":"{\"candidate\": \"phi4-mini-instruct\", \"status\": \"completed\", \"tasks\": {\"ok\": 200, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":2967.858576993,"data":"=== control-missing-revision ===\n"}
+,{"stream_name":"stdout","time":2978.691751957,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":2978.723327992,"data":"[control-missing-revision] FAILED to load: RevisionNotFoundError: 404 Client Error. (Request ID: Root=1-6ad8dae5-0507c56b2ddc39e8567e6098;ec39195d-413c-438a-b01a-cd28561b3112)\n"}
+,{"stream_name":"stdout","time":2978.723371949,"data":"\n"}
+,{"stream_name":"stdout","time":2978.723377995,"data":"Revision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false\u0026expand=false.\n"}
+,{"stream_name":"stdout","time":2978.723383819,"data":"\n"}
+,{"stream_name":"stdout","time":2978.723828614,"data":"{\"candidate\": \"control-missing-revision\", \"status\": \"failed\", \"tasks\": {\"ok\": 0, \"error\": 0, \"failed_ids\": []}}\n"}
+,{"stream_name":"stdout","time":2979.771289979,"data":"{\n"}
+,{"stream_name":"stdout","time":2979.771326389,"data":"  \"qwen35-4b\": {\n"}
+,{"stream_name":"stdout","time":2979.771333582,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":2979.771354571,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":2979.771360304,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":2979.771364967,"data":"      \"ok\": 200,\n"}
+,{"stream_name":"stdout","time":2979.771369547,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":2979.771374219,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":2979.771392782,"data":"    },\n"}
+,{"stream_name":"stdout","time":2979.771396625,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":2979.771399685,"data":"    \"wall_seconds\": 1182.3\n"}
+,{"stream_name":"stdout","time":2979.771402781,"data":"  },\n"}
+,{"stream_name":"stdout","time":2979.771405733,"data":"  \"smollm3-3b\": {\n"}
+,{"stream_name":"stdout","time":2979.771408709,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":2979.771411669,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":2979.771433843,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":2979.771438613,"data":"      \"ok\": 200,\n"}
+,{"stream_name":"stdout","time":2979.771442717,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":2979.77144704,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":2979.771451141,"data":"    },\n"}
+,{"stream_name":"stdout","time":2979.771454706,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":2979.771458225,"data":"    \"wall_seconds\": 885.5\n"}
+,{"stream_name":"stdout","time":2979.771461823,"data":"  },\n"}
+,{"stream_name":"stdout","time":2979.771465203,"data":"  \"phi4-mini-instruct\": {\n"}
+,{"stream_name":"stdout","time":2979.771468859,"data":"    \"exit_code\": 0,\n"}
+,{"stream_name":"stdout","time":2979.77147247,"data":"    \"status\": \"completed\",\n"}
+,{"stream_name":"stdout","time":2979.771476147,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":2979.771479657,"data":"      \"ok\": 200,\n"}
+,{"stream_name":"stdout","time":2979.771483188,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":2979.771486745,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":2979.771490565,"data":"    },\n"}
+,{"stream_name":"stdout","time":2979.771494111,"data":"    \"error\": null,\n"}
+,{"stream_name":"stdout","time":2979.771501166,"data":"    \"wall_seconds\": 870.0\n"}
+,{"stream_name":"stdout","time":2979.771503537,"data":"  },\n"}
+,{"stream_name":"stdout","time":2979.771505784,"data":"  \"control-missing-revision\": {\n"}
+,{"stream_name":"stdout","time":2979.771508153,"data":"    \"exit_code\": 2,\n"}
+,{"stream_name":"stdout","time":2979.771510459,"data":"    \"status\": \"failed\",\n"}
+,{"stream_name":"stdout","time":2979.771512961,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":2979.771523962,"data":"      \"ok\": 0,\n"}
+,{"stream_name":"stdout","time":2979.771528073,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":2979.771532247,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":2979.771536068,"data":"    },\n"}
+,{"stream_name":"stdout","time":2979.771541825,"data":"    \"error\": \"404 Client Error. (Request ID: Root=1-6ad8dae5-0507c56b2ddc39e8567e6098;ec39195d-413c-438a-b01a-cd28561b3112)\\n\\nRevision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false\u0026expand=false.\\nInvalid rev id: 0000000000000000000000000000000000000000\",\n"}
+,{"stream_name":"stdout","time":2979.77154763,"data":"    \"wall_seconds\": 11.9\n"}
+,{"stream_name":"stdout","time":2979.77155129,"data":"  }\n"}
+,{"stream_name":"stdout","time":2979.771554735,"data":"}\n"}
+,{"stream_name":"stderr","time":2981.718743254,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":2981.718769959,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":2981.948581041,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":2981.948604209,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":2982.681855598,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":2983.587366996,"data":"[NbConvertApp] Writing 303277 bytes to __results__.html\n"}
+]

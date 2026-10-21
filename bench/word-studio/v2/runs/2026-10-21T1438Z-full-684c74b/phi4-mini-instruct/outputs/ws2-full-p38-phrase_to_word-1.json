@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p38-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "fbd7b7d52d2eb563df1f35bc0700a3454e185f44a5b7f532902929ffad6421c1",
+  "seed": 8553587078822207853,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"accomplishment\", \"achievement\", \"success\", \"victory\", \"progress\", \"milestone\", \"achievement\", \"progress\", \"success\", \"triumph\"]}",
+  "timing": {
+    "first_text_ms": 190.6,
+    "option_ms": [
+      508.8,
+      642.7,
+      775.4,
+      954.5,
+      1088.6,
+      1267.9,
+      1401.6,
+      1537.0,
+      1671.5,
+      1895.7
+    ],
+    "total_ms": 1985.9,
+    "stream": [
+      [
+        190.6,
+        2
+      ],
+      [
+        239.2,
+        9
+      ],
+      [
+        285.3,
+        11
+      ],
+      [
+        330.4,
+        14
+      ],
+      [
+        375.5,
+        16
+      ],
+      [
+        420.3,
+        21
+      ],
+      [
+        464.7,
+        28
+      ],
+      [
+        508.8,
+        30
+      ],
+      [
+        553.1,
+        32
+      ],
+      [
+        598.0,
+        43
+      ],
+      [
+        642.7,
+        45
+      ],
+      [
+        687.0,
+        47
+      ],
+      [
+        731.2,
+        54
+      ],
+      [
+        775.4,
+        56
+      ],
+      [
+        820.7,
+        58
+      ],
+      [
+        865.5,
+        62
+      ],
+      [
+        910.1,
+        65
+      ],
+      [
+        954.5,
+        67
+      ],
+      [
+        998.9,
+        69
+      ],
+      [
+        1044.0,
+        77
+      ],
+      [
+        1088.6,
+        79
+      ],
+      [
+        1133.1,
+        81
+      ],
+      [
+        1177.6,
+        84
+      ],
+      [
+        1222.8,
+        90
+      ],
+      [
+        1267.9,
+        92
+      ],
+      [
+        1312.8,
+        94
+      ],
+      [
+        1357.3,
+        105
+      ],
+      [
+        1401.6,
+        107
+      ],
+      [
+        1447.2,
+        109
+      ],
+      [
+        1492.3,
+        117
+      ],
+      [
+        1537.0,
+        119
+      ],
+      [
+        1581.5,
+        121
+      ],
+      [
+        1626.7,
+        128
+      ],
+      [
+        1671.5,
+        130
+      ],
+      [
+        1716.2,
+        132
+      ],
+      [
+        1760.9,
+        134
+      ],
+      [
+        1805.4,
+        137
+      ],
+      [
+        1850.8,
+        139
+      ],
+      [
+        1895.7,
+        141
+      ],
+      [
+        1940.6,
+        142
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nDuring my junior year, I tore a ligament in my knee during a soccer game and had to miss the rest of the season. Soccer had always been a big part of who I was, so not being able to play made me feel lost. For the first few weeks, I barely wanted to leave my room. Then my physical therapist pushed me to set small goals, like walking without crutches or doing ten squats. Every small win gave me a little more confidence. When I finally stepped back onto the field the next fall, I was stronger, both physically and mentally.\n\"\"\"\n\nThe writer selected the phrase \"small win\" in this sentence (marked with [[ ]]):\nEvery [[small win]] gave me a little more confidence.\n\nGive 10 single words that can replace \"small win\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 302,
+  "new_tokens": 41,
+  "finish_reason": "stop",
+  "error": null
+}

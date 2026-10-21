@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p21-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "5cc60e95e3ee40c93d4785a39ae99a4e79ab4527639627255ba2ea9a42349453",
+  "seed": 1881228759248682705,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"demand\", \"seek\", \"request\", \"plead\", \"beg\", \"claim\", \"entreat\", \"petition\", \"call\", \"urge\"]}\n",
+  "timing": {
+    "first_text_ms": 526.3,
+    "option_ms": [
+      845.4,
+      1041.1,
+      1229.5,
+      1478.2,
+      1671.2,
+      1859.2,
+      2115.6,
+      2302.9,
+      2492.9,
+      2690.1
+    ],
+    "total_ms": 2884.7,
+    "stream": [
+      [
+        526.3,
+        2
+      ],
+      [
+        592.0,
+        9
+      ],
+      [
+        656.5,
+        11
+      ],
+      [
+        719.8,
+        14
+      ],
+      [
+        781.5,
+        20
+      ],
+      [
+        845.4,
+        22
+      ],
+      [
+        911.7,
+        24
+      ],
+      [
+        977.7,
+        28
+      ],
+      [
+        1041.1,
+        30
+      ],
+      [
+        1104.0,
+        32
+      ],
+      [
+        1167.0,
+        39
+      ],
+      [
+        1229.5,
+        41
+      ],
+      [
+        1290.8,
+        43
+      ],
+      [
+        1352.8,
+        46
+      ],
+      [
+        1416.3,
+        48
+      ],
+      [
+        1478.2,
+        50
+      ],
+      [
+        1542.1,
+        52
+      ],
+      [
+        1605.8,
+        55
+      ],
+      [
+        1671.2,
+        57
+      ],
+      [
+        1733.2,
+        59
+      ],
+      [
+        1795.6,
+        64
+      ],
+      [
+        1859.2,
+        66
+      ],
+      [
+        1923.8,
+        68
+      ],
+      [
+        1988.7,
+        71
+      ],
+      [
+        2052.6,
+        75
+      ],
+      [
+        2115.6,
+        77
+      ],
+      [
+        2178.7,
+        79
+      ],
+      [
+        2241.1,
+        87
+      ],
+      [
+        2302.9,
+        89
+      ],
+      [
+        2365.3,
+        91
+      ],
+      [
+        2428.1,
+        95
+      ],
+      [
+        2492.9,
+        97
+      ],
+      [
+        2556.5,
+        99
+      ],
+      [
+        2619.1,
+        103
+      ],
+      [
+        2690.1,
+        106
+      ],
+      [
+        2818.5,
+        107
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Black Death was a plague that spread across Europe starting in 1347. It was carried by fleas that lived on rats, and it moved quickly along trade routes and through crowded cities. Within just a few years, it killed somewhere between a third and half of Europe's population. Because so many workers died, the people who survived could ask for higher pay, which made the old feudal system weaker. The plague also made a lot of people question the church, since prayers did not seem to stop the disease.\n\"\"\"\n\nThe writer selected the phrase \"ask for\" in this sentence (marked with [[ ]]):\nBecause so many workers died, the people who survived could [[ask for]] higher pay, which made the old feudal system weaker.\n\nGive 10 single words that can replace \"ask for\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 325,
+  "new_tokens": 38,
+  "finish_reason": "stop",
+  "error": null
+}

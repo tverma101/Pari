@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p09-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "7d0c500e9bc432f8491929362b45f03e21c75909ea32b09446d8b4cede99cbad",
+  "seed": 7735302412533530886,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"low-income\", \"financially disadvantaged\", \"less wealthy\", \"limited means\", \"economically struggling\", \"modest\", \"working-class\", \"financially challenged\", \"less privileged\", \"lower income\"]}\n",
+  "timing": {
+    "first_text_ms": 478.7,
+    "option_ms": [
+      888.0,
+      1193.9,
+      1434.7,
+      1676.2,
+      1981.1,
+      2224.0,
+      2464.2,
+      2768.1,
+      3013.8,
+      3253.8
+    ],
+    "total_ms": 3433.6,
+    "stream": [
+      [
+        478.7,
+        2
+      ],
+      [
+        547.9,
+        9
+      ],
+      [
+        616.0,
+        11
+      ],
+      [
+        677.9,
+        14
+      ],
+      [
+        739.1,
+        17
+      ],
+      [
+        799.4,
+        24
+      ],
+      [
+        888.0,
+        26
+      ],
+      [
+        952.1,
+        28
+      ],
+      [
+        1013.5,
+        37
+      ],
+      [
+        1073.3,
+        39
+      ],
+      [
+        1133.1,
+        53
+      ],
+      [
+        1193.9,
+        55
+      ],
+      [
+        1254.3,
+        57
+      ],
+      [
+        1314.0,
+        61
+      ],
+      [
+        1373.6,
+        69
+      ],
+      [
+        1434.7,
+        71
+      ],
+      [
+        1495.1,
+        73
+      ],
+      [
+        1555.3,
+        80
+      ],
+      [
+        1615.5,
+        86
+      ],
+      [
+        1676.2,
+        88
+      ],
+      [
+        1736.7,
+        90
+      ],
+      [
+        1796.7,
+        96
+      ],
+      [
+        1857.1,
+        102
+      ],
+      [
+        1918.7,
+        113
+      ],
+      [
+        1981.1,
+        115
+      ],
+      [
+        2043.5,
+        117
+      ],
+      [
+        2103.2,
+        120
+      ],
+      [
+        2163.0,
+        123
+      ],
+      [
+        2224.0,
+        125
+      ],
+      [
+        2284.2,
+        127
+      ],
+      [
+        2343.9,
+        134
+      ],
+      [
+        2403.7,
+        140
+      ],
+      [
+        2464.2,
+        142
+      ],
+      [
+        2523.4,
+        144
+      ],
+      [
+        2585.6,
+        153
+      ],
+      [
+        2648.3,
+        155
+      ],
+      [
+        2707.8,
+        166
+      ],
+      [
+        2768.1,
+        168
+      ],
+      [
+        2829.5,
+        170
+      ],
+      [
+        2891.4,
+        174
+      ],
+      [
+        2953.6,
+        185
+      ],
+      [
+        3013.8,
+        187
+      ],
+      [
+        3075.5,
+        189
+      ],
+      [
+        3136.3,
+        194
+      ],
+      [
+        3195.0,
+        201
+      ],
+      [
+        3253.8,
+        204
+      ],
+      [
+        3372.6,
+        205
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSome people think school uniforms are a bad idea, but I think they help students in many ways. First, uniforms make it harder for kids to judge each other based on how much their clothes cost. When everyone wears the same thing, students from poor families do not stand out as much. Second, uniforms save time in the morning because students do not have to pick out an outfit every day. Critics say that uniforms take away students' freedom to express themselves. However, students can still show who they are through their hobbies, their writing, and the way they treat others.\n\"\"\"\n\nThe writer tapped the word \"poor\" in this sentence (marked with [[ ]]):\nWhen everyone wears the same thing, students from [[poor]] families do not stand out as much.\n\nGive 10 replacements for \"poor\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"poor\" without changing the rest of the sentence. Do not repeat \"poor\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 353,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

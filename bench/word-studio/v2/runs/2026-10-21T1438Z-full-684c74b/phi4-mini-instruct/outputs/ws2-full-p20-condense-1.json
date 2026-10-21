@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p20-condense-1",
+  "kind": "condense",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "b7f878a496666a56e4fefa2dc2637a6240ea70ad6e1edd1c7c20b859662d6d41",
+  "seed": 4799548187640596011,
+  "max_new_tokens": 640,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Neither thinks of their families' reaction.\", \"Neither considers their families' response.\", \"Neither ponders their families' reaction.\", \"Neither thinks about their families' discovery.\", \"Neither reflects on their families' reaction.\"]}",
+  "timing": {
+    "first_text_ms": 196.3,
+    "option_ms": [
+      691.7,
+      1049.2,
+      1452.6,
+      1858.4,
+      2324.8
+    ],
+    "total_ms": 2415.3,
+    "stream": [
+      [
+        196.3,
+        2
+      ],
+      [
+        244.0,
+        9
+      ],
+      [
+        289.8,
+        11
+      ],
+      [
+        335.1,
+        14
+      ],
+      [
+        379.9,
+        21
+      ],
+      [
+        424.6,
+        28
+      ],
+      [
+        469.1,
+        31
+      ],
+      [
+        513.9,
+        37
+      ],
+      [
+        558.7,
+        46
+      ],
+      [
+        603.2,
+        47
+      ],
+      [
+        647.4,
+        56
+      ],
+      [
+        691.7,
+        59
+      ],
+      [
+        736.2,
+        61
+      ],
+      [
+        781.0,
+        68
+      ],
+      [
+        826.4,
+        78
+      ],
+      [
+        870.6,
+        84
+      ],
+      [
+        914.8,
+        93
+      ],
+      [
+        959.6,
+        94
+      ],
+      [
+        1004.6,
+        103
+      ],
+      [
+        1049.2,
+        106
+      ],
+      [
+        1093.7,
+        108
+      ],
+      [
+        1137.9,
+        115
+      ],
+      [
+        1183.2,
+        117
+      ],
+      [
+        1228.4,
+        123
+      ],
+      [
+        1273.2,
+        129
+      ],
+      [
+        1317.7,
+        138
+      ],
+      [
+        1362.1,
+        139
+      ],
+      [
+        1407.5,
+        148
+      ],
+      [
+        1452.6,
+        151
+      ],
+      [
+        1497.4,
+        153
+      ],
+      [
+        1542.0,
+        160
+      ],
+      [
+        1586.5,
+        167
+      ],
+      [
+        1631.9,
+        173
+      ],
+      [
+        1677.0,
+        179
+      ],
+      [
+        1721.6,
+        188
+      ],
+      [
+        1766.3,
+        189
+      ],
+      [
+        1811.5,
+        199
+      ],
+      [
+        1858.4,
+        202
+      ],
+      [
+        1921.1,
+        204
+      ],
+      [
+        1964.3,
+        211
+      ],
+      [
+        2008.9,
+        220
+      ],
+      [
+        2054.2,
+        223
+      ],
+      [
+        2099.5,
+        229
+      ],
+      [
+        2144.5,
+        238
+      ],
+      [
+        2189.5,
+        239
+      ],
+      [
+        2234.1,
+        248
+      ],
+      [
+        2279.7,
+        249
+      ],
+      [
+        2324.8,
+        251
+      ],
+      [
+        2369.8,
+        252
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nRomeo and Juliet is often called a love story, but it is also a story about how acting too fast can lead to disaster. Romeo and Juliet meet, fall in love, and get married in less than a week. Neither of them stops to think about what their families will do when they find out. Friar Laurence even warns Romeo that \"they stumble that run fast,\" but Romeo does not listen. When Romeo hears that Juliet is dead, he kills himself right away instead of waiting to learn the truth. If the two young lovers had slowed down, the play might have had a happy ending.\n\"\"\"\n\nThe writer selected this text:\n\"\"\"\nNeither of them stops to think about what their families will do when they find out.\n\"\"\"\n\nGive 5 different rewrites of the selected text that say the same thing in fewer words. Keep every fact, name, number and quotation, and keep the claim exactly as strong or as uncertain as it is. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 306,
+  "new_tokens": 50,
+  "finish_reason": "stop",
+  "error": null
+}

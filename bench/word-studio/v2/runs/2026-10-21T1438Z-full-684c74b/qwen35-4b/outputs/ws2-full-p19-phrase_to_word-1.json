@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p19-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "3b9beaeb4e0c68523785c41720585e889af09fd0ff617cbed379909fcfd88c3f",
+  "seed": 5799275487369828653,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"afford\", \"spend\", \"cover\", \"buy\", \"purchase\", \"fund\", \"finance\", \"support\", \"buy\", \"pay\"]}\n",
+  "timing": {
+    "first_text_ms": 531.0,
+    "option_ms": [
+      900.6,
+      1146.1,
+      1327.5,
+      1511.5,
+      1698.0,
+      1882.8,
+      2065.8,
+      2248.6,
+      2431.7,
+      2615.6
+    ],
+    "total_ms": 2801.3,
+    "stream": [
+      [
+        531.0,
+        2
+      ],
+      [
+        594.4,
+        9
+      ],
+      [
+        655.2,
+        11
+      ],
+      [
+        716.6,
+        14
+      ],
+      [
+        778.0,
+        17
+      ],
+      [
+        840.0,
+        20
+      ],
+      [
+        900.6,
+        22
+      ],
+      [
+        962.0,
+        24
+      ],
+      [
+        1023.7,
+        26
+      ],
+      [
+        1085.2,
+        29
+      ],
+      [
+        1146.1,
+        31
+      ],
+      [
+        1206.9,
+        33
+      ],
+      [
+        1267.0,
+        38
+      ],
+      [
+        1327.5,
+        40
+      ],
+      [
+        1388.9,
+        42
+      ],
+      [
+        1451.1,
+        45
+      ],
+      [
+        1511.5,
+        47
+      ],
+      [
+        1573.3,
+        49
+      ],
+      [
+        1636.3,
+        57
+      ],
+      [
+        1698.0,
+        59
+      ],
+      [
+        1758.9,
+        61
+      ],
+      [
+        1820.9,
+        65
+      ],
+      [
+        1882.8,
+        67
+      ],
+      [
+        1943.8,
+        69
+      ],
+      [
+        2004.9,
+        76
+      ],
+      [
+        2065.8,
+        78
+      ],
+      [
+        2126.2,
+        80
+      ],
+      [
+        2187.7,
+        87
+      ],
+      [
+        2248.6,
+        89
+      ],
+      [
+        2309.3,
+        91
+      ],
+      [
+        2370.5,
+        94
+      ],
+      [
+        2431.7,
+        96
+      ],
+      [
+        2492.9,
+        98
+      ],
+      [
+        2553.5,
+        101
+      ],
+      [
+        2615.6,
+        104
+      ],
+      [
+        2737.6,
+        105
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nStandardized tests like the SAT are supposed to measure how ready students are for college, but they do not tell the whole story. A student's score can depend a lot on whether their family could pay for tutoring and practice books. Some students are also very nervous test-takers, so their scores do not show what they actually know. Because of this, more than 1,800 colleges have made the SAT optional. I think colleges should look at grades, essays, and activities instead of focusing on one test score.\n\"\"\"\n\nThe writer selected the phrase \"pay for\" in this sentence (marked with [[ ]]):\nA student's score can depend a lot on whether their family could [[pay for]] tutoring and practice books.\n\nGive 10 single words that can replace \"pay for\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 321,
+  "new_tokens": 38,
+  "finish_reason": "stop",
+  "error": null
+}

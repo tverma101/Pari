@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p43-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "f4f0360791b96243c257ee7cd05ec7d9749a758c911711ae8804afdc7236289a",
+  "seed": 3355963886366091736,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"draw in\", \"bring in\", \"involve\", \"drag in\", \"include\", \"involves\", \"entangle\", \"draw in\", \"involve\", \"include\"]}",
+  "timing": {
+    "first_text_ms": 172.1,
+    "option_ms": [
+      420.1,
+      586.7,
+      753.1,
+      917.2,
+      1040.9,
+      1244.8,
+      1409.6,
+      1577.4,
+      1742.5,
+      1865.9
+    ],
+    "total_ms": 1907.5,
+    "stream": [
+      [
+        172.1,
+        2
+      ],
+      [
+        214.3,
+        9
+      ],
+      [
+        255.2,
+        11
+      ],
+      [
+        296.5,
+        14
+      ],
+      [
+        337.8,
+        18
+      ],
+      [
+        379.2,
+        21
+      ],
+      [
+        420.1,
+        23
+      ],
+      [
+        460.8,
+        25
+      ],
+      [
+        501.8,
+        30
+      ],
+      [
+        545.4,
+        33
+      ],
+      [
+        586.7,
+        35
+      ],
+      [
+        628.8,
+        37
+      ],
+      [
+        670.6,
+        40
+      ],
+      [
+        712.1,
+        44
+      ],
+      [
+        753.1,
+        46
+      ],
+      [
+        794.0,
+        48
+      ],
+      [
+        834.6,
+        52
+      ],
+      [
+        876.2,
+        55
+      ],
+      [
+        917.2,
+        57
+      ],
+      [
+        959.9,
+        59
+      ],
+      [
+        1000.4,
+        66
+      ],
+      [
+        1040.9,
+        68
+      ],
+      [
+        1081.4,
+        70
+      ],
+      [
+        1122.3,
+        72
+      ],
+      [
+        1163.3,
+        75
+      ],
+      [
+        1204.0,
+        78
+      ],
+      [
+        1244.8,
+        80
+      ],
+      [
+        1285.9,
+        82
+      ],
+      [
+        1326.7,
+        85
+      ],
+      [
+        1368.5,
+        90
+      ],
+      [
+        1409.6,
+        92
+      ],
+      [
+        1450.3,
+        94
+      ],
+      [
+        1492.1,
+        98
+      ],
+      [
+        1535.6,
+        101
+      ],
+      [
+        1577.4,
+        103
+      ],
+      [
+        1618.3,
+        105
+      ],
+      [
+        1660.2,
+        108
+      ],
+      [
+        1701.6,
+        112
+      ],
+      [
+        1742.5,
+        114
+      ],
+      [
+        1784.3,
+        116
+      ],
+      [
+        1824.6,
+        123
+      ],
+      [
+        1865.9,
+        126
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nWorld War I had many causes, but the event that started it was the assassination of Archduke Franz Ferdinand in 1914. Before that, the major powers of Europe had already been building up their armies and making alliances with each other. These alliances meant that a fight between two countries could quickly pull in many others. When Austria-Hungary declared war on Serbia, Russia came to Serbia's defense, and then Germany, France, and Britain joined in. Nationalism also played a big role, because many people were proud of their countries and eager to prove their strength.\n\"\"\"\n\nThe writer tapped the word \"pull\" in this sentence (marked with [[ ]]):\nThese alliances meant that a fight between two countries could quickly [[pull]] in many others.\n\nGive 10 replacements for \"pull\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"pull\" without changing the rest of the sentence. Do not repeat \"pull\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 375,
+  "new_tokens": 43,
+  "finish_reason": "stop",
+  "error": null
+}

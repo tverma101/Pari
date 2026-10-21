@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p25-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "8ceeac3367a06d4139718d49441e691cd7f346644655adbf44731e78619e4d8a",
+  "seed": 5738847280726915155,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"affected\", \"struck\", \"impacted\", \"touched\", \"landed on\", \"brought to\", \"reached\", \"oversaw\", \"occurred over\"]}\n",
+  "timing": {
+    "first_text_ms": 522.1,
+    "option_ms": [
+      827.3,
+      1077.1,
+      1323.7,
+      1575.0,
+      1909.4,
+      2219.0,
+      2462.4,
+      2710.0,
+      3019.2
+    ],
+    "total_ms": 3205.2,
+    "stream": [
+      [
+        522.1,
+        2
+      ],
+      [
+        583.5,
+        9
+      ],
+      [
+        644.3,
+        11
+      ],
+      [
+        704.9,
+        14
+      ],
+      [
+        765.8,
+        22
+      ],
+      [
+        827.3,
+        24
+      ],
+      [
+        887.6,
+        26
+      ],
+      [
+        950.0,
+        29
+      ],
+      [
+        1015.8,
+        32
+      ],
+      [
+        1077.1,
+        34
+      ],
+      [
+        1140.2,
+        36
+      ],
+      [
+        1201.3,
+        39
+      ],
+      [
+        1261.3,
+        44
+      ],
+      [
+        1323.7,
+        46
+      ],
+      [
+        1383.7,
+        48
+      ],
+      [
+        1451.4,
+        49
+      ],
+      [
+        1514.4,
+        55
+      ],
+      [
+        1575.0,
+        57
+      ],
+      [
+        1635.6,
+        59
+      ],
+      [
+        1704.0,
+        63
+      ],
+      [
+        1785.9,
+        65
+      ],
+      [
+        1847.3,
+        68
+      ],
+      [
+        1909.4,
+        70
+      ],
+      [
+        1970.3,
+        72
+      ],
+      [
+        2032.3,
+        73
+      ],
+      [
+        2096.3,
+        79
+      ],
+      [
+        2158.6,
+        82
+      ],
+      [
+        2219.0,
+        84
+      ],
+      [
+        2279.4,
+        86
+      ],
+      [
+        2340.7,
+        88
+      ],
+      [
+        2401.6,
+        93
+      ],
+      [
+        2462.4,
+        95
+      ],
+      [
+        2523.2,
+        97
+      ],
+      [
+        2584.4,
+        102
+      ],
+      [
+        2647.5,
+        104
+      ],
+      [
+        2710.0,
+        106
+      ],
+      [
+        2772.4,
+        108
+      ],
+      [
+        2835.4,
+        111
+      ],
+      [
+        2896.8,
+        116
+      ],
+      [
+        2957.4,
+        121
+      ],
+      [
+        3019.2,
+        124
+      ],
+      [
+        3143.7,
+        125
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Dust Bowl was a period in the 1930s when huge dust storms hit the Great Plains. Farmers had plowed up the grass that held the soil in place, and then a long drought dried everything out. When strong winds came, they picked up the loose dirt and created clouds of dust so thick that people could not see the sun. Crops died, animals got sick, and many families lost their farms. Thousands of people packed up their belongings and moved west to California looking for work. The disaster taught the government that it needed to help farmers protect the land.\n\"\"\"\n\nThe writer tapped the word \"hit\" in this sentence (marked with [[ ]]):\nThe Dust Bowl was a period in the 1930s when huge dust storms [[hit]] the Great Plains.\n\nGive 10 replacements for \"hit\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"hit\" without changing the rest of the sentence. Do not repeat \"hit\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 356,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

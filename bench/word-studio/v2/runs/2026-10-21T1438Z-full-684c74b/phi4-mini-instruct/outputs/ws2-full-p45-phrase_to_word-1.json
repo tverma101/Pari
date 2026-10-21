@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p45-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "d46d7ae4764e35a459e07e3f81dbbc8fb54604d817c931488ba13e2416d930d1",
+  "seed": 8774857414776484539,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"seek retribution\", \"vengeance\", \"seek justice\", \"assault\", \"retaliate\", \"revenge\", \"avenging\", \"punish\", \"strike back\", \"retaliation\"]}",
+  "timing": {
+    "first_text_ms": 203.0,
+    "option_ms": [
+      524.2,
+      748.3,
+      927.1,
+      1106.4,
+      1330.9,
+      1511.3,
+      1691.3,
+      1872.0,
+      2052.7,
+      2278.6
+    ],
+    "total_ms": 2369.7,
+    "stream": [
+      [
+        203.0,
+        2
+      ],
+      [
+        251.8,
+        9
+      ],
+      [
+        298.3,
+        11
+      ],
+      [
+        344.3,
+        14
+      ],
+      [
+        390.5,
+        18
+      ],
+      [
+        435.3,
+        21
+      ],
+      [
+        479.9,
+        30
+      ],
+      [
+        524.2,
+        32
+      ],
+      [
+        569.2,
+        34
+      ],
+      [
+        613.9,
+        37
+      ],
+      [
+        658.5,
+        39
+      ],
+      [
+        702.9,
+        43
+      ],
+      [
+        748.3,
+        45
+      ],
+      [
+        793.3,
+        47
+      ],
+      [
+        838.0,
+        51
+      ],
+      [
+        882.6,
+        59
+      ],
+      [
+        927.1,
+        61
+      ],
+      [
+        972.3,
+        63
+      ],
+      [
+        1017.0,
+        66
+      ],
+      [
+        1061.7,
+        70
+      ],
+      [
+        1106.4,
+        72
+      ],
+      [
+        1150.9,
+        74
+      ],
+      [
+        1196.8,
+        77
+      ],
+      [
+        1241.6,
+        80
+      ],
+      [
+        1286.3,
+        83
+      ],
+      [
+        1330.9,
+        85
+      ],
+      [
+        1376.6,
+        87
+      ],
+      [
+        1421.9,
+        92
+      ],
+      [
+        1466.7,
+        94
+      ],
+      [
+        1511.3,
+        96
+      ],
+      [
+        1555.9,
+        98
+      ],
+      [
+        1601.3,
+        100
+      ],
+      [
+        1646.4,
+        106
+      ],
+      [
+        1691.3,
+        108
+      ],
+      [
+        1736.1,
+        110
+      ],
+      [
+        1781.8,
+        113
+      ],
+      [
+        1827.0,
+        116
+      ],
+      [
+        1872.0,
+        118
+      ],
+      [
+        1916.7,
+        120
+      ],
+      [
+        1962.4,
+        126
+      ],
+      [
+        2007.8,
+        131
+      ],
+      [
+        2052.7,
+        133
+      ],
+      [
+        2097.5,
+        135
+      ],
+      [
+        2142.5,
+        138
+      ],
+      [
+        2188.5,
+        141
+      ],
+      [
+        2233.6,
+        146
+      ],
+      [
+        2278.6,
+        148
+      ],
+      [
+        2323.5,
+        149
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nHamlet is a character who thinks too much and acts too little. After his father's ghost tells him that Claudius murdered him, Hamlet promises to get revenge. But instead of acting right away, he spends most of the play doubting himself and planning. In his famous speech, he asks, \"To be, or not to be,\" as he wonders whether life is worth the pain. Even when he has a perfect chance to kill Claudius while he is praying, he decides to wait. His delay ends up causing the deaths of many people, including himself.\n\"\"\"\n\nThe writer selected the phrase \"get revenge\" in this sentence (marked with [[ ]]):\nAfter his father's ghost tells him that Claudius murdered him, Hamlet promises to [[get revenge]].\n\nGive 10 single words that can replace \"get revenge\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 310,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

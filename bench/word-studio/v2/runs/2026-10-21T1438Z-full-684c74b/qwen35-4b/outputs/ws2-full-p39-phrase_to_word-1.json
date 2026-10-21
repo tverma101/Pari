@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p39-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "a5bf675caf8fe7ed89a07996d26297a82128df0842717c97d68aed3f1b1894b8",
+  "seed": 977015631930530294,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"directed\", \"focused\", \"targeted\", \"intended\", \"designed\", \"pointed\", \"turned\", \"aimed\", \"specially\", \"specifically\"]}\n",
+  "timing": {
+    "first_text_ms": 517.6,
+    "option_ms": [
+      889.6,
+      1075.7,
+      1319.9,
+      1565.0,
+      1814.2,
+      2059.4,
+      2245.1,
+      2490.2,
+      2738.0,
+      2984.5
+    ],
+    "total_ms": 3171.8,
+    "stream": [
+      [
+        517.6,
+        2
+      ],
+      [
+        580.3,
+        9
+      ],
+      [
+        646.0,
+        11
+      ],
+      [
+        707.3,
+        14
+      ],
+      [
+        768.5,
+        20
+      ],
+      [
+        829.2,
+        22
+      ],
+      [
+        889.6,
+        24
+      ],
+      [
+        953.1,
+        26
+      ],
+      [
+        1014.5,
+        33
+      ],
+      [
+        1075.7,
+        35
+      ],
+      [
+        1137.0,
+        37
+      ],
+      [
+        1198.3,
+        43
+      ],
+      [
+        1258.9,
+        45
+      ],
+      [
+        1319.9,
+        47
+      ],
+      [
+        1380.8,
+        49
+      ],
+      [
+        1443.4,
+        52
+      ],
+      [
+        1504.0,
+        57
+      ],
+      [
+        1565.0,
+        59
+      ],
+      [
+        1628.6,
+        61
+      ],
+      [
+        1692.1,
+        64
+      ],
+      [
+        1753.1,
+        69
+      ],
+      [
+        1814.2,
+        71
+      ],
+      [
+        1874.6,
+        73
+      ],
+      [
+        1937.4,
+        78
+      ],
+      [
+        1998.9,
+        80
+      ],
+      [
+        2059.4,
+        82
+      ],
+      [
+        2120.8,
+        84
+      ],
+      [
+        2183.2,
+        90
+      ],
+      [
+        2245.1,
+        92
+      ],
+      [
+        2305.8,
+        94
+      ],
+      [
+        2367.0,
+        97
+      ],
+      [
+        2428.8,
+        99
+      ],
+      [
+        2490.2,
+        101
+      ],
+      [
+        2552.1,
+        103
+      ],
+      [
+        2613.5,
+        104
+      ],
+      [
+        2676.5,
+        112
+      ],
+      [
+        2738.0,
+        114
+      ],
+      [
+        2799.7,
+        116
+      ],
+      [
+        2860.3,
+        124
+      ],
+      [
+        2922.7,
+        128
+      ],
+      [
+        2984.5,
+        131
+      ],
+      [
+        3108.1,
+        132
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nFast food companies spend billions of dollars every year on ads that are aimed at children. These commercials often use cartoon characters, bright colors, and free toys to make kids want to eat there. Young children cannot always tell the difference between an ad and a regular TV show, so they believe what the ads say. This is a problem because eating too much fast food can lead to health issues like obesity and diabetes. I believe the government should put stronger limits on food ads that target kids, the same way it does for cigarette ads.\n\"\"\"\n\nThe writer selected the phrase \"are aimed at\" in this sentence (marked with [[ ]]):\nFast food companies spend billions of dollars every year on ads that [[are aimed at]] children.\n\nGive 10 single words that can replace \"are aimed at\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 320,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p09-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "cade2be45e4b60e54f2cb9feb68d0fccedbcf47fd8a0d666ce3d4637b24a284b",
+  "seed": 2412731590358485180,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"select\", \"choose\", \"find\", \"decide\", \"wear\", \"buy\", \"select\", \"opt\", \"find\", \"choose\"]}\n",
+  "timing": {
+    "first_text_ms": 484.6,
+    "option_ms": [
+      814.2,
+      996.5,
+      1173.8,
+      1412.8,
+      1591.7,
+      1772.9,
+      1960.6,
+      2141.1,
+      2320.6,
+      2500.2
+    ],
+    "total_ms": 2681.6,
+    "stream": [
+      [
+        484.6,
+        2
+      ],
+      [
+        555.6,
+        9
+      ],
+      [
+        624.8,
+        11
+      ],
+      [
+        689.5,
+        14
+      ],
+      [
+        753.1,
+        20
+      ],
+      [
+        814.2,
+        22
+      ],
+      [
+        875.6,
+        24
+      ],
+      [
+        936.9,
+        30
+      ],
+      [
+        996.5,
+        32
+      ],
+      [
+        1056.0,
+        34
+      ],
+      [
+        1114.9,
+        38
+      ],
+      [
+        1173.8,
+        40
+      ],
+      [
+        1233.0,
+        42
+      ],
+      [
+        1293.3,
+        45
+      ],
+      [
+        1352.2,
+        48
+      ],
+      [
+        1412.8,
+        50
+      ],
+      [
+        1471.8,
+        52
+      ],
+      [
+        1531.3,
+        56
+      ],
+      [
+        1591.7,
+        58
+      ],
+      [
+        1652.1,
+        60
+      ],
+      [
+        1712.5,
+        63
+      ],
+      [
+        1772.9,
+        65
+      ],
+      [
+        1834.5,
+        67
+      ],
+      [
+        1895.9,
+        73
+      ],
+      [
+        1960.6,
+        75
+      ],
+      [
+        2021.1,
+        77
+      ],
+      [
+        2080.7,
+        80
+      ],
+      [
+        2141.1,
+        82
+      ],
+      [
+        2200.8,
+        84
+      ],
+      [
+        2261.0,
+        88
+      ],
+      [
+        2320.6,
+        90
+      ],
+      [
+        2380.3,
+        92
+      ],
+      [
+        2440.2,
+        98
+      ],
+      [
+        2500.2,
+        101
+      ],
+      [
+        2620.8,
+        102
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSome people think school uniforms are a bad idea, but I think they help students in many ways. First, uniforms make it harder for kids to judge each other based on how much their clothes cost. When everyone wears the same thing, students from poor families do not stand out as much. Second, uniforms save time in the morning because students do not have to pick out an outfit every day. Critics say that uniforms take away students' freedom to express themselves. However, students can still show who they are through their hobbies, their writing, and the way they treat others.\n\"\"\"\n\nThe writer selected the phrase \"pick out\" in this sentence (marked with [[ ]]):\nSecond, uniforms save time in the morning because students do not have to [[pick out]] an outfit every day.\n\nGive 10 single words that can replace \"pick out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 331,
+  "new_tokens": 37,
+  "finish_reason": "stop",
+  "error": null
+}

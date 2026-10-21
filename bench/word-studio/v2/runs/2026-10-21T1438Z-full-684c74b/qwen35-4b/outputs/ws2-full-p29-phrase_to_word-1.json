@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p29-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "b57f5ab5c1ff806f1dc06bd9a495993b1b8e5101d33ec030c8a27cbd392d389c",
+  "seed": 5389832075417500606,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"persisting\", \"striving\", \"advocating\", \"laboring\", \"pushing\", \"persist\", \"strive\", \"advocate\", \"pressing\", \"continuing\"]}\n",
+  "timing": {
+    "first_text_ms": 529.4,
+    "option_ms": [
+      898.2,
+      1167.2,
+      1468.7,
+      1708.4,
+      1947.9,
+      2127.9,
+      2368.6,
+      2613.7,
+      2854.0,
+      3098.7
+    ],
+    "total_ms": 3278.7,
+    "stream": [
+      [
+        529.4,
+        2
+      ],
+      [
+        590.3,
+        9
+      ],
+      [
+        650.1,
+        11
+      ],
+      [
+        712.1,
+        14
+      ],
+      [
+        771.6,
+        21
+      ],
+      [
+        838.1,
+        24
+      ],
+      [
+        898.2,
+        26
+      ],
+      [
+        959.6,
+        28
+      ],
+      [
+        1019.5,
+        31
+      ],
+      [
+        1079.5,
+        36
+      ],
+      [
+        1167.2,
+        38
+      ],
+      [
+        1228.1,
+        40
+      ],
+      [
+        1288.2,
+        43
+      ],
+      [
+        1349.2,
+        45
+      ],
+      [
+        1408.5,
+        50
+      ],
+      [
+        1468.7,
+        52
+      ],
+      [
+        1528.5,
+        54
+      ],
+      [
+        1588.1,
+        59
+      ],
+      [
+        1647.4,
+        62
+      ],
+      [
+        1708.4,
+        64
+      ],
+      [
+        1767.8,
+        66
+      ],
+      [
+        1827.9,
+        70
+      ],
+      [
+        1887.3,
+        73
+      ],
+      [
+        1947.9,
+        75
+      ],
+      [
+        2008.2,
+        77
+      ],
+      [
+        2068.2,
+        84
+      ],
+      [
+        2127.9,
+        86
+      ],
+      [
+        2187.6,
+        88
+      ],
+      [
+        2247.2,
+        91
+      ],
+      [
+        2308.2,
+        94
+      ],
+      [
+        2368.6,
+        96
+      ],
+      [
+        2428.8,
+        98
+      ],
+      [
+        2493.8,
+        101
+      ],
+      [
+        2553.8,
+        106
+      ],
+      [
+        2613.7,
+        108
+      ],
+      [
+        2673.3,
+        110
+      ],
+      [
+        2734.8,
+        115
+      ],
+      [
+        2793.8,
+        118
+      ],
+      [
+        2854.0,
+        120
+      ],
+      [
+        2915.1,
+        122
+      ],
+      [
+        2977.2,
+        128
+      ],
+      [
+        3038.6,
+        132
+      ],
+      [
+        3098.7,
+        135
+      ],
+      [
+        3218.6,
+        136
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe fight for women's right to vote in the United States lasted for more than seventy years. It officially began at the Seneca Falls Convention in 1848, where activists like Elizabeth Cady Stanton demanded equal rights for women. For decades, suffragists gave speeches, marched in parades, and even went to jail for their cause. Many people at the time thought that women were too emotional to make decisions about politics. Finally, in 1920, the 19th Amendment was passed, which gave women the right to vote. This victory showed that ordinary people can change the law if they keep pushing for it.\n\"\"\"\n\nThe writer selected the phrase \"keep pushing for it\" in this sentence (marked with [[ ]]):\nThis victory showed that ordinary people can change the law if they [[keep pushing for it]].\n\nGive 10 single words that can replace \"keep pushing for it\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 346,
+  "new_tokens": 46,
+  "finish_reason": "stop",
+  "error": null
+}

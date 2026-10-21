@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p11-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "37a5eba4f2e439964c03b073e04e2360f49b61da80ee30447cbe14f52dc6f51f",
+  "seed": 5675729578451706249,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"capped\", \"restricted\", \"limited\", \"bound\", \"curbed\", \"constrained\", \"regulated\", \"governed\", \"controlled\", \"restricted\"]}\n",
+  "timing": {
+    "first_text_ms": 494.3,
+    "option_ms": [
+      866.9,
+      1049.1,
+      1233.4,
+      1415.9,
+      1660.6,
+      1907.8,
+      2090.4,
+      2391.1,
+      2570.3,
+      2754.3
+    ],
+    "total_ms": 2935.2,
+    "stream": [
+      [
+        494.3,
+        2
+      ],
+      [
+        558.2,
+        9
+      ],
+      [
+        622.3,
+        11
+      ],
+      [
+        682.5,
+        14
+      ],
+      [
+        744.5,
+        15
+      ],
+      [
+        804.8,
+        20
+      ],
+      [
+        866.9,
+        22
+      ],
+      [
+        928.2,
+        24
+      ],
+      [
+        988.6,
+        34
+      ],
+      [
+        1049.1,
+        36
+      ],
+      [
+        1110.8,
+        38
+      ],
+      [
+        1172.5,
+        45
+      ],
+      [
+        1233.4,
+        47
+      ],
+      [
+        1294.7,
+        49
+      ],
+      [
+        1355.2,
+        54
+      ],
+      [
+        1415.9,
+        56
+      ],
+      [
+        1476.5,
+        58
+      ],
+      [
+        1537.3,
+        61
+      ],
+      [
+        1598.0,
+        64
+      ],
+      [
+        1660.6,
+        66
+      ],
+      [
+        1721.3,
+        68
+      ],
+      [
+        1783.4,
+        71
+      ],
+      [
+        1845.5,
+        79
+      ],
+      [
+        1907.8,
+        81
+      ],
+      [
+        1968.1,
+        83
+      ],
+      [
+        2028.2,
+        92
+      ],
+      [
+        2090.4,
+        94
+      ],
+      [
+        2150.2,
+        96
+      ],
+      [
+        2210.1,
+        97
+      ],
+      [
+        2270.5,
+        102
+      ],
+      [
+        2330.5,
+        104
+      ],
+      [
+        2391.1,
+        106
+      ],
+      [
+        2450.8,
+        108
+      ],
+      [
+        2510.7,
+        118
+      ],
+      [
+        2570.3,
+        120
+      ],
+      [
+        2633.2,
+        122
+      ],
+      [
+        2693.1,
+        132
+      ],
+      [
+        2754.3,
+        135
+      ],
+      [
+        2874.9,
+        136
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nDuring the Industrial Revolution, a lot of children worked in factories and mines instead of going to school. Some of them were only six or seven years old, and they often worked twelve hours a day. The conditions were very dangerous, and many children got hurt by the machines or became sick from breathing in dust. Factory owners liked hiring kids because they could pay them less money than adults. Over time, reformers wrote articles and gave speeches about how bad the situation was. In Britain, the Factory Act of 1833 finally set limits on how many hours children could work.\n\"\"\"\n\nThe writer selected the phrase \"set limits on\" in this sentence (marked with [[ ]]):\nIn Britain, the Factory Act of 1833 finally [[set limits on]] how many hours children could work.\n\nGive 10 single words that can replace \"set limits on\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 337,
+  "new_tokens": 41,
+  "finish_reason": "stop",
+  "error": null
+}

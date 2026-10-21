@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p11-condense-1",
+  "kind": "condense",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "c92412b2c9923741ea7cc8e71055119846256f802e2587e8119df8ed28c6a92d",
+  "seed": 5407582138152017745,
+  "max_new_tokens": 640,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Factory owners hired kids to save money.\", \"Kids were cheaper for factory owners.\", \"Factory owners paid kids less than adults.\", \"Factory owners preferred hiring children for lower wages.\", \"Hiring kids allowed factory owners to cut costs.\"]}",
+  "timing": {
+    "first_text_ms": 161.7,
+    "option_ms": [
+      614.9,
+      940.0,
+      1308.0,
+      1717.0,
+      2187.9
+    ],
+    "total_ms": 2296.8,
+    "stream": [
+      [
+        161.7,
+        2
+      ],
+      [
+        203.8,
+        9
+      ],
+      [
+        246.7,
+        11
+      ],
+      [
+        287.8,
+        14
+      ],
+      [
+        330.2,
+        21
+      ],
+      [
+        370.5,
+        28
+      ],
+      [
+        411.1,
+        34
+      ],
+      [
+        451.8,
+        39
+      ],
+      [
+        493.7,
+        42
+      ],
+      [
+        534.3,
+        47
+      ],
+      [
+        574.9,
+        53
+      ],
+      [
+        614.9,
+        56
+      ],
+      [
+        655.8,
+        58
+      ],
+      [
+        696.0,
+        62
+      ],
+      [
+        737.8,
+        67
+      ],
+      [
+        778.2,
+        75
+      ],
+      [
+        818.3,
+        79
+      ],
+      [
+        859.2,
+        87
+      ],
+      [
+        899.7,
+        94
+      ],
+      [
+        940.0,
+        97
+      ],
+      [
+        980.6,
+        99
+      ],
+      [
+        1021.3,
+        106
+      ],
+      [
+        1062.4,
+        113
+      ],
+      [
+        1103.2,
+        118
+      ],
+      [
+        1144.6,
+        123
+      ],
+      [
+        1185.3,
+        128
+      ],
+      [
+        1226.9,
+        133
+      ],
+      [
+        1267.5,
+        140
+      ],
+      [
+        1308.0,
+        143
+      ],
+      [
+        1348.6,
+        145
+      ],
+      [
+        1389.3,
+        152
+      ],
+      [
+        1430.0,
+        159
+      ],
+      [
+        1470.9,
+        169
+      ],
+      [
+        1512.1,
+        176
+      ],
+      [
+        1552.9,
+        185
+      ],
+      [
+        1593.5,
+        189
+      ],
+      [
+        1634.6,
+        195
+      ],
+      [
+        1675.2,
+        201
+      ],
+      [
+        1717.0,
+        204
+      ],
+      [
+        1760.3,
+        206
+      ],
+      [
+        1801.6,
+        207
+      ],
+      [
+        1843.2,
+        212
+      ],
+      [
+        1885.5,
+        217
+      ],
+      [
+        1927.5,
+        225
+      ],
+      [
+        1974.7,
+        233
+      ],
+      [
+        2017.8,
+        240
+      ],
+      [
+        2059.3,
+        243
+      ],
+      [
+        2101.1,
+        247
+      ],
+      [
+        2144.7,
+        253
+      ],
+      [
+        2187.9,
+        255
+      ],
+      [
+        2234.9,
+        257
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nDuring the Industrial Revolution, a lot of children worked in factories and mines instead of going to school. Some of them were only six or seven years old, and they often worked twelve hours a day. The conditions were very dangerous, and many children got hurt by the machines or became sick from breathing in dust. Factory owners liked hiring kids because they could pay them less money than adults. Over time, reformers wrote articles and gave speeches about how bad the situation was. In Britain, the Factory Act of 1833 finally set limits on how many hours children could work.\n\"\"\"\n\nThe writer selected this text:\n\"\"\"\nFactory owners liked hiring kids because they could pay them less money than adults.\n\"\"\"\n\nGive 5 different rewrites of the selected text that say the same thing in fewer words. Keep every fact, name, number and quotation, and keep the claim exactly as strong or as uncertain as it is. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 345,
+  "new_tokens": 52,
+  "finish_reason": "stop",
+  "error": null
+}

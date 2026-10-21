@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p12-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "89b442b71506d644677682b23b8b3456bcc5d9ad47882dd8e7f943caf7cc9090",
+  "seed": 8197776874418178534,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"evolve\", \"adapt\", \"develop resistance\", \"mutate\", \"alter\", \"transform\", \"shift\", \"modify\", \"develop\", \"adjust\"]}\n",
+  "timing": {
+    "first_text_ms": 516.1,
+    "option_ms": [
+      880.4,
+      1061.1,
+      1297.7,
+      1537.5,
+      1718.0,
+      1895.9,
+      2076.0,
+      2256.4,
+      2435.2,
+      2615.5
+    ],
+    "total_ms": 2795.5,
+    "stream": [
+      [
+        516.1,
+        2
+      ],
+      [
+        578.6,
+        9
+      ],
+      [
+        640.8,
+        11
+      ],
+      [
+        702.0,
+        14
+      ],
+      [
+        761.1,
+        16
+      ],
+      [
+        820.9,
+        20
+      ],
+      [
+        880.4,
+        22
+      ],
+      [
+        941.9,
+        24
+      ],
+      [
+        1001.7,
+        29
+      ],
+      [
+        1061.1,
+        31
+      ],
+      [
+        1120.1,
+        33
+      ],
+      [
+        1179.7,
+        40
+      ],
+      [
+        1238.6,
+        51
+      ],
+      [
+        1297.7,
+        53
+      ],
+      [
+        1357.2,
+        55
+      ],
+      [
+        1416.9,
+        58
+      ],
+      [
+        1476.7,
+        61
+      ],
+      [
+        1537.5,
+        63
+      ],
+      [
+        1598.4,
+        65
+      ],
+      [
+        1658.8,
+        70
+      ],
+      [
+        1718.0,
+        72
+      ],
+      [
+        1776.8,
+        74
+      ],
+      [
+        1836.5,
+        83
+      ],
+      [
+        1895.9,
+        85
+      ],
+      [
+        1956.5,
+        87
+      ],
+      [
+        2015.5,
+        92
+      ],
+      [
+        2076.0,
+        94
+      ],
+      [
+        2135.8,
+        96
+      ],
+      [
+        2196.6,
+        102
+      ],
+      [
+        2256.4,
+        104
+      ],
+      [
+        2316.2,
+        106
+      ],
+      [
+        2375.4,
+        113
+      ],
+      [
+        2435.2,
+        115
+      ],
+      [
+        2494.6,
+        117
+      ],
+      [
+        2555.3,
+        123
+      ],
+      [
+        2615.5,
+        126
+      ],
+      [
+        2735.3,
+        127
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nAntibiotics are medicines that kill bacteria, and they have saved millions of lives since they were discovered. The problem is that bacteria can change over time so that the medicine does not work on them anymore. This happens faster when people take antibiotics they do not really need, like for a cold, which is caused by a virus. It also happens when people stop taking their pills early because they start to feel better. If this keeps going, simple infections could become deadly again. To stop this, doctors need to be careful about giving out antibiotics, and patients need to finish the whole treatment.\n\"\"\"\n\nThe writer tapped the word \"change\" in this sentence (marked with [[ ]]):\nThe problem is that bacteria can [[change]] over time so that the medicine does not work on them anymore.\n\nGive 10 replacements for \"change\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"change\" without changing the rest of the sentence. Do not repeat \"change\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 353,
+  "new_tokens": 39,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p33-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "72730fea44961261a2b7711501b71730a341719cc6863accb569fc9ae7e9a44f",
+  "seed": 6374988018344898022,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"admires\", \"respects\", \"trusts\", \"follows\", \"values\", \"cherishes\", \"resembles\", \"watches\", \"observes\", \"honors\"]}\n",
+  "timing": {
+    "first_text_ms": 516.6,
+    "option_ms": [
+      883.9,
+      1128.0,
+      1374.0,
+      1621.1,
+      1801.7,
+      2041.1,
+      2298.7,
+      2542.7,
+      2783.3,
+      3026.8
+    ],
+    "total_ms": 3210.0,
+    "stream": [
+      [
+        516.6,
+        2
+      ],
+      [
+        580.2,
+        9
+      ],
+      [
+        641.2,
+        11
+      ],
+      [
+        702.6,
+        14
+      ],
+      [
+        762.9,
+        17
+      ],
+      [
+        823.4,
+        21
+      ],
+      [
+        883.9,
+        23
+      ],
+      [
+        945.1,
+        25
+      ],
+      [
+        1005.6,
+        28
+      ],
+      [
+        1066.1,
+        33
+      ],
+      [
+        1128.0,
+        35
+      ],
+      [
+        1188.6,
+        37
+      ],
+      [
+        1250.1,
+        42
+      ],
+      [
+        1311.6,
+        43
+      ],
+      [
+        1374.0,
+        45
+      ],
+      [
+        1436.7,
+        47
+      ],
+      [
+        1497.6,
+        53
+      ],
+      [
+        1560.1,
+        54
+      ],
+      [
+        1621.1,
+        56
+      ],
+      [
+        1681.3,
+        58
+      ],
+      [
+        1741.2,
+        64
+      ],
+      [
+        1801.7,
+        66
+      ],
+      [
+        1861.5,
+        68
+      ],
+      [
+        1921.3,
+        72
+      ],
+      [
+        1981.1,
+        77
+      ],
+      [
+        2041.1,
+        79
+      ],
+      [
+        2100.9,
+        81
+      ],
+      [
+        2165.0,
+        83
+      ],
+      [
+        2238.0,
+        90
+      ],
+      [
+        2298.7,
+        92
+      ],
+      [
+        2358.6,
+        94
+      ],
+      [
+        2418.8,
+        95
+      ],
+      [
+        2479.8,
+        101
+      ],
+      [
+        2542.7,
+        103
+      ],
+      [
+        2603.1,
+        105
+      ],
+      [
+        2663.7,
+        108
+      ],
+      [
+        2723.5,
+        113
+      ],
+      [
+        2783.3,
+        115
+      ],
+      [
+        2844.5,
+        117
+      ],
+      [
+        2905.5,
+        120
+      ],
+      [
+        2965.9,
+        123
+      ],
+      [
+        3026.8,
+        126
+      ],
+      [
+        3148.4,
+        127
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSince my mom works night shifts at the hospital, I have been taking care of my little brother after school since I was thirteen. I help him with his homework, make him dinner, and make sure he goes to bed on time. Some days it is stressful, especially when I have a big test the next morning. But taking care of him has made me more patient and responsible than most kids my age. I have learned how to manage my time and stay calm when things do not go as planned. My brother looks up to me, and that makes all the hard work worth it.\n\"\"\"\n\nThe writer selected the phrase \"looks up to\" in this sentence (marked with [[ ]]):\nMy brother [[looks up to]] me, and that makes all the hard work worth it.\n\nGive 10 single words that can replace \"looks up to\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 332,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

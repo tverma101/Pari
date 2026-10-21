@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p24-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "bb631b2788b0e67abee0435bef44ade6c9726c1de50410bb7821e4f5bb2aa6e6",
+  "seed": 8540603052830620490,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"repeatedly\", \"constantly\", \"frequently\", \"repeatedly\", \"time after time\", \"again and again\", \"repeatedly\", \"over and over again\", \"continually\", \"multiple times\"]}",
+  "timing": {
+    "first_text_ms": 165.1,
+    "option_ms": [
+      456.1,
+      620.3,
+      786.2,
+      992.1,
+      1201.4,
+      1411.7,
+      1618.1,
+      1872.6,
+      2064.8,
+      2236.0
+    ],
+    "total_ms": 2278.3,
+    "stream": [
+      [
+        165.1,
+        2
+      ],
+      [
+        209.3,
+        9
+      ],
+      [
+        250.5,
+        11
+      ],
+      [
+        291.9,
+        14
+      ],
+      [
+        333.0,
+        16
+      ],
+      [
+        373.6,
+        22
+      ],
+      [
+        414.5,
+        24
+      ],
+      [
+        456.1,
+        26
+      ],
+      [
+        496.6,
+        28
+      ],
+      [
+        537.6,
+        33
+      ],
+      [
+        578.9,
+        38
+      ],
+      [
+        620.3,
+        40
+      ],
+      [
+        662.1,
+        42
+      ],
+      [
+        703.5,
+        43
+      ],
+      [
+        744.9,
+        52
+      ],
+      [
+        786.2,
+        54
+      ],
+      [
+        827.2,
+        56
+      ],
+      [
+        867.6,
+        58
+      ],
+      [
+        908.6,
+        64
+      ],
+      [
+        950.6,
+        66
+      ],
+      [
+        992.1,
+        68
+      ],
+      [
+        1034.2,
+        70
+      ],
+      [
+        1075.9,
+        74
+      ],
+      [
+        1117.7,
+        80
+      ],
+      [
+        1159.8,
+        85
+      ],
+      [
+        1201.4,
+        87
+      ],
+      [
+        1245.1,
+        89
+      ],
+      [
+        1287.2,
+        94
+      ],
+      [
+        1328.3,
+        98
+      ],
+      [
+        1370.4,
+        104
+      ],
+      [
+        1411.7,
+        106
+      ],
+      [
+        1452.8,
+        108
+      ],
+      [
+        1493.4,
+        110
+      ],
+      [
+        1535.4,
+        116
+      ],
+      [
+        1576.5,
+        118
+      ],
+      [
+        1618.1,
+        120
+      ],
+      [
+        1659.6,
+        122
+      ],
+      [
+        1701.8,
+        126
+      ],
+      [
+        1748.6,
+        130
+      ],
+      [
+        1790.9,
+        135
+      ],
+      [
+        1831.8,
+        141
+      ],
+      [
+        1872.6,
+        143
+      ],
+      [
+        1914.5,
+        145
+      ],
+      [
+        1955.6,
+        151
+      ],
+      [
+        2006.8,
+        156
+      ],
+      [
+        2064.8,
+        158
+      ],
+      [
+        2108.9,
+        160
+      ],
+      [
+        2150.7,
+        168
+      ],
+      [
+        2192.8,
+        174
+      ],
+      [
+        2236.0,
+        177
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Frankenstein, Mary Shelley shows that the creature becomes a monster because of how he is treated. When he is first created, the creature is gentle and wants to be loved. However, every person who sees him is scared of his appearance and attacks him or runs away. Even Victor Frankenstein, the man who made him, abandons him right after bringing him to life. The creature says, \"I was benevolent and good; misery made me a fiend.\" This line shows that his anger comes from being rejected over and over, not from his nature.\n\"\"\"\n\nThe writer selected the phrase \"over and over\" in this sentence (marked with [[ ]]):\nThis line shows that his anger comes from being rejected [[over and over]], not from his nature.\n\nGive 10 single words that can replace \"over and over\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 358,
+  "new_tokens": 51,
+  "finish_reason": "stop",
+  "error": null
+}

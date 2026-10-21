@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p09-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "7d0c500e9bc432f8491929362b45f03e21c75909ea32b09446d8b4cede99cbad",
+  "seed": 7735302412533530886,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"low-income families\", \"less affluent families\", \"working-class families\", \"working families\", \"middle-class families\", \"working-class\", \"working families\", \"middle-income families\", \"less well-off families\", \"working families\"]}",
+  "timing": {
+    "first_text_ms": 145.4,
+    "option_ms": [
+      433.9,
+      637.9,
+      842.7,
+      1005.8,
+      1209.4,
+      1373.1,
+      1535.8,
+      1746.7,
+      2011.2,
+      2182.2
+    ],
+    "total_ms": 2224.8,
+    "stream": [
+      [
+        145.4,
+        2
+      ],
+      [
+        187.4,
+        9
+      ],
+      [
+        228.3,
+        11
+      ],
+      [
+        268.8,
+        14
+      ],
+      [
+        309.2,
+        17
+      ],
+      [
+        350.3,
+        24
+      ],
+      [
+        392.7,
+        33
+      ],
+      [
+        433.9,
+        35
+      ],
+      [
+        475.7,
+        37
+      ],
+      [
+        516.2,
+        41
+      ],
+      [
+        556.6,
+        50
+      ],
+      [
+        597.5,
+        59
+      ],
+      [
+        637.9,
+        61
+      ],
+      [
+        679.3,
+        63
+      ],
+      [
+        721.2,
+        70
+      ],
+      [
+        762.3,
+        76
+      ],
+      [
+        802.5,
+        85
+      ],
+      [
+        842.7,
+        87
+      ],
+      [
+        883.1,
+        89
+      ],
+      [
+        923.3,
+        96
+      ],
+      [
+        964.4,
+        105
+      ],
+      [
+        1005.8,
+        107
+      ],
+      [
+        1046.2,
+        109
+      ],
+      [
+        1086.6,
+        115
+      ],
+      [
+        1127.1,
+        121
+      ],
+      [
+        1167.9,
+        130
+      ],
+      [
+        1209.4,
+        132
+      ],
+      [
+        1249.5,
+        134
+      ],
+      [
+        1289.8,
+        141
+      ],
+      [
+        1330.2,
+        147
+      ],
+      [
+        1373.1,
+        149
+      ],
+      [
+        1413.8,
+        151
+      ],
+      [
+        1454.7,
+        158
+      ],
+      [
+        1495.1,
+        167
+      ],
+      [
+        1535.8,
+        169
+      ],
+      [
+        1576.4,
+        171
+      ],
+      [
+        1617.0,
+        177
+      ],
+      [
+        1659.4,
+        184
+      ],
+      [
+        1704.2,
+        193
+      ],
+      [
+        1746.7,
+        195
+      ],
+      [
+        1787.3,
+        197
+      ],
+      [
+        1828.3,
+        201
+      ],
+      [
+        1868.9,
+        206
+      ],
+      [
+        1909.4,
+        210
+      ],
+      [
+        1956.3,
+        219
+      ],
+      [
+        2011.2,
+        221
+      ],
+      [
+        2058.4,
+        223
+      ],
+      [
+        2098.8,
+        230
+      ],
+      [
+        2139.5,
+        239
+      ],
+      [
+        2182.2,
+        242
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nSome people think school uniforms are a bad idea, but I think they help students in many ways. First, uniforms make it harder for kids to judge each other based on how much their clothes cost. When everyone wears the same thing, students from poor families do not stand out as much. Second, uniforms save time in the morning because students do not have to pick out an outfit every day. Critics say that uniforms take away students' freedom to express themselves. However, students can still show who they are through their hobbies, their writing, and the way they treat others.\n\"\"\"\n\nThe writer tapped the word \"poor\" in this sentence (marked with [[ ]]):\nWhen everyone wears the same thing, students from [[poor]] families do not stand out as much.\n\nGive 10 replacements for \"poor\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"poor\" without changing the rest of the sentence. Do not repeat \"poor\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 381,
+  "new_tokens": 51,
+  "finish_reason": "stop",
+  "error": null
+}

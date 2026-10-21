@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p35-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "b48b758059bb906eec384b4eb19e2b26bd7f9881622952c6364f1442e545e18b",
+  "seed": 5545437395571638856,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"outpace\", \"surpass\", \"excel\", \"outdo\", \"outstrip\", \"overtake\", \"outperform\", \"triumph over\", \"top\", \"best\"]}",
+  "timing": {
+    "first_text_ms": 191.6,
+    "option_ms": [
+      464.4,
+      643.6,
+      778.7,
+      958.3,
+      1138.1,
+      1365.0,
+      1545.0,
+      1816.1,
+      1952.7,
+      2089.1
+    ],
+    "total_ms": 2180.0,
+    "stream": [
+      [
+        191.6,
+        2
+      ],
+      [
+        238.3,
+        9
+      ],
+      [
+        284.4,
+        11
+      ],
+      [
+        330.0,
+        14
+      ],
+      [
+        374.8,
+        17
+      ],
+      [
+        419.4,
+        21
+      ],
+      [
+        464.4,
+        23
+      ],
+      [
+        509.5,
+        25
+      ],
+      [
+        554.3,
+        28
+      ],
+      [
+        599.1,
+        32
+      ],
+      [
+        643.6,
+        34
+      ],
+      [
+        689.0,
+        36
+      ],
+      [
+        734.1,
+        41
+      ],
+      [
+        778.7,
+        43
+      ],
+      [
+        823.1,
+        45
+      ],
+      [
+        868.1,
+        48
+      ],
+      [
+        913.4,
+        50
+      ],
+      [
+        958.3,
+        52
+      ],
+      [
+        1003.1,
+        54
+      ],
+      [
+        1047.7,
+        57
+      ],
+      [
+        1093.1,
+        62
+      ],
+      [
+        1138.1,
+        64
+      ],
+      [
+        1182.9,
+        66
+      ],
+      [
+        1229.1,
+        67
+      ],
+      [
+        1274.6,
+        71
+      ],
+      [
+        1319.9,
+        74
+      ],
+      [
+        1365.0,
+        76
+      ],
+      [
+        1409.8,
+        78
+      ],
+      [
+        1454.6,
+        81
+      ],
+      [
+        1499.9,
+        88
+      ],
+      [
+        1545.0,
+        90
+      ],
+      [
+        1589.8,
+        92
+      ],
+      [
+        1635.0,
+        94
+      ],
+      [
+        1680.5,
+        97
+      ],
+      [
+        1725.9,
+        99
+      ],
+      [
+        1770.9,
+        104
+      ],
+      [
+        1816.1,
+        106
+      ],
+      [
+        1861.9,
+        108
+      ],
+      [
+        1907.4,
+        111
+      ],
+      [
+        1952.7,
+        113
+      ],
+      [
+        1997.9,
+        115
+      ],
+      [
+        2043.7,
+        119
+      ],
+      [
+        2089.1,
+        121
+      ],
+      [
+        2134.3,
+        122
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nOn July 20, 1969, Neil Armstrong became the first person to walk on the moon. The Apollo 11 mission was the result of years of hard work by thousands of scientists, engineers, and astronauts. The United States wanted to beat the Soviet Union in the space race, which was part of the larger Cold War. Millions of people around the world watched the landing live on television. The mission showed what humans can do when they work together toward a big goal. It also led to new technologies that we still use today.\n\"\"\"\n\nThe writer tapped the word \"beat\" in this sentence (marked with [[ ]]):\nThe United States wanted to [[beat]] the Soviet Union in the space race, which was part of the larger Cold War.\n\nGive 10 replacements for \"beat\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"beat\" without changing the rest of the sentence. Do not repeat \"beat\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 327,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p34-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "2d66de61a7d55b0305c6df12a6f7b7332b97d31338fc0df4d3f67e1e5fd63b09",
+  "seed": 5000777542145828850,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"generate\", \"amass\", \"produce\", \"create\", \"accumulate\", \"derive\", \"reap\", \"yield\", \"harvest\", \"produce\"]}",
+  "timing": {
+    "first_text_ms": 185.3,
+    "option_ms": [
+      414.2,
+      592.6,
+      727.2,
+      861.5,
+      1041.1,
+      1175.8,
+      1355.8,
+      1491.6,
+      1672.9,
+      1823.2
+    ],
+    "total_ms": 1918.2,
+    "stream": [
+      [
+        185.3,
+        2
+      ],
+      [
+        232.1,
+        9
+      ],
+      [
+        278.5,
+        11
+      ],
+      [
+        324.0,
+        14
+      ],
+      [
+        368.7,
+        22
+      ],
+      [
+        414.2,
+        24
+      ],
+      [
+        459.2,
+        26
+      ],
+      [
+        503.8,
+        28
+      ],
+      [
+        548.3,
+        31
+      ],
+      [
+        592.6,
+        33
+      ],
+      [
+        637.7,
+        35
+      ],
+      [
+        682.6,
+        42
+      ],
+      [
+        727.2,
+        44
+      ],
+      [
+        771.7,
+        46
+      ],
+      [
+        816.4,
+        52
+      ],
+      [
+        861.5,
+        54
+      ],
+      [
+        906.4,
+        56
+      ],
+      [
+        951.0,
+        59
+      ],
+      [
+        995.8,
+        66
+      ],
+      [
+        1041.1,
+        68
+      ],
+      [
+        1086.1,
+        70
+      ],
+      [
+        1131.2,
+        76
+      ],
+      [
+        1175.8,
+        78
+      ],
+      [
+        1220.5,
+        80
+      ],
+      [
+        1265.9,
+        82
+      ],
+      [
+        1310.9,
+        84
+      ],
+      [
+        1355.8,
+        86
+      ],
+      [
+        1400.4,
+        88
+      ],
+      [
+        1446.1,
+        93
+      ],
+      [
+        1491.6,
+        95
+      ],
+      [
+        1537.2,
+        97
+      ],
+      [
+        1582.4,
+        100
+      ],
+      [
+        1627.7,
+        104
+      ],
+      [
+        1672.9,
+        106
+      ],
+      [
+        1717.8,
+        108
+      ],
+      [
+        1763.5,
+        115
+      ],
+      [
+        1823.2,
+        117
+      ],
+      [
+        1873.0,
+        118
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nCollege athletes bring in millions of dollars for their schools, but for a long time they were not allowed to earn any of it. Big football and basketball programs sell tickets, jerseys, and TV rights, while the players who make it all possible get nothing except a scholarship. Many athletes spend more than forty hours a week on their sport, which makes it hard to keep a part-time job. In 2021, new rules finally let athletes make money from their name and image. I think this was a fair change, and schools should go even further by sharing some of their profits with players.\n\"\"\"\n\nThe writer selected the phrase \"bring in\" in this sentence (marked with [[ ]]):\nCollege athletes [[bring in]] millions of dollars for their schools, but for a long time they were not allowed to earn any of it.\n\nGive 10 single words that can replace \"bring in\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 321,
+  "new_tokens": 39,
+  "finish_reason": "stop",
+  "error": null
+}

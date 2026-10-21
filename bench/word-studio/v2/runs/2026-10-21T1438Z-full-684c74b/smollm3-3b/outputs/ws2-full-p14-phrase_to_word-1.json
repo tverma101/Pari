@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p14-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "f2685682be042caddb6083ea743284a72b4891c2e1f3b5f9abe7c3b86fdf523f",
+  "seed": 6442771966930353323,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"examine\", \"study\", \"investigate\", \"analyze\", \"scrutinize\", \"review\", \"expose\", \"scrutinize\", \"check\", \"evaluate\"]}",
+  "timing": {
+    "first_text_ms": 163.9,
+    "option_ms": [
+      411.2,
+      536.1,
+      700.9,
+      824.2,
+      1033.2,
+      1155.7,
+      1319.4,
+      1529.0,
+      1653.0,
+      1776.9
+    ],
+    "total_ms": 1818.5,
+    "stream": [
+      [
+        163.9,
+        2
+      ],
+      [
+        206.1,
+        9
+      ],
+      [
+        247.2,
+        11
+      ],
+      [
+        288.1,
+        14
+      ],
+      [
+        329.5,
+        16
+      ],
+      [
+        370.4,
+        21
+      ],
+      [
+        411.2,
+        23
+      ],
+      [
+        452.2,
+        25
+      ],
+      [
+        494.3,
+        30
+      ],
+      [
+        536.1,
+        32
+      ],
+      [
+        576.8,
+        34
+      ],
+      [
+        617.8,
+        40
+      ],
+      [
+        659.1,
+        45
+      ],
+      [
+        700.9,
+        47
+      ],
+      [
+        741.7,
+        49
+      ],
+      [
+        782.4,
+        56
+      ],
+      [
+        824.2,
+        58
+      ],
+      [
+        866.8,
+        60
+      ],
+      [
+        908.2,
+        63
+      ],
+      [
+        949.4,
+        65
+      ],
+      [
+        991.8,
+        70
+      ],
+      [
+        1033.2,
+        72
+      ],
+      [
+        1074.0,
+        74
+      ],
+      [
+        1115.2,
+        80
+      ],
+      [
+        1155.7,
+        82
+      ],
+      [
+        1196.9,
+        84
+      ],
+      [
+        1237.9,
+        86
+      ],
+      [
+        1278.7,
+        90
+      ],
+      [
+        1319.4,
+        92
+      ],
+      [
+        1361.8,
+        94
+      ],
+      [
+        1402.6,
+        97
+      ],
+      [
+        1443.9,
+        99
+      ],
+      [
+        1485.0,
+        104
+      ],
+      [
+        1529.0,
+        106
+      ],
+      [
+        1570.1,
+        108
+      ],
+      [
+        1611.3,
+        113
+      ],
+      [
+        1653.0,
+        115
+      ],
+      [
+        1694.3,
+        117
+      ],
+      [
+        1735.4,
+        125
+      ],
+      [
+        1776.9,
+        128
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nSome school districts have switched to a four-day school week to save money and give students more time to rest. Supporters say that teachers are less tired and students come to school more ready to learn. The extra day off can also be used for doctor appointments, jobs, or family time. However, the longer school days can be hard for younger kids who have trouble focusing for that long. Working parents might also have to pay for childcare on the fifth day, which could be a problem for families without much money. Before more districts make this change, they should look closely at how it affects students' learning.\n\"\"\"\n\nThe writer selected the phrase \"look closely at\" in this sentence (marked with [[ ]]):\nBefore more districts make this change, they should [[look closely at]] how it affects students' learning.\n\nGive 10 single words that can replace \"look closely at\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 365,
+  "new_tokens": 41,
+  "finish_reason": "stop",
+  "error": null
+}

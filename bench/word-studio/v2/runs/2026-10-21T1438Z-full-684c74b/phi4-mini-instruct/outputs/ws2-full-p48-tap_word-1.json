@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p48-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "5f010a16ab35896b8768cf6a18894a39361d69910643d511e7f2f91004b62b88",
+  "seed": 6137932450062732111,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"secure\", \"peaceful\", \"tranquil\", \"protected\", \"safe haven\", \"peaceful retreat\", \"quiet sanctuary\", \"peaceful abode\", \"harmonious environment\", \"peaceful refuge\"]}",
+  "timing": {
+    "first_text_ms": 188.5,
+    "option_ms": [
+      418.0,
+      597.3,
+      776.6,
+      910.6,
+      1095.4,
+      1320.0,
+      1502.3,
+      1728.3,
+      2000.9,
+      2229.4
+    ],
+    "total_ms": 2321.3,
+    "stream": [
+      [
+        188.5,
+        2
+      ],
+      [
+        235.3,
+        9
+      ],
+      [
+        281.1,
+        11
+      ],
+      [
+        326.7,
+        14
+      ],
+      [
+        373.3,
+        20
+      ],
+      [
+        418.0,
+        22
+      ],
+      [
+        462.7,
+        24
+      ],
+      [
+        507.4,
+        29
+      ],
+      [
+        552.6,
+        32
+      ],
+      [
+        597.3,
+        34
+      ],
+      [
+        641.8,
+        36
+      ],
+      [
+        686.5,
+        40
+      ],
+      [
+        731.5,
+        44
+      ],
+      [
+        776.6,
+        46
+      ],
+      [
+        821.4,
+        48
+      ],
+      [
+        866.1,
+        57
+      ],
+      [
+        910.6,
+        59
+      ],
+      [
+        956.8,
+        61
+      ],
+      [
+        1002.1,
+        65
+      ],
+      [
+        1048.5,
+        71
+      ],
+      [
+        1095.4,
+        73
+      ],
+      [
+        1139.8,
+        75
+      ],
+      [
+        1184.9,
+        80
+      ],
+      [
+        1229.8,
+        83
+      ],
+      [
+        1274.6,
+        91
+      ],
+      [
+        1320.0,
+        93
+      ],
+      [
+        1365.9,
+        95
+      ],
+      [
+        1412.3,
+        100
+      ],
+      [
+        1456.8,
+        110
+      ],
+      [
+        1502.3,
+        112
+      ],
+      [
+        1547.4,
+        114
+      ],
+      [
+        1592.4,
+        119
+      ],
+      [
+        1637.3,
+        122
+      ],
+      [
+        1683.0,
+        128
+      ],
+      [
+        1728.3,
+        130
+      ],
+      [
+        1773.6,
+        132
+      ],
+      [
+        1818.8,
+        136
+      ],
+      [
+        1864.3,
+        138
+      ],
+      [
+        1909.6,
+        142
+      ],
+      [
+        1955.8,
+        154
+      ],
+      [
+        2000.9,
+        156
+      ],
+      [
+        2046.9,
+        158
+      ],
+      [
+        2092.6,
+        163
+      ],
+      [
+        2138.1,
+        166
+      ],
+      [
+        2183.5,
+        173
+      ],
+      [
+        2229.4,
+        175
+      ],
+      [
+        2275.1,
+        176
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nSome people think public libraries are not needed anymore because everything is online, but I strongly disagree. Libraries give free internet and computers to people who cannot afford them at home. They also offer programs like reading groups for kids, job help for adults, and English classes for immigrants. For many people, the library is one of the only safe and quiet places where they can study. If cities cut library funding, the people who would be hurt the most are the ones who already have the least. That is why we should keep supporting our libraries.\n\"\"\"\n\nThe writer tapped the word \"safe\" in this sentence (marked with [[ ]]):\nFor many people, the library is one of the only [[safe]] and quiet places where they can study.\n\nGive 10 replacements for \"safe\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"safe\" without changing the rest of the sentence. Do not repeat \"safe\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 324,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

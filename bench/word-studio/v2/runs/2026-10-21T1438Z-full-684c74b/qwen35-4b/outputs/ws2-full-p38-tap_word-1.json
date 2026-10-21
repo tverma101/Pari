@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p38-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "d8eafa74f88f31a88e9704e854537883c2445dbde6e65503c50f534ba211ce76",
+  "seed": 8043312406648917064,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"disoriented\", \"uncertain\", \"adrift\", \"confused\", \"directionless\", \"lost\", \"unsettled\", \"aimless\", \"disconnected\", \"bewildered\"]}\n",
+  "timing": {
+    "first_text_ms": 528.9,
+    "option_ms": [
+      927.4,
+      1176.0,
+      1419.6,
+      1660.6,
+      1911.0,
+      2093.6,
+      2395.8,
+      2636.1,
+      2881.0,
+      3189.3
+    ],
+    "total_ms": 3377.1,
+    "stream": [
+      [
+        528.9,
+        2
+      ],
+      [
+        589.5,
+        9
+      ],
+      [
+        665.5,
+        11
+      ],
+      [
+        726.0,
+        14
+      ],
+      [
+        785.8,
+        17
+      ],
+      [
+        846.1,
+        25
+      ],
+      [
+        927.4,
+        27
+      ],
+      [
+        995.9,
+        29
+      ],
+      [
+        1055.8,
+        32
+      ],
+      [
+        1116.0,
+        38
+      ],
+      [
+        1176.0,
+        40
+      ],
+      [
+        1237.0,
+        42
+      ],
+      [
+        1297.2,
+        45
+      ],
+      [
+        1358.3,
+        48
+      ],
+      [
+        1419.6,
+        50
+      ],
+      [
+        1479.9,
+        52
+      ],
+      [
+        1540.0,
+        56
+      ],
+      [
+        1600.4,
+        60
+      ],
+      [
+        1660.6,
+        62
+      ],
+      [
+        1722.8,
+        64
+      ],
+      [
+        1783.9,
+        73
+      ],
+      [
+        1846.7,
+        77
+      ],
+      [
+        1911.0,
+        79
+      ],
+      [
+        1972.0,
+        81
+      ],
+      [
+        2033.3,
+        85
+      ],
+      [
+        2093.6,
+        87
+      ],
+      [
+        2153.4,
+        89
+      ],
+      [
+        2215.2,
+        94
+      ],
+      [
+        2275.0,
+        95
+      ],
+      [
+        2335.6,
+        98
+      ],
+      [
+        2395.8,
+        100
+      ],
+      [
+        2455.8,
+        102
+      ],
+      [
+        2515.7,
+        105
+      ],
+      [
+        2575.6,
+        109
+      ],
+      [
+        2636.1,
+        111
+      ],
+      [
+        2696.5,
+        113
+      ],
+      [
+        2759.1,
+        116
+      ],
+      [
+        2820.0,
+        125
+      ],
+      [
+        2881.0,
+        127
+      ],
+      [
+        2942.0,
+        129
+      ],
+      [
+        3003.1,
+        132
+      ],
+      [
+        3064.9,
+        135
+      ],
+      [
+        3127.7,
+        139
+      ],
+      [
+        3189.3,
+        142
+      ],
+      [
+        3315.1,
+        143
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nDuring my junior year, I tore a ligament in my knee during a soccer game and had to miss the rest of the season. Soccer had always been a big part of who I was, so not being able to play made me feel lost. For the first few weeks, I barely wanted to leave my room. Then my physical therapist pushed me to set small goals, like walking without crutches or doing ten squats. Every small win gave me a little more confidence. When I finally stepped back onto the field the next fall, I was stronger, both physically and mentally.\n\"\"\"\n\nThe writer tapped the word \"lost\" in this sentence (marked with [[ ]]):\nSoccer had always been a big part of who I was, so not being able to play made me feel [[lost]].\n\nGive 10 replacements for \"lost\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"lost\" without changing the rest of the sentence. Do not repeat \"lost\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 355,
+  "new_tokens": 47,
+  "finish_reason": "stop",
+  "error": null
+}

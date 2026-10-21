@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p18-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "8f0ae664eb4ff56515d46f5961ed550207e5858950712b057f1ea8da961c8106",
+  "seed": 8964634394167777257,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"determine\", \"diagnose\", \"identify\", \"analyze\", \"resolve\", \"uncover\", \"investigate\", \"elucidate\", \"explain\", \"diagnose\"]}",
+  "timing": {
+    "first_text_ms": 202.7,
+    "option_ms": [
+      479.0,
+      657.6,
+      791.8,
+      971.4,
+      1106.3,
+      1285.6,
+      1465.4,
+      1689.7,
+      1869.5,
+      2049.4
+    ],
+    "total_ms": 2140.3,
+    "stream": [
+      [
+        202.7,
+        2
+      ],
+      [
+        252.2,
+        9
+      ],
+      [
+        298.7,
+        11
+      ],
+      [
+        344.3,
+        14
+      ],
+      [
+        389.6,
+        17
+      ],
+      [
+        434.5,
+        23
+      ],
+      [
+        479.0,
+        25
+      ],
+      [
+        523.5,
+        27
+      ],
+      [
+        568.5,
+        32
+      ],
+      [
+        613.2,
+        35
+      ],
+      [
+        657.6,
+        37
+      ],
+      [
+        702.2,
+        39
+      ],
+      [
+        746.6,
+        47
+      ],
+      [
+        791.8,
+        49
+      ],
+      [
+        836.4,
+        51
+      ],
+      [
+        882.6,
+        53
+      ],
+      [
+        927.0,
+        58
+      ],
+      [
+        971.4,
+        60
+      ],
+      [
+        1016.6,
+        62
+      ],
+      [
+        1061.7,
+        69
+      ],
+      [
+        1106.3,
+        71
+      ],
+      [
+        1150.7,
+        73
+      ],
+      [
+        1195.5,
+        75
+      ],
+      [
+        1240.5,
+        80
+      ],
+      [
+        1285.6,
+        82
+      ],
+      [
+        1330.1,
+        84
+      ],
+      [
+        1374.6,
+        90
+      ],
+      [
+        1420.2,
+        95
+      ],
+      [
+        1465.4,
+        97
+      ],
+      [
+        1510.3,
+        99
+      ],
+      [
+        1554.8,
+        101
+      ],
+      [
+        1599.9,
+        105
+      ],
+      [
+        1644.9,
+        108
+      ],
+      [
+        1689.7,
+        110
+      ],
+      [
+        1734.4,
+        112
+      ],
+      [
+        1779.0,
+        114
+      ],
+      [
+        1824.4,
+        119
+      ],
+      [
+        1869.5,
+        121
+      ],
+      [
+        1914.4,
+        123
+      ],
+      [
+        1959.2,
+        128
+      ],
+      [
+        2003.8,
+        131
+      ],
+      [
+        2049.4,
+        133
+      ],
+      [
+        2094.6,
+        134
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nJoining the robotics team in tenth grade was one of the best choices I ever made. Our first competition was a disaster because our robot stopped working in the middle of the match. I felt embarrassed, and I wanted to quit the team right then. Instead, our coach told us to figure out what went wrong and try again. We spent weeks testing every part until we found a loose wire in the motor. At our next competition, the robot worked perfectly and we made it to the finals. That experience taught me that failing is just part of getting better.\n\"\"\"\n\nThe writer selected the phrase \"figure out\" in this sentence (marked with [[ ]]):\nInstead, our coach told us to [[figure out]] what went wrong and try again.\n\nGive 10 single words that can replace \"figure out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 303,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

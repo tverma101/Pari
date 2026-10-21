@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p19-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "af4e600b37290e8163385d8ab9983a3442ede607a55a9458193da33953dc9dc3",
+  "seed": 4790749743306100405,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"anxious\", \"stressed\", \"nervous\", \"uneasy\", \"worried\", \"apprehensive\", \"tense\", \"overwhelmed\", \"flustered\", \"distracted\"]}\n",
+  "timing": {
+    "first_text_ms": 530.3,
+    "option_ms": [
+      897.7,
+      1139.6,
+      1460.2,
+      1706.7,
+      1956.9,
+      2266.6,
+      2510.8,
+      2821.0,
+      3134.2,
+      3443.8
+    ],
+    "total_ms": 3628.4,
+    "stream": [
+      [
+        530.3,
+        2
+      ],
+      [
+        592.9,
+        9
+      ],
+      [
+        654.2,
+        11
+      ],
+      [
+        714.8,
+        14
+      ],
+      [
+        775.0,
+        16
+      ],
+      [
+        836.1,
+        21
+      ],
+      [
+        897.7,
+        23
+      ],
+      [
+        958.4,
+        25
+      ],
+      [
+        1018.5,
+        27
+      ],
+      [
+        1079.4,
+        33
+      ],
+      [
+        1139.6,
+        35
+      ],
+      [
+        1201.4,
+        37
+      ],
+      [
+        1261.6,
+        38
+      ],
+      [
+        1328.4,
+        41
+      ],
+      [
+        1397.7,
+        44
+      ],
+      [
+        1460.2,
+        46
+      ],
+      [
+        1521.4,
+        48
+      ],
+      [
+        1582.6,
+        51
+      ],
+      [
+        1643.2,
+        54
+      ],
+      [
+        1706.7,
+        56
+      ],
+      [
+        1768.3,
+        58
+      ],
+      [
+        1830.8,
+        61
+      ],
+      [
+        1895.5,
+        65
+      ],
+      [
+        1956.9,
+        67
+      ],
+      [
+        2017.5,
+        69
+      ],
+      [
+        2079.7,
+        72
+      ],
+      [
+        2142.3,
+        75
+      ],
+      [
+        2205.0,
+        81
+      ],
+      [
+        2266.6,
+        83
+      ],
+      [
+        2328.4,
+        85
+      ],
+      [
+        2389.0,
+        86
+      ],
+      [
+        2450.3,
+        90
+      ],
+      [
+        2510.8,
+        92
+      ],
+      [
+        2571.8,
+        94
+      ],
+      [
+        2632.5,
+        98
+      ],
+      [
+        2693.9,
+        102
+      ],
+      [
+        2756.5,
+        105
+      ],
+      [
+        2821.0,
+        107
+      ],
+      [
+        2885.9,
+        109
+      ],
+      [
+        2948.2,
+        111
+      ],
+      [
+        3009.6,
+        116
+      ],
+      [
+        3072.8,
+        118
+      ],
+      [
+        3134.2,
+        120
+      ],
+      [
+        3199.3,
+        122
+      ],
+      [
+        3260.4,
+        123
+      ],
+      [
+        3321.6,
+        127
+      ],
+      [
+        3382.9,
+        132
+      ],
+      [
+        3443.8,
+        135
+      ],
+      [
+        3565.2,
+        136
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nStandardized tests like the SAT are supposed to measure how ready students are for college, but they do not tell the whole story. A student's score can depend a lot on whether their family could pay for tutoring and practice books. Some students are also very nervous test-takers, so their scores do not show what they actually know. Because of this, more than 1,800 colleges have made the SAT optional. I think colleges should look at grades, essays, and activities instead of focusing on one test score.\n\"\"\"\n\nThe writer tapped the word \"nervous\" in this sentence (marked with [[ ]]):\nSome students are also very [[nervous]] test-takers, so their scores do not show what they actually know.\n\nGive 10 replacements for \"nervous\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"nervous\" without changing the rest of the sentence. Do not repeat \"nervous\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 352,
+  "new_tokens": 51,
+  "finish_reason": "stop",
+  "error": null
+}

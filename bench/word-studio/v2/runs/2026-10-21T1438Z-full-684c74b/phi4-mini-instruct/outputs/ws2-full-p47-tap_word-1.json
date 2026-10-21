@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p47-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "0930d0a17520b97ffc8d03cfbeae40df5b789b038c5f10bae7e80bf13e6515d6",
+  "seed": 3865912894503946482,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"puzzling\", \"daunting\", \"baffling\", \"bewildering\", \"overwhelming\", \"complex\", \"intricate\", \"complicated\", \"daunting process\", \"challenging\"]}",
+  "timing": {
+    "first_text_ms": 200.4,
+    "option_ms": [
+      523.0,
+      704.5,
+      932.2,
+      1159.7,
+      1388.2,
+      1533.5,
+      1728.7,
+      1911.9,
+      2141.5,
+      2324.5
+    ],
+    "total_ms": 2416.4,
+    "stream": [
+      [
+        200.4,
+        2
+      ],
+      [
+        247.7,
+        9
+      ],
+      [
+        294.7,
+        11
+      ],
+      [
+        340.9,
+        14
+      ],
+      [
+        386.6,
+        15
+      ],
+      [
+        431.7,
+        18
+      ],
+      [
+        477.5,
+        22
+      ],
+      [
+        523.0,
+        24
+      ],
+      [
+        568.3,
+        26
+      ],
+      [
+        613.1,
+        28
+      ],
+      [
+        659.1,
+        34
+      ],
+      [
+        704.5,
+        36
+      ],
+      [
+        750.9,
+        38
+      ],
+      [
+        795.7,
+        39
+      ],
+      [
+        841.4,
+        42
+      ],
+      [
+        887.0,
+        46
+      ],
+      [
+        932.2,
+        48
+      ],
+      [
+        977.4,
+        50
+      ],
+      [
+        1023.5,
+        53
+      ],
+      [
+        1069.3,
+        58
+      ],
+      [
+        1114.8,
+        61
+      ],
+      [
+        1159.7,
+        63
+      ],
+      [
+        1205.8,
+        65
+      ],
+      [
+        1251.5,
+        69
+      ],
+      [
+        1296.9,
+        73
+      ],
+      [
+        1342.1,
+        77
+      ],
+      [
+        1388.2,
+        79
+      ],
+      [
+        1442.6,
+        81
+      ],
+      [
+        1488.1,
+        88
+      ],
+      [
+        1533.5,
+        90
+      ],
+      [
+        1578.8,
+        92
+      ],
+      [
+        1624.1,
+        96
+      ],
+      [
+        1670.1,
+        101
+      ],
+      [
+        1728.7,
+        103
+      ],
+      [
+        1775.9,
+        105
+      ],
+      [
+        1821.1,
+        109
+      ],
+      [
+        1866.4,
+        116
+      ],
+      [
+        1911.9,
+        118
+      ],
+      [
+        1957.8,
+        120
+      ],
+      [
+        2003.4,
+        122
+      ],
+      [
+        2048.8,
+        128
+      ],
+      [
+        2094.5,
+        136
+      ],
+      [
+        2141.5,
+        138
+      ],
+      [
+        2186.7,
+        140
+      ],
+      [
+        2232.2,
+        145
+      ],
+      [
+        2278.5,
+        151
+      ],
+      [
+        2324.5,
+        153
+      ],
+      [
+        2370.1,
+        154
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nI will be the first person in my family to go to college, and that comes with a lot of pressure. My parents did not have the chance to continue their education because they had to start working when they were teenagers. They have always told me that school is the key to a better life. Filling out applications was confusing because no one at home had done it before, so I had to ask my counselor for help with almost every step. Even though the process was hard, it made me more determined to succeed. I want to make my parents proud and show my younger cousins that college is possible for them too.\n\"\"\"\n\nThe writer tapped the word \"confusing\" in this sentence (marked with [[ ]]):\nFilling out applications was [[confusing]] because no one at home had done it before, so I had to ask my counselor for help with almost every step.\n\nGive 10 replacements for \"confusing\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"confusing\" without changing the rest of the sentence. Do not repeat \"confusing\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 355,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

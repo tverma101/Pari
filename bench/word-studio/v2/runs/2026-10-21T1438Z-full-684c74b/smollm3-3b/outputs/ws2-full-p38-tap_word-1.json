@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p38-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "d8eafa74f88f31a88e9704e854537883c2445dbde6e65503c50f534ba211ce76",
+  "seed": 8043312406648917064,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"bereft\", \"empty\", \"lonely\", \"forlorn\", \"dejected\", \"dispirited\", \"disenfranchised\", \"depressed\", \"wistful\", \"disenheartened\"]}",
+  "timing": {
+    "first_text_ms": 171.4,
+    "option_ms": [
+      419.4,
+      543.3,
+      708.1,
+      911.8,
+      1077.3,
+      1278.3,
+      1557.9,
+      1722.5,
+      1927.4,
+      2178.5
+    ],
+    "total_ms": 2219.9,
+    "stream": [
+      [
+        171.4,
+        2
+      ],
+      [
+        213.8,
+        9
+      ],
+      [
+        255.8,
+        11
+      ],
+      [
+        297.0,
+        14
+      ],
+      [
+        337.8,
+        18
+      ],
+      [
+        378.8,
+        20
+      ],
+      [
+        419.4,
+        22
+      ],
+      [
+        461.1,
+        24
+      ],
+      [
+        502.2,
+        29
+      ],
+      [
+        543.3,
+        31
+      ],
+      [
+        585.9,
+        33
+      ],
+      [
+        626.5,
+        36
+      ],
+      [
+        667.2,
+        39
+      ],
+      [
+        708.1,
+        41
+      ],
+      [
+        748.3,
+        43
+      ],
+      [
+        790.3,
+        46
+      ],
+      [
+        830.5,
+        47
+      ],
+      [
+        871.2,
+        50
+      ],
+      [
+        911.8,
+        52
+      ],
+      [
+        952.2,
+        54
+      ],
+      [
+        993.4,
+        56
+      ],
+      [
+        1036.7,
+        62
+      ],
+      [
+        1077.3,
+        64
+      ],
+      [
+        1118.0,
+        66
+      ],
+      [
+        1158.0,
+        69
+      ],
+      [
+        1198.2,
+        72
+      ],
+      [
+        1238.4,
+        76
+      ],
+      [
+        1278.3,
+        78
+      ],
+      [
+        1318.1,
+        80
+      ],
+      [
+        1357.9,
+        83
+      ],
+      [
+        1398.1,
+        85
+      ],
+      [
+        1438.1,
+        87
+      ],
+      [
+        1478.2,
+        91
+      ],
+      [
+        1518.2,
+        95
+      ],
+      [
+        1557.9,
+        97
+      ],
+      [
+        1599.9,
+        99
+      ],
+      [
+        1640.5,
+        101
+      ],
+      [
+        1681.2,
+        108
+      ],
+      [
+        1722.5,
+        110
+      ],
+      [
+        1763.6,
+        112
+      ],
+      [
+        1804.3,
+        113
+      ],
+      [
+        1844.5,
+        116
+      ],
+      [
+        1885.6,
+        119
+      ],
+      [
+        1927.4,
+        121
+      ],
+      [
+        1968.3,
+        123
+      ],
+      [
+        2012.5,
+        126
+      ],
+      [
+        2055.6,
+        128
+      ],
+      [
+        2096.3,
+        133
+      ],
+      [
+        2137.3,
+        137
+      ],
+      [
+        2178.5,
+        140
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nDuring my junior year, I tore a ligament in my knee during a soccer game and had to miss the rest of the season. Soccer had always been a big part of who I was, so not being able to play made me feel lost. For the first few weeks, I barely wanted to leave my room. Then my physical therapist pushed me to set small goals, like walking without crutches or doing ten squats. Every small win gave me a little more confidence. When I finally stepped back onto the field the next fall, I was stronger, both physically and mentally.\n\"\"\"\n\nThe writer tapped the word \"lost\" in this sentence (marked with [[ ]]):\nSoccer had always been a big part of who I was, so not being able to play made me feel [[lost]].\n\nGive 10 replacements for \"lost\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"lost\" without changing the rest of the sentence. Do not repeat \"lost\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 384,
+  "new_tokens": 51,
+  "finish_reason": "stop",
+  "error": null
+}

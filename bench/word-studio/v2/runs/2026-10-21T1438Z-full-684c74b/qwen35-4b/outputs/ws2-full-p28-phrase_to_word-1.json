@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p28-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "443462fd23d218f58e5a5f1bf5e888dd3d8b6b24c4bd66be737c197214add38f",
+  "seed": 3020687074474777931,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"morality\", \"ethics\", \"judgment\", \"virtue\", \"principles\", \"integrity\", \"conduct\", \"behavior\", \"morals\", \"code\"]}\n",
+  "timing": {
+    "first_text_ms": 526.1,
+    "option_ms": [
+      893.3,
+      1138.2,
+      1399.1,
+      1673.0,
+      1917.3,
+      2160.9,
+      2342.8,
+      2524.0,
+      2767.6,
+      2949.9
+    ],
+    "total_ms": 3135.7,
+    "stream": [
+      [
+        526.1,
+        2
+      ],
+      [
+        589.1,
+        9
+      ],
+      [
+        650.0,
+        11
+      ],
+      [
+        710.4,
+        14
+      ],
+      [
+        771.6,
+        17
+      ],
+      [
+        832.1,
+        22
+      ],
+      [
+        893.3,
+        24
+      ],
+      [
+        953.9,
+        26
+      ],
+      [
+        1016.7,
+        29
+      ],
+      [
+        1077.1,
+        32
+      ],
+      [
+        1138.2,
+        34
+      ],
+      [
+        1198.9,
+        36
+      ],
+      [
+        1277.0,
+        39
+      ],
+      [
+        1338.6,
+        44
+      ],
+      [
+        1399.1,
+        46
+      ],
+      [
+        1460.0,
+        48
+      ],
+      [
+        1534.6,
+        52
+      ],
+      [
+        1611.9,
+        54
+      ],
+      [
+        1673.0,
+        56
+      ],
+      [
+        1734.7,
+        58
+      ],
+      [
+        1797.0,
+        65
+      ],
+      [
+        1857.0,
+        68
+      ],
+      [
+        1917.3,
+        70
+      ],
+      [
+        1978.2,
+        72
+      ],
+      [
+        2039.9,
+        75
+      ],
+      [
+        2099.8,
+        81
+      ],
+      [
+        2160.9,
+        83
+      ],
+      [
+        2222.1,
+        85
+      ],
+      [
+        2282.1,
+        92
+      ],
+      [
+        2342.8,
+        94
+      ],
+      [
+        2403.4,
+        96
+      ],
+      [
+        2464.2,
+        104
+      ],
+      [
+        2524.0,
+        106
+      ],
+      [
+        2584.7,
+        108
+      ],
+      [
+        2645.8,
+        111
+      ],
+      [
+        2706.7,
+        114
+      ],
+      [
+        2767.6,
+        116
+      ],
+      [
+        2828.3,
+        118
+      ],
+      [
+        2888.8,
+        122
+      ],
+      [
+        2949.9,
+        125
+      ],
+      [
+        3074.3,
+        126
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Lord of the Flies, a group of boys stranded on an island slowly lose their sense of right and wrong. At first, they choose Ralph as their leader and try to follow rules, like only speaking when they hold the conch shell. As time goes on, Jack becomes more interested in hunting than in keeping the signal fire going. More and more boys join Jack's tribe because it seems more fun than doing chores. By the end, the boys have turned violent, and two of them are dead. Golding uses the story to suggest that people can quickly become savage when there are no rules to control them.\n\"\"\"\n\nThe writer selected the phrase \"sense of right and wrong\" in this sentence (marked with [[ ]]):\nIn Lord of the Flies, a group of boys stranded on an island slowly lose their [[sense of right and wrong]].\n\nGive 10 single words that can replace \"sense of right and wrong\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 349,
+  "new_tokens": 43,
+  "finish_reason": "stop",
+  "error": null
+}

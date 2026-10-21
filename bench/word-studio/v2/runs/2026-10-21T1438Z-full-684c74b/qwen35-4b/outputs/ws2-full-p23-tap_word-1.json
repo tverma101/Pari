@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p23-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "6edce479b513678a056c8e433740f0fdd5585b142e2a108897a3732fff12cb0e",
+  "seed": 7640090582291043849,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"a voice\", \"an opinion\", \"a say\", \"input\", \"a stake\", \"a role\", \"a voice in\", \"a voice on\", \"influence\", \"participation\"]}\n",
+  "timing": {
+    "first_text_ms": 523.4,
+    "option_ms": [
+      894.3,
+      1138.2,
+      1381.1,
+      1564.2,
+      1806.9,
+      2047.3,
+      2346.1,
+      2652.2,
+      2833.0,
+      3076.2
+    ],
+    "total_ms": 3259.1,
+    "stream": [
+      [
+        523.4,
+        2
+      ],
+      [
+        586.6,
+        9
+      ],
+      [
+        650.4,
+        11
+      ],
+      [
+        711.5,
+        14
+      ],
+      [
+        772.6,
+        15
+      ],
+      [
+        832.8,
+        21
+      ],
+      [
+        894.3,
+        23
+      ],
+      [
+        955.4,
+        25
+      ],
+      [
+        1016.2,
+        27
+      ],
+      [
+        1076.8,
+        35
+      ],
+      [
+        1138.2,
+        37
+      ],
+      [
+        1198.8,
+        39
+      ],
+      [
+        1259.3,
+        40
+      ],
+      [
+        1319.8,
+        44
+      ],
+      [
+        1381.1,
+        46
+      ],
+      [
+        1442.7,
+        48
+      ],
+      [
+        1503.8,
+        53
+      ],
+      [
+        1564.2,
+        55
+      ],
+      [
+        1626.8,
+        57
+      ],
+      [
+        1686.8,
+        58
+      ],
+      [
+        1746.7,
+        64
+      ],
+      [
+        1806.9,
+        66
+      ],
+      [
+        1866.5,
+        68
+      ],
+      [
+        1927.3,
+        69
+      ],
+      [
+        1987.4,
+        74
+      ],
+      [
+        2047.3,
+        76
+      ],
+      [
+        2107.1,
+        78
+      ],
+      [
+        2166.8,
+        79
+      ],
+      [
+        2227.0,
+        85
+      ],
+      [
+        2286.5,
+        88
+      ],
+      [
+        2346.1,
+        90
+      ],
+      [
+        2406.5,
+        92
+      ],
+      [
+        2466.4,
+        93
+      ],
+      [
+        2526.7,
+        99
+      ],
+      [
+        2588.2,
+        102
+      ],
+      [
+        2652.2,
+        104
+      ],
+      [
+        2712.5,
+        106
+      ],
+      [
+        2772.9,
+        115
+      ],
+      [
+        2833.0,
+        117
+      ],
+      [
+        2893.9,
+        119
+      ],
+      [
+        2955.1,
+        123
+      ],
+      [
+        3016.1,
+        132
+      ],
+      [
+        3076.2,
+        135
+      ],
+      [
+        3198.2,
+        136
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSome people believe the voting age should be lowered from 18 to 16. At sixteen, many teenagers already have jobs, pay taxes, and can drive a car. Laws about schools, the environment, and the economy will affect young people for the rest of their lives, so they should have a say in them. Critics argue that sixteen-year-olds are not mature enough to make good choices about politics. However, studies of places like Austria, where sixteen-year-olds can vote, show that young voters make choices that are just as thought-out as older voters.\n\"\"\"\n\nThe writer tapped the word \"say\" in this sentence (marked with [[ ]]):\nLaws about schools, the environment, and the economy will affect young people for the rest of their lives, so they should have a [[say]] in them.\n\nGive 10 replacements for \"say\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"say\" without changing the rest of the sentence. Do not repeat \"say\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 360,
+  "new_tokens": 46,
+  "finish_reason": "stop",
+  "error": null
+}

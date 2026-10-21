@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p40-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "6a7db476d6e41352dd906c4013cb8821e6a110f3bba0274c9cfcc7afacba3bfc",
+  "seed": 5558178546743810183,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"distinct\", \"diverse\", \"unique\", \"different\", \"varied\", \"unique\", \"distinct\", \"separate\", \"unlike\", \"other\"]}",
+  "timing": {
+    "first_text_ms": 162.6,
+    "option_ms": [
+      369.3,
+      529.2,
+      651.3,
+      772.1,
+      935.1,
+      1055.3,
+      1178.2,
+      1339.7,
+      1502.0,
+      1622.2
+    ],
+    "total_ms": 1663.5,
+    "stream": [
+      [
+        162.6,
+        2
+      ],
+      [
+        204.0,
+        9
+      ],
+      [
+        244.4,
+        11
+      ],
+      [
+        286.3,
+        14
+      ],
+      [
+        327.2,
+        22
+      ],
+      [
+        369.3,
+        24
+      ],
+      [
+        409.0,
+        26
+      ],
+      [
+        449.2,
+        29
+      ],
+      [
+        489.2,
+        33
+      ],
+      [
+        529.2,
+        35
+      ],
+      [
+        569.2,
+        37
+      ],
+      [
+        610.3,
+        43
+      ],
+      [
+        651.3,
+        45
+      ],
+      [
+        691.9,
+        47
+      ],
+      [
+        731.8,
+        56
+      ],
+      [
+        772.1,
+        58
+      ],
+      [
+        812.4,
+        60
+      ],
+      [
+        854.5,
+        63
+      ],
+      [
+        894.9,
+        66
+      ],
+      [
+        935.1,
+        68
+      ],
+      [
+        975.1,
+        70
+      ],
+      [
+        1015.1,
+        76
+      ],
+      [
+        1055.3,
+        78
+      ],
+      [
+        1096.0,
+        80
+      ],
+      [
+        1137.2,
+        88
+      ],
+      [
+        1178.2,
+        90
+      ],
+      [
+        1218.1,
+        92
+      ],
+      [
+        1258.8,
+        94
+      ],
+      [
+        1299.1,
+        100
+      ],
+      [
+        1339.7,
+        102
+      ],
+      [
+        1381.9,
+        104
+      ],
+      [
+        1422.1,
+        106
+      ],
+      [
+        1462.0,
+        110
+      ],
+      [
+        1502.0,
+        112
+      ],
+      [
+        1542.2,
+        114
+      ],
+      [
+        1582.2,
+        119
+      ],
+      [
+        1622.2,
+        122
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Silk Road was not one single road but a network of trade routes that connected China to the Middle East and Europe. Merchants traveled these routes for more than a thousand years, carrying goods like silk, spices, and paper. But the Silk Road did more than move products from one place to another. It also helped spread religions, languages, and inventions between very different cultures. For example, Buddhism traveled from India to China along these routes. In many ways, the Silk Road was an early example of how the world is connected.\n\"\"\"\n\nThe writer selected the phrase \"very different\" in this sentence (marked with [[ ]]):\nIt also helped spread religions, languages, and inventions between [[very different]] cultures.\n\nGive 10 single words that can replace \"very different\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 345,
+  "new_tokens": 38,
+  "finish_reason": "stop",
+  "error": null
+}

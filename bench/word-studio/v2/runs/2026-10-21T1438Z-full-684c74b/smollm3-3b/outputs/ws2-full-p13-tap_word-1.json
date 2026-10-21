@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p13-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "c00fb730d4d8fc5f540a9d397bd98896c38c6e1bc3101446c82f6a3995c77dbd",
+  "seed": 2083694819706732776,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"intelligent\", \"wise\", \"clever\", \"brilliant\", \"knowledgeable\", \"shrewd\", \"sophisticated\", \"experienced\", \"exemplary\", \"accomplished\"]}",
+  "timing": {
+    "first_text_ms": 206.5,
+    "option_ms": [
+      456.2,
+      578.9,
+      741.2,
+      944.5,
+      1112.3,
+      1320.6,
+      1570.0,
+      1735.9,
+      1946.1,
+      2157.7
+    ],
+    "total_ms": 2199.3,
+    "stream": [
+      [
+        206.5,
+        2
+      ],
+      [
+        249.1,
+        9
+      ],
+      [
+        291.0,
+        11
+      ],
+      [
+        332.5,
+        14
+      ],
+      [
+        373.2,
+        17
+      ],
+      [
+        414.2,
+        25
+      ],
+      [
+        456.2,
+        27
+      ],
+      [
+        497.2,
+        29
+      ],
+      [
+        538.4,
+        33
+      ],
+      [
+        578.9,
+        35
+      ],
+      [
+        619.9,
+        37
+      ],
+      [
+        660.3,
+        40
+      ],
+      [
+        701.0,
+        43
+      ],
+      [
+        741.2,
+        45
+      ],
+      [
+        782.0,
+        47
+      ],
+      [
+        822.7,
+        49
+      ],
+      [
+        863.4,
+        52
+      ],
+      [
+        904.2,
+        56
+      ],
+      [
+        944.5,
+        58
+      ],
+      [
+        987.5,
+        60
+      ],
+      [
+        1027.8,
+        69
+      ],
+      [
+        1071.1,
+        73
+      ],
+      [
+        1112.3,
+        75
+      ],
+      [
+        1152.8,
+        77
+      ],
+      [
+        1193.9,
+        79
+      ],
+      [
+        1236.1,
+        82
+      ],
+      [
+        1277.9,
+        83
+      ],
+      [
+        1320.6,
+        85
+      ],
+      [
+        1361.4,
+        87
+      ],
+      [
+        1402.4,
+        88
+      ],
+      [
+        1444.1,
+        91
+      ],
+      [
+        1486.0,
+        96
+      ],
+      [
+        1527.8,
+        100
+      ],
+      [
+        1570.0,
+        102
+      ],
+      [
+        1611.0,
+        104
+      ],
+      [
+        1652.7,
+        106
+      ],
+      [
+        1694.0,
+        115
+      ],
+      [
+        1735.9,
+        117
+      ],
+      [
+        1777.9,
+        119
+      ],
+      [
+        1819.4,
+        121
+      ],
+      [
+        1860.9,
+        125
+      ],
+      [
+        1904.0,
+        128
+      ],
+      [
+        1946.1,
+        130
+      ],
+      [
+        1992.8,
+        132
+      ],
+      [
+        2033.5,
+        137
+      ],
+      [
+        2074.8,
+        139
+      ],
+      [
+        2116.7,
+        144
+      ],
+      [
+        2157.7,
+        147
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nMy grandmother is the person who has had the biggest impact on my life. She grew up on a farm in Mexico and never got the chance to finish school, but she is one of the smartest people I know. Every Sunday she cooks a huge meal for the whole family, and she makes everyone put their phones away so we can actually talk. She taught me that being kind is more important than being right. When I was having a hard time in middle school, she was the one who listened to me without judging. I want to be the kind of person who makes others feel welcome, just like she does.\n\"\"\"\n\nThe writer tapped the word \"smartest\" in this sentence (marked with [[ ]]):\nShe grew up on a farm in Mexico and never got the chance to finish school, but she is one of the [[smartest]] people I know.\n\nGive 10 replacements for \"smartest\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"smartest\" without changing the rest of the sentence. Do not repeat \"smartest\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 400,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

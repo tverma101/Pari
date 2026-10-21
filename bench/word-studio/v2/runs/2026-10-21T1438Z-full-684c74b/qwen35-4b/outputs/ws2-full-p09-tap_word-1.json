@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p09-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "7ee001d95a0387872438546af74db5040a6251cf9f754a093589c298a0abbc6c",
+  "seed": 67322205710480145,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"evaluate\", \"assess\", \"evaluate based on\", \"determine\", \"rate\", \"compare\", \"differentiate\", \"distinguish\", \"evaluate each other\", \"assess each other\"]}\n",
+  "timing": {
+    "first_text_ms": 488.6,
+    "option_ms": [
+      794.3,
+      1039.7,
+      1344.1,
+      1585.3,
+      1765.1,
+      1948.4,
+      2192.9,
+      2437.1,
+      2740.9,
+      3104.8
+    ],
+    "total_ms": 3291.7,
+    "stream": [
+      [
+        488.6,
+        2
+      ],
+      [
+        551.2,
+        9
+      ],
+      [
+        612.1,
+        11
+      ],
+      [
+        672.3,
+        14
+      ],
+      [
+        733.2,
+        22
+      ],
+      [
+        794.3,
+        24
+      ],
+      [
+        856.2,
+        26
+      ],
+      [
+        918.6,
+        29
+      ],
+      [
+        978.3,
+        32
+      ],
+      [
+        1039.7,
+        34
+      ],
+      [
+        1099.4,
+        36
+      ],
+      [
+        1159.4,
+        44
+      ],
+      [
+        1220.3,
+        50
+      ],
+      [
+        1284.0,
+        53
+      ],
+      [
+        1344.1,
+        55
+      ],
+      [
+        1404.0,
+        57
+      ],
+      [
+        1465.0,
+        58
+      ],
+      [
+        1525.6,
+        66
+      ],
+      [
+        1585.3,
+        68
+      ],
+      [
+        1645.1,
+        70
+      ],
+      [
+        1704.9,
+        74
+      ],
+      [
+        1765.1,
+        76
+      ],
+      [
+        1826.0,
+        78
+      ],
+      [
+        1888.0,
+        85
+      ],
+      [
+        1948.4,
+        87
+      ],
+      [
+        2009.5,
+        89
+      ],
+      [
+        2070.7,
+        98
+      ],
+      [
+        2131.6,
+        102
+      ],
+      [
+        2192.9,
+        104
+      ],
+      [
+        2255.8,
+        106
+      ],
+      [
+        2317.7,
+        107
+      ],
+      [
+        2377.5,
+        117
+      ],
+      [
+        2437.1,
+        119
+      ],
+      [
+        2497.8,
+        121
+      ],
+      [
+        2558.1,
+        129
+      ],
+      [
+        2619.2,
+        134
+      ],
+      [
+        2679.0,
+        140
+      ],
+      [
+        2740.9,
+        142
+      ],
+      [
+        2800.5,
+        144
+      ],
+      [
+        2863.5,
+        147
+      ],
+      [
+        2924.0,
+        150
+      ],
+      [
+        2983.5,
+        155
+      ],
+      [
+        3044.5,
+        161
+      ],
+      [
+        3104.8,
+        164
+      ],
+      [
+        3227.8,
+        165
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSome people think school uniforms are a bad idea, but I think they help students in many ways. First, uniforms make it harder for kids to judge each other based on how much their clothes cost. When everyone wears the same thing, students from poor families do not stand out as much. Second, uniforms save time in the morning because students do not have to pick out an outfit every day. Critics say that uniforms take away students' freedom to express themselves. However, students can still show who they are through their hobbies, their writing, and the way they treat others.\n\"\"\"\n\nThe writer tapped the word \"judge\" in this sentence (marked with [[ ]]):\nFirst, uniforms make it harder for kids to [[judge]] each other based on how much their clothes cost.\n\nGive 10 replacements for \"judge\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"judge\" without changing the rest of the sentence. Do not repeat \"judge\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 350,
+  "new_tokens": 47,
+  "finish_reason": "stop",
+  "error": null
+}

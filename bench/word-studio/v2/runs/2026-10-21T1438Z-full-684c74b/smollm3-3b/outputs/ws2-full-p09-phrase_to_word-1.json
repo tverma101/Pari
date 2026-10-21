@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p09-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "cade2be45e4b60e54f2cb9feb68d0fccedbcf47fd8a0d666ce3d4637b24a284b",
+  "seed": 2412731590358485180,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"choose\", \"select\", \"pick\", \"determine\", \"pick\", \"choose\", \"select\", \"determine\", \"choose\", \"pick\"]}",
+  "timing": {
+    "first_text_ms": 154.4,
+    "option_ms": [
+      374.3,
+      498.5,
+      623.1,
+      786.3,
+      908.3,
+      1030.7,
+      1154.2,
+      1317.8,
+      1440.7,
+      1563.4
+    ],
+    "total_ms": 1605.0,
+    "stream": [
+      [
+        154.4,
+        2
+      ],
+      [
+        199.5,
+        9
+      ],
+      [
+        243.8,
+        11
+      ],
+      [
+        292.4,
+        14
+      ],
+      [
+        333.7,
+        20
+      ],
+      [
+        374.3,
+        22
+      ],
+      [
+        415.3,
+        24
+      ],
+      [
+        456.6,
+        30
+      ],
+      [
+        498.5,
+        32
+      ],
+      [
+        540.1,
+        34
+      ],
+      [
+        581.2,
+        38
+      ],
+      [
+        623.1,
+        40
+      ],
+      [
+        663.5,
+        42
+      ],
+      [
+        704.4,
+        43
+      ],
+      [
+        745.8,
+        51
+      ],
+      [
+        786.3,
+        53
+      ],
+      [
+        827.4,
+        55
+      ],
+      [
+        867.8,
+        59
+      ],
+      [
+        908.3,
+        61
+      ],
+      [
+        949.3,
+        63
+      ],
+      [
+        990.2,
+        69
+      ],
+      [
+        1030.7,
+        71
+      ],
+      [
+        1071.4,
+        73
+      ],
+      [
+        1112.7,
+        79
+      ],
+      [
+        1154.2,
+        81
+      ],
+      [
+        1195.0,
+        83
+      ],
+      [
+        1235.4,
+        84
+      ],
+      [
+        1277.6,
+        92
+      ],
+      [
+        1317.8,
+        94
+      ],
+      [
+        1358.8,
+        96
+      ],
+      [
+        1399.7,
+        102
+      ],
+      [
+        1440.7,
+        104
+      ],
+      [
+        1482.1,
+        106
+      ],
+      [
+        1522.9,
+        110
+      ],
+      [
+        1563.4,
+        113
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nSome people think school uniforms are a bad idea, but I think they help students in many ways. First, uniforms make it harder for kids to judge each other based on how much their clothes cost. When everyone wears the same thing, students from poor families do not stand out as much. Second, uniforms save time in the morning because students do not have to pick out an outfit every day. Critics say that uniforms take away students' freedom to express themselves. However, students can still show who they are through their hobbies, their writing, and the way they treat others.\n\"\"\"\n\nThe writer selected the phrase \"pick out\" in this sentence (marked with [[ ]]):\nSecond, uniforms save time in the morning because students do not have to [[pick out]] an outfit every day.\n\nGive 10 single words that can replace \"pick out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 359,
+  "new_tokens": 36,
+  "finish_reason": "stop",
+  "error": null
+}

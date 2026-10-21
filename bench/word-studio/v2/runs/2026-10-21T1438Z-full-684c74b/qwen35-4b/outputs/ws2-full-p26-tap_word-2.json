@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p26-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "3ddfc0ac9a99632b72eb8f9c80e0edc922a8d91451304e768219d510fe7a0fee",
+  "seed": 6447165241580319985,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"realized\", \"knew\", \"understood\", \"saw\", \"became aware\", \"recognized\", \"discovered\", \"grasped\", \"learned\", \"took to heart\"]}\n",
+  "timing": {
+    "first_text_ms": 535.6,
+    "option_ms": [
+      901.1,
+      1146.2,
+      1390.4,
+      1637.3,
+      1940.0,
+      2122.0,
+      2364.3,
+      2671.6,
+      2912.3,
+      3217.0
+    ],
+    "total_ms": 3399.3,
+    "stream": [
+      [
+        535.6,
+        2
+      ],
+      [
+        598.3,
+        9
+      ],
+      [
+        658.9,
+        11
+      ],
+      [
+        719.4,
+        14
+      ],
+      [
+        779.8,
+        18
+      ],
+      [
+        840.4,
+        22
+      ],
+      [
+        901.1,
+        24
+      ],
+      [
+        962.5,
+        26
+      ],
+      [
+        1024.4,
+        27
+      ],
+      [
+        1084.5,
+        30
+      ],
+      [
+        1146.2,
+        32
+      ],
+      [
+        1207.2,
+        34
+      ],
+      [
+        1268.3,
+        39
+      ],
+      [
+        1328.8,
+        44
+      ],
+      [
+        1390.4,
+        46
+      ],
+      [
+        1451.5,
+        48
+      ],
+      [
+        1515.4,
+        49
+      ],
+      [
+        1577.0,
+        51
+      ],
+      [
+        1637.3,
+        53
+      ],
+      [
+        1697.2,
+        55
+      ],
+      [
+        1759.1,
+        58
+      ],
+      [
+        1819.4,
+        61
+      ],
+      [
+        1879.8,
+        67
+      ],
+      [
+        1940.0,
+        69
+      ],
+      [
+        2000.3,
+        71
+      ],
+      [
+        2061.8,
+        81
+      ],
+      [
+        2122.0,
+        83
+      ],
+      [
+        2182.1,
+        85
+      ],
+      [
+        2242.3,
+        88
+      ],
+      [
+        2303.0,
+        95
+      ],
+      [
+        2364.3,
+        97
+      ],
+      [
+        2425.4,
+        99
+      ],
+      [
+        2488.2,
+        101
+      ],
+      [
+        2549.3,
+        103
+      ],
+      [
+        2610.7,
+        106
+      ],
+      [
+        2671.6,
+        108
+      ],
+      [
+        2732.2,
+        110
+      ],
+      [
+        2792.3,
+        115
+      ],
+      [
+        2852.3,
+        117
+      ],
+      [
+        2912.3,
+        119
+      ],
+      [
+        2974.1,
+        121
+      ],
+      [
+        3035.6,
+        125
+      ],
+      [
+        3096.2,
+        128
+      ],
+      [
+        3156.6,
+        134
+      ],
+      [
+        3217.0,
+        137
+      ],
+      [
+        3336.9,
+        138
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nEvery Saturday for the past two years, I have volunteered at a food bank in my neighborhood. At first, I only went because I needed community service hours for school. But after a few weeks, I started to really care about the people who came in. Many of them were working parents who just did not have enough money at the end of the month. One woman told me that the food we gave her was the only reason her kids had dinner that week. Hearing that made me realize how many people in my own town are struggling. Now I want to study social work so I can help families like hers.\n\"\"\"\n\nThe writer tapped the word \"realize\" in this sentence (marked with [[ ]]):\nHearing that made me [[realize]] how many people in my own town are struggling.\n\nGive 10 replacements for \"realize\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"realize\" without changing the rest of the sentence. Do not repeat \"realize\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 359,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

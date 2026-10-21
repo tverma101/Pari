@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p46-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "1ecd9f150b4a2246cda58fc514f00704f9303c40c80b5698c87a0fbb0b8d3687",
+  "seed": 6725902712213370792,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"beneficial\", \"advantageous\", \"positive\", \"healthy\", \"helpful\", \"useful\", \"advantageous\", \"favorable\", \"beneficial\", \"positive\"]}\n",
+  "timing": {
+    "first_text_ms": 509.3,
+    "option_ms": [
+      873.8,
+      1176.1,
+      1357.0,
+      1536.9,
+      1778.4,
+      2023.2,
+      2323.4,
+      2566.2,
+      2820.9,
+      3007.6
+    ],
+    "total_ms": 3189.7,
+    "stream": [
+      [
+        509.3,
+        2
+      ],
+      [
+        570.4,
+        9
+      ],
+      [
+        629.9,
+        11
+      ],
+      [
+        689.7,
+        14
+      ],
+      [
+        749.0,
+        19
+      ],
+      [
+        811.2,
+        24
+      ],
+      [
+        873.8,
+        26
+      ],
+      [
+        935.3,
+        28
+      ],
+      [
+        995.9,
+        31
+      ],
+      [
+        1056.1,
+        37
+      ],
+      [
+        1115.7,
+        40
+      ],
+      [
+        1176.1,
+        42
+      ],
+      [
+        1236.4,
+        44
+      ],
+      [
+        1296.2,
+        52
+      ],
+      [
+        1357.0,
+        54
+      ],
+      [
+        1417.2,
+        56
+      ],
+      [
+        1477.3,
+        63
+      ],
+      [
+        1536.9,
+        65
+      ],
+      [
+        1597.0,
+        67
+      ],
+      [
+        1656.9,
+        71
+      ],
+      [
+        1716.9,
+        74
+      ],
+      [
+        1778.4,
+        76
+      ],
+      [
+        1841.0,
+        78
+      ],
+      [
+        1903.4,
+        81
+      ],
+      [
+        1963.8,
+        84
+      ],
+      [
+        2023.2,
+        86
+      ],
+      [
+        2083.0,
+        88
+      ],
+      [
+        2141.9,
+        91
+      ],
+      [
+        2201.2,
+        97
+      ],
+      [
+        2261.0,
+        100
+      ],
+      [
+        2323.4,
+        102
+      ],
+      [
+        2388.4,
+        104
+      ],
+      [
+        2448.0,
+        109
+      ],
+      [
+        2507.2,
+        113
+      ],
+      [
+        2566.2,
+        115
+      ],
+      [
+        2624.9,
+        117
+      ],
+      [
+        2684.2,
+        122
+      ],
+      [
+        2753.7,
+        127
+      ],
+      [
+        2820.9,
+        129
+      ],
+      [
+        2884.0,
+        131
+      ],
+      [
+        2946.2,
+        139
+      ],
+      [
+        3007.6,
+        142
+      ],
+      [
+        3128.6,
+        143
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nMost people know that exercise is good for the body, but it is also good for the brain. When we exercise, our hearts pump more blood to the brain, which brings it extra oxygen. Studies have shown that regular exercise can improve memory and help people focus. It can also lower stress and make people feel happier because the body releases chemicals called endorphins. Even a short walk of twenty minutes can make a difference. For students, this means that taking breaks to move around might actually help them study better.\n\"\"\"\n\nThe writer tapped the word \"good\" in this sentence (marked with [[ ]]):\nMost people know that exercise is good for the body, but it is also [[good]] for the brain.\n\nGive 10 replacements for \"good\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"good\" without changing the rest of the sentence. Do not repeat \"good\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 338,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p35-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "b48b758059bb906eec384b4eb19e2b26bd7f9881622952c6364f1442e545e18b",
+  "seed": 5545437395571638856,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"overcome\", \"triumph over\", \"defeat\", \"outperform\", \"surpass\", \"prevail against\", \"excel over\", \"outdo\", \"top\", \"conquer\"]}",
+  "timing": {
+    "first_text_ms": 171.3,
+    "option_ms": [
+      420.4,
+      664.6,
+      826.3,
+      990.1,
+      1153.3,
+      1357.1,
+      1519.7,
+      1681.6,
+      1802.2,
+      1964.5
+    ],
+    "total_ms": 2006.1,
+    "stream": [
+      [
+        171.3,
+        2
+      ],
+      [
+        214.4,
+        9
+      ],
+      [
+        256.5,
+        11
+      ],
+      [
+        297.7,
+        14
+      ],
+      [
+        337.8,
+        18
+      ],
+      [
+        379.6,
+        22
+      ],
+      [
+        420.4,
+        24
+      ],
+      [
+        460.7,
+        26
+      ],
+      [
+        501.0,
+        28
+      ],
+      [
+        542.5,
+        31
+      ],
+      [
+        583.7,
+        33
+      ],
+      [
+        624.6,
+        38
+      ],
+      [
+        664.6,
+        40
+      ],
+      [
+        704.8,
+        42
+      ],
+      [
+        744.9,
+        45
+      ],
+      [
+        785.6,
+        48
+      ],
+      [
+        826.3,
+        50
+      ],
+      [
+        866.9,
+        52
+      ],
+      [
+        907.8,
+        55
+      ],
+      [
+        949.3,
+        62
+      ],
+      [
+        990.1,
+        64
+      ],
+      [
+        1030.9,
+        66
+      ],
+      [
+        1071.8,
+        69
+      ],
+      [
+        1112.4,
+        73
+      ],
+      [
+        1153.3,
+        75
+      ],
+      [
+        1194.1,
+        77
+      ],
+      [
+        1234.4,
+        81
+      ],
+      [
+        1275.0,
+        84
+      ],
+      [
+        1316.0,
+        92
+      ],
+      [
+        1357.1,
+        94
+      ],
+      [
+        1398.3,
+        96
+      ],
+      [
+        1438.6,
+        101
+      ],
+      [
+        1479.1,
+        106
+      ],
+      [
+        1519.7,
+        108
+      ],
+      [
+        1560.8,
+        110
+      ],
+      [
+        1601.8,
+        113
+      ],
+      [
+        1641.6,
+        115
+      ],
+      [
+        1681.6,
+        117
+      ],
+      [
+        1721.7,
+        119
+      ],
+      [
+        1761.9,
+        122
+      ],
+      [
+        1802.2,
+        124
+      ],
+      [
+        1843.1,
+        126
+      ],
+      [
+        1883.8,
+        129
+      ],
+      [
+        1924.0,
+        133
+      ],
+      [
+        1964.5,
+        136
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nOn July 20, 1969, Neil Armstrong became the first person to walk on the moon. The Apollo 11 mission was the result of years of hard work by thousands of scientists, engineers, and astronauts. The United States wanted to beat the Soviet Union in the space race, which was part of the larger Cold War. Millions of people around the world watched the landing live on television. The mission showed what humans can do when they work together toward a big goal. It also led to new technologies that we still use today.\n\"\"\"\n\nThe writer tapped the word \"beat\" in this sentence (marked with [[ ]]):\nThe United States wanted to [[beat]] the Soviet Union in the space race, which was part of the larger Cold War.\n\nGive 10 replacements for \"beat\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"beat\" without changing the rest of the sentence. Do not repeat \"beat\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 374,
+  "new_tokens": 46,
+  "finish_reason": "stop",
+  "error": null
+}

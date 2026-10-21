@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p14-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "f2685682be042caddb6083ea743284a72b4891c2e1f3b5f9abe7c3b86fdf523f",
+  "seed": 6442771966930353323,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"examine\", \"investigate\", \"scrutinize\", \"assess\", \"review\", \"study\", \"evaluate\", \"analyze\", \"observe\", \"inspect\"]}\n",
+  "timing": {
+    "first_text_ms": 525.3,
+    "option_ms": [
+      893.4,
+      1140.9,
+      1445.4,
+      1707.3,
+      1891.3,
+      2075.4,
+      2257.7,
+      2440.1,
+      2625.3,
+      2807.6
+    ],
+    "total_ms": 2987.6,
+    "stream": [
+      [
+        525.3,
+        2
+      ],
+      [
+        588.8,
+        9
+      ],
+      [
+        650.4,
+        11
+      ],
+      [
+        711.2,
+        14
+      ],
+      [
+        772.9,
+        16
+      ],
+      [
+        833.0,
+        21
+      ],
+      [
+        893.4,
+        23
+      ],
+      [
+        953.8,
+        25
+      ],
+      [
+        1017.6,
+        31
+      ],
+      [
+        1079.8,
+        36
+      ],
+      [
+        1140.9,
+        38
+      ],
+      [
+        1202.3,
+        40
+      ],
+      [
+        1263.8,
+        43
+      ],
+      [
+        1324.4,
+        47
+      ],
+      [
+        1385.1,
+        50
+      ],
+      [
+        1445.4,
+        52
+      ],
+      [
+        1507.9,
+        54
+      ],
+      [
+        1576.3,
+        57
+      ],
+      [
+        1644.0,
+        60
+      ],
+      [
+        1707.3,
+        62
+      ],
+      [
+        1769.0,
+        64
+      ],
+      [
+        1831.0,
+        70
+      ],
+      [
+        1891.3,
+        72
+      ],
+      [
+        1952.8,
+        74
+      ],
+      [
+        2015.3,
+        79
+      ],
+      [
+        2075.4,
+        81
+      ],
+      [
+        2135.8,
+        83
+      ],
+      [
+        2197.0,
+        91
+      ],
+      [
+        2257.7,
+        93
+      ],
+      [
+        2318.1,
+        95
+      ],
+      [
+        2379.4,
+        102
+      ],
+      [
+        2440.1,
+        104
+      ],
+      [
+        2502.8,
+        106
+      ],
+      [
+        2564.4,
+        113
+      ],
+      [
+        2625.3,
+        115
+      ],
+      [
+        2687.0,
+        117
+      ],
+      [
+        2747.3,
+        124
+      ],
+      [
+        2807.6,
+        127
+      ],
+      [
+        2926.4,
+        128
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSome school districts have switched to a four-day school week to save money and give students more time to rest. Supporters say that teachers are less tired and students come to school more ready to learn. The extra day off can also be used for doctor appointments, jobs, or family time. However, the longer school days can be hard for younger kids who have trouble focusing for that long. Working parents might also have to pay for childcare on the fifth day, which could be a problem for families without much money. Before more districts make this change, they should look closely at how it affects students' learning.\n\"\"\"\n\nThe writer selected the phrase \"look closely at\" in this sentence (marked with [[ ]]):\nBefore more districts make this change, they should [[look closely at]] how it affects students' learning.\n\nGive 10 single words that can replace \"look closely at\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 337,
+  "new_tokens": 41,
+  "finish_reason": "stop",
+  "error": null
+}

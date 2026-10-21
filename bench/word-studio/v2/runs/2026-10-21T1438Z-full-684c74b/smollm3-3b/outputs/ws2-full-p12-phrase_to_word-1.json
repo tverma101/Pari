@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p12-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "d174d8b017921f698fefff3d1d1988a893b7171279df5d11c211dd79ee387632",
+  "seed": 7972066830998807981,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"prescribing\", \"distributing\", \"administering\", \"supplying\", \"dispensing\", \"issuing\", \"providing\", \"giving\", \"allocating\", \"furnishing\"]}",
+  "timing": {
+    "first_text_ms": 176.7,
+    "option_ms": [
+      430.2,
+      638.1,
+      843.7,
+      1008.1,
+      1174.5,
+      1338.8,
+      1549.0,
+      1715.0,
+      1877.6,
+      2079.1
+    ],
+    "total_ms": 2121.6,
+    "stream": [
+      [
+        176.7,
+        2
+      ],
+      [
+        221.3,
+        9
+      ],
+      [
+        262.7,
+        11
+      ],
+      [
+        304.2,
+        14
+      ],
+      [
+        345.0,
+        18
+      ],
+      [
+        388.4,
+        25
+      ],
+      [
+        430.2,
+        27
+      ],
+      [
+        471.9,
+        29
+      ],
+      [
+        513.0,
+        30
+      ],
+      [
+        554.6,
+        36
+      ],
+      [
+        596.7,
+        41
+      ],
+      [
+        638.1,
+        43
+      ],
+      [
+        679.7,
+        45
+      ],
+      [
+        720.7,
+        50
+      ],
+      [
+        761.8,
+        55
+      ],
+      [
+        802.8,
+        58
+      ],
+      [
+        843.7,
+        60
+      ],
+      [
+        885.1,
+        62
+      ],
+      [
+        926.1,
+        68
+      ],
+      [
+        967.0,
+        71
+      ],
+      [
+        1008.1,
+        73
+      ],
+      [
+        1048.9,
+        75
+      ],
+      [
+        1090.2,
+        79
+      ],
+      [
+        1133.2,
+        85
+      ],
+      [
+        1174.5,
+        87
+      ],
+      [
+        1215.6,
+        89
+      ],
+      [
+        1256.7,
+        92
+      ],
+      [
+        1297.9,
+        96
+      ],
+      [
+        1338.8,
+        98
+      ],
+      [
+        1382.6,
+        100
+      ],
+      [
+        1424.0,
+        103
+      ],
+      [
+        1465.7,
+        106
+      ],
+      [
+        1507.1,
+        109
+      ],
+      [
+        1549.0,
+        111
+      ],
+      [
+        1591.1,
+        113
+      ],
+      [
+        1632.4,
+        114
+      ],
+      [
+        1674.4,
+        119
+      ],
+      [
+        1715.0,
+        121
+      ],
+      [
+        1755.6,
+        123
+      ],
+      [
+        1796.6,
+        128
+      ],
+      [
+        1836.8,
+        133
+      ],
+      [
+        1877.6,
+        135
+      ],
+      [
+        1917.8,
+        137
+      ],
+      [
+        1957.9,
+        138
+      ],
+      [
+        1998.5,
+        141
+      ],
+      [
+        2038.9,
+        147
+      ],
+      [
+        2079.1,
+        150
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nAntibiotics are medicines that kill bacteria, and they have saved millions of lives since they were discovered. The problem is that bacteria can change over time so that the medicine does not work on them anymore. This happens faster when people take antibiotics they do not really need, like for a cold, which is caused by a virus. It also happens when people stop taking their pills early because they start to feel better. If this keeps going, simple infections could become deadly again. To stop this, doctors need to be careful about giving out antibiotics, and patients need to finish the whole treatment.\n\"\"\"\n\nThe writer selected the phrase \"giving out\" in this sentence (marked with [[ ]]):\nTo stop this, doctors need to be careful about [[giving out]] antibiotics, and patients need to finish the whole treatment.\n\nGive 10 single words that can replace \"giving out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 367,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

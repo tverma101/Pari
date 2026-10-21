@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p40-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "15d9a7d13e3d7db887032f545b2f684762f70835387e0561339e052244cdd85b",
+  "seed": 3611120536314508982,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"interlinked\", \"interwoven\", \"interconnected\", \"interdependent\", \"interrelated\", \"interfused\", \"interlaced\", \"intertangled\", \"interconnected\", \"intertwined\"]}",
+  "timing": {
+    "first_text_ms": 189.4,
+    "option_ms": [
+      462.7,
+      643.0,
+      822.3,
+      1002.0,
+      1182.4,
+      1408.0,
+      1634.9,
+      1861.0,
+      2041.8,
+      2268.4
+    ],
+    "total_ms": 2359.9,
+    "stream": [
+      [
+        189.4,
+        2
+      ],
+      [
+        236.3,
+        9
+      ],
+      [
+        282.0,
+        11
+      ],
+      [
+        326.9,
+        14
+      ],
+      [
+        372.3,
+        19
+      ],
+      [
+        418.3,
+        25
+      ],
+      [
+        462.7,
+        27
+      ],
+      [
+        508.4,
+        29
+      ],
+      [
+        553.2,
+        34
+      ],
+      [
+        598.2,
+        39
+      ],
+      [
+        643.0,
+        41
+      ],
+      [
+        687.5,
+        43
+      ],
+      [
+        731.9,
+        48
+      ],
+      [
+        777.4,
+        57
+      ],
+      [
+        822.3,
+        59
+      ],
+      [
+        867.0,
+        61
+      ],
+      [
+        911.7,
+        66
+      ],
+      [
+        956.5,
+        75
+      ],
+      [
+        1002.0,
+        77
+      ],
+      [
+        1047.1,
+        79
+      ],
+      [
+        1092.1,
+        84
+      ],
+      [
+        1136.8,
+        91
+      ],
+      [
+        1182.4,
+        93
+      ],
+      [
+        1227.5,
+        95
+      ],
+      [
+        1272.6,
+        100
+      ],
+      [
+        1317.4,
+        101
+      ],
+      [
+        1362.2,
+        105
+      ],
+      [
+        1408.0,
+        107
+      ],
+      [
+        1453.4,
+        109
+      ],
+      [
+        1498.4,
+        114
+      ],
+      [
+        1543.2,
+        115
+      ],
+      [
+        1589.3,
+        119
+      ],
+      [
+        1634.9,
+        121
+      ],
+      [
+        1679.9,
+        123
+      ],
+      [
+        1724.6,
+        128
+      ],
+      [
+        1769.9,
+        129
+      ],
+      [
+        1815.1,
+        135
+      ],
+      [
+        1861.0,
+        137
+      ],
+      [
+        1905.9,
+        139
+      ],
+      [
+        1950.8,
+        144
+      ],
+      [
+        1996.5,
+        153
+      ],
+      [
+        2041.8,
+        155
+      ],
+      [
+        2086.8,
+        157
+      ],
+      [
+        2131.7,
+        162
+      ],
+      [
+        2177.7,
+        164
+      ],
+      [
+        2223.3,
+        168
+      ],
+      [
+        2268.4,
+        170
+      ],
+      [
+        2313.4,
+        171
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nThe Silk Road was not one single road but a network of trade routes that connected China to the Middle East and Europe. Merchants traveled these routes for more than a thousand years, carrying goods like silk, spices, and paper. But the Silk Road did more than move products from one place to another. It also helped spread religions, languages, and inventions between very different cultures. For example, Buddhism traveled from India to China along these routes. In many ways, the Silk Road was an early example of how the world is connected.\n\"\"\"\n\nThe writer tapped the word \"connected\" in this sentence (marked with [[ ]]):\nIn many ways, the Silk Road was an early example of how the world is [[connected]].\n\nGive 10 replacements for \"connected\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"connected\" without changing the rest of the sentence. Do not repeat \"connected\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 321,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

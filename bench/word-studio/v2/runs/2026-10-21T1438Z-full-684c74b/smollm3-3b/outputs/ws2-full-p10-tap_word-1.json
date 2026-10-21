@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p10-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "00987e1f3b609f2d47de4ed14627920d0cb7d835147e7f2ac5b21a2c8e682278",
+  "seed": 7551423685204041120,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"voraciously\", \"deeply\", \"intensely\", \"severely\", \"vehemently\", \"fiercely\", \"zealously\", \"furiously\", \"ardently\", \"passionately\"]}",
+  "timing": {
+    "first_text_ms": 206.7,
+    "option_ms": [
+      494.6,
+      659.1,
+      820.7,
+      1024.4,
+      1227.9,
+      1472.4,
+      1677.2,
+      1847.0,
+      2022.0,
+      2246.1
+    ],
+    "total_ms": 2287.5,
+    "stream": [
+      [
+        206.7,
+        2
+      ],
+      [
+        248.4,
+        9
+      ],
+      [
+        288.9,
+        11
+      ],
+      [
+        329.3,
+        14
+      ],
+      [
+        369.8,
+        17
+      ],
+      [
+        410.5,
+        19
+      ],
+      [
+        451.2,
+        25
+      ],
+      [
+        494.6,
+        27
+      ],
+      [
+        535.1,
+        29
+      ],
+      [
+        576.9,
+        33
+      ],
+      [
+        617.1,
+        35
+      ],
+      [
+        659.1,
+        37
+      ],
+      [
+        699.1,
+        39
+      ],
+      [
+        739.8,
+        42
+      ],
+      [
+        779.9,
+        48
+      ],
+      [
+        820.7,
+        50
+      ],
+      [
+        861.9,
+        52
+      ],
+      [
+        902.1,
+        54
+      ],
+      [
+        943.2,
+        57
+      ],
+      [
+        983.7,
+        60
+      ],
+      [
+        1024.4,
+        62
+      ],
+      [
+        1064.7,
+        64
+      ],
+      [
+        1105.7,
+        67
+      ],
+      [
+        1146.7,
+        72
+      ],
+      [
+        1187.0,
+        74
+      ],
+      [
+        1227.9,
+        76
+      ],
+      [
+        1267.9,
+        78
+      ],
+      [
+        1308.5,
+        79
+      ],
+      [
+        1348.8,
+        82
+      ],
+      [
+        1388.9,
+        83
+      ],
+      [
+        1429.1,
+        86
+      ],
+      [
+        1472.4,
+        88
+      ],
+      [
+        1512.9,
+        90
+      ],
+      [
+        1554.4,
+        92
+      ],
+      [
+        1595.0,
+        94
+      ],
+      [
+        1635.4,
+        99
+      ],
+      [
+        1677.2,
+        101
+      ],
+      [
+        1719.0,
+        103
+      ],
+      [
+        1763.6,
+        106
+      ],
+      [
+        1805.3,
+        112
+      ],
+      [
+        1847.0,
+        114
+      ],
+      [
+        1888.5,
+        116
+      ],
+      [
+        1929.3,
+        119
+      ],
+      [
+        1970.7,
+        124
+      ],
+      [
+        2022.0,
+        126
+      ],
+      [
+        2081.0,
+        128
+      ],
+      [
+        2122.1,
+        132
+      ],
+      [
+        2163.1,
+        135
+      ],
+      [
+        2205.1,
+        140
+      ],
+      [
+        2246.1,
+        143
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nIn The Great Gatsby, the green light at the end of Daisy's dock stands for Gatsby's dream of being with her again. Gatsby stretches out his arms toward the light across the water, which shows how badly he wants something that is far away. The light is also connected to the bigger idea of the American Dream, the belief that anyone can become rich and happy if they work hard enough. By the end of the novel, Gatsby's dream falls apart, and the light seems to lose its meaning. Nick says that Gatsby \"believed in the green light,\" even though the future he wanted kept moving away from him. Fitzgerald uses the light to show that some dreams are impossible to reach.\n\"\"\"\n\nThe writer tapped the word \"badly\" in this sentence (marked with [[ ]]):\nGatsby stretches out his arms toward the light across the water, which shows how [[badly]] he wants something that is far away.\n\nGive 10 replacements for \"badly\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"badly\" without changing the rest of the sentence. Do not repeat \"badly\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 417,
+  "new_tokens": 51,
+  "finish_reason": "stop",
+  "error": null
+}

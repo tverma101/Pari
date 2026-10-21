@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p21-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "a9ab5d4ee5272f4671c9b38320ec1494e78c5797a6ec231e640ebee8d9f3847a",
+  "seed": 5857044829518043120,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"more fragile\", \"less stable\", \"more vulnerable\", \"more easily disrupted\", \"less rigid\", \"more susceptible to change\", \"more prone to collapse\", \"less effective\", \"more unstable\", \"more easily undermined\"]}\n",
+  "timing": {
+    "first_text_ms": 541.7,
+    "option_ms": [
+      901.4,
+      1139.6,
+      1383.6,
+      1688.5,
+      1929.9,
+      2295.2,
+      2662.4,
+      2906.2,
+      3150.3,
+      3457.5
+    ],
+    "total_ms": 3641.1,
+    "stream": [
+      [
+        541.7,
+        2
+      ],
+      [
+        602.5,
+        9
+      ],
+      [
+        663.0,
+        11
+      ],
+      [
+        722.7,
+        14
+      ],
+      [
+        782.4,
+        18
+      ],
+      [
+        842.0,
+        26
+      ],
+      [
+        901.4,
+        28
+      ],
+      [
+        960.4,
+        30
+      ],
+      [
+        1020.4,
+        34
+      ],
+      [
+        1080.2,
+        41
+      ],
+      [
+        1139.6,
+        43
+      ],
+      [
+        1199.4,
+        45
+      ],
+      [
+        1259.5,
+        49
+      ],
+      [
+        1322.7,
+        60
+      ],
+      [
+        1383.6,
+        62
+      ],
+      [
+        1444.6,
+        64
+      ],
+      [
+        1505.1,
+        68
+      ],
+      [
+        1566.0,
+        75
+      ],
+      [
+        1627.2,
+        85
+      ],
+      [
+        1688.5,
+        87
+      ],
+      [
+        1749.0,
+        89
+      ],
+      [
+        1809.3,
+        93
+      ],
+      [
+        1869.4,
+        99
+      ],
+      [
+        1929.9,
+        101
+      ],
+      [
+        1991.0,
+        103
+      ],
+      [
+        2051.2,
+        107
+      ],
+      [
+        2111.9,
+        119
+      ],
+      [
+        2172.2,
+        122
+      ],
+      [
+        2233.3,
+        129
+      ],
+      [
+        2295.2,
+        131
+      ],
+      [
+        2356.6,
+        133
+      ],
+      [
+        2418.6,
+        137
+      ],
+      [
+        2479.4,
+        143
+      ],
+      [
+        2540.0,
+        146
+      ],
+      [
+        2601.3,
+        155
+      ],
+      [
+        2662.4,
+        157
+      ],
+      [
+        2723.3,
+        159
+      ],
+      [
+        2783.9,
+        163
+      ],
+      [
+        2844.2,
+        173
+      ],
+      [
+        2906.2,
+        175
+      ],
+      [
+        2966.6,
+        177
+      ],
+      [
+        3027.6,
+        181
+      ],
+      [
+        3088.4,
+        190
+      ],
+      [
+        3150.3,
+        192
+      ],
+      [
+        3212.0,
+        194
+      ],
+      [
+        3273.0,
+        198
+      ],
+      [
+        3335.6,
+        205
+      ],
+      [
+        3397.3,
+        216
+      ],
+      [
+        3457.5,
+        219
+      ],
+      [
+        3579.0,
+        220
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Black Death was a plague that spread across Europe starting in 1347. It was carried by fleas that lived on rats, and it moved quickly along trade routes and through crowded cities. Within just a few years, it killed somewhere between a third and half of Europe's population. Because so many workers died, the people who survived could ask for higher pay, which made the old feudal system weaker. The plague also made a lot of people question the church, since prayers did not seem to stop the disease.\n\"\"\"\n\nThe writer tapped the word \"weaker\" in this sentence (marked with [[ ]]):\nBecause so many workers died, the people who survived could ask for higher pay, which made the old feudal system [[weaker]].\n\nGive 10 replacements for \"weaker\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"weaker\" without changing the rest of the sentence. Do not repeat \"weaker\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 349,
+  "new_tokens": 52,
+  "finish_reason": "stop",
+  "error": null
+}

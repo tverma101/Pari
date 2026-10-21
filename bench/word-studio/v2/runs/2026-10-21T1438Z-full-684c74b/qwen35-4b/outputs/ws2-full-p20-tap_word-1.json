@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p20-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "9247912841b16c7823ce008663af9ea02107c51e0af4b545be53ef5b975cc860",
+  "seed": 533428471134686029,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"hasty\", \"quick\", \"rapid\", \"swift\", \"immediate\", \"rushed\", \"precipitous\", \"impetuous\", \"hurried\", \"speedy\"]}\n",
+  "timing": {
+    "first_text_ms": 547.6,
+    "option_ms": [
+      918.9,
+      1099.7,
+      1282.1,
+      1463.6,
+      1713.2,
+      1958.1,
+      2260.8,
+      2566.8,
+      2816.8,
+      3062.9
+    ],
+    "total_ms": 3248.0,
+    "stream": [
+      [
+        547.6,
+        2
+      ],
+      [
+        609.9,
+        9
+      ],
+      [
+        671.4,
+        11
+      ],
+      [
+        735.9,
+        14
+      ],
+      [
+        797.9,
+        15
+      ],
+      [
+        858.5,
+        19
+      ],
+      [
+        918.9,
+        21
+      ],
+      [
+        979.5,
+        23
+      ],
+      [
+        1039.5,
+        28
+      ],
+      [
+        1099.7,
+        30
+      ],
+      [
+        1160.5,
+        32
+      ],
+      [
+        1221.2,
+        37
+      ],
+      [
+        1282.1,
+        39
+      ],
+      [
+        1342.3,
+        41
+      ],
+      [
+        1403.0,
+        46
+      ],
+      [
+        1463.6,
+        48
+      ],
+      [
+        1525.7,
+        50
+      ],
+      [
+        1586.1,
+        52
+      ],
+      [
+        1648.9,
+        59
+      ],
+      [
+        1713.2,
+        61
+      ],
+      [
+        1774.3,
+        63
+      ],
+      [
+        1835.6,
+        64
+      ],
+      [
+        1896.7,
+        69
+      ],
+      [
+        1958.1,
+        71
+      ],
+      [
+        2018.9,
+        73
+      ],
+      [
+        2079.5,
+        77
+      ],
+      [
+        2139.8,
+        79
+      ],
+      [
+        2200.2,
+        84
+      ],
+      [
+        2260.8,
+        86
+      ],
+      [
+        2321.0,
+        88
+      ],
+      [
+        2381.3,
+        91
+      ],
+      [
+        2443.0,
+        93
+      ],
+      [
+        2504.6,
+        97
+      ],
+      [
+        2566.8,
+        99
+      ],
+      [
+        2630.6,
+        101
+      ],
+      [
+        2692.7,
+        104
+      ],
+      [
+        2755.6,
+        108
+      ],
+      [
+        2816.8,
+        110
+      ],
+      [
+        2877.8,
+        112
+      ],
+      [
+        2939.9,
+        117
+      ],
+      [
+        3002.3,
+        118
+      ],
+      [
+        3062.9,
+        121
+      ],
+      [
+        3185.7,
+        122
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nRomeo and Juliet is often called a love story, but it is also a story about how acting too fast can lead to disaster. Romeo and Juliet meet, fall in love, and get married in less than a week. Neither of them stops to think about what their families will do when they find out. Friar Laurence even warns Romeo that \"they stumble that run fast,\" but Romeo does not listen. When Romeo hears that Juliet is dead, he kills himself right away instead of waiting to learn the truth. If the two young lovers had slowed down, the play might have had a happy ending.\n\"\"\"\n\nThe writer tapped the word \"fast\" in this sentence (marked with [[ ]]):\nRomeo and Juliet is often called a love story, but it is also a story about how acting too [[fast]] can lead to disaster.\n\nGive 10 replacements for \"fast\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"fast\" without changing the rest of the sentence. Do not repeat \"fast\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 366,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

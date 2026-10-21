@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p27-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "16e8fab9d899b39c50d6e3421be8d648cde7ebda493935b672d22c68f16a86d7",
+  "seed": 5022016616414266802,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"encourage\", \"advise\", \"persuade\", \"urge\", \"motivate\", \"prompt\", \"push\", \"motivate\", \"advocate\", \"inspire\"]}\n",
+  "timing": {
+    "first_text_ms": 528.1,
+    "option_ms": [
+      898.6,
+      1145.3,
+      1456.6,
+      1641.4,
+      1895.2,
+      2085.5,
+      2280.1,
+      2527.7,
+      2776.5,
+      3019.2
+    ],
+    "total_ms": 3203.0,
+    "stream": [
+      [
+        528.1,
+        2
+      ],
+      [
+        590.4,
+        9
+      ],
+      [
+        650.9,
+        11
+      ],
+      [
+        712.2,
+        14
+      ],
+      [
+        775.9,
+        17
+      ],
+      [
+        836.9,
+        23
+      ],
+      [
+        898.6,
+        25
+      ],
+      [
+        960.7,
+        27
+      ],
+      [
+        1021.9,
+        30
+      ],
+      [
+        1084.6,
+        33
+      ],
+      [
+        1145.3,
+        35
+      ],
+      [
+        1205.4,
+        37
+      ],
+      [
+        1268.8,
+        41
+      ],
+      [
+        1334.1,
+        42
+      ],
+      [
+        1395.2,
+        45
+      ],
+      [
+        1456.6,
+        47
+      ],
+      [
+        1518.6,
+        49
+      ],
+      [
+        1581.2,
+        53
+      ],
+      [
+        1641.4,
+        55
+      ],
+      [
+        1702.4,
+        57
+      ],
+      [
+        1764.2,
+        60
+      ],
+      [
+        1828.6,
+        65
+      ],
+      [
+        1895.2,
+        67
+      ],
+      [
+        1957.6,
+        69
+      ],
+      [
+        2021.3,
+        75
+      ],
+      [
+        2085.5,
+        77
+      ],
+      [
+        2153.2,
+        79
+      ],
+      [
+        2216.5,
+        83
+      ],
+      [
+        2280.1,
+        85
+      ],
+      [
+        2342.7,
+        87
+      ],
+      [
+        2405.6,
+        90
+      ],
+      [
+        2466.7,
+        95
+      ],
+      [
+        2527.7,
+        97
+      ],
+      [
+        2590.5,
+        99
+      ],
+      [
+        2651.7,
+        102
+      ],
+      [
+        2714.4,
+        107
+      ],
+      [
+        2776.5,
+        109
+      ],
+      [
+        2837.6,
+        111
+      ],
+      [
+        2897.9,
+        114
+      ],
+      [
+        2958.8,
+        118
+      ],
+      [
+        3019.2,
+        121
+      ],
+      [
+        3142.9,
+        122
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nPlastic bags are cheap and easy to use, but they cause big problems for the environment. Most of them are only used once before they get thrown away. Because they are so light, they often blow out of trash cans and end up in rivers and oceans, where animals like sea turtles mistake them for food. A plastic bag can take hundreds of years to break down. Several states, such as California and New York, have already banned single-use plastic bags. I think every state should do the same and encourage people to bring reusable bags to the store.\n\"\"\"\n\nThe writer tapped the word \"encourage\" in this sentence (marked with [[ ]]):\nI think every state should do the same and [[encourage]] people to bring reusable bags to the store.\n\nGive 10 replacements for \"encourage\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"encourage\" without changing the rest of the sentence. Do not repeat \"encourage\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 351,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

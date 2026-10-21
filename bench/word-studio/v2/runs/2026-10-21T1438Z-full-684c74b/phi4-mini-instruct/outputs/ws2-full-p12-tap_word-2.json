@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p12-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "98ebc794116f37ebef6cf31789f6208705654e942e596be9c1f2c5dbb712ea28",
+  "seed": 1673435058180536820,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"basic\", \"common\", \"ordinary\", \"general\", \"everyday\", \"routine\", \"basic-level\", \"common-cause\", \"non-complex\", \"uncomplicated\", \"usual-infections\"]}",
+  "timing": {
+    "first_text_ms": 189.2,
+    "option_ms": [
+      418.4,
+      553.5,
+      689.0,
+      825.2,
+      1006.5,
+      1142.4,
+      1323.6,
+      1550.4,
+      1778.0,
+      2005.3,
+      2234.0
+    ],
+    "total_ms": 2325.8,
+    "stream": [
+      [
+        189.2,
+        2
+      ],
+      [
+        236.2,
+        9
+      ],
+      [
+        282.3,
+        11
+      ],
+      [
+        327.8,
+        14
+      ],
+      [
+        373.4,
+        19
+      ],
+      [
+        418.4,
+        21
+      ],
+      [
+        463.1,
+        23
+      ],
+      [
+        507.7,
+        29
+      ],
+      [
+        553.5,
+        31
+      ],
+      [
+        599.0,
+        33
+      ],
+      [
+        644.1,
+        41
+      ],
+      [
+        689.0,
+        43
+      ],
+      [
+        734.5,
+        45
+      ],
+      [
+        780.0,
+        52
+      ],
+      [
+        825.2,
+        54
+      ],
+      [
+        870.3,
+        56
+      ],
+      [
+        915.8,
+        61
+      ],
+      [
+        961.4,
+        64
+      ],
+      [
+        1006.5,
+        66
+      ],
+      [
+        1051.7,
+        68
+      ],
+      [
+        1096.7,
+        75
+      ],
+      [
+        1142.4,
+        77
+      ],
+      [
+        1187.6,
+        79
+      ],
+      [
+        1232.7,
+        84
+      ],
+      [
+        1277.7,
+        90
+      ],
+      [
+        1323.6,
+        92
+      ],
+      [
+        1369.1,
+        94
+      ],
+      [
+        1414.2,
+        100
+      ],
+      [
+        1459.2,
+        102
+      ],
+      [
+        1505.0,
+        106
+      ],
+      [
+        1550.4,
+        108
+      ],
+      [
+        1596.4,
+        110
+      ],
+      [
+        1641.2,
+        113
+      ],
+      [
+        1687.1,
+        117
+      ],
+      [
+        1732.6,
+        121
+      ],
+      [
+        1778.0,
+        123
+      ],
+      [
+        1823.0,
+        125
+      ],
+      [
+        1869.0,
+        127
+      ],
+      [
+        1914.9,
+        131
+      ],
+      [
+        1960.2,
+        138
+      ],
+      [
+        2005.3,
+        140
+      ],
+      [
+        2051.3,
+        142
+      ],
+      [
+        2097.1,
+        147
+      ],
+      [
+        2142.6,
+        150
+      ],
+      [
+        2187.9,
+        158
+      ],
+      [
+        2234.0,
+        160
+      ],
+      [
+        2279.7,
+        161
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nAntibiotics are medicines that kill bacteria, and they have saved millions of lives since they were discovered. The problem is that bacteria can change over time so that the medicine does not work on them anymore. This happens faster when people take antibiotics they do not really need, like for a cold, which is caused by a virus. It also happens when people stop taking their pills early because they start to feel better. If this keeps going, simple infections could become deadly again. To stop this, doctors need to be careful about giving out antibiotics, and patients need to finish the whole treatment.\n\"\"\"\n\nThe writer tapped the word \"simple\" in this sentence (marked with [[ ]]):\nIf this keeps going, [[simple]] infections could become deadly again.\n\nGive 10 replacements for \"simple\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"simple\" without changing the rest of the sentence. Do not repeat \"simple\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 326,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

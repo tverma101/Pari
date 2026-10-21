@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "benchmark": "word-studio-v2",
+  "candidate": {
+    "candidate_id": "phi4-mini-instruct",
+    "role": "mac_candidate",
+    "family": "Phi-4",
+    "model_id": "microsoft/Phi-4-mini-instruct",
+    "revision": "cfbefacb99257ffa30c83adab238a50856ac3083",
+    "parameter_count_billions": 3.8,
+    "upstream_weight_files_bytes": 7672066216,
+    "license": {
+      "spdx": "MIT",
+      "personal_use": "allowed_under_license_terms"
+    },
+    "mlx": {
+      "available": true,
+      "model_id": "mlx-community/Phi-4-mini-instruct-4bit",
+      "revision": "ac1c269cb4222a4e136a3d09edad301056c1f36a",
+      "quantization_bits": 4,
+      "weight_file_bytes": 2158100796,
+      "runtime": "mlx-lm"
+    },
+    "mac_fit_assessment": "likely_by_4bit_artifact_size; runtime memory, context cache, and latency are unmeasured",
+    "kaggle_2xt4_assessment": "eligible_for_smoke; upstream checkpoint files are below one T4's memory by size, but runtime fit and compatibility are unmeasured",
+    "sources": [
+      {
+        "claim": "model identity, 3.8B parameter size, MIT license, Transformers/vLLM support, and upstream revision",
+        "url": "https://huggingface.co/microsoft/Phi-4-mini-instruct/tree/cfbefacb99257ffa30c83adab238a50856ac3083",
+        "metadata_url": "https://huggingface.co/api/models/microsoft/Phi-4-mini-instruct?blobs=true",
+        "verified_on": "2026-10-16"
+      },
+      {
+        "claim": "4-bit MLX conversion and artifact size",
+        "url": "https://huggingface.co/mlx-community/Phi-4-mini-instruct-4bit/tree/ac1c269cb4222a4e136a3d09edad301056c1f36a",
+        "metadata_url": "https://huggingface.co/api/models/mlx-community/Phi-4-mini-instruct-4bit?blobs=true",
+        "verified_on": "2026-10-16"
+      }
+    ],
+    "listed_in": "bench/candidates.json"
+  },
+  "task_set": "full",
+  "task_file_sha256": "1b1e7e7a5e453988d9d47c1b82ac35868c5b5acd062f45ef91113ddd4d15b79a",
+  "manifest_sha256": "81e4e9b95b574e533b3782013d54eae84ec40eea82bd45d7ccc453610920f5b1",
+  "prompt_version": "ws2-prompts-v1",
+  "generation": {
+    "do_sample": true,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": 50,
+    "repetition_penalty": 1.0,
+    "samples_per_task": 1,
+    "seed": "first 8 bytes of sha256(task id), big-endian",
+    "thinking": "disabled: enable_thinking=False is passed to every chat template"
+  },
+  "task_limit": null,
+  "tasks_planned": 200,
+  "repo": {
+    "sha": "684c74b56994f3081070699cc07d068ad1129ad7",
+    "dirty_paths": []
+  },
+  "status": "completed",
+  "stage": "done",
+  "started_at": "2026-10-21T15:17:08+00:00",
+  "finished_at": "2026-10-21T15:31:37+00:00",
+  "load": {
+    "warmup_seconds": 0.78,
+    "model_class": "Phi3ForCausalLM",
+    "dtype": "float16",
+    "device_map": "single T4 (cuda:0)",
+    "devices": [],
+    "unexpected_keys": 0,
+    "parameters": 3836021760,
+    "generation_config": {
+      "max_length": null,
+      "max_new_tokens": null,
+      "min_length": null,
+      "min_new_tokens": null,
+      "early_stopping": null,
+      "max_time": null,
+      "stop_strings": null,
+      "do_sample": true,
+      "num_beams": null,
+      "use_mtp": null,
+      "use_cache": null,
+      "cache_implementation": null,
+      "cache_config": null,
+      "max_cache_len": null,
+      "temperature": 0.7,
+      "top_k": 50,
+      "top_p": 0.9,
+      "min_p": null,
+      "top_h": null,
+      "typical_p": null,
+      "epsilon_cutoff": null,
+      "eta_cutoff": null,
+      "repetition_penalty": 1.0,
+      "encoder_repetition_penalty": null,
+      "length_penalty": null,
+      "no_repeat_ngram_size": null,
+      "bad_words_ids": null,
+      "renormalize_logits": null,
+      "forced_bos_token_id": null,
+      "forced_eos_token_id": null,
+      "remove_invalid_values": null,
+      "exponential_decay_length_penalty": null,
+      "suppress_tokens": null,
+      "begin_suppress_tokens": null,
+      "sequence_bias": null,
+      "token_healing": null,
+      "guidance_scale": null,
+      "watermarking_config": null,
+      "num_return_sequences": null,
+      "output_attentions": null,
+      "output_hidden_states": null,
+      "output_scores": null,
+      "output_logits": null,
+      "return_dict_in_generate": null,
+      "pad_token_id": 199999,
+      "bos_token_id": 199999,
+      "eos_token_id": [
+        200020,
+        199999
+      ],
+      "encoder_no_repeat_ngram_size": null,
+      "decoder_start_token_id": null,
+      "is_assistant": null,
+      "num_assistant_tokens": null,
+      "num_assistant_tokens_schedule": null,
+      "assistant_confidence_threshold": null,
+      "prompt_lookup_num_tokens": null,
+      "max_matching_ngram_size": null,
+      "assistant_early_exit": null,
+      "assistant_lookbehind": null,
+      "target_lookbehind": null,
+      "assistant_ensemble_weight": null,
+      "speculation_type": null,
+      "compile_config": null,
+      "disable_compile": null,
+      "continuous_batching_config": null,
+      "low_memory": null,
+      "penalty_alpha": null,
+      "dola_layers": null,
+      "diversity_penalty": null,
+      "num_beam_groups": null,
+      "constraints": null,
+      "force_words_ids": null,
+      "prefill_chunk_size": null,
+      "_from_model_config": null,
+      "transformers_version": "5.18.0"
+    },
+    "chat_template_sha256": "febf589225c9728ab791f52e8897d7607a823d45368f0a4c92fa68997b40cce9",
+    "load_seconds": 56.51
+  },
+  "environment": {
+    "python": "3.13.15 (main, Aug  6 2026, 11:06:22) [GCC 13.3.0]",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "packages": {
+      "torch": "2.11.0+cu128",
+      "transformers": "5.18.0",
+      "accelerate": "1.15.0",
+      "tokenizers": "0.23.1",
+      "huggingface_hub": "1.33.0",
+      "safetensors": "0.8.0"
+    },
+    "cuda": "12.8",
+    "gpus": [
+      "Tesla T4",
+      "Tesla T4"
+    ],
+    "peak_memory": {
+      "cuda:0": 0,
+      "cuda:1": 0
+    },
+    "nvidia_smi": [
+      "Tesla T4, 15360 MiB, 580.178.04",
+      "Tesla T4, 15360 MiB, 580.178.04"
+    ]
+  },
+  "tasks": {
+    "ok": 200,
+    "error": 0,
+    "failed_ids": []
+  },
+  "error": null,
+  "scores": "none: this runner never scores; see v2/RUBRIC.md",
+  "peak_memory": {
+    "cuda:0": 7819120640,
+    "cuda:1": 0
+  },
+  "complete_set": true
+}

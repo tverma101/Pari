@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p28-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "11ba7a52504dd889cbcfd73898b38343073e6676d24b7fdccd6c13ddc39851a8",
+  "seed": 7455818387673403863,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"ferocious\", \"hostile\", \"belligerent\", \"aggressive\", \"belligerent\", \"belligerent\", \"belligerent\", \"belligerent\", \"belligerent\", \"hostile\"]}",
+  "timing": {
+    "first_text_ms": 193.6,
+    "option_ms": [
+      467.5,
+      647.3,
+      872.6,
+      1052.2,
+      1277.9,
+      1504.0,
+      1735.5,
+      1963.2,
+      2191.1,
+      2373.5
+    ],
+    "total_ms": 2464.7,
+    "stream": [
+      [
+        193.6,
+        2
+      ],
+      [
+        241.5,
+        9
+      ],
+      [
+        287.4,
+        11
+      ],
+      [
+        332.4,
+        14
+      ],
+      [
+        377.3,
+        17
+      ],
+      [
+        422.3,
+        23
+      ],
+      [
+        467.5,
+        25
+      ],
+      [
+        512.3,
+        27
+      ],
+      [
+        557.1,
+        31
+      ],
+      [
+        601.8,
+        34
+      ],
+      [
+        647.3,
+        36
+      ],
+      [
+        692.4,
+        38
+      ],
+      [
+        737.3,
+        42
+      ],
+      [
+        782.1,
+        46
+      ],
+      [
+        827.3,
+        49
+      ],
+      [
+        872.6,
+        51
+      ],
+      [
+        917.5,
+        53
+      ],
+      [
+        962.3,
+        55
+      ],
+      [
+        1006.8,
+        63
+      ],
+      [
+        1052.2,
+        65
+      ],
+      [
+        1097.6,
+        67
+      ],
+      [
+        1142.6,
+        71
+      ],
+      [
+        1187.5,
+        75
+      ],
+      [
+        1232.6,
+        78
+      ],
+      [
+        1277.9,
+        80
+      ],
+      [
+        1323.0,
+        82
+      ],
+      [
+        1367.9,
+        86
+      ],
+      [
+        1412.9,
+        90
+      ],
+      [
+        1458.7,
+        93
+      ],
+      [
+        1504.0,
+        95
+      ],
+      [
+        1549.2,
+        97
+      ],
+      [
+        1594.5,
+        101
+      ],
+      [
+        1642.5,
+        105
+      ],
+      [
+        1689.6,
+        108
+      ],
+      [
+        1735.5,
+        110
+      ],
+      [
+        1781.2,
+        112
+      ],
+      [
+        1826.9,
+        116
+      ],
+      [
+        1872.4,
+        120
+      ],
+      [
+        1917.4,
+        123
+      ],
+      [
+        1963.2,
+        125
+      ],
+      [
+        2008.7,
+        127
+      ],
+      [
+        2054.0,
+        131
+      ],
+      [
+        2099.2,
+        135
+      ],
+      [
+        2145.2,
+        138
+      ],
+      [
+        2191.1,
+        140
+      ],
+      [
+        2236.5,
+        142
+      ],
+      [
+        2281.7,
+        146
+      ],
+      [
+        2327.7,
+        149
+      ],
+      [
+        2373.5,
+        151
+      ],
+      [
+        2418.8,
+        152
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nIn Lord of the Flies, a group of boys stranded on an island slowly lose their sense of right and wrong. At first, they choose Ralph as their leader and try to follow rules, like only speaking when they hold the conch shell. As time goes on, Jack becomes more interested in hunting than in keeping the signal fire going. More and more boys join Jack's tribe because it seems more fun than doing chores. By the end, the boys have turned violent, and two of them are dead. Golding uses the story to suggest that people can quickly become savage when there are no rules to control them.\n\"\"\"\n\nThe writer tapped the word \"violent\" in this sentence (marked with [[ ]]):\nBy the end, the boys have turned [[violent]], and two of them are dead.\n\nGive 10 replacements for \"violent\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"violent\" without changing the rest of the sentence. Do not repeat \"violent\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 337,
+  "new_tokens": 51,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p17-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "f3e87da1ac1dea735f318a0e29ac2f4fd8adc9c740bc2610b30e2f3b9e9470e4",
+  "seed": 3625331948740396492,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"crucial\", \"vital\", \"essential\", \"key\", \"fundamental\", \"critical\", \"necessary\", \"significant\", \"central\", \"key\"]}",
+  "timing": {
+    "first_text_ms": 168.3,
+    "option_ms": [
+      458.5,
+      620.7,
+      743.9,
+      864.4,
+      1025.5,
+      1146.9,
+      1267.9,
+      1390.0,
+      1511.2,
+      1631.9
+    ],
+    "total_ms": 1673.2,
+    "stream": [
+      [
+        168.3,
+        2
+      ],
+      [
+        211.0,
+        9
+      ],
+      [
+        253.8,
+        11
+      ],
+      [
+        294.5,
+        14
+      ],
+      [
+        335.5,
+        16
+      ],
+      [
+        377.1,
+        18
+      ],
+      [
+        417.5,
+        21
+      ],
+      [
+        458.5,
+        23
+      ],
+      [
+        498.9,
+        25
+      ],
+      [
+        539.1,
+        26
+      ],
+      [
+        579.6,
+        30
+      ],
+      [
+        620.7,
+        32
+      ],
+      [
+        661.1,
+        34
+      ],
+      [
+        701.5,
+        43
+      ],
+      [
+        743.9,
+        45
+      ],
+      [
+        783.9,
+        47
+      ],
+      [
+        824.4,
+        50
+      ],
+      [
+        864.4,
+        52
+      ],
+      [
+        904.5,
+        54
+      ],
+      [
+        945.4,
+        58
+      ],
+      [
+        985.3,
+        65
+      ],
+      [
+        1025.5,
+        67
+      ],
+      [
+        1065.4,
+        69
+      ],
+      [
+        1106.4,
+        77
+      ],
+      [
+        1146.9,
+        79
+      ],
+      [
+        1187.1,
+        81
+      ],
+      [
+        1227.5,
+        90
+      ],
+      [
+        1267.9,
+        92
+      ],
+      [
+        1308.1,
+        94
+      ],
+      [
+        1348.5,
+        105
+      ],
+      [
+        1390.0,
+        107
+      ],
+      [
+        1430.9,
+        109
+      ],
+      [
+        1471.1,
+        116
+      ],
+      [
+        1511.2,
+        118
+      ],
+      [
+        1551.3,
+        120
+      ],
+      [
+        1591.5,
+        123
+      ],
+      [
+        1631.9,
+        126
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nBees are very important for the food we eat. When a bee goes from flower to flower to collect nectar, it carries pollen that helps plants make fruits and seeds. About one third of the food crops in the world depend on bees and other pollinators. In the past few decades, bee populations have gone down a lot because of pesticides, disease, and the loss of wild flowers. If bees keep disappearing, foods like apples, almonds, and blueberries could become much harder to grow. People can help by planting flowers and avoiding chemicals in their gardens.\n\"\"\"\n\nThe writer tapped the word \"important\" in this sentence (marked with [[ ]]):\nBees are very [[important]] for the food we eat.\n\nGive 10 replacements for \"important\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"important\" without changing the rest of the sentence. Do not repeat \"important\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 368,
+  "new_tokens": 38,
+  "finish_reason": "stop",
+  "error": null
+}

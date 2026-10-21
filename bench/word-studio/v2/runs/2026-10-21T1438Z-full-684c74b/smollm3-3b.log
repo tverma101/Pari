@@ -1,0 +1,232 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]
+Fetching 2 files:  50%|█████     | 1/2 [00:10<00:10, 10.42s/it]
+Fetching 2 files: 100%|██████████| 2/2 [00:31<00:00, 16.85s/it]
+Fetching 2 files: 100%|██████████| 2/2 [00:31<00:00, 15.88s/it]
+
+Loading weights:   0%|          | 0/326 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/326 [00:00<01:58,  2.74it/s]
+Loading weights:   9%|▉         | 30/326 [00:00<00:03, 83.31it/s]
+Loading weights:  15%|█▍        | 48/326 [00:00<00:02, 93.74it/s]
+Loading weights:  20%|██        | 66/326 [00:00<00:02, 97.20it/s]
+Loading weights:  26%|██▌       | 84/326 [00:00<00:02, 112.00it/s]
+Loading weights:  30%|███       | 98/326 [00:01<00:02, 112.92it/s]
+Loading weights:  34%|███▍      | 111/326 [00:01<00:02, 105.96it/s]
+Loading weights:  38%|███▊      | 123/326 [00:01<00:02, 98.11it/s] 
+Loading weights:  42%|████▏     | 138/326 [00:01<00:01, 99.60it/s]
+Loading weights:  48%|████▊     | 156/326 [00:01<00:01, 94.46it/s]
+Loading weights:  53%|█████▎    | 174/326 [00:01<00:01, 111.25it/s]
+Loading weights:  57%|█████▋    | 187/326 [00:01<00:01, 115.11it/s]
+Loading weights:  61%|██████▏   | 200/326 [00:02<00:01, 109.26it/s]
+Loading weights:  65%|██████▌   | 212/326 [00:02<00:01, 97.65it/s] 
+Loading weights:  70%|██████▉   | 228/326 [00:02<00:01, 96.02it/s]
+Loading weights:  75%|███████▌  | 246/326 [00:02<00:00, 111.98it/s]
+Loading weights:  81%|████████  | 264/326 [00:02<00:00, 111.77it/s]
+Loading weights:  85%|████████▍ | 276/326 [00:02<00:00, 112.62it/s]
+Loading weights:  88%|████████▊ | 288/326 [00:02<00:00, 103.93it/s]
+Loading weights:  92%|█████████▏| 301/326 [00:02<00:00, 107.88it/s]
+Loading weights:  96%|█████████▌| 313/326 [00:03<00:00, 100.25it/s]
+Loading weights: 100%|██████████| 326/326 [00:03<00:00, 102.69it/s]
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+[smollm3-3b] 1/200 ws2-full-p09-academic-1 ok 7.8s options_seen=5
+[smollm3-3b] 2/200 ws2-full-p09-paraphrase-1 ok 5.6s options_seen=5
+[smollm3-3b] 3/200 ws2-full-p09-phrase_to_word-1 ok 1.6s options_seen=10
+[smollm3-3b] 4/200 ws2-full-p09-tap_word-1 ok 2.3s options_seen=11
+[smollm3-3b] 5/200 ws2-full-p09-tap_word-2 ok 2.2s options_seen=10
+[smollm3-3b] 6/200 ws2-full-p10-academic-1 ok 5.9s options_seen=5
+[smollm3-3b] 7/200 ws2-full-p10-condense-1 ok 5.1s options_seen=5
+[smollm3-3b] 8/200 ws2-full-p10-paraphrase-1 ok 6.7s options_seen=5
+[smollm3-3b] 9/200 ws2-full-p10-tap_word-1 ok 2.3s options_seen=10
+[smollm3-3b] 10/200 ws2-full-p10-tap_word-2 ok 2.6s options_seen=10
+[smollm3-3b] 11/200 ws2-full-p11-academic-1 ok 4.9s options_seen=5
+[smollm3-3b] 12/200 ws2-full-p11-condense-1 ok 2.3s options_seen=5
+[smollm3-3b] 13/200 ws2-full-p11-phrase_to_word-1 ok 1.9s options_seen=10
+[smollm3-3b] 14/200 ws2-full-p11-tap_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 15/200 ws2-full-p11-tap_word-2 ok 2.1s options_seen=10
+[smollm3-3b] 16/200 ws2-full-p12-condense-1 ok 4.6s options_seen=5
+[smollm3-3b] 17/200 ws2-full-p12-paraphrase-1 ok 5.6s options_seen=5
+[smollm3-3b] 18/200 ws2-full-p12-phrase_to_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 19/200 ws2-full-p12-tap_word-1 ok 1.7s options_seen=10
+[smollm3-3b] 20/200 ws2-full-p12-tap_word-2 ok 1.7s options_seen=10
+[smollm3-3b] 21/200 ws2-full-p13-academic-1 ok 5.0s options_seen=5
+[smollm3-3b] 22/200 ws2-full-p13-paraphrase-1 ok 4.7s options_seen=5
+[smollm3-3b] 23/200 ws2-full-p13-tap_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 24/200 ws2-full-p13-tap_word-2 ok 9.1s options_seen=10
+[smollm3-3b] 25/200 ws2-full-p13-word_sentences-1 ok 4.3s options_seen=5
+[smollm3-3b] 26/200 ws2-full-p14-academic-1 ok 5.2s options_seen=5
+[smollm3-3b] 27/200 ws2-full-p14-phrase_to_word-1 ok 1.8s options_seen=10
+[smollm3-3b] 28/200 ws2-full-p14-tap_word-1 ok 13.4s options_seen=12
+[smollm3-3b] 29/200 ws2-full-p14-tap_word-2 ok 13.5s options_seen=10
+[smollm3-3b] 30/200 ws2-full-p14-word_sentences-1 ok 4.0s options_seen=5
+[smollm3-3b] 31/200 ws2-full-p15-paraphrase-1 ok 9.5s options_seen=5
+[smollm3-3b] 32/200 ws2-full-p15-phrase_to_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 33/200 ws2-full-p15-tap_word-1 ok 2.4s options_seen=10
+[smollm3-3b] 34/200 ws2-full-p15-tap_word-2 ok 2.2s options_seen=10
+[smollm3-3b] 35/200 ws2-full-p15-word_sentences-1 ok 5.7s options_seen=5
+[smollm3-3b] 36/200 ws2-full-p16-academic-1 ok 6.7s options_seen=5
+[smollm3-3b] 37/200 ws2-full-p16-condense-1 ok 4.7s options_seen=5
+[smollm3-3b] 38/200 ws2-full-p16-tap_word-1 ok 1.8s options_seen=10
+[smollm3-3b] 39/200 ws2-full-p16-tap_word-2 ok 2.0s options_seen=10
+[smollm3-3b] 40/200 ws2-full-p16-word_sentences-1 ok 3.9s options_seen=5
+[smollm3-3b] 41/200 ws2-full-p17-condense-1 ok 5.4s options_seen=5
+[smollm3-3b] 42/200 ws2-full-p17-paraphrase-1 ok 4.2s options_seen=5
+[smollm3-3b] 43/200 ws2-full-p17-tap_word-1 ok 1.7s options_seen=10
+[smollm3-3b] 44/200 ws2-full-p17-tap_word-2 ok 6.8s options_seen=10
+[smollm3-3b] 45/200 ws2-full-p17-word_sentences-1 ok 3.8s options_seen=5
+[smollm3-3b] 46/200 ws2-full-p18-condense-1 ok 3.5s options_seen=5
+[smollm3-3b] 47/200 ws2-full-p18-phrase_to_word-1 ok 1.7s options_seen=10
+[smollm3-3b] 48/200 ws2-full-p18-tap_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 49/200 ws2-full-p18-tap_word-2 ok 2.0s options_seen=10
+[smollm3-3b] 50/200 ws2-full-p18-word_sentences-1 ok 3.4s options_seen=5
+[smollm3-3b] 51/200 ws2-full-p19-academic-1 ok 7.9s options_seen=5
+[smollm3-3b] 52/200 ws2-full-p19-paraphrase-1 ok 4.7s options_seen=5
+[smollm3-3b] 53/200 ws2-full-p19-phrase_to_word-1 ok 1.7s options_seen=10
+[smollm3-3b] 54/200 ws2-full-p19-tap_word-1 ok 1.8s options_seen=10
+[smollm3-3b] 55/200 ws2-full-p19-tap_word-2 ok 2.4s options_seen=9
+[smollm3-3b] 56/200 ws2-full-p20-academic-1 ok 5.0s options_seen=5
+[smollm3-3b] 57/200 ws2-full-p20-condense-1 ok 5.4s options_seen=5
+[smollm3-3b] 58/200 ws2-full-p20-paraphrase-1 ok 5.4s options_seen=5
+[smollm3-3b] 59/200 ws2-full-p20-tap_word-1 ok 2.3s options_seen=10
+[smollm3-3b] 60/200 ws2-full-p20-tap_word-2 ok 2.3s options_seen=10
+[smollm3-3b] 61/200 ws2-full-p21-academic-1 ok 5.9s options_seen=5
+[smollm3-3b] 62/200 ws2-full-p21-condense-1 ok 3.7s options_seen=5
+[smollm3-3b] 63/200 ws2-full-p21-phrase_to_word-1 ok 1.9s options_seen=10
+[smollm3-3b] 64/200 ws2-full-p21-tap_word-1 ok 2.3s options_seen=10
+[smollm3-3b] 65/200 ws2-full-p21-tap_word-2 ok 2.3s options_seen=10
+[smollm3-3b] 66/200 ws2-full-p22-condense-1 ok 4.4s options_seen=5
+[smollm3-3b] 67/200 ws2-full-p22-paraphrase-1 ok 5.0s options_seen=5
+[smollm3-3b] 68/200 ws2-full-p22-phrase_to_word-1 ok 1.8s options_seen=10
+[smollm3-3b] 69/200 ws2-full-p22-tap_word-1 ok 1.9s options_seen=10
+[smollm3-3b] 70/200 ws2-full-p22-tap_word-2 ok 2.0s options_seen=10
+[smollm3-3b] 71/200 ws2-full-p23-academic-1 ok 5.3s options_seen=5
+[smollm3-3b] 72/200 ws2-full-p23-paraphrase-1 ok 4.2s options_seen=5
+[smollm3-3b] 73/200 ws2-full-p23-tap_word-1 ok 2.6s options_seen=10
+[smollm3-3b] 74/200 ws2-full-p23-tap_word-2 ok 2.1s options_seen=10
+[smollm3-3b] 75/200 ws2-full-p23-word_sentences-1 ok 8.0s options_seen=5
+[smollm3-3b] 76/200 ws2-full-p24-academic-1 ok 5.1s options_seen=5
+[smollm3-3b] 77/200 ws2-full-p24-phrase_to_word-1 ok 2.3s options_seen=10
+[smollm3-3b] 78/200 ws2-full-p24-tap_word-1 ok 2.0s options_seen=10
+[smollm3-3b] 79/200 ws2-full-p24-tap_word-2 ok 2.0s options_seen=10
+[smollm3-3b] 80/200 ws2-full-p24-word_sentences-1 ok 3.3s options_seen=5
+[smollm3-3b] 81/200 ws2-full-p25-paraphrase-1 ok 6.2s options_seen=5
+[smollm3-3b] 82/200 ws2-full-p25-phrase_to_word-1 ok 2.3s options_seen=10
+[smollm3-3b] 83/200 ws2-full-p25-tap_word-1 ok 13.4s options_seen=11
+[smollm3-3b] 84/200 ws2-full-p25-tap_word-2 ok 13.6s options_seen=11
+[smollm3-3b] 85/200 ws2-full-p25-word_sentences-1 ok 4.7s options_seen=5
+[smollm3-3b] 86/200 ws2-full-p26-academic-1 ok 5.0s options_seen=5
+[smollm3-3b] 87/200 ws2-full-p26-condense-1 ok 2.3s options_seen=5
+[smollm3-3b] 88/200 ws2-full-p26-tap_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 89/200 ws2-full-p26-tap_word-2 ok 4.0s options_seen=10
+[smollm3-3b] 90/200 ws2-full-p26-word_sentences-1 ok 9.1s options_seen=5
+[smollm3-3b] 91/200 ws2-full-p27-condense-1 ok 5.6s options_seen=5
+[smollm3-3b] 92/200 ws2-full-p27-paraphrase-1 ok 3.9s options_seen=5
+[smollm3-3b] 93/200 ws2-full-p27-tap_word-1 ok 13.4s options_seen=11
+[smollm3-3b] 94/200 ws2-full-p27-tap_word-2 ok 1.7s options_seen=10
+[smollm3-3b] 95/200 ws2-full-p27-word_sentences-1 ok 4.2s options_seen=5
+[smollm3-3b] 96/200 ws2-full-p28-condense-1 ok 3.1s options_seen=5
+[smollm3-3b] 97/200 ws2-full-p28-phrase_to_word-1 ok 2.0s options_seen=10
+[smollm3-3b] 98/200 ws2-full-p28-tap_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 99/200 ws2-full-p28-tap_word-2 ok 2.1s options_seen=10
+[smollm3-3b] 100/200 ws2-full-p28-word_sentences-1 ok 4.3s options_seen=5
+[smollm3-3b] 101/200 ws2-full-p29-academic-1 ok 5.3s options_seen=5
+[smollm3-3b] 102/200 ws2-full-p29-condense-1 ok 4.9s options_seen=5
+[smollm3-3b] 103/200 ws2-full-p29-paraphrase-1 ok 6.7s options_seen=5
+[smollm3-3b] 104/200 ws2-full-p29-phrase_to_word-1 ok 1.7s options_seen=10
+[smollm3-3b] 105/200 ws2-full-p29-tap_word-1 ok 3.6s options_seen=10
+[smollm3-3b] 106/200 ws2-full-p30-academic-1 ok 5.6s options_seen=5
+[smollm3-3b] 107/200 ws2-full-p30-paraphrase-1 ok 3.2s options_seen=5
+[smollm3-3b] 108/200 ws2-full-p30-phrase_to_word-1 ok 2.0s options_seen=10
+[smollm3-3b] 109/200 ws2-full-p30-tap_word-1 ok 1.9s options_seen=10
+[smollm3-3b] 110/200 ws2-full-p30-word_sentences-1 ok 3.8s options_seen=5
+[smollm3-3b] 111/200 ws2-full-p31-academic-1 ok 4.7s options_seen=5
+[smollm3-3b] 112/200 ws2-full-p31-condense-1 ok 3.6s options_seen=5
+[smollm3-3b] 113/200 ws2-full-p31-paraphrase-1 ok 4.6s options_seen=5
+[smollm3-3b] 114/200 ws2-full-p31-tap_word-1 ok 2.0s options_seen=10
+[smollm3-3b] 115/200 ws2-full-p31-word_sentences-1 ok 3.5s options_seen=5
+[smollm3-3b] 116/200 ws2-full-p32-academic-1 ok 6.1s options_seen=5
+[smollm3-3b] 117/200 ws2-full-p32-condense-1 ok 4.3s options_seen=5
+[smollm3-3b] 118/200 ws2-full-p32-phrase_to_word-1 ok 1.7s options_seen=10
+[smollm3-3b] 119/200 ws2-full-p32-tap_word-1 ok 2.3s options_seen=10
+[smollm3-3b] 120/200 ws2-full-p32-word_sentences-1 ok 3.5s options_seen=5
+[smollm3-3b] 121/200 ws2-full-p33-condense-1 ok 5.9s options_seen=5
+[smollm3-3b] 122/200 ws2-full-p33-paraphrase-1 ok 3.6s options_seen=5
+[smollm3-3b] 123/200 ws2-full-p33-phrase_to_word-1 ok 2.4s options_seen=10
+[smollm3-3b] 124/200 ws2-full-p33-tap_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 125/200 ws2-full-p33-word_sentences-1 ok 3.7s options_seen=5
+[smollm3-3b] 126/200 ws2-full-p34-academic-1 ok 4.7s options_seen=5
+[smollm3-3b] 127/200 ws2-full-p34-condense-1 ok 5.2s options_seen=5
+[smollm3-3b] 128/200 ws2-full-p34-paraphrase-1 ok 5.9s options_seen=5
+[smollm3-3b] 129/200 ws2-full-p34-phrase_to_word-1 ok 1.6s options_seen=10
+[smollm3-3b] 130/200 ws2-full-p34-tap_word-1 ok 1.6s options_seen=10
+[smollm3-3b] 131/200 ws2-full-p35-academic-1 ok 7.8s options_seen=5
+[smollm3-3b] 132/200 ws2-full-p35-paraphrase-1 ok 3.1s options_seen=5
+[smollm3-3b] 133/200 ws2-full-p35-phrase_to_word-1 ok 1.9s options_seen=10
+[smollm3-3b] 134/200 ws2-full-p35-tap_word-1 ok 2.0s options_seen=10
+[smollm3-3b] 135/200 ws2-full-p35-word_sentences-1 ok 4.0s options_seen=5
+[smollm3-3b] 136/200 ws2-full-p36-academic-1 ok 4.7s options_seen=5
+[smollm3-3b] 137/200 ws2-full-p36-condense-1 ok 5.1s options_seen=5
+[smollm3-3b] 138/200 ws2-full-p36-paraphrase-1 ok 3.9s options_seen=5
+[smollm3-3b] 139/200 ws2-full-p36-tap_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 140/200 ws2-full-p36-word_sentences-1 ok 13.0s options_seen=5
+[smollm3-3b] 141/200 ws2-full-p37-academic-1 ok 4.7s options_seen=5
+[smollm3-3b] 142/200 ws2-full-p37-condense-1 ok 6.2s options_seen=5
+[smollm3-3b] 143/200 ws2-full-p37-phrase_to_word-1 ok 1.7s options_seen=10
+[smollm3-3b] 144/200 ws2-full-p37-tap_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 145/200 ws2-full-p37-word_sentences-1 ok 4.2s options_seen=5
+[smollm3-3b] 146/200 ws2-full-p38-condense-1 ok 5.1s options_seen=5
+[smollm3-3b] 147/200 ws2-full-p38-paraphrase-1 ok 4.9s options_seen=5
+[smollm3-3b] 148/200 ws2-full-p38-phrase_to_word-1 ok 1.7s options_seen=10
+[smollm3-3b] 149/200 ws2-full-p38-tap_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 150/200 ws2-full-p38-word_sentences-1 ok 10.1s options_seen=5
+[smollm3-3b] 151/200 ws2-full-p39-academic-1 ok 5.3s options_seen=5
+[smollm3-3b] 152/200 ws2-full-p39-condense-1 ok 4.2s options_seen=5
+[smollm3-3b] 153/200 ws2-full-p39-paraphrase-1 ok 6.7s options_seen=5
+[smollm3-3b] 154/200 ws2-full-p39-phrase_to_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 155/200 ws2-full-p39-tap_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 156/200 ws2-full-p40-academic-1 ok 6.8s options_seen=5
+[smollm3-3b] 157/200 ws2-full-p40-paraphrase-1 ok 5.1s options_seen=5
+[smollm3-3b] 158/200 ws2-full-p40-phrase_to_word-1 ok 1.7s options_seen=10
+[smollm3-3b] 159/200 ws2-full-p40-tap_word-1 ok 7.6s options_seen=10
+[smollm3-3b] 160/200 ws2-full-p40-word_sentences-1 ok 8.2s options_seen=5
+[smollm3-3b] 161/200 ws2-full-p41-academic-1 ok 4.3s options_seen=5
+[smollm3-3b] 162/200 ws2-full-p41-condense-1 ok 3.5s options_seen=5
+[smollm3-3b] 163/200 ws2-full-p41-phrase_to_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 164/200 ws2-full-p41-tap_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 165/200 ws2-full-p41-word_sentences-1 ok 4.1s options_seen=5
+[smollm3-3b] 166/200 ws2-full-p42-academic-1 ok 5.0s options_seen=5
+[smollm3-3b] 167/200 ws2-full-p42-condense-1 ok 3.8s options_seen=5
+[smollm3-3b] 168/200 ws2-full-p42-paraphrase-1 ok 4.8s options_seen=5
+[smollm3-3b] 169/200 ws2-full-p42-tap_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 170/200 ws2-full-p42-word_sentences-1 ok 5.2s options_seen=5
+[smollm3-3b] 171/200 ws2-full-p43-condense-1 ok 5.3s options_seen=5
+[smollm3-3b] 172/200 ws2-full-p43-paraphrase-1 ok 5.7s options_seen=5
+[smollm3-3b] 173/200 ws2-full-p43-phrase_to_word-1 ok 2.0s options_seen=10
+[smollm3-3b] 174/200 ws2-full-p43-tap_word-1 ok 1.9s options_seen=10
+[smollm3-3b] 175/200 ws2-full-p43-word_sentences-1 ok 3.4s options_seen=5
+[smollm3-3b] 176/200 ws2-full-p44-academic-1 ok 5.2s options_seen=5
+[smollm3-3b] 177/200 ws2-full-p44-condense-1 ok 4.8s options_seen=5
+[smollm3-3b] 178/200 ws2-full-p44-paraphrase-1 ok 4.2s options_seen=5
+[smollm3-3b] 179/200 ws2-full-p44-phrase_to_word-1 ok 2.7s options_seen=10
+[smollm3-3b] 180/200 ws2-full-p44-tap_word-1 ok 3.1s options_seen=10
+[smollm3-3b] 181/200 ws2-full-p45-academic-1 ok 7.9s options_seen=5
+[smollm3-3b] 182/200 ws2-full-p45-paraphrase-1 ok 4.6s options_seen=5
+[smollm3-3b] 183/200 ws2-full-p45-phrase_to_word-1 ok 2.4s options_seen=10
+[smollm3-3b] 184/200 ws2-full-p45-tap_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 185/200 ws2-full-p45-word_sentences-1 ok 4.9s options_seen=5
+[smollm3-3b] 186/200 ws2-full-p46-academic-1 ok 4.7s options_seen=5
+[smollm3-3b] 187/200 ws2-full-p46-condense-1 ok 3.5s options_seen=5
+[smollm3-3b] 188/200 ws2-full-p46-paraphrase-1 ok 4.9s options_seen=5
+[smollm3-3b] 189/200 ws2-full-p46-tap_word-1 ok 3.7s options_seen=10
+[smollm3-3b] 190/200 ws2-full-p46-word_sentences-1 ok 3.7s options_seen=5
+[smollm3-3b] 191/200 ws2-full-p47-academic-1 ok 5.7s options_seen=5
+[smollm3-3b] 192/200 ws2-full-p47-condense-1 ok 3.6s options_seen=5
+[smollm3-3b] 193/200 ws2-full-p47-phrase_to_word-1 ok 2.0s options_seen=10
+[smollm3-3b] 194/200 ws2-full-p47-tap_word-1 ok 2.0s options_seen=10
+[smollm3-3b] 195/200 ws2-full-p47-word_sentences-1 ok 4.4s options_seen=5
+[smollm3-3b] 196/200 ws2-full-p48-condense-1 ok 10.3s options_seen=5
+[smollm3-3b] 197/200 ws2-full-p48-paraphrase-1 ok 4.1s options_seen=5
+[smollm3-3b] 198/200 ws2-full-p48-phrase_to_word-1 ok 2.3s options_seen=10
+[smollm3-3b] 199/200 ws2-full-p48-tap_word-1 ok 1.9s options_seen=10
+[smollm3-3b] 200/200 ws2-full-p48-word_sentences-1 ok 5.1s options_seen=5
+{"candidate": "smollm3-3b", "status": "completed", "tasks": {"ok": 200, "error": 0, "failed_ids": []}}

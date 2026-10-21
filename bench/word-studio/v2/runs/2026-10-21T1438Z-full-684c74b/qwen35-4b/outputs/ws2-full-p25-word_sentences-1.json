@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p25-word_sentences-1",
+  "kind": "word_sentences",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "4e440fab25c7959550a0c36d78c1f21dccc2df188d6c12c9c8a5afc5647da23b",
+  "seed": 4776964976290093489,
+  "max_new_tokens": 768,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"A long drought dried everything out.\", \"When a long drought dried everything out.\", \"The long drought dried everything out.\", \"The drought dried everything out.\", \"The long drought dried all things out.\"]}\n",
+  "timing": {
+    "first_text_ms": 520.1,
+    "option_ms": [
+      1122.4,
+      1666.9,
+      2151.9,
+      2576.0,
+      3123.9
+    ],
+    "total_ms": 3367.4,
+    "stream": [
+      [
+        520.1,
+        2
+      ],
+      [
+        583.5,
+        9
+      ],
+      [
+        643.9,
+        11
+      ],
+      [
+        704.4,
+        14
+      ],
+      [
+        763.9,
+        15
+      ],
+      [
+        823.5,
+        20
+      ],
+      [
+        884.5,
+        28
+      ],
+      [
+        943.8,
+        34
+      ],
+      [
+        1003.2,
+        45
+      ],
+      [
+        1063.3,
+        49
+      ],
+      [
+        1122.4,
+        52
+      ],
+      [
+        1182.4,
+        54
+      ],
+      [
+        1242.8,
+        58
+      ],
+      [
+        1302.3,
+        60
+      ],
+      [
+        1362.1,
+        65
+      ],
+      [
+        1421.2,
+        73
+      ],
+      [
+        1482.7,
+        79
+      ],
+      [
+        1543.2,
+        90
+      ],
+      [
+        1605.4,
+        94
+      ],
+      [
+        1666.9,
+        97
+      ],
+      [
+        1728.5,
+        99
+      ],
+      [
+        1789.1,
+        102
+      ],
+      [
+        1849.1,
+        107
+      ],
+      [
+        1910.2,
+        115
+      ],
+      [
+        1970.8,
+        121
+      ],
+      [
+        2030.7,
+        132
+      ],
+      [
+        2091.1,
+        136
+      ],
+      [
+        2151.9,
+        139
+      ],
+      [
+        2212.5,
+        141
+      ],
+      [
+        2272.9,
+        144
+      ],
+      [
+        2332.8,
+        152
+      ],
+      [
+        2392.8,
+        158
+      ],
+      [
+        2455.0,
+        169
+      ],
+      [
+        2515.0,
+        173
+      ],
+      [
+        2576.0,
+        176
+      ],
+      [
+        2637.8,
+        178
+      ],
+      [
+        2699.6,
+        181
+      ],
+      [
+        2760.7,
+        186
+      ],
+      [
+        2821.3,
+        194
+      ],
+      [
+        2882.0,
+        200
+      ],
+      [
+        2941.7,
+        204
+      ],
+      [
+        3003.4,
+        211
+      ],
+      [
+        3063.8,
+        215
+      ],
+      [
+        3123.9,
+        217
+      ],
+      [
+        3185.3,
+        219
+      ],
+      [
+        3306.9,
+        220
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Dust Bowl was a period in the 1930s when huge dust storms hit the Great Plains. Farmers had plowed up the grass that held the soil in place, and then a long drought dried everything out. When strong winds came, they picked up the loose dirt and created clouds of dust so thick that people could not see the sun. Crops died, animals got sick, and many families lost their farms. Thousands of people packed up their belongings and moved west to California looking for work. The disaster taught the government that it needed to help farmers protect the land.\n\"\"\"\n\nThe writer wants to use the word \"drought\" in this essay.\n\nWrite 5 different sentences that use \"drought\" naturally and could fit into this paragraph, on its topic and in its argument. Each sentence must contain \"drought\" (another form of the word, such as a plural or past tense, is fine). Use only ideas the paragraph already contains; do not invent statistics, names or quotations. Put the best sentences first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 337,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p15-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "4573975a52fbe2767571c9c3053cdaad240fb5f9f4143c9de7a04897ff60165a",
+  "seed": 5897477096274807355,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"collapses\", \"disintegrates\", \"crumbles\", \"breaks down\", \"cracks\", \"fails\", \"disintegrates\", \"disintegrates\", \"falls apart\", \"falls to pieces\"]}",
+  "timing": {
+    "first_text_ms": 176.8,
+    "option_ms": [
+      430.6,
+      637.3,
+      806.8,
+      1016.8,
+      1183.9,
+      1310.2,
+      1519.4,
+      1726.0,
+      1894.3,
+      2113.7
+    ],
+    "total_ms": 2155.6,
+    "stream": [
+      [
+        176.8,
+        2
+      ],
+      [
+        222.2,
+        9
+      ],
+      [
+        264.2,
+        11
+      ],
+      [
+        306.1,
+        14
+      ],
+      [
+        347.5,
+        18
+      ],
+      [
+        389.0,
+        23
+      ],
+      [
+        430.6,
+        25
+      ],
+      [
+        472.3,
+        27
+      ],
+      [
+        513.3,
+        30
+      ],
+      [
+        554.5,
+        36
+      ],
+      [
+        596.2,
+        40
+      ],
+      [
+        637.3,
+        42
+      ],
+      [
+        679.0,
+        44
+      ],
+      [
+        720.3,
+        46
+      ],
+      [
+        762.3,
+        52
+      ],
+      [
+        806.8,
+        54
+      ],
+      [
+        848.9,
+        56
+      ],
+      [
+        891.7,
+        61
+      ],
+      [
+        933.4,
+        62
+      ],
+      [
+        975.4,
+        67
+      ],
+      [
+        1016.8,
+        69
+      ],
+      [
+        1058.1,
+        71
+      ],
+      [
+        1100.1,
+        73
+      ],
+      [
+        1141.6,
+        77
+      ],
+      [
+        1183.9,
+        79
+      ],
+      [
+        1227.0,
+        81
+      ],
+      [
+        1269.1,
+        86
+      ],
+      [
+        1310.2,
+        88
+      ],
+      [
+        1351.5,
+        90
+      ],
+      [
+        1393.2,
+        93
+      ],
+      [
+        1435.6,
+        99
+      ],
+      [
+        1477.3,
+        103
+      ],
+      [
+        1519.4,
+        105
+      ],
+      [
+        1560.5,
+        107
+      ],
+      [
+        1602.0,
+        110
+      ],
+      [
+        1643.0,
+        116
+      ],
+      [
+        1685.0,
+        120
+      ],
+      [
+        1726.0,
+        122
+      ],
+      [
+        1767.4,
+        124
+      ],
+      [
+        1811.0,
+        129
+      ],
+      [
+        1852.3,
+        135
+      ],
+      [
+        1894.3,
+        137
+      ],
+      [
+        1939.6,
+        139
+      ],
+      [
+        1985.7,
+        144
+      ],
+      [
+        2030.0,
+        147
+      ],
+      [
+        2071.9,
+        154
+      ],
+      [
+        2113.7,
+        157
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Of Mice and Men, George and Lennie share a dream of owning a small farm together. For George, the dream gives him a reason to keep working hard even though his life is lonely. For Lennie, it is mostly about getting to take care of rabbits. Most of the other workers on the ranch have no one, so they are surprised that the two men travel together. Steinbeck uses their friendship to show how important it is to have someone who cares about you. When the dream falls apart at the end, it shows how hard it was for poor workers to change their lives during the Great Depression.\n\"\"\"\n\nThe writer selected the phrase \"falls apart\" in this sentence (marked with [[ ]]):\nWhen the dream [[falls apart]] at the end, it shows how hard it was for poor workers to change their lives during the Great Depression.\n\nGive 10 single words that can replace \"falls apart\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 375,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

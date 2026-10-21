@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p17-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "8c6693c722e062c89a0c33a0ef668f0d050cb791f7be1838c43cdaea42e6fb89",
+  "seed": 9025225142981080757,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"vanishing\", \"fading\", \"going extinct\", \"declining\", \"disintegrating\", \"lost\", \"wearing away\", \"fading out\", \"becoming scarce\", \"fading into nothing\"]}\n",
+  "timing": {
+    "first_text_ms": 541.6,
+    "option_ms": [
+      916.7,
+      1162.4,
+      1408.3,
+      1656.3,
+      1961.7,
+      2144.9,
+      2445.9,
+      2748.2,
+      3054.9,
+      3420.7
+    ],
+    "total_ms": 3604.2,
+    "stream": [
+      [
+        541.6,
+        2
+      ],
+      [
+        605.1,
+        9
+      ],
+      [
+        667.0,
+        11
+      ],
+      [
+        729.8,
+        14
+      ],
+      [
+        790.8,
+        17
+      ],
+      [
+        853.0,
+        23
+      ],
+      [
+        916.7,
+        25
+      ],
+      [
+        977.7,
+        27
+      ],
+      [
+        1039.6,
+        28
+      ],
+      [
+        1101.1,
+        33
+      ],
+      [
+        1162.4,
+        35
+      ],
+      [
+        1223.4,
+        37
+      ],
+      [
+        1284.5,
+        42
+      ],
+      [
+        1346.6,
+        50
+      ],
+      [
+        1408.3,
+        52
+      ],
+      [
+        1470.0,
+        54
+      ],
+      [
+        1531.6,
+        58
+      ],
+      [
+        1593.9,
+        63
+      ],
+      [
+        1656.3,
+        65
+      ],
+      [
+        1718.7,
+        67
+      ],
+      [
+        1778.4,
+        70
+      ],
+      [
+        1838.4,
+        76
+      ],
+      [
+        1901.9,
+        81
+      ],
+      [
+        1961.7,
+        83
+      ],
+      [
+        2021.9,
+        85
+      ],
+      [
+        2082.1,
+        89
+      ],
+      [
+        2144.9,
+        91
+      ],
+      [
+        2205.1,
+        93
+      ],
+      [
+        2264.6,
+        94
+      ],
+      [
+        2325.3,
+        100
+      ],
+      [
+        2385.3,
+        105
+      ],
+      [
+        2445.9,
+        107
+      ],
+      [
+        2506.2,
+        109
+      ],
+      [
+        2565.7,
+        110
+      ],
+      [
+        2626.6,
+        115
+      ],
+      [
+        2687.8,
+        119
+      ],
+      [
+        2748.2,
+        121
+      ],
+      [
+        2808.6,
+        123
+      ],
+      [
+        2869.6,
+        126
+      ],
+      [
+        2933.0,
+        131
+      ],
+      [
+        2994.2,
+        138
+      ],
+      [
+        3054.9,
+        140
+      ],
+      [
+        3117.4,
+        142
+      ],
+      [
+        3177.3,
+        143
+      ],
+      [
+        3238.6,
+        148
+      ],
+      [
+        3298.3,
+        153
+      ],
+      [
+        3358.0,
+        161
+      ],
+      [
+        3420.7,
+        164
+      ],
+      [
+        3542.2,
+        165
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nBees are very important for the food we eat. When a bee goes from flower to flower to collect nectar, it carries pollen that helps plants make fruits and seeds. About one third of the food crops in the world depend on bees and other pollinators. In the past few decades, bee populations have gone down a lot because of pesticides, disease, and the loss of wild flowers. If bees keep disappearing, foods like apples, almonds, and blueberries could become much harder to grow. People can help by planting flowers and avoiding chemicals in their gardens.\n\"\"\"\n\nThe writer tapped the word \"disappearing\" in this sentence (marked with [[ ]]):\nIf bees keep [[disappearing]], foods like apples, almonds, and blueberries could become much harder to grow.\n\nGive 10 replacements for \"disappearing\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"disappearing\" without changing the rest of the sentence. Do not repeat \"disappearing\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 359,
+  "new_tokens": 51,
+  "finish_reason": "stop",
+  "error": null
+}

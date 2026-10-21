@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p19-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "a61ec81d30dbe54c23c5ac4920bfd64dad575fb491c730bfe7c551e13bed0c19",
+  "seed": 4975093315820536332,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"evaluate readiness\", \"assess preparedness\", \"evaluate college readiness\", \"judge college readiness\", \"assess readiness\", \"evaluate suitability\", \"judge suitability\", \"assess preparedness\", \"evaluate suitability\", \"judge suitability\"]}",
+  "timing": {
+    "first_text_ms": 184.4,
+    "option_ms": [
+      456.5,
+      680.3,
+      906.9,
+      1151.2,
+      1376.1,
+      1556.7,
+      1736.6,
+      1962.4,
+      2144.4,
+      2330.1
+    ],
+    "total_ms": 2421.5,
+    "stream": [
+      [
+        184.4,
+        2
+      ],
+      [
+        230.7,
+        9
+      ],
+      [
+        276.6,
+        11
+      ],
+      [
+        322.0,
+        14
+      ],
+      [
+        366.7,
+        22
+      ],
+      [
+        411.2,
+        32
+      ],
+      [
+        456.5,
+        34
+      ],
+      [
+        501.6,
+        36
+      ],
+      [
+        546.2,
+        39
+      ],
+      [
+        590.6,
+        42
+      ],
+      [
+        635.2,
+        55
+      ],
+      [
+        680.3,
+        57
+      ],
+      [
+        724.9,
+        59
+      ],
+      [
+        769.6,
+        67
+      ],
+      [
+        817.2,
+        75
+      ],
+      [
+        862.2,
+        85
+      ],
+      [
+        906.9,
+        87
+      ],
+      [
+        951.5,
+        89
+      ],
+      [
+        996.0,
+        94
+      ],
+      [
+        1041.0,
+        102
+      ],
+      [
+        1097.8,
+        112
+      ],
+      [
+        1151.2,
+        114
+      ],
+      [
+        1195.7,
+        116
+      ],
+      [
+        1240.2,
+        119
+      ],
+      [
+        1285.9,
+        122
+      ],
+      [
+        1330.9,
+        132
+      ],
+      [
+        1376.1,
+        134
+      ],
+      [
+        1420.9,
+        136
+      ],
+      [
+        1466.1,
+        144
+      ],
+      [
+        1511.6,
+        156
+      ],
+      [
+        1556.7,
+        158
+      ],
+      [
+        1601.4,
+        160
+      ],
+      [
+        1646.1,
+        165
+      ],
+      [
+        1691.5,
+        177
+      ],
+      [
+        1736.6,
+        179
+      ],
+      [
+        1781.5,
+        181
+      ],
+      [
+        1826.3,
+        184
+      ],
+      [
+        1872.0,
+        187
+      ],
+      [
+        1917.2,
+        200
+      ],
+      [
+        1962.4,
+        202
+      ],
+      [
+        2007.5,
+        204
+      ],
+      [
+        2053.2,
+        212
+      ],
+      [
+        2098.7,
+        224
+      ],
+      [
+        2144.4,
+        226
+      ],
+      [
+        2192.2,
+        228
+      ],
+      [
+        2238.9,
+        233
+      ],
+      [
+        2285.2,
+        245
+      ],
+      [
+        2330.1,
+        247
+      ],
+      [
+        2375.1,
+        248
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nStandardized tests like the SAT are supposed to measure how ready students are for college, but they do not tell the whole story. A student's score can depend a lot on whether their family could pay for tutoring and practice books. Some students are also very nervous test-takers, so their scores do not show what they actually know. Because of this, more than 1,800 colleges have made the SAT optional. I think colleges should look at grades, essays, and activities instead of focusing on one test score.\n\"\"\"\n\nThe writer tapped the word \"measure\" in this sentence (marked with [[ ]]):\nStandardized tests like the SAT are supposed to [[measure]] how ready students are for college, but they do not tell the whole story.\n\nGive 10 replacements for \"measure\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"measure\" without changing the rest of the sentence. Do not repeat \"measure\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 325,
+  "new_tokens": 50,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p39-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "97589c9f57e5e62332d039d67bc4709c66e79092009de7cc1065ed7677c86cff",
+  "seed": 4001648963559269886,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"vivid\", \"eye-catching\", \"colorful\", \"lively\", \"glossy\", \"eye-popping\", \"radiant\", \"striking\", \"vibrant\", \"brilliant\"]}\n",
+  "timing": {
+    "first_text_ms": 540.0,
+    "option_ms": [
+      909.8,
+      1154.1,
+      1395.8,
+      1638.8,
+      1942.4,
+      2245.5,
+      2492.1,
+      2735.2,
+      3042.4,
+      3372.5
+    ],
+    "total_ms": 3565.5,
+    "stream": [
+      [
+        540.0,
+        2
+      ],
+      [
+        602.9,
+        9
+      ],
+      [
+        664.1,
+        11
+      ],
+      [
+        725.3,
+        14
+      ],
+      [
+        787.9,
+        15
+      ],
+      [
+        849.4,
+        19
+      ],
+      [
+        909.8,
+        21
+      ],
+      [
+        971.2,
+        23
+      ],
+      [
+        1031.5,
+        26
+      ],
+      [
+        1092.3,
+        35
+      ],
+      [
+        1154.1,
+        37
+      ],
+      [
+        1214.1,
+        39
+      ],
+      [
+        1274.4,
+        44
+      ],
+      [
+        1335.3,
+        47
+      ],
+      [
+        1395.8,
+        49
+      ],
+      [
+        1457.3,
+        51
+      ],
+      [
+        1518.0,
+        52
+      ],
+      [
+        1578.8,
+        57
+      ],
+      [
+        1638.8,
+        59
+      ],
+      [
+        1699.8,
+        61
+      ],
+      [
+        1760.6,
+        62
+      ],
+      [
+        1820.7,
+        66
+      ],
+      [
+        1881.5,
+        67
+      ],
+      [
+        1942.4,
+        69
+      ],
+      [
+        2002.2,
+        71
+      ],
+      [
+        2063.1,
+        74
+      ],
+      [
+        2123.6,
+        76
+      ],
+      [
+        2184.2,
+        82
+      ],
+      [
+        2245.5,
+        84
+      ],
+      [
+        2305.7,
+        86
+      ],
+      [
+        2366.4,
+        90
+      ],
+      [
+        2430.0,
+        93
+      ],
+      [
+        2492.1,
+        95
+      ],
+      [
+        2554.1,
+        97
+      ],
+      [
+        2614.1,
+        101
+      ],
+      [
+        2674.2,
+        105
+      ],
+      [
+        2735.2,
+        107
+      ],
+      [
+        2797.6,
+        109
+      ],
+      [
+        2858.3,
+        110
+      ],
+      [
+        2920.3,
+        113
+      ],
+      [
+        2981.9,
+        116
+      ],
+      [
+        3042.4,
+        118
+      ],
+      [
+        3110.7,
+        120
+      ],
+      [
+        3171.4,
+        122
+      ],
+      [
+        3231.9,
+        125
+      ],
+      [
+        3293.7,
+        129
+      ],
+      [
+        3372.5,
+        132
+      ],
+      [
+        3503.4,
+        133
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nFast food companies spend billions of dollars every year on ads that are aimed at children. These commercials often use cartoon characters, bright colors, and free toys to make kids want to eat there. Young children cannot always tell the difference between an ad and a regular TV show, so they believe what the ads say. This is a problem because eating too much fast food can lead to health issues like obesity and diabetes. I believe the government should put stronger limits on food ads that target kids, the same way it does for cigarette ads.\n\"\"\"\n\nThe writer tapped the word \"bright\" in this sentence (marked with [[ ]]):\nThese commercials often use cartoon characters, [[bright]] colors, and free toys to make kids want to eat there.\n\nGive 10 replacements for \"bright\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"bright\" without changing the rest of the sentence. Do not repeat \"bright\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 342,
+  "new_tokens": 50,
+  "finish_reason": "stop",
+  "error": null
+}

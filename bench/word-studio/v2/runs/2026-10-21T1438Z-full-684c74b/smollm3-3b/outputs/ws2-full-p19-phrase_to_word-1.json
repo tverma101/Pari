@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p19-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "smollm3-3b",
+  "messages_sha256": "3b9beaeb4e0c68523785c41720585e889af09fd0ff617cbed379909fcfd88c3f",
+  "seed": 5799275487369828653,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"afford\", \"provide\", \"cover\", \"support\", \"furnish\", \"supply\", \"allow\", \"enable\", \"give\", \"grant\"]}",
+  "timing": {
+    "first_text_ms": 163.3,
+    "option_ms": [
+      413.4,
+      539.4,
+      666.0,
+      790.5,
+      997.9,
+      1124.1,
+      1250.9,
+      1377.6,
+      1504.1,
+      1635.3
+    ],
+    "total_ms": 1678.6,
+    "stream": [
+      [
+        163.3,
+        2
+      ],
+      [
+        205.9,
+        9
+      ],
+      [
+        247.6,
+        11
+      ],
+      [
+        289.8,
+        14
+      ],
+      [
+        330.5,
+        17
+      ],
+      [
+        372.7,
+        20
+      ],
+      [
+        413.4,
+        22
+      ],
+      [
+        456.7,
+        24
+      ],
+      [
+        497.5,
+        31
+      ],
+      [
+        539.4,
+        33
+      ],
+      [
+        582.8,
+        35
+      ],
+      [
+        625.1,
+        40
+      ],
+      [
+        666.0,
+        42
+      ],
+      [
+        707.6,
+        44
+      ],
+      [
+        748.8,
+        51
+      ],
+      [
+        790.5,
+        53
+      ],
+      [
+        831.7,
+        55
+      ],
+      [
+        872.6,
+        56
+      ],
+      [
+        913.9,
+        59
+      ],
+      [
+        956.0,
+        62
+      ],
+      [
+        997.9,
+        64
+      ],
+      [
+        1040.2,
+        66
+      ],
+      [
+        1082.5,
+        72
+      ],
+      [
+        1124.1,
+        74
+      ],
+      [
+        1167.1,
+        76
+      ],
+      [
+        1208.8,
+        81
+      ],
+      [
+        1250.9,
+        83
+      ],
+      [
+        1293.2,
+        85
+      ],
+      [
+        1334.7,
+        91
+      ],
+      [
+        1377.6,
+        93
+      ],
+      [
+        1419.9,
+        95
+      ],
+      [
+        1462.3,
+        99
+      ],
+      [
+        1504.1,
+        101
+      ],
+      [
+        1545.4,
+        103
+      ],
+      [
+        1591.5,
+        108
+      ],
+      [
+        1635.3,
+        111
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\n## Metadata\n\nKnowledge Cutoff Date: June 2025\nToday Date: 21 October 2026\nReasoning Mode: /no_think\n\n## Custom Instructions\n\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.\n\n<|im_start|>user\nParagraph:\n\"\"\"\nStandardized tests like the SAT are supposed to measure how ready students are for college, but they do not tell the whole story. A student's score can depend a lot on whether their family could pay for tutoring and practice books. Some students are also very nervous test-takers, so their scores do not show what they actually know. Because of this, more than 1,800 colleges have made the SAT optional. I think colleges should look at grades, essays, and activities instead of focusing on one test score.\n\"\"\"\n\nThe writer selected the phrase \"pay for\" in this sentence (marked with [[ ]]):\nA student's score can depend a lot on whether their family could [[pay for]] tutoring and practice books.\n\nGive 10 single words that can replace \"pay for\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n",
+  "prompt_tokens": 347,
+  "new_tokens": 37,
+  "finish_reason": "stop",
+  "error": null
+}
