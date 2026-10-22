@@ -1,0 +1,35 @@
+{
+  "config": {
+    "candidates": [
+      "qwen35-35b-a3b-gptq-int4"
+    ],
+    "dtype": "float16",
+    "git_sha": "dd4c78173c9b78d0f89edce6f29909c413c7ec0d",
+    "limit": 2,
+    "per_candidate_timeout_s": 7200,
+    "pip": [
+      "transformers==5.18.0",
+      "accelerate==1.15.0",
+      "gptqmodel==7.5.0"
+    ],
+    "repo_url": "https://github.com/tverma101/Pari.git",
+    "run_id": "2026-10-22T1942Z-screen-dd4c781-limit2",
+    "task_set": "screen"
+  },
+  "git_head": "dd4c78173c9b78d0f89edce6f29909c413c7ec0d",
+  "started_at": "2026-10-22T19:44:14+00:00",
+  "candidates": {
+    "qwen35-35b-a3b-gptq-int4": {
+      "exit_code": 0,
+      "status": "completed",
+      "tasks": {
+        "ok": 2,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": null,
+      "wall_seconds": 521.6
+    }
+  },
+  "finished_at": "2026-10-22T19:52:55+00:00"
+}
