@@ -84,6 +84,15 @@ dropped. An explicit `--tasks` subset is recorded in `packets/index.json`.
 Start with a smoke run (`--limit 2`) of every candidate. It shows which ones
 load and generate on T4 in fp16 before the full screen spends quota.
 
+The 2×T4 reference (`qwen35-35b-a3b-gptq-int4`) is a GPTQ MoE checkpoint.
+Transformers alone cannot fill its per-expert weights, so the launcher also
+installs GPTQModel for GPTQ candidates and the runner loads them with it. Since
+GPTQModel does not check for missing weights, the runner compares the loaded
+model with the checkpoint index itself. A model with any weight placed off the
+GPUs fails at load instead of running on the CPU. The reference answers whether
+a big open model beats the best Mac-sized one by enough to justify
+distillation (#92). Judge it alone with anchors, like any new model.
+
 ## Judging with subagents
 
 When the `claude` CLI has no login or API key of its own (for example in a
