@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 0,
+    "5": 1,
+    "6": 0,
+    "7": 1,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "Only 1 'circulated' is strong. 4 'reached across Europe' changes the meaning (0). 6 'passed across' is odd (0). 8 'ran' is the wrong sense (0). 9 'crossed across' is ungrammatical (0). 10 'expanded' means grew, not spread (0). 2 and 7 are plain."
+  }
+ ]
+}

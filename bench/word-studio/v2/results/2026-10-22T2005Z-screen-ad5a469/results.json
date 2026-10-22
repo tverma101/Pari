@@ -1,0 +1,503 @@
+{
+  "benchmark": "word-studio-v2",
+  "run_id": "2026-10-22T2005Z-screen-ad5a469",
+  "task_set": "screen",
+  "task_selection": "recorded_run_tasks",
+  "task_set_complete": true,
+  "tasks_judged": 40,
+  "judge": {
+    "judge": "claude-subagent:claude-opus-5-5",
+    "session": "batch:4b80dcd67108f6abd5cae5de0f10ccc65c9c2e12e255c1f141be42f3a46331b6",
+    "blind": true,
+    "effort_level": "high",
+    "provider": "claude-code-subagent",
+    "model_verified": false,
+    "provider_instance_id": null,
+    "delegated_task_id": null,
+    "child_run_id": null
+  },
+  "anchor_agreement": {
+    "anchors": 10,
+    "options": 60,
+    "label_agreement": 0.9167,
+    "bar_agreement": 0.9833,
+    "top3_shift_mean": 0.0,
+    "citations": [
+      {
+        "task_id": "ws2-screen-p01-tap_word-2",
+        "label": "B",
+        "original": {
+          "judging": "bench/word-studio/v2/judging/2026-10-16T1933Z-screen-0dd011b",
+          "label": "C",
+          "task_id": "ws2-screen-p01-tap_word-2"
+        },
+        "sha256": "793dea75655688c8755d09e24c7977ed3ff34804dfa4612b8397949a8ba8d316"
+      },
+      {
+        "task_id": "ws2-screen-p02-phrase_to_word-1",
+        "label": "A",
+        "original": {
+          "judging": "bench/word-studio/v2/judging/2026-10-16T1933Z-screen-0dd011b",
+          "label": "B",
+          "task_id": "ws2-screen-p02-phrase_to_word-1"
+        },
+        "sha256": "9155aad22d5937e14f9aa2511c75e710e89a7fd1e56ce0e2df27ae6854831910"
+      },
+      {
+        "task_id": "ws2-screen-p02-tap_word-1",
+        "label": "A",
+        "original": {
+          "judging": "bench/word-studio/v2/judging/2026-10-16T1933Z-screen-0dd011b",
+          "label": "E",
+          "task_id": "ws2-screen-p02-tap_word-1"
+        },
+        "sha256": "22acd580b36b16455ddc89e7b7080282308ecf00e0b51eabbf3c4947af939642"
+      },
+      {
+        "task_id": "ws2-screen-p04-condense-1",
+        "label": "A",
+        "original": {
+          "judging": "bench/word-studio/v2/judging/2026-10-16T1933Z-screen-0dd011b",
+          "label": "B",
+          "task_id": "ws2-screen-p04-condense-1"
+        },
+        "sha256": "e5eee85f7894a8f1266ab245bc64f0c31582d84a377c5931e64fc44ce7c0c590"
+      },
+      {
+        "task_id": "ws2-screen-p05-phrase_to_word-1",
+        "label": "B",
+        "original": {
+          "judging": "bench/word-studio/v2/judging/2026-10-16T1933Z-screen-0dd011b",
+          "label": "A",
+          "task_id": "ws2-screen-p05-phrase_to_word-1"
+        },
+        "sha256": "ffed8af7c3d3aad3d5f52634e8296a05cb6b692e35cec970412c22fb606979d2"
+      },
+      {
+        "task_id": "ws2-screen-p05-tap_word-1",
+        "label": "A",
+        "original": {
+          "judging": "bench/word-studio/v2/judging/2026-10-16T1933Z-screen-0dd011b",
+          "label": "C",
+          "task_id": "ws2-screen-p05-tap_word-1"
+        },
+        "sha256": "d800176dd74c2d57f4e6e8a164a918dc789416ebfd702b5bdc8ab6659ee61197"
+      },
+      {
+        "task_id": "ws2-screen-p06-academic-1",
+        "label": "B",
+        "original": {
+          "judging": "bench/word-studio/v2/judging/2026-10-16T1933Z-screen-0dd011b",
+          "label": "B",
+          "task_id": "ws2-screen-p06-academic-1"
+        },
+        "sha256": "476d11a25302c56cb4b5fd060241d7902e20db7d4cc904c81a8276f2117aad2b"
+      },
+      {
+        "task_id": "ws2-screen-p07-condense-1",
+        "label": "A",
+        "original": {
+          "judging": "bench/word-studio/v2/judging/2026-10-16T1933Z-screen-0dd011b",
+          "label": "B",
+          "task_id": "ws2-screen-p07-condense-1"
+        },
+        "sha256": "71bab4c20c6165a899da62f5c311f34d732ca3bdde7471d137976e5b107f6ed6"
+      },
+      {
+        "task_id": "ws2-screen-p07-tap_word-1",
+        "label": "B",
+        "original": {
+          "judging": "bench/word-studio/v2/judging/2026-10-16T1933Z-screen-0dd011b",
+          "label": "A",
+          "task_id": "ws2-screen-p07-tap_word-1"
+        },
+        "sha256": "b4e08ec870850c8e2352a69ade65f00f9180846a2e27d61707b36a1693336e59"
+      },
+      {
+        "task_id": "ws2-screen-p08-paraphrase-1",
+        "label": "B",
+        "original": {
+          "judging": "bench/word-studio/v2/judging/2026-10-16T1933Z-screen-0dd011b",
+          "label": "E",
+          "task_id": "ws2-screen-p08-paraphrase-1"
+        },
+        "sha256": "aa2d709a33765a8847d6bada9632fcc9ba37f5786d34c16aad795ca645a5392a"
+      }
+    ]
+  },
+  "sources": {
+    "run_dir": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469",
+    "judge_receipt_sha256": "558453c8c66784bd8cdec0d60f467404a6c7a0c3343eba0fd6d3f190fe96e78b",
+    "packets_index_sha256": "9dffcdcfecfba6d607cdc993e082743827d1a30c339153243f9d70302ccbb4f6",
+    "key_sha256": "d2e53f2a049895f3ca6e0f8b595dd76dc52bc56e0e31e0b5b0525d5b709c2323",
+    "scores_sha256": "e34a3b8c53a0c9d9db9dda684784c1a75ec305b9cf3945bf5872addcd3f8a010",
+    "rubric_sha256_at_judging": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+    "rubric_unchanged_since": true,
+    "checks_version": "ws2-hard-checks-v3"
+  },
+  "ranking": [
+    "qwen35-35b-a3b-gptq-int4"
+  ],
+  "ranking_rule": "top3_at_bar, then usable_per_task (v2/RUBRIC.md)",
+  "uncertainty": {
+    "metric": "top3_at_bar",
+    "method": "per-task mean, standard error clustered by source paragraph, t interval with clusters-1 df (Miller 2024, arXiv:2411.00640)",
+    "candidates": {
+      "qwen35-35b-a3b-gptq-int4": {
+        "mean": 0.8417,
+        "n": 40,
+        "clusters": 8,
+        "se": 0.0216,
+        "ci95": [
+          0.7906,
+          0.8927
+        ]
+      }
+    },
+    "leader": "qwen35-35b-a3b-gptq-int4",
+    "gap_to_leader": {}
+  },
+  "candidates": {
+    "qwen35-35b-a3b-gptq-int4": {
+      "tasks": 40,
+      "top3_at_bar": 0.8417,
+      "top1_at_bar": 0.95,
+      "top3_strong": 0.4917,
+      "usable_per_task": 4.65,
+      "strong_share": 0.2552,
+      "criteria_means": {
+        "fit": 3.9,
+        "meaning": 3.67,
+        "register": 3.85,
+        "usefulness": 3.42,
+        "variety": 2.88
+      },
+      "criteria_rows": 40,
+      "by_kind": {
+        "academic": {
+          "tasks": 5,
+          "top3_at_bar": 0.8667,
+          "usable_per_task": 4.0
+        },
+        "condense": {
+          "tasks": 6,
+          "top3_at_bar": 0.7222,
+          "usable_per_task": 3.33
+        },
+        "paraphrase": {
+          "tasks": 5,
+          "top3_at_bar": 0.8667,
+          "usable_per_task": 3.8
+        },
+        "phrase_to_word": {
+          "tasks": 6,
+          "top3_at_bar": 0.8333,
+          "usable_per_task": 5.5
+        },
+        "tap_word": {
+          "tasks": 12,
+          "top3_at_bar": 0.8611,
+          "usable_per_task": 5.58
+        },
+        "word_sentences": {
+          "tasks": 6,
+          "top3_at_bar": 0.8889,
+          "usable_per_task": 4.5
+        }
+      },
+      "formats": {
+        "strict": 40
+      },
+      "token_limit_hits": 0,
+      "fail_flags": {
+        "duplicate": 27,
+        "echo": 2,
+        "too_many_words": 1
+      },
+      "warn_flags": {
+        "copies_paragraph": 1,
+        "invented_number": 1,
+        "name_dropped": 5
+      },
+      "latency_t4": {
+        "first_text": {
+          "n": 40,
+          "median_ms": 4658.4,
+          "p90_ms": 4789.5
+        },
+        "first_option": {
+          "n": 40,
+          "median_ms": 8614.1,
+          "p90_ms": 11369.3
+        },
+        "third_option": {
+          "n": 40,
+          "median_ms": 15559.1,
+          "p90_ms": 23002.5
+        },
+        "whole_output": {
+          "n": 40,
+          "median_ms": 23041.8,
+          "p90_ms": 36090.2
+        }
+      },
+      "citations": [
+        {
+          "task_id": "ws2-screen-p01-academic-1",
+          "output_ref": "o-8b46d20ccdcf",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p01-academic-1.json",
+          "sha256": "c7f61fabc20e33f0743c35c9c181b22aa6509de219c46cb2c24e650f172913f3"
+        },
+        {
+          "task_id": "ws2-screen-p01-condense-1",
+          "output_ref": "o-ef6ef1a305eb",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p01-condense-1.json",
+          "sha256": "dffd5f130d686968cf5df503a927215167b4ff9c89b4e3982e0198c6b87df176"
+        },
+        {
+          "task_id": "ws2-screen-p01-tap_word-1",
+          "output_ref": "o-939de863b0d1",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p01-tap_word-1.json",
+          "sha256": "f79636c411fac02c7ae5440de1a1a671573ce14d65e798ae86a4b4d4b65ccb70"
+        },
+        {
+          "task_id": "ws2-screen-p01-tap_word-2",
+          "output_ref": "o-f6a8dfdd4ffb",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p01-tap_word-2.json",
+          "sha256": "8927ae3fc523796e2aa838cbab5a96ffdf73f3391bb2a28939935a2846c863d7"
+        },
+        {
+          "task_id": "ws2-screen-p01-word_sentences-1",
+          "output_ref": "o-d56c95affe3a",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p01-word_sentences-1.json",
+          "sha256": "b7cfab91d38cca3718971efb2baa439d62c56650bf9ec2342a15a2db6795f6e6"
+        },
+        {
+          "task_id": "ws2-screen-p02-academic-1",
+          "output_ref": "o-e38721ace419",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p02-academic-1.json",
+          "sha256": "dccd63da66eeca0fe33a3e401a561ccfe2d22fb8eefacb912670b68bfeb0b382"
+        },
+        {
+          "task_id": "ws2-screen-p02-paraphrase-1",
+          "output_ref": "o-ca8f5e64610e",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p02-paraphrase-1.json",
+          "sha256": "b620fce049baa1b18850646a02b09815ce6fccee3a660cce191a249813a0b037"
+        },
+        {
+          "task_id": "ws2-screen-p02-phrase_to_word-1",
+          "output_ref": "o-6d9f062722bb",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p02-phrase_to_word-1.json",
+          "sha256": "d7986161f06a277aafbd35bbafc720c8589f0882ed847ed2721687e19f8b69f5"
+        },
+        {
+          "task_id": "ws2-screen-p02-tap_word-1",
+          "output_ref": "o-3c37966fb228",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p02-tap_word-1.json",
+          "sha256": "068bf792f8f2d6ed2a3ff0d70e387c5c8dcfef2214bfcfca5451217a2d538d59"
+        },
+        {
+          "task_id": "ws2-screen-p02-word_sentences-1",
+          "output_ref": "o-d00f6b8b0c82",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p02-word_sentences-1.json",
+          "sha256": "7bf95ff779da0f5ce7d55357a01d01bceabc7103cc6feae665d69801740fadf6"
+        },
+        {
+          "task_id": "ws2-screen-p03-academic-1",
+          "output_ref": "o-706f2368d5b4",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p03-academic-1.json",
+          "sha256": "926f0f57dfef1ff84f423a8d1f84d75345a63eeefd69906f50505cb0cb0693a0"
+        },
+        {
+          "task_id": "ws2-screen-p03-condense-1",
+          "output_ref": "o-cb854404583c",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p03-condense-1.json",
+          "sha256": "6c5ada001bfdc74f18055c343aac2151aa5ffcf7a2e5a19567de0cfc33d2fc2d"
+        },
+        {
+          "task_id": "ws2-screen-p03-paraphrase-1",
+          "output_ref": "o-22cba9619947",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p03-paraphrase-1.json",
+          "sha256": "7754cb5104b9fffddd4bc7dafecc7f05ae1ffd2920feab68f35cc31597665e4d"
+        },
+        {
+          "task_id": "ws2-screen-p03-tap_word-1",
+          "output_ref": "o-441d5cf00c0b",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p03-tap_word-1.json",
+          "sha256": "09e19d3103b4b796a2df363c70255403b099b42ff919513cba9a5cf9fc8fbed1"
+        },
+        {
+          "task_id": "ws2-screen-p03-tap_word-2",
+          "output_ref": "o-fe9b6137c493",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p03-tap_word-2.json",
+          "sha256": "0aae72f473e2f6c0101e97660d0859709aea71e4ac891aa7993012944299f69a"
+        },
+        {
+          "task_id": "ws2-screen-p04-condense-1",
+          "output_ref": "o-5cc28dc969af",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p04-condense-1.json",
+          "sha256": "10cb8e59ea2e0fb72288ae9efb9f47a83c7fb5cb6dac0fe469e187d8276b3211"
+        },
+        {
+          "task_id": "ws2-screen-p04-paraphrase-1",
+          "output_ref": "o-40a0af8bb122",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p04-paraphrase-1.json",
+          "sha256": "8b19ff48443bfb6b7eb0b85403df239cee2360c327c6aeef7894872e05fa4350"
+        },
+        {
+          "task_id": "ws2-screen-p04-phrase_to_word-1",
+          "output_ref": "o-827e67839b80",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p04-phrase_to_word-1.json",
+          "sha256": "b5ab6e97c28384ba4c79e6622d22ab17e9c63bb9b7c779e3c71365d88491c8f9"
+        },
+        {
+          "task_id": "ws2-screen-p04-tap_word-1",
+          "output_ref": "o-242495a78a56",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p04-tap_word-1.json",
+          "sha256": "a8461d851c4e835acd1657a1cf87d5b136bf4007590775dc5cafb4cd1fd1d66f"
+        },
+        {
+          "task_id": "ws2-screen-p04-word_sentences-1",
+          "output_ref": "o-2c51aa05fe62",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p04-word_sentences-1.json",
+          "sha256": "5aa99dc825fe3facd728830902c63c4b88e162d474a6123bc49a517a362338f4"
+        },
+        {
+          "task_id": "ws2-screen-p05-paraphrase-1",
+          "output_ref": "o-68e78e565225",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p05-paraphrase-1.json",
+          "sha256": "854e31edb0244fdab3efa43ddd3e727c9137856bc695bff30557ffdfd5fa5831"
+        },
+        {
+          "task_id": "ws2-screen-p05-phrase_to_word-1",
+          "output_ref": "o-f40d04f7c276",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p05-phrase_to_word-1.json",
+          "sha256": "a93f283de86885999d059172ef0b344dceb4800bd1744a52b02f3236e467c3fe"
+        },
+        {
+          "task_id": "ws2-screen-p05-tap_word-1",
+          "output_ref": "o-fdb488d2e8b0",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p05-tap_word-1.json",
+          "sha256": "ff6704b1ed7929759ed7fdd03bf9b5fbb7576077b0d2a0bc29ca7315bba5143e"
+        },
+        {
+          "task_id": "ws2-screen-p05-tap_word-2",
+          "output_ref": "o-493fff01fe68",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p05-tap_word-2.json",
+          "sha256": "e7f256de58ff6bca5ce5d771d0b9647eadd872c1e1eab0bc01d62fa1ed9e89fb"
+        },
+        {
+          "task_id": "ws2-screen-p05-word_sentences-1",
+          "output_ref": "o-d1d3d6e2dbd4",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p05-word_sentences-1.json",
+          "sha256": "d7663f239f2258422d3733e4c60416664c9ac0ec4566a9259992b6d03edfd9b2"
+        },
+        {
+          "task_id": "ws2-screen-p06-academic-1",
+          "output_ref": "o-7f9dffe7fd0f",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p06-academic-1.json",
+          "sha256": "28e88c977937912f98ab5df66f5194d3c771422a9861dcaaf83c6bdad88e4e08"
+        },
+        {
+          "task_id": "ws2-screen-p06-condense-1",
+          "output_ref": "o-624a0d7ac0cb",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p06-condense-1.json",
+          "sha256": "c9c155069a2c1092ce091516b6c108fdbe5c13246e80646c59ed6363bbc64195"
+        },
+        {
+          "task_id": "ws2-screen-p06-phrase_to_word-1",
+          "output_ref": "o-cefc91744b2d",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p06-phrase_to_word-1.json",
+          "sha256": "3798db7cc932cd90de4e78340ef3a0231828bd982458c73ae447b3fc1b1e4049"
+        },
+        {
+          "task_id": "ws2-screen-p06-tap_word-1",
+          "output_ref": "o-74b30b98f2b6",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p06-tap_word-1.json",
+          "sha256": "46f8d99ac00356fb3fba56934ad63c7d82e4416da2ffbafa0882b7b5980c3cd5"
+        },
+        {
+          "task_id": "ws2-screen-p06-word_sentences-1",
+          "output_ref": "o-14566e2c1caa",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p06-word_sentences-1.json",
+          "sha256": "5a8ec15a3039d4672cd4bdda63aba92aa07b57e29ec2ac6b7880fd2a0e5138ba"
+        },
+        {
+          "task_id": "ws2-screen-p07-academic-1",
+          "output_ref": "o-15289b67f926",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p07-academic-1.json",
+          "sha256": "939bd2e4f7770123144e9bc7e28a0213efeb042f950ff95fcfe58abd113224e1"
+        },
+        {
+          "task_id": "ws2-screen-p07-condense-1",
+          "output_ref": "o-25abca51271d",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p07-condense-1.json",
+          "sha256": "3f9b0092604820138834234abefea654732382ee1918958f73e9d9cd24894be0"
+        },
+        {
+          "task_id": "ws2-screen-p07-phrase_to_word-1",
+          "output_ref": "o-e0fa10dec5ef",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p07-phrase_to_word-1.json",
+          "sha256": "144ed18732004bf8aaed6b1b9a069102f6b10cfaa19da96a9aa83edff33c0bb2"
+        },
+        {
+          "task_id": "ws2-screen-p07-tap_word-1",
+          "output_ref": "o-5fde726854b8",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p07-tap_word-1.json",
+          "sha256": "cf524e08935c4a7c55eacc444f7bded364620ce8bc801aafb762735a4ebfb5db"
+        },
+        {
+          "task_id": "ws2-screen-p07-tap_word-2",
+          "output_ref": "o-86da0231315a",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p07-tap_word-2.json",
+          "sha256": "156c5b118fae8d1cae5c73e7a0e2acfb57c1775d59c5926f8a97d63550369ba7"
+        },
+        {
+          "task_id": "ws2-screen-p08-condense-1",
+          "output_ref": "o-a8d1cb695c22",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p08-condense-1.json",
+          "sha256": "1379b3624b37786629dd144b5edfbb6ec8099d9f39e6b577fc56864453358b29"
+        },
+        {
+          "task_id": "ws2-screen-p08-paraphrase-1",
+          "output_ref": "o-4174f0d9979a",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p08-paraphrase-1.json",
+          "sha256": "f2eb54037abc7859651fc725ddee1c4acd5ad680fae47cae7b714e811eff9792"
+        },
+        {
+          "task_id": "ws2-screen-p08-phrase_to_word-1",
+          "output_ref": "o-3d1351a21203",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p08-phrase_to_word-1.json",
+          "sha256": "82f5c6b5a9a48de98f5601b7ab99fdc6123f1ed39327aabb09b84e1f6c81d4e6"
+        },
+        {
+          "task_id": "ws2-screen-p08-tap_word-1",
+          "output_ref": "o-36c89f51bfc0",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p08-tap_word-1.json",
+          "sha256": "2de8172d78b7888b5e6f0ea19187f366c2b3019423b24d8e1d3c859e06c17481"
+        },
+        {
+          "task_id": "ws2-screen-p08-word_sentences-1",
+          "output_ref": "o-ec937201974f",
+          "raw_output": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/outputs/ws2-screen-p08-word_sentences-1.json",
+          "sha256": "e5c6d22e30dcdf924b3baaac222b9692458f83d7ecd4006f6c250c038c8cc272"
+        }
+      ],
+      "run": {
+        "status": "completed",
+        "complete_set": true,
+        "run_json": "bench/word-studio/v2/runs/2026-10-22T2005Z-screen-ad5a469/qwen35-35b-a3b-gptq-int4/run.json",
+        "run_sha256": "c89f144facd4bd1df155e59486740eee8c75532c3ccfc7723ccb237a4b04c4ac",
+        "model_id": "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",
+        "revision": "3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b",
+        "load_seconds": 376.86,
+        "peak_memory": {
+          "cuda:0": 12163481600,
+          "cuda:1": 13101219840
+        }
+      }
+    }
+  },
+  "not_judged": [],
+  "aggregated_at": "2026-10-22T20:34:52+00:00"
+}

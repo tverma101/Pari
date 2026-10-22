@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 0,
+    "5": 2
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "1, 2, 5 use integrity correctly with paragraph ideas. 3 equates bravery with integrity, a loose fit. 4 misuses integrity ('his integrity in wanting his kids to be fair' is about fairness, not integrity) and is clunky (0). All share the 'Atticus shows integrity by' frame."
+  }
+ ]
+}

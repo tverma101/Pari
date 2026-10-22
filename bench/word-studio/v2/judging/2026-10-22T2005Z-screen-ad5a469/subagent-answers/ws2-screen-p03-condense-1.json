@@ -1,0 +1,21 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 1,
+    "4": 0,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 4,
+    "variety": 2,
+    "usefulness": 3
+   },
+   "note": "All drop 'Johannes' at the name's first mention, which the instruction said to keep, so none is better than usable. 4 'had to be copied by hand slowly' is awkward and implies slowness was required (0). 1 and 5 lose 'had to'. Options are near copies of each other."
+  }
+ ]
+}

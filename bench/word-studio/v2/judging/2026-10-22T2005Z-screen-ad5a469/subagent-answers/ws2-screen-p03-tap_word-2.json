@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 2,
+    "4": 1,
+    "5": 0,
+    "6": 1,
+    "7": 0,
+    "8": 0,
+    "9": 1,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 5
+   },
+   "note": "Top three strong, best first. 5 'revolutionary' overstates the claim and clashes with 'Scientific Revolution' (0). 7 'decisive' is the wrong sense for changes (0). 8 'groundbreaking' overstates and is odd with changes (0). 6 and 10 lean stronger than 'big'."
+  }
+ ]
+}

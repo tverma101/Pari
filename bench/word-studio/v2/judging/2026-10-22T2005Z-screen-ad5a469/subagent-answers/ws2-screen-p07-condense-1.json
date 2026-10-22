@@ -1,0 +1,4 @@
+{"scores": [
+{"label": "A", "relevance": {"1": 2, "2": 1, "3": 0, "4": 1, "5": 0}, "criteria": {"fit": 3, "meaning": 3, "register": 3, "variety": 3, "usefulness": 3}, "note": "Options 3 and 5 are 0: both drop 'once he becomes king', the timing the paragraph's sequence needs (5 also lacks a period). 2 and 4 use the unidiomatic 'fearing to lose'."},
+{"label": "B", "relevance": {"1": 1, "2": 1, "3": 1, "4": 2, "5": 1}, "criteria": {"fit": 4, "meaning": 3, "register": 3, "variety": 2, "usefulness": 3}, "note": "All keep the timing but recast fear as purpose ('to keep power'); 4 'to avoid losing power' is closest. 1 repeats 'keep'; 3 'kills as king' is awkward. Options are near copies."}
+]}

@@ -1,0 +1,50 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 1,
+    "8": 1,
+    "9": 0,
+    "10": 2
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 4
+   },
+   "note": "1,2,10 strong. 3 grammatical but stiff. 4 'exemplifies that' and 5 'depicts that' are ungrammatical before a that-clause (0). 6 'proves' boosts certainty (0). 9 'signifies that' is the wrong sense for a person (0). 7, 8 usable but drift toward 'says/discloses'."
+  },
+  {
+   "label": "B",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 2,
+    "4": 0,
+    "5": 1,
+    "6": 2,
+    "7": 1,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 4,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "Top three all strong. 4 'exemplifies that', 8 'portrays that', 9 'manifests that' are ungrammatical before a that-clause (0). 10 'proves' boosts certainty (0). 7 suggests spoken emphasis."
+  }
+ ]
+}

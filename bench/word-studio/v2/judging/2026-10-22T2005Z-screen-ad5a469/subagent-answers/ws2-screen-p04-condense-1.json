@@ -1,0 +1,39 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 0,
+    "3": 2,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 3
+   },
+   "note": "3 is strong and keeps the transition. 2 turns 'looking at their phones' into 'texting', which changes a fact (0). 1 and 4 change 'many teens' to 'teens often/frequently', a change of scope. 5 drifts from falling asleep to 'sleep properly'."
+  },
+  {
+   "label": "B",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 0,
+    "4": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "1 is strong. 3 drops 'many', which overgeneralizes to all teens, and 'where' is awkward (0). 4 drops the teens staying up, a detail the paragraph needs (0). 'on phones' is clipped throughout."
+  }
+ ]
+}
