@@ -101,7 +101,10 @@ but only multilingual token soup; it is kept as a record and never judged. The
 checkpoint stores its symmetric zero points as 8 (`0x88888888`, the `gptq_v2`
 layout) without naming a format, so GPTQModel read it as `gptq`, added one to
 every zero point and shifted every expert weight down one quantization step. The
-runner now reads the stored zero points and passes the format they imply. The reference answers whether
+runner now reads the stored zero points and passes the format they imply. That
+smoke also ran at about 1.6 tokens a second, because defuser's expert loop syncs
+the GPU once per expert (256) per layer per token. The runner swaps in a loop
+over the routed experts only, which gives the same output. The reference answers whether
 a big open model beats the best Mac-sized one by enough to justify
 distillation (#92). Judge it alone with anchors, like any new model.
 

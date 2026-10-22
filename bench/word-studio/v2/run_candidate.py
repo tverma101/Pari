@@ -464,6 +464,34 @@ def lazy_expert_shells() -> Iterator[None]:
         experts._unfuse_single_projection = original
 
 
+def routed_experts_forward(self: Any, hidden_states: Any, top_k_index: Any, top_k_weights: Any) -> Any:
+    """Defuser's ``linear_loop`` experts forward, visiting only the experts the router chose.
+
+    Defuser checks every expert with ``mask.any()``, one GPU sync each: 256
+    experts times 40 layers per generated token for the 35B MoE, which ran at
+    about 1.6 tokens a second (run 2026-10-22T1909Z-screen-ffbc99d-limit2).
+    Each expert still sees the same rows, so the output is the same.
+    """
+    import torch
+    from defuser.modeling.moe_experts_interface import _apply_expert_gate
+
+    shape = hidden_states.shape
+    hidden_states = hidden_states.reshape(-1, shape[-1])
+    top_k = top_k_index.size(-1)
+    expert_ids = top_k_index.reshape(-1)
+    token_idx = torch.arange(hidden_states.size(0), device=hidden_states.device).repeat_interleave(top_k)
+    selected = hidden_states[token_idx]
+    out = torch.zeros_like(selected)
+    for expert_idx in torch.unique(expert_ids).tolist():
+        mask = expert_ids == expert_idx
+        expert = getattr(self, str(expert_idx))
+        expert_input = selected[mask]
+        gate_out = expert.gate_proj(expert_input) if hasattr(expert, "gate_proj") else None
+        out[mask] = expert.down_proj(_apply_expert_gate(self, gate_out, expert.up_proj(expert_input))).to(out.dtype)
+    out = out * top_k_weights.reshape(-1).to(out.dtype).unsqueeze(-1)
+    return out.view(-1, top_k, shape[-1]).sum(dim=1).view(shape)
+
+
 class GPTQModelBackend(TransformersBackend):
     """A GPTQ checkpoint loaded by GPTQModel, which splits the fused MoE experts Transformers would leave empty.
 
@@ -496,6 +524,9 @@ class GPTQModelBackend(TransformersBackend):
             wrapped = GPTQModel.load(self.model_id, revision=self.revision, device_map=device_map, dtype=dtype,
                                      backend=self.KERNEL, trust_remote_code=False, **options)
         model = wrapped.model
+        from transformers.integrations.moe import ALL_EXPERTS_FUNCTIONS
+        ALL_EXPERTS_FUNCTIONS["linear_loop"] = routed_experts_forward
+        extra["experts_forward"] = routed_experts_forward.__name__
         missing, unused = checkpoint_coverage(model.state_dict(), stored, kernel_buffers=self.KERNEL_BUFFERS,
                                               unused_prefixes=self.UNUSED_PREFIXES)
         extra["quant_kernels"] = sorted({type(m).__name__ for m in model.modules()
