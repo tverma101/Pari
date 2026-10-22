@@ -1,0 +1,19 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "4": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 3,
+    "variety": 1,
+    "usefulness": 2
+   },
+   "note": "Option 1 is 0: 'never learning to think' drops 'for themselves' and overstates the claim. Option 4 keeps independence but 'learning independent thought' is awkward. Options 2, 3 and 5 failed as duplicates, so the list has almost no variety."
+  }
+ ]
+}

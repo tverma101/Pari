@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 0,
+    "5": 1,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 2,
+    "meaning": 3,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "Best two first. 0s: 4 'abolished' wrong collocation (laws, not diseases); 6 'cleared' odd for a disease; 7 'finished' and 8 'ended' awkward in 'have been ___'; 9 'crushed' casual/wrong sense; 10 'snuffed' needs 'out' and is casual."
+  }
+ ]
+}

@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 5,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "All use 'milestone' correctly with paragraph ideas only; 1 and 2 fit best; 3 (milestone that led to technologies) and 5 are slightly awkward; 4 largely repeats 1."
+  }
+ ]
+}

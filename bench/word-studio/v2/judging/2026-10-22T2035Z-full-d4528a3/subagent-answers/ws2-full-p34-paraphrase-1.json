@@ -1,0 +1,20 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 5,
+    "register": 4,
+    "variety": 2,
+    "usefulness": 3
+   },
+   "note": "1 and 2 reword cleanly ('hold', 'devote ... weekly'); 3 is a near copy with a plainer 'so it is hard'. Options 4 and 5 failed as duplicates."
+  }
+ ]
+}

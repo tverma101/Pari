@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 0,
+    "3": 1,
+    "4": 1,
+    "5": 2
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 4,
+    "register": 5,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "Option 2 is 0: 'learns of Juliet's death' presents her death as fact, but she is not dead, which contradicts the original's 'hears that' and 'the truth'. 3: 'refusing' adds intent. 4 is close to a copy. 1 and 5 are clean paraphrases."
+  }
+ ]
+}

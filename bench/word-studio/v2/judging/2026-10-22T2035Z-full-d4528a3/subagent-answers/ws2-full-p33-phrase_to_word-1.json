@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 0,
+    "4": 1,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 2,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "admires is the right pick; respects and idolizes usable. 0s: 3 reveres overstates and is odd for a little brother; 5 honors is a different sense; 6 follows, 7 values, 8 trusts, 9 praises change the meaning; 10 worships overstates."
+  }
+ ]
+}

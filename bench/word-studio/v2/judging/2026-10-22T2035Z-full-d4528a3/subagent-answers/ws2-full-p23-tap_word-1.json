@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 0,
+    "3": 1,
+    "4": 0,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 1,
+    "9": 0,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "Most options carry an article, giving 'a a voice' in place, so need a small edit (cap 1). 2 'a say-so' 0: repeats 'say' and is casual. 4 'a say' 0: repeats the original word, which the instruction forbids. 9 'an opinion' 0: having an opinion in laws is not having influence over them; meaning lost. 'a voice' and 'a vote' are the best picks."
+  }
+ ]
+}

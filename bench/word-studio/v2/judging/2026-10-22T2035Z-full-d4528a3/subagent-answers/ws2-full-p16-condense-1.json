@@ -1,0 +1,21 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "5": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 1,
+    "register": 2,
+    "variety": 2,
+    "usefulness": 1
+   },
+   "note": "Every option drops 'to work every day', a fact the instruction says to keep (the daily commute shows the sacrifice). 2 and 5 also drop 'buses' ('rather than ride'/'instead of riding' with no object); 3 'skip buses' is casual. 4 failed as duplicate."
+  }
+ ]
+}

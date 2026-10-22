@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 0,
+    "3": 2,
+    "4": 2,
+    "5": 1,
+    "6": 1,
+    "7": 2,
+    "8": 1,
+    "9": 1,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 5,
+    "variety": 4,
+    "usefulness": 5
+   },
+   "note": "Strong picks first (vivid, vibrant, bold, eye-catching). Option 2 is 0: 'colorful colors' is redundant and awkward in place."
+  }
+ ]
+}

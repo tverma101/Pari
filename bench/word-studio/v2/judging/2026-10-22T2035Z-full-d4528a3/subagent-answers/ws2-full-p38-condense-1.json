@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 0,
+    "3": 2,
+    "4": 1,
+    "5": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 4,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "2 and 5 are 0: 'a soccer game tore my knee ligament' gives the game the agency, an odd sentence a teacher would flag. 4 drops that the injury happened during a game. 1 and 3 are clean and shorter."
+  }
+ ]
+}

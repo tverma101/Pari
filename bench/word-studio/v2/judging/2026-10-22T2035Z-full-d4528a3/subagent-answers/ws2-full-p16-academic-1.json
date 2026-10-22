@@ -1,0 +1,21 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "4 calls the boycott 'the movement' (confusable with the civil rights movement) and has a dangling 'Initiated' clause, changing the referent. 2 'declining' softens 'refusing'; 3 is nearly the original with no register lift. 5 failed as duplicate."
+  }
+ ]
+}

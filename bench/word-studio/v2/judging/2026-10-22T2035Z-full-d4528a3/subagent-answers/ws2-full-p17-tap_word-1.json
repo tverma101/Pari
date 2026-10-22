@@ -1,0 +1,49 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 2,
+    "4": 1,
+    "5": 1,
+    "6": 2,
+    "7": 1,
+    "8": 1,
+    "9": 1,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "Best picks first (crucial, vital, critical). 'very essential/indispensable/key/fundamental' read awkwardly after 'very'; 'central for' needs 'to'. Option 10 'primary' is 0: 'very primary for the food we eat' is ungrammatical and the wrong sense."
+  },
+  {
+   "label": "B",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 2,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 4,
+    "register": 4,
+    "variety": 2,
+    "usefulness": 4
+   },
+   "note": "Strong top three. Option 8 'vitality' and option 10 'cruciality' are 0: nouns, ungrammatical in place of the adjective. 'significant' is weaker and repeated (9 failed as a duplicate)."
+  }
+ ]
+}

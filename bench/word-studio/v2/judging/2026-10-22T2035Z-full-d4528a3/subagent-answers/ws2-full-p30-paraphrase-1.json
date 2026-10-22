@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 0,
+    "3": 1,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 3,
+    "variety": 2,
+    "usefulness": 2
+   },
+   "note": "2 is 0: 'returns' implies the real germ was there before, changing the meaning. Others are near copies with minimal new wording; 'strike/hit it fast' is casual; 1 and 5 turn 'If' into 'When'."
+  }
+ ]
+}

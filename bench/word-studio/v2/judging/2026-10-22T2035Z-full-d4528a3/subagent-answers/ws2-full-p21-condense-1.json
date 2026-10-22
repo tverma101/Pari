@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 2,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 1
+   },
+   "note": "Every option drops 'seem' ('did not seem to stop'), so it states as fact that prayers failed, which changes the certainty: all 0. 2 also weakens the cause, from 'since' to 'when'. 3 also drops what the prayers failed to do."
+  }
+ ]
+}

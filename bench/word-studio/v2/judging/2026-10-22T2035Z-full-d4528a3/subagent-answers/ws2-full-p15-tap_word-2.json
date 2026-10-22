@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 1,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "5 'how severe it was ... to change' wrong sense; 6 'formidable' odd with an infinitive of changing one's life; 7 'grueling' and 9 'strenuous' mean physically exhausting, overstating and shifting sense; 8 'exacting' means demanding precision, wrong sense. Top two strong."
+  }
+ ]
+}

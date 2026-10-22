@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "1 is a strong formal rewrite keeping certainty; 2 'approaches to decelerate' is stiff; 3 'Even given' is awkward; 4 'most viable' drifts from 'best'; 5 is barely more academic."
+  }
+ ]
+}

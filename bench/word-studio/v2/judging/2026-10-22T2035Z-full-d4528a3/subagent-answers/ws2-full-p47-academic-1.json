@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 5,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "1 is a strong formal rewrite with the same meaning. 2 is only slightly more formal; 3 'start employment' and 4 'commence working' are stiff; 5 'due to the necessity of starting work' is wordy. All keep facts and certainty."
+  }
+ ]
+}

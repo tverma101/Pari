@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 1,
+    "5": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 4,
+    "variety": 2,
+    "usefulness": 3
+   },
+   "note": "5 says the dream gives Lennie companionship needed to care for rabbits, illogical and not the paragraph's idea. 1-4 largely copy paragraph sentences with the word swapped in; 4 shifts the closing point from changing lives to finding companionship."
+  }
+ ]
+}

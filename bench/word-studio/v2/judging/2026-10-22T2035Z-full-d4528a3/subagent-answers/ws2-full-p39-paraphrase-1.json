@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 4,
+    "register": 4,
+    "variety": 2,
+    "usefulness": 2
+   },
+   "note": "Option 1 is 0: 'often cannot' overstates the original 'cannot always'. Options 2-5 keep the meaning but are near copies of the original wording, so usable only."
+  }
+ ]
+}

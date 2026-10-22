@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 2,
+    "4": 0,
+    "5": 2
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 4,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 5
+   },
+   "note": "1, 2, 3, 5 use 'hysteria' correctly and restate the paragraph's own points. 4 is a muddled comparison: 'the hysteria in the 1950s mirrors the way people were accused' compares the 1950s with itself instead of Salem with the 1950s (0)."
+  }
+ ]
+}

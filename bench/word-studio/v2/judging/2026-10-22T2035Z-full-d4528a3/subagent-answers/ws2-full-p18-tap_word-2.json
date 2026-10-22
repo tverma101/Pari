@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 2,
+    "5": 0,
+    "6": 1,
+    "7": 0,
+    "8": 0,
+    "9": 1,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "5 'very best' repeats the forbidden word 'best' (0); 7 'ideal' and 8 'perfect' are absolute and read oddly after 'one of the' (0); 10 'wise' is ungrammatical in place, needs 'wisest' (0). 1 smartest and 4 most valuable are strong; 6 top is a little casual."
+  }
+ ]
+}

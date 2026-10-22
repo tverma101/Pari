@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 2,
+    "3": 1,
+    "4": 0,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 1,
+    "9": 1,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "generate is the only precise pick; earn repeats 'earn' later in the sentence; 4 'yield' is odd with athletes as subject (0); 10 'fetch' is the sale-price sense, wrong meaning (0); raise/secure drift toward fundraising."
+  }
+ ]
+}

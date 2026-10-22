@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 2,
+    "5": 1,
+    "6": 0,
+    "7": 2,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 4
+   },
+   "note": "0s: 'heterogeneous' means internally mixed and is too rare; 'alien' adds a negative judgment; 'unlike' is odd as an attributive here; 'separate' changes the meaning from different to apart."
+  }
+ ]
+}

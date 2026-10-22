@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 0,
+    "3": 2,
+    "4": 0,
+    "5": 1,
+    "6": 0,
+    "7": 0,
+    "8": 1,
+    "9": 1,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "2 'his life is alone', 4 'his life is by himself', 7 'his life is on his own', 10 'his life is in solitude' are ungrammatical in place (describe the man, not his life); 6 'his life is cut off' reads as life ended, wrong sense. 'isolated' and 'solitary' are strong; 'desolate' overstates slightly."
+  }
+ ]
+}

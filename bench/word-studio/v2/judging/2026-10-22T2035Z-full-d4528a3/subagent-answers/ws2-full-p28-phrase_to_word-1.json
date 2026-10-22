@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 2,
+    "4": 1,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 1,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 4
+   },
+   "note": "Strong picks first (morals, conscience). 9 'honor' shifts to reputation/personal honour, not a moral sense; 10 'justice' is a different concept (fairness/law), wrong meaning."
+  }
+ ]
+}

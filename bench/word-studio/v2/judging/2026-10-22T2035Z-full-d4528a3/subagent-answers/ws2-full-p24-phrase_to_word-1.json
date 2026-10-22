@@ -1,0 +1,42 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 2,
+    "usefulness": 4
+   },
+   "note": "'repeatedly' and 'continually' are strong and first. 'constantly' and 'incessantly' overstate a little; 'consistently' and 'persistently' are slightly off-sense. 8 'recurring' 0: an adjective, ungrammatical after 'rejected'. Three duplicate fails hurt variety."
+  },
+  {
+   "label": "B",
+   "relevance": {
+    "1": 0,
+    "2": 2,
+    "3": 1,
+    "5": 1,
+    "6": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 1,
+    "usefulness": 2
+   },
+   "note": "1 'again' 0: means once more, losing the repeated-rejection meaning, and it sits first. 'repeatedly' is strong but second. 'continuously' implies unbroken rejection; 'consistently'/'persistently' slightly off-sense. Five duplicate fails leave few real choices."
+  }
+ ]
+}

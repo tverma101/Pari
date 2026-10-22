@@ -1,0 +1,20 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 2,
+    "3": 2
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 4,
+    "register": 4,
+    "variety": 2,
+    "usefulness": 3
+   },
+   "note": "2 and 3 keep the causal link and shorten cleanly ('failed' keeps the meaning of 'stopped working'). 1 turns 'because' into 'when', weakening the causal claim. 4 and 5 failed as duplicates, so variety is low."
+  }
+ ]
+}

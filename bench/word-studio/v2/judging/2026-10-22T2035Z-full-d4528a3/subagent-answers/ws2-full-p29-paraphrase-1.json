@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 2,
+    "3": 1,
+    "4": 1,
+    "5": 2
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 5,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "All keep the meaning and length. 1 and 4 use casual 'back then', 3 'in those days'; 2 and 5 are clean essay register. Options are fairly close variants of each other. No zeros."
+  }
+ ]
+}

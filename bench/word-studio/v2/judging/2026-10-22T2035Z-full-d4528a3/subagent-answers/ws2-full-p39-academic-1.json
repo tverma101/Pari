@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 0,
+    "3": 2,
+    "4": 1,
+    "5": 2
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 4,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "2 is 0: 'a significant issue' adds a booster and 'may' adds a hedge, so the certainty changes. 4 barely raises the register ('eating too much' is kept). 1, 3 and 5 are formal and keep 'can'."
+  }
+ ]
+}

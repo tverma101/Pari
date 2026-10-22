@@ -1,0 +1,19 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 4,
+    "variety": 2,
+    "usefulness": 3
+   },
+   "note": "Only 1-2 judged (3-5 fail as duplicates). Both drop 'stronger', so the point that limits already exist is lost. Dropping 'I believe' is acceptable filler. 2 shortens 'cigarette ads' to 'cigarettes'. Usable but not strong."
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "2": 1,
+    "3": 1,
+    "4": 0,
+    "5": 2,
+    "6": 2,
+    "7": 1,
+    "8": 1,
+    "9": 0,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 3
+   },
+   "note": "Option 1 failed (echo of 'afraid') and sits at the top, so the best picks (5 hesitant, 6 reluctant) are buried. 2 fearful and 7 apprehensive read better with 'of/about speaking'; 3 scared and 8 nervous are plain/casual; 10 unwilling loses the fear. 4 'timid' describes a trait and does not take 'to speak up' (0). 9 'dreadful' is the wrong sense, meaning terrible (0)."
+  }
+ ]
+}

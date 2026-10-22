@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 2,
+    "3": 2,
+    "4": 1,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 2,
+    "9": 0,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 5,
+    "variety": 4,
+    "usefulness": 5
+   },
+   "note": "beneficial, valuable, worthwhile are strong. useful is a plain near-synonym and repeats 'useful' in the last sentence. advantageous is a bit stiff; productive, constructive, meaningful and effective drift slightly from 'helps practice'. 9 'supportive' is the wrong sense for homework (0)."
+  }
+ ]
+}

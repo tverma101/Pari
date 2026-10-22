@@ -1,0 +1,18 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 3,
+    "variety": 1,
+    "usefulness": 1
+   },
+   "note": "Option 1 changes only 'decides' to 'chooses': correct, but hardly new wording. Options 2-5 failed as duplicates, so the list offers no real choice."
+  }
+ ]
+}

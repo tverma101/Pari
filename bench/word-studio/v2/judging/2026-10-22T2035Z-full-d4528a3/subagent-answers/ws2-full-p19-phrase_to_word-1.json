@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 1,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 2,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "4 'bear' reads as tolerate (wrong sense) (0); 5 'foot' needs 'the bill' (0); 6 'meet' and 7 'settle' do not take 'tutoring' as object (0); 9 'sponsor' changes the meaning (0); 10 'pay tutoring' is ungrammatical without 'for' (0). 1 afford is the best pick and is first."
+  }
+ ]
+}

@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 2,
+    "4": 2,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 5,
+    "register": 5,
+    "variety": 4,
+    "usefulness": 5
+   },
+   "note": "All keep the date, amendment and certainty with a more formal register; 5 is plainer ('achieved') and closest to the original. No zeros."
+  }
+ ]
+}

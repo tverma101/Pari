@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 2,
+    "meaning": 1,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 1
+   },
+   "note": "Option 1 'reason' is usable but loses the independence. Option 2 'think' only truncates the phrase, dropping 'for themselves'. Options 3 'judge', 4 'decide', 6 'plan' and 10 'conclude' are different skills. Option 7 'reflect' and option 8 'analyze' drift from independent thinking. Options 5 'solve' and 9 'process' need an object and are the wrong sense."
+  }
+ ]
+}

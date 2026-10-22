@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 0,
+    "3": 1,
+    "4": 0,
+    "5": 2,
+    "6": 1,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 2,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 2
+   },
+   "note": "2 'ready' 0: 'not ready enough' is awkward with 'enough'. 4 'sophisticated' 0: shifts the critics' claim from maturity to worldliness. 7 'enlightened' 0: wrong sense and odd for the essay. 8 'aware' and 9 'informed' 0: change the claim from maturity to knowledge. 'responsible' is the only strong pick and sits at position 5."
+  }
+ ]
+}

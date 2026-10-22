@@ -1,0 +1,21 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 5,
+    "register": 2,
+    "variety": 3,
+    "usefulness": 2
+   },
+   "note": "All keep the fact and date but barely raise the register: 1 swaps one word, 2-3 are plain paraphrases, 4 'moonwalk' is informal; option 5 failed the duplicate check and was not judged."
+  }
+ ]
+}

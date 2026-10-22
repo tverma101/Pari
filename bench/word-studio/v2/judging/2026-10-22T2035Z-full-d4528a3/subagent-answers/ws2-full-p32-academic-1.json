@@ -1,0 +1,19 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 4,
+    "register": 2,
+    "variety": 1,
+    "usefulness": 2
+   },
+   "note": "Options 2-4 failed as duplicates. 1 'composed'/'critique' raises register slightly but 'the accusation of communism' loses 'people' and drops 'real'. 5 is barely more formal than the original and 'communism lacking real evidence' is an awkward, ambiguous attachment. Little variety across the list."
+  }
+ ]
+}

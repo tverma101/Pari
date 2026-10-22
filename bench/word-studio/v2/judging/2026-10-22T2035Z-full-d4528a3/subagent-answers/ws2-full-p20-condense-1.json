@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 4,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "All options shift the paragraph's present tense to past and drop 'when they find out', so each needs a small edit. 1 and 3 ('ignored', 'disregarded') suggest a deliberate dismissal where the original says they never stop to think. 4 ('failed to consider') is closest. 5 uses a contraction."
+  }
+ ]
+}

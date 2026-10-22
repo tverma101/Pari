@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 1,
+    "3": 0,
+    "4": 1,
+    "5": 2
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "3 is 0: 'the concept of herd immunity' cannot protect anyone, a logic error. 1 nearly repeats the paragraph's last line; 2 omits that enough people must be vaccinated; 4 adds 'spread' and 'ensures'. 5 is the strongest but is placed last."
+  }
+ ]
+}

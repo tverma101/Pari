@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 2,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 2,
+    "meaning": 2,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "0s: 'united' implies political unity; 'bound' reads as constrained; 'tied' and 'woven' need 'together' to work; 'allied' is the wrong sense; 'meshed' is odd in an essay."
+  }
+ ]
+}

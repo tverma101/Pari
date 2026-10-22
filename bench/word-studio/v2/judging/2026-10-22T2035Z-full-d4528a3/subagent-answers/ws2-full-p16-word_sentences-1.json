@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 2,
+    "3": 1,
+    "4": 1,
+    "5": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "5 claims the community's solidarity led to the Supreme Court ruling, a causal claim the paragraph does not make. 1 'by stopping riding' is awkward; 3 adds a causal 'succeeded because of'; 4 is clunky."
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 2,
+    "3": 2,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 2,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "humiliated and mortified are strong; ashamed implies guilt but is close. upset is plain. Option 5 'disgraced' is 0: it means a loss of honour or standing, too strong. Options 6 'crushed', 7 'defeated', 8 'dejected' and 9 'discouraged' are 0: they name a different feeling (dejection), not embarrassment."
+  }
+ ]
+}

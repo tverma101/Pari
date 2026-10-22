@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 0,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 3,
+    "variety": 2,
+    "usefulness": 2
+   },
+   "note": "Option 4 is 0: drops 'can', turning a possibility into a flat claim, and 'changes things' is vague and casual. 1 and 2 are near copies of the original (2 drops 'Even'); 3 'stroll' is slightly casual; 5 'change things' is vague. Little real variety."
+  }
+ ]
+}

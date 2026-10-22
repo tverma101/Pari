@@ -1,0 +1,26 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 0,
+    "3": 1,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 2,
+    "meaning": 2,
+    "register": 3,
+    "variety": 2,
+    "usefulness": 2
+   },
+   "note": "Option 2 is 0: 'revenge' as a verb is archaic and needs an object. Options 4 'punish', 5 'repay' and 6 'exact' need an object, so they are ungrammatical in place, and 'punish' also shifts the meaning. Options 7 'settle', 8 'strike' and 10 'take' are the wrong sense. Option 1 'avenge' is the best pick but reads better with an object. Option 3 'retaliate' is usable. Option 9 failed for too many words."
+  }
+ ]
+}

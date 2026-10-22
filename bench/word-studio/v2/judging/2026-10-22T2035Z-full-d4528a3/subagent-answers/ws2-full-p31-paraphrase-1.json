@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 2,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "1 and 4 are clean rewrites that keep the claim. 2 'fill the clock' is not idiomatic and 'drained' is casual. 3 'to pass time' shifts the sense of 'fill time' and 'cease to care' is stiff. 5 is a near copy of the original (only However/if/instructors/become changed). No zeros."
+  }
+ ]
+}

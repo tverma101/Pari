@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "5": 1,
+    "6": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 4,
+    "register": 4,
+    "variety": 1,
+    "usefulness": 3
+   },
+   "note": "dying out and vanishing are strong; declining softens the claim slightly; going away is plain; fading away is fine. Half the list (4, 7-10) just echoes 'disappearing'."
+  }
+ ]
+}

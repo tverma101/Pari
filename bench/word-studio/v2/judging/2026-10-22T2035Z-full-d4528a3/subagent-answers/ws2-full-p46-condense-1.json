@@ -1,0 +1,40 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 2,
+    "3": 1,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 3
+   },
+   "note": "Option 1 is 0: drops 'when we exercise', the condition the sentence and paragraph need, so the claim is about hearts in general. 2 is clean and shorter. 3 is awkward with a dangling 'pumping'; 4 is barely shorter and passive; 5 is stiff ('extra oxygen supply')."
+  },
+  {
+   "label": "B",
+   "relevance": {
+    "1": 1,
+    "2": 1,
+    "3": 2,
+    "4": 2,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 2,
+    "usefulness": 3
+   },
+   "note": "3 keeps every fact (hearts, exercise, blood, oxygen) in fewer words; 4 is clean. 1 and 5 say 'exercise pumps' blood (mis-assigns the heart's role), 5 repeats 'extra'; 2 'adding extra' is redundant. Options are near copies of one another."
+  }
+ ]
+}

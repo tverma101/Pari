@@ -1,0 +1,26 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 1,
+    "3": 1,
+    "4": 2,
+    "5": 0,
+    "6": 0,
+    "8": 0,
+    "9": 0,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "4 'weakened' is the precise pick but sits 4th. 0s: 1 'harmless' duplicates 'or harmless'; 5 'dormant' wrong sense; 6 'mild' odd for a piece of germ; 8 'diminished' and 9 'reduced' suggest a smaller piece, not a weakened one. 2 'attenuated' is correct but rare; 3 and 10 need 'a'->'an'."
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 2,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 1,
+    "9": 1,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 5
+   },
+   "note": "10 'rank how ready students are' changes the meaning, ranking is not measuring readiness (0). 6 estimate and 7 predict drift slightly; 9 check is casual. Strong picks assess, evaluate, gauge lead the list."
+  }
+ ]
+}

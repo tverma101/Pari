@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 2,
+    "3": 1,
+    "4": 2,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "All use 'isolation' correctly with paragraph ideas. 1 'causes his anger, not his nature' is unparallel and reads ambiguously. 3 'Repeated isolation' is an odd collocation that conflates isolation with rejection. 5 'loving people' is ambiguous. Sentences are short and plain; 1, 2 and 5 make nearly the same point."
+  }
+ ]
+}

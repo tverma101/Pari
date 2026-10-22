@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 0,
+    "3": 1,
+    "4": 1,
+    "5": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "Option 2 is 0: 'Evidence suggests' hedges the original 'studies have shown' (weaker certainty). Option 5 is 0: 'It is established' boosts certainty and drops the attribution to studies. 1 drops 'can' and softens to 'indicates' (slight drift); 3 'boost' is informal; 4 'supports memory' is vaguer than 'improve'."
+  }
+ ]
+}

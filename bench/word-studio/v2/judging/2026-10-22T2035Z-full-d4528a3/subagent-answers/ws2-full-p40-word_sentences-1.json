@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 2,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 4,
+    "register": 5,
+    "variety": 3,
+    "usefulness": 5
+   },
+   "note": "All use 'exchange' correctly with paragraph ideas. Option 3 adds 'constant'; option 5 is plainer and repeats option 1's point."
+  }
+ ]
+}

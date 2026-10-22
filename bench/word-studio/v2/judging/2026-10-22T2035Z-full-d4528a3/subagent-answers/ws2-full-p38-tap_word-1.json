@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 1,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 1,
+    "9": 0,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 4
+   },
+   "note": "9 'adrift and empty' is 0: it adds 'empty', a new claim, and repeats option 1. 1 adrift and 2 directionless are strong. 3 is a bit literary, 4 a slightly casual idiom, and 7 and 8 weaken the sense of losing an identity."
+  }
+ ]
+}

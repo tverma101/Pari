@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 0,
+    "5": 1,
+    "6": 0,
+    "7": 2,
+    "8": 0,
+    "9": 0,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "4 triumph, 6 feat and 8 breakthrough are 0: they overstate and contradict 'small'. 9 is 0: 'Every progress' is ungrammatical. Most others lose 'small' (usable). 7 milestone fits the goal-setting context best."
+  }
+ ]
+}

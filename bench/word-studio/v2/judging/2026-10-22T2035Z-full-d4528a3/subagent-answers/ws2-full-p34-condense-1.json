@@ -1,0 +1,18 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 4,
+    "variety": 1,
+    "usefulness": 2
+   },
+   "note": "Option 1 keeps the facts and the 'only' restriction (negation warn is fine) but drops 'who make it all possible', which carries the paragraph's fairness point. Options 2-5 failed as duplicates."
+  }
+ ]
+}

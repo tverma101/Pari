@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 0,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 4,
+    "register": 5,
+    "variety": 4,
+    "usefulness": 4
+   },
+   "note": "negation_changed warns are benign ('not overwhelming' -> 'rather than excessive' etc.). 4 is 0: 'must' and 'guarantee' raise the certainty above 'should'. 3 'Institutions' is vague; 5 'serves a purpose' is a looser 'useful'."
+  }
+ ]
+}

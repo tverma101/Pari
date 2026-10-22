@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 0,
+    "3": 1,
+    "4": 0,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 2,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 2
+   },
+   "note": "1, 2, 4 drop 'witchcraft', a fact the paragraph needs (0); 4 is also awkward ('convinced ... without proof'). 3 and 5 keep witchcraft and convey uncritical belief ('took as fact', 'blindly'), so the negation_changed warn is a rewording, but they soften 'without asking for proof' and, like all options, shift the paragraph's present tense to past."
+  }
+ ]
+}

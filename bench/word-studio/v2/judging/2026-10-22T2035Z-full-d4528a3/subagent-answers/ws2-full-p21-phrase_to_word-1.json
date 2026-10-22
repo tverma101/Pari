@@ -1,0 +1,47 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0
+   },
+   "criteria": {
+    "fit": 2,
+    "meaning": 2,
+    "register": 2,
+    "variety": 2,
+    "usefulness": 3
+   },
+   "note": "After 'could', the verb must be in base form. So 3 'seeking', 4 'pleading', 5 'sought', 7 'cried', 8 'pleaded' and 9 'solicited' are ungrammatical in place: 0. 6 'beg' changes the meaning and needs 'for': 0. 'cried' is also the wrong sense. 'demand' and 'request' fit."
+  },
+  {
+   "label": "B",
+   "relevance": {
+    "1": 2,
+    "3": 2,
+    "4": 1,
+    "5": 1,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "6 'insist', 8 'press' and 10 'petition' each need 'on' or 'for' before 'higher pay', so they are ungrammatical in place: 0. 7 'urge higher pay' has the wrong meaning: 0. 'demand' and 'seek' are strong. 'request' is plain. 'claim' is a slightly different sense."
+  }
+ ]
+}

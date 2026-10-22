@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 2,
+    "5": 0
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 3,
+    "register": 5,
+    "variety": 4,
+    "usefulness": 4
+   },
+   "note": "negation_changed warns are rewordings of 'does not listen' (ignores, disregards) and keep the meaning, except 5: 'remains unconvinced' changes not listening into disagreement (0). 2 'refuses' slightly overstates; 3 recasts the warning as 'advice' and drops 'even'. Quotation kept in all."
+  }
+ ]
+}

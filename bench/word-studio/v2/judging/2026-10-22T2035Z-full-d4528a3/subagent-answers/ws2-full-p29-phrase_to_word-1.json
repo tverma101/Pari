@@ -1,0 +1,24 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 1,
+    "5": 0,
+    "6": 1,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 2,
+    "usefulness": 3
+   },
+   "note": "5 'if they press' is incomplete without 'on'/'for it' and reads ungrammatically in place. 10 'struggle' reads as 'have difficulty', changing the meaning. 4 'endure' and 6 'push' lose some of the sense of continued effort. Duplicates 7-9 are code fails, which lowers variety."
+  }
+ ]
+}

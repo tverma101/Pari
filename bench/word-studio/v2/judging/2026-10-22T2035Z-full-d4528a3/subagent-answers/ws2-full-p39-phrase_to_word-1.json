@@ -1,0 +1,25 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 1,
+    "7": 0,
+    "8": 0
+   },
+   "criteria": {
+    "fit": 2,
+    "meaning": 2,
+    "register": 3,
+    "variety": 2,
+    "usefulness": 2
+   },
+   "note": "Only 'target' fits cleanly; 'court' usable. 0s: 'focus' and 'appeal' are ungrammatical without a preposition; 'direct' reads as instruct children; 'intend' ungrammatical; 'seek' odd/wrong sense; 'reach' changes intent to result. Options 9-10 duplicate 'court'."
+  }
+ ]
+}

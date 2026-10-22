@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 2,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 4
+   },
+   "note": "1 and 3 use the word well within the paragraph's ideas. 2 is wordy, 4 tacks on a circular 'because bees are indispensable', 5 'the indispensable bees' is awkward. Most sentences copy paragraph sentences closely."
+  }
+ ]
+}

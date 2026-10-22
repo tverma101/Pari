@@ -1,0 +1,19 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 1
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 4,
+    "register": 4,
+    "variety": 1,
+    "usefulness": 2
+   },
+   "note": "Only 1-2 judged (3-5 fail as duplicates). Both just swap one or two words ('encouraged', 'urged', 'Next'), so they are near copies of the original, not real paraphrases. 'encouraged' slightly softens 'pushed'."
+  }
+ ]
+}

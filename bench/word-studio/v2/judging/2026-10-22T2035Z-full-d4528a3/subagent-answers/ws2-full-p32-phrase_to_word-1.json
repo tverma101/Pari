@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 1,
+    "meaning": 1,
+    "register": 3,
+    "variety": 2,
+    "usefulness": 1
+   },
+   "note": "All 0. 'speak up' here means voicing that the girls are lying. 1 confess and 2 admit change the meaning to confessing his own secret. 3 reveal, 4 disclose, 5 expose, 6 mention, 7 state, 9 assert and 10 say are transitive and leave the sentence without an object (ungrammatical in place). 8 declare likewise needs an object or complement. None works as an intransitive replacement (e.g. protest, object, testify)."
+  }
+ ]
+}

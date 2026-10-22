@@ -1,0 +1,25 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 2,
+    "4": 0,
+    "5": 1,
+    "6": 2,
+    "8": 1,
+    "9": 2
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 5,
+    "variety": 4,
+    "usefulness": 5
+   },
+   "note": "determine, discover, identify, pinpoint and diagnose fit well. 'find' and 'uncover' are usable but slightly off. Option 4 'solve' is 0: 'solve what went wrong' is ungrammatical and changes the meaning. 7 and 10 failed as multi-word."
+  }
+ ]
+}

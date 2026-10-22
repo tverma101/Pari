@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 1,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 1
+   },
+   "note": "Every option includes 'more', so replacing only 'fun' gives 'it seems more more enjoyable than doing chores': all 1-10 are ungrammatical in place. Underlying words 1-2 are apt; 5-8 (thrilling, exciting, satisfying, rewarding) also drift from 'fun'."
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 0,
+    "3": 1,
+    "4": 2,
+    "5": 0,
+    "6": 1,
+    "7": 2,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 4,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 3
+   },
+   "note": "The word 'too' stays in place, so 2 ('too too quickly'), 5 ('too in haste'), 8 ('too too soon') and 9 ('too without pause') are ungrammatical: 0. 10 makes 'too prematurely', a redundant and awkward phrase: 0. 3 ('impatiently') and 6 ('recklessly') shift the meaning from speed. 1, 4 and 7 are strong."
+  }
+ ]
+}

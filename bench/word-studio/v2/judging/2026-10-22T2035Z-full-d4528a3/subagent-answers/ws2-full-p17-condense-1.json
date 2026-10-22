@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 1,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 1
+   },
+   "note": "All five options (1-5) drop the time frame 'In the past few decades', a fact the instruction says to keep, so all are 0. Option 2 also drops the magnitude 'a lot'; option 3 'drastically' slightly overstates; option 4 'Bees have fallen' is awkward."
+  }
+ ]
+}

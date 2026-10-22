@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 1,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 2,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 2
+   },
+   "note": "Option 2 is 0: 'AI is a useful guide' drops 'can be' and raises the certainty. Option 3 is 0: 'serves as' raises the certainty the same way. Option 4 is 0: 'see AI as a helpful teacher' asserts rather than allows, and 'teacher' blurs the paragraph's contrast with real teachers. Options 1 and 5 keep 'can'. Option 1's 'Some' weakens the 'Others' contrast and option 5's 'mentor' is a looser fit."
+  }
+ ]
+}

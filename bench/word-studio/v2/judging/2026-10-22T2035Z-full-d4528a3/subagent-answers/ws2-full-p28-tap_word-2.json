@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 1,
+    "5": 1,
+    "6": 1,
+    "7": 1,
+    "8": 1,
+    "9": 1,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 5,
+    "meaning": 4,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 4
+   },
+   "note": "Brutal and savage are strong and fit the paragraph's theme; later options are weaker (hostile, aggressive, fierce, dangerous understate) or shift nuance (cruel, ruthless, bloodthirsty) but remain usable. No zeros."
+  }
+ ]
+}

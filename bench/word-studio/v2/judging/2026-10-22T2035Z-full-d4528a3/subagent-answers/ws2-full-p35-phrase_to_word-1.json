@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 2,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "cooperate and collaborate are strong and first; unite/align are loose; 4 join, 5 combine, 8 link, 9 merge are ungrammatical or wrong sense with 'toward a big goal' (0); 6 pool needs an object and 7 band needs 'together' (0)."
+  }
+ ]
+}

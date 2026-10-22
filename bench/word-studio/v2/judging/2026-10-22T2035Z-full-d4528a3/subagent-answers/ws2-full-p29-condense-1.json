@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 1,
+    "3": 0,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 2,
+    "register": 3,
+    "variety": 3,
+    "usefulness": 2
+   },
+   "note": "1 and 3 say suffragists 'jailed themselves', a wrong meaning (they were jailed by authorities). 4 'faced jail' weakens 'went to jail'; 2 adds 'followed' and awkward 'jailings'; 5 is accurate but stylized. 'for their cause' dropped throughout."
+  }
+ ]
+}

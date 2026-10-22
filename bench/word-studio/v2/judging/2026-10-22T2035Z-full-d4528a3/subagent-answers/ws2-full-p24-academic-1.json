@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 2,
+    "3": 1,
+    "4": 1,
+    "5": 1
+   },
+   "criteria": {
+    "fit": 4,
+    "meaning": 4,
+    "register": 4,
+    "variety": 4,
+    "usefulness": 4
+   },
+   "note": "1 and 2 raise the register and keep the meaning. 3 'right after his birth' is inaccurate for the creature and barely more formal. 4 'rejects' shifts slightly from 'abandons'. 5 'the instant he is alive' is awkward and not more academic. No zeros."
+  }
+ ]
+}

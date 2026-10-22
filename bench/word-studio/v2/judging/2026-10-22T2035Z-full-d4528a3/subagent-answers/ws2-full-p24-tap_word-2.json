@@ -1,0 +1,27 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "3": 1,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 1,
+    "10": 0
+   },
+   "criteria": {
+    "fit": 2,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "The sentence keeps 'of his appearance'. 4 'alarmed', 5 'shaken', 6 'appalled', 7 'horrified', 8 'disturbed', 10 'startled' are all 0: each is ungrammatical with 'of' (needs 'by'), and 'appalled'/'disturbed' also shift the meaning. 'fearful' is strong and first; 'afraid', 'terrified' (slightly intensified), 'frightened' are usable."
+  }
+ ]
+}

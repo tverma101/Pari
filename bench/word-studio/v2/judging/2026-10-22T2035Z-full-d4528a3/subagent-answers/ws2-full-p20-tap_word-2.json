@@ -1,0 +1,22 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0
+   },
+   "criteria": {
+    "fit": 1,
+    "meaning": 3,
+    "register": 3,
+    "variety": 1,
+    "usefulness": 2
+   },
+   "note": "Options 1-5 all include 'Romeo', which the sentence already has, so each reads 'even tells Romeo Romeo that': ungrammatical in place, 0. Also, 4 ('reminds') changes the meaning and 5 ('urges ... that') does not work with this sentence. Options 6-10 are duplicates. The verbs 'cautions' and 'advises' would have been usable."
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "scores": [
+  {
+   "label": "A",
+   "relevance": {
+    "1": 2,
+    "2": 1,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 1,
+    "8": 1,
+    "9": 1,
+    "10": 1
+   },
+   "criteria": {
+    "fit": 3,
+    "meaning": 3,
+    "register": 4,
+    "variety": 3,
+    "usefulness": 3
+   },
+   "note": "Option 3 echoes 'nervous' (fail, not judged). 4 'panicked' overstates (0); 5 'upset' is the wrong sense (0); 6 'shaken' is the wrong sense for a trait of test-takers (0). 1 anxious is strong; the rest are usable near-synonyms."
+  }
+ ]
+}
