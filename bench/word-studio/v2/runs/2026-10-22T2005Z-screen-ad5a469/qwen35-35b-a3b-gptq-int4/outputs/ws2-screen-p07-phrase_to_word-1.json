@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p07-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "49a91955f62c1a49b9640b466451946f362f969a35c826b65046485e1bf4d5de",
+  "seed": 7239249134444914657,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"greed\", \"ambition\", \"lust\", \"desire\", \"covetousness\", \"hunger\", \"thirst\", \"yearning\", \"craving\", \"longing\"]}",
+  "timing": {
+    "first_text_ms": 4716.2,
+    "option_ms": [
+      6268.1,
+      7330.5,
+      8130.3,
+      9192.1,
+      10770.5,
+      11841.8,
+      12892.1,
+      13946.7,
+      15019.5,
+      16064.8
+    ],
+    "total_ms": 16336.0,
+    "stream": [
+      [
+        4716.2,
+        2
+      ],
+      [
+        4982.6,
+        9
+      ],
+      [
+        5242.1,
+        11
+      ],
+      [
+        5498.6,
+        14
+      ],
+      [
+        5752.9,
+        17
+      ],
+      [
+        6011.5,
+        19
+      ],
+      [
+        6268.1,
+        21
+      ],
+      [
+        6527.8,
+        23
+      ],
+      [
+        6792.1,
+        26
+      ],
+      [
+        7057.3,
+        31
+      ],
+      [
+        7330.5,
+        33
+      ],
+      [
+        7600.4,
+        35
+      ],
+      [
+        7864.2,
+        39
+      ],
+      [
+        8130.3,
+        41
+      ],
+      [
+        8393.2,
+        43
+      ],
+      [
+        8657.5,
+        46
+      ],
+      [
+        8927.0,
+        49
+      ],
+      [
+        9192.1,
+        51
+      ],
+      [
+        9453.5,
+        53
+      ],
+      [
+        9715.5,
+        56
+      ],
+      [
+        9984.2,
+        58
+      ],
+      [
+        10245.4,
+        61
+      ],
+      [
+        10506.6,
+        65
+      ],
+      [
+        10770.5,
+        67
+      ],
+      [
+        11040.4,
+        69
+      ],
+      [
+        11313.1,
+        70
+      ],
+      [
+        11579.7,
+        75
+      ],
+      [
+        11841.8,
+        77
+      ],
+      [
+        12107.1,
+        79
+      ],
+      [
+        12364.8,
+        81
+      ],
+      [
+        12629.1,
+        85
+      ],
+      [
+        12892.1,
+        87
+      ],
+      [
+        13159.1,
+        89
+      ],
+      [
+        13421.1,
+        93
+      ],
+      [
+        13683.6,
+        97
+      ],
+      [
+        13946.7,
+        99
+      ],
+      [
+        14209.3,
+        101
+      ],
+      [
+        14501.4,
+        103
+      ],
+      [
+        14757.6,
+        108
+      ],
+      [
+        15019.5,
+        110
+      ],
+      [
+        15278.4,
+        112
+      ],
+      [
+        15537.3,
+        116
+      ],
+      [
+        15801.4,
+        119
+      ],
+      [
+        16064.8,
+        122
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Macbeth, Shakespeare shows how wanting power too much can destroy a person. At the start of the play, Macbeth is a loyal soldier who fights bravely for King Duncan. After the witches tell him he will be king, he cannot stop thinking about it. Lady Macbeth pushes him to kill Duncan, and he finally agrees even though he feels guilty. Once he becomes king, he keeps killing people because he is afraid of losing what he has. By the end, Macbeth says that life is \"a tale told by an idiot,\" which shows how empty he feels. His story is a warning about what happens when ambition gets out of control.\n\"\"\"\n\nThe writer selected the phrase \"wanting power too much\" in this sentence (marked with [[ ]]):\nIn Macbeth, Shakespeare shows how [[wanting power too much]] can destroy a person.\n\nGive 10 single words that can replace \"wanting power too much\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 350,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

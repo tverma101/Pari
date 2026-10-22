@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p05-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "0b4c1c4119e91458311ee71e392dd70614dc975224c38b1c9426b7ee57d701d5",
+  "seed": 4480558206971114398,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"afraid\", \"frightened\", \"terrified\", \"too nervous\", \"too timid\", \"too anxious\", \"too hesitant\", \"too fearful\", \"too shy\", \"too intimidated\"]}",
+  "timing": {
+    "first_text_ms": 4697.8,
+    "option_ms": [
+      6303.6,
+      7645.2,
+      8700.5,
+      9746.8,
+      10811.2,
+      11876.5,
+      12942.6,
+      14003.7,
+      15062.5,
+      16111.7
+    ],
+    "total_ms": 16370.8,
+    "stream": [
+      [
+        4697.8,
+        2
+      ],
+      [
+        4959.0,
+        9
+      ],
+      [
+        5223.4,
+        11
+      ],
+      [
+        5491.2,
+        14
+      ],
+      [
+        5762.0,
+        16
+      ],
+      [
+        6029.8,
+        20
+      ],
+      [
+        6303.6,
+        22
+      ],
+      [
+        6575.1,
+        24
+      ],
+      [
+        6846.3,
+        25
+      ],
+      [
+        7111.0,
+        30
+      ],
+      [
+        7376.2,
+        34
+      ],
+      [
+        7645.2,
+        36
+      ],
+      [
+        7910.5,
+        38
+      ],
+      [
+        8174.3,
+        42
+      ],
+      [
+        8435.7,
+        47
+      ],
+      [
+        8700.5,
+        49
+      ],
+      [
+        8961.0,
+        51
+      ],
+      [
+        9226.9,
+        54
+      ],
+      [
+        9485.4,
+        62
+      ],
+      [
+        9746.8,
+        64
+      ],
+      [
+        10009.7,
+        66
+      ],
+      [
+        10296.7,
+        69
+      ],
+      [
+        10553.9,
+        75
+      ],
+      [
+        10811.2,
+        77
+      ],
+      [
+        11080.7,
+        79
+      ],
+      [
+        11346.7,
+        82
+      ],
+      [
+        11611.7,
+        90
+      ],
+      [
+        11876.5,
+        92
+      ],
+      [
+        12144.3,
+        94
+      ],
+      [
+        12409.4,
+        97
+      ],
+      [
+        12677.7,
+        106
+      ],
+      [
+        12942.6,
+        108
+      ],
+      [
+        13210.6,
+        110
+      ],
+      [
+        13474.9,
+        113
+      ],
+      [
+        13736.3,
+        121
+      ],
+      [
+        14003.7,
+        123
+      ],
+      [
+        14272.0,
+        125
+      ],
+      [
+        14533.9,
+        128
+      ],
+      [
+        14795.5,
+        132
+      ],
+      [
+        15062.5,
+        134
+      ],
+      [
+        15330.1,
+        136
+      ],
+      [
+        15591.7,
+        139
+      ],
+      [
+        15852.0,
+        151
+      ],
+      [
+        16111.7,
+        154
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nWhen my family moved to the United States, I was eleven years old and I only knew a few words in English. The first few months at school were really hard because I could not understand what the teachers were saying. I felt alone most of the time, and I was too scared to talk in class. My English teacher, Ms. Alvarez, started staying after school to help me with reading and writing. She never made me feel stupid when I made mistakes. Little by little, I started to understand more and even make some friends. Now I am the one who helps new students when they first get here, because I know how it feels.\n\"\"\"\n\nThe writer tapped the word \"scared\" in this sentence (marked with [[ ]]):\nI felt alone most of the time, and I was too [[scared]] to talk in class.\n\nGive 10 replacements for \"scared\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"scared\" without changing the rest of the sentence. Do not repeat \"scared\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 368,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

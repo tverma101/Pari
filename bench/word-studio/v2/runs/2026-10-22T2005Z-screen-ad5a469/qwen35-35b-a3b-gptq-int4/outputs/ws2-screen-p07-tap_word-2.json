@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p07-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "ea14e2afef41d8b5eaeafbf37b249f01dbd71e3d8a95ba7a49579c5ed5de72b1",
+  "seed": 2613629754426857759,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"hollow\", \"meaningless\", \"pointless\", \"vacant\", \"devoid\", \"worthless\", \"void\", \"desolate\", \"barren\", \"futile\"]}",
+  "timing": {
+    "first_text_ms": 4751.4,
+    "option_ms": [
+      6347.0,
+      7408.5,
+      8458.8,
+      9501.0,
+      10531.8,
+      11619.5,
+      12399.2,
+      13490.5,
+      14539.7,
+      15588.7
+    ],
+    "total_ms": 15853.9,
+    "stream": [
+      [
+        4751.4,
+        2
+      ],
+      [
+        5012.7,
+        9
+      ],
+      [
+        5278.8,
+        11
+      ],
+      [
+        5548.1,
+        14
+      ],
+      [
+        5820.3,
+        15
+      ],
+      [
+        6084.0,
+        20
+      ],
+      [
+        6347.0,
+        22
+      ],
+      [
+        6616.1,
+        24
+      ],
+      [
+        6878.8,
+        31
+      ],
+      [
+        7141.8,
+        35
+      ],
+      [
+        7408.5,
+        37
+      ],
+      [
+        7673.8,
+        39
+      ],
+      [
+        7935.9,
+        44
+      ],
+      [
+        8193.8,
+        48
+      ],
+      [
+        8458.8,
+        50
+      ],
+      [
+        8723.1,
+        52
+      ],
+      [
+        8980.6,
+        55
+      ],
+      [
+        9240.3,
+        58
+      ],
+      [
+        9501.0,
+        60
+      ],
+      [
+        9754.3,
+        62
+      ],
+      [
+        10007.2,
+        64
+      ],
+      [
+        10262.3,
+        68
+      ],
+      [
+        10531.8,
+        70
+      ],
+      [
+        10826.5,
+        72
+      ],
+      [
+        11087.5,
+        77
+      ],
+      [
+        11353.6,
+        81
+      ],
+      [
+        11619.5,
+        83
+      ],
+      [
+        11878.1,
+        85
+      ],
+      [
+        12135.0,
+        89
+      ],
+      [
+        12399.2,
+        91
+      ],
+      [
+        12664.2,
+        93
+      ],
+      [
+        12929.8,
+        96
+      ],
+      [
+        13218.2,
+        101
+      ],
+      [
+        13490.5,
+        103
+      ],
+      [
+        13753.1,
+        105
+      ],
+      [
+        14020.1,
+        108
+      ],
+      [
+        14278.2,
+        111
+      ],
+      [
+        14539.7,
+        113
+      ],
+      [
+        14801.6,
+        115
+      ],
+      [
+        15062.3,
+        116
+      ],
+      [
+        15327.5,
+        121
+      ],
+      [
+        15588.7,
+        124
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Macbeth, Shakespeare shows how wanting power too much can destroy a person. At the start of the play, Macbeth is a loyal soldier who fights bravely for King Duncan. After the witches tell him he will be king, he cannot stop thinking about it. Lady Macbeth pushes him to kill Duncan, and he finally agrees even though he feels guilty. Once he becomes king, he keeps killing people because he is afraid of losing what he has. By the end, Macbeth says that life is \"a tale told by an idiot,\" which shows how empty he feels. His story is a warning about what happens when ambition gets out of control.\n\"\"\"\n\nThe writer tapped the word \"empty\" in this sentence (marked with [[ ]]):\nBy the end, Macbeth says that life is \"a tale told by an idiot,\" which shows how [[empty]] he feels.\n\nGive 10 replacements for \"empty\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"empty\" without changing the rest of the sentence. Do not repeat \"empty\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 372,
+  "new_tokens": 43,
+  "finish_reason": "stop",
+  "error": null
+}

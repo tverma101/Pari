@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p05-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "394fe77fad45216a8196f0c789e1efe457b2e730438107efebfca742c34ba318",
+  "seed": 3934763681888439009,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Gradually\", \"Slowly\", \"Eventually\", \"Progressively\", \"Steadily\", \"Incrementally\", \"Continuously\", \"Constantly\", \"Persistently\", \"Step by step\"]}",
+  "timing": {
+    "first_text_ms": 4727.2,
+    "option_ms": [
+      6314.4,
+      7389.6,
+      8171.2,
+      9211.9,
+      10535.8,
+      11584.1,
+      12628.5,
+      13691.1,
+      14732.8,
+      16056.2
+    ],
+    "total_ms": 16318.5,
+    "stream": [
+      [
+        4727.2,
+        2
+      ],
+      [
+        4993.9,
+        9
+      ],
+      [
+        5268.6,
+        11
+      ],
+      [
+        5532.7,
+        14
+      ],
+      [
+        5795.0,
+        18
+      ],
+      [
+        6058.6,
+        23
+      ],
+      [
+        6314.4,
+        25
+      ],
+      [
+        6579.2,
+        27
+      ],
+      [
+        6858.0,
+        31
+      ],
+      [
+        7125.7,
+        33
+      ],
+      [
+        7389.6,
+        35
+      ],
+      [
+        7651.6,
+        37
+      ],
+      [
+        7909.5,
+        47
+      ],
+      [
+        8171.2,
+        49
+      ],
+      [
+        8431.6,
+        51
+      ],
+      [
+        8694.7,
+        59
+      ],
+      [
+        8950.6,
+        64
+      ],
+      [
+        9211.9,
+        66
+      ],
+      [
+        9473.1,
+        68
+      ],
+      [
+        9739.0,
+        70
+      ],
+      [
+        10001.9,
+        73
+      ],
+      [
+        10270.1,
+        76
+      ],
+      [
+        10535.8,
+        78
+      ],
+      [
+        10798.0,
+        80
+      ],
+      [
+        11057.1,
+        89
+      ],
+      [
+        11324.4,
+        93
+      ],
+      [
+        11584.1,
+        95
+      ],
+      [
+        11841.4,
+        97
+      ],
+      [
+        12099.9,
+        103
+      ],
+      [
+        12362.4,
+        109
+      ],
+      [
+        12628.5,
+        111
+      ],
+      [
+        12911.2,
+        113
+      ],
+      [
+        13170.8,
+        121
+      ],
+      [
+        13431.0,
+        123
+      ],
+      [
+        13691.1,
+        125
+      ],
+      [
+        13945.9,
+        127
+      ],
+      [
+        14205.5,
+        134
+      ],
+      [
+        14468.2,
+        139
+      ],
+      [
+        14732.8,
+        141
+      ],
+      [
+        14993.6,
+        143
+      ],
+      [
+        15272.8,
+        147
+      ],
+      [
+        15535.2,
+        150
+      ],
+      [
+        15795.7,
+        155
+      ],
+      [
+        16056.2,
+        158
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nWhen my family moved to the United States, I was eleven years old and I only knew a few words in English. The first few months at school were really hard because I could not understand what the teachers were saying. I felt alone most of the time, and I was too scared to talk in class. My English teacher, Ms. Alvarez, started staying after school to help me with reading and writing. She never made me feel stupid when I made mistakes. Little by little, I started to understand more and even make some friends. Now I am the one who helps new students when they first get here, because I know how it feels.\n\"\"\"\n\nThe writer selected the phrase \"Little by little\" in this sentence (marked with [[ ]]):\n[[Little by little]], I started to understand more and even make some friends.\n\nGive 10 single words that can replace \"Little by little\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 341,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

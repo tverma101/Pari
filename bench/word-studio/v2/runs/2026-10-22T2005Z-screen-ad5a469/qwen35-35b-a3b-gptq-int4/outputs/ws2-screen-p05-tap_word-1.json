@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p05-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "0ed20b306452a74196a33db4ad417514818bf30c8ea17d5b843300c79c750116",
+  "seed": 2751814752026027083,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"difficult\", \"very difficult\", \"struggling\", \"tough\", \"very tough\", \"challenging\", \"very challenging\", \"hardship\", \"very hard\", \"a struggle\"]}",
+  "timing": {
+    "first_text_ms": 4624.1,
+    "option_ms": [
+      6197.1,
+      7293.0,
+      8341.6,
+      9399.4,
+      10447.2,
+      11761.2,
+      12823.2,
+      13874.7,
+      14918.9,
+      15968.3
+    ],
+    "total_ms": 16240.3,
+    "stream": [
+      [
+        4624.1,
+        2
+      ],
+      [
+        4891.3,
+        9
+      ],
+      [
+        5155.6,
+        11
+      ],
+      [
+        5413.4,
+        14
+      ],
+      [
+        5668.0,
+        18
+      ],
+      [
+        5929.3,
+        23
+      ],
+      [
+        6197.1,
+        25
+      ],
+      [
+        6493.1,
+        27
+      ],
+      [
+        6760.1,
+        31
+      ],
+      [
+        7028.1,
+        41
+      ],
+      [
+        7293.0,
+        43
+      ],
+      [
+        7556.4,
+        45
+      ],
+      [
+        7815.7,
+        48
+      ],
+      [
+        8076.7,
+        55
+      ],
+      [
+        8341.6,
+        57
+      ],
+      [
+        8604.6,
+        59
+      ],
+      [
+        8869.9,
+        60
+      ],
+      [
+        9138.4,
+        64
+      ],
+      [
+        9399.4,
+        66
+      ],
+      [
+        9661.4,
+        68
+      ],
+      [
+        9924.4,
+        72
+      ],
+      [
+        10186.1,
+        78
+      ],
+      [
+        10447.2,
+        80
+      ],
+      [
+        10704.3,
+        82
+      ],
+      [
+        10964.0,
+        84
+      ],
+      [
+        11227.0,
+        90
+      ],
+      [
+        11491.7,
+        93
+      ],
+      [
+        11761.2,
+        95
+      ],
+      [
+        12027.1,
+        97
+      ],
+      [
+        12299.5,
+        101
+      ],
+      [
+        12560.2,
+        113
+      ],
+      [
+        12823.2,
+        115
+      ],
+      [
+        13086.0,
+        117
+      ],
+      [
+        13351.2,
+        121
+      ],
+      [
+        13610.9,
+        125
+      ],
+      [
+        13874.7,
+        127
+      ],
+      [
+        14137.4,
+        129
+      ],
+      [
+        14399.4,
+        133
+      ],
+      [
+        14656.1,
+        138
+      ],
+      [
+        14918.9,
+        140
+      ],
+      [
+        15178.4,
+        142
+      ],
+      [
+        15443.5,
+        143
+      ],
+      [
+        15703.9,
+        152
+      ],
+      [
+        15968.3,
+        155
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nWhen my family moved to the United States, I was eleven years old and I only knew a few words in English. The first few months at school were really hard because I could not understand what the teachers were saying. I felt alone most of the time, and I was too scared to talk in class. My English teacher, Ms. Alvarez, started staying after school to help me with reading and writing. She never made me feel stupid when I made mistakes. Little by little, I started to understand more and even make some friends. Now I am the one who helps new students when they first get here, because I know how it feels.\n\"\"\"\n\nThe writer tapped the word \"hard\" in this sentence (marked with [[ ]]):\nThe first few months at school were really [[hard]] because I could not understand what the teachers were saying.\n\nGive 10 replacements for \"hard\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"hard\" without changing the rest of the sentence. Do not repeat \"hard\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 365,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

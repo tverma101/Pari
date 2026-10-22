@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p06-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "20a7c2e0643654e760e3d980eea4885702e84a19ab5b5e80e9248fc792056c81",
+  "seed": 6367893422741591056,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"significant\", \"major\", \"profound\", \"powerful\", \"strong\", \"substantial\", \"considerable\", \"deep\", \"far-reaching\", \"great\"]}",
+  "timing": {
+    "first_text_ms": 4682.0,
+    "option_ms": [
+      5978.5,
+      6749.9,
+      7795.1,
+      8843.2,
+      9635.3,
+      10685.6,
+      11732.5,
+      12514.3,
+      13604.3,
+      14373.9
+    ],
+    "total_ms": 14637.5,
+    "stream": [
+      [
+        4682.0,
+        2
+      ],
+      [
+        4939.1,
+        9
+      ],
+      [
+        5193.9,
+        11
+      ],
+      [
+        5458.8,
+        14
+      ],
+      [
+        5717.3,
+        25
+      ],
+      [
+        5978.5,
+        27
+      ],
+      [
+        6234.2,
+        29
+      ],
+      [
+        6491.7,
+        34
+      ],
+      [
+        6749.9,
+        36
+      ],
+      [
+        7007.2,
+        38
+      ],
+      [
+        7268.9,
+        41
+      ],
+      [
+        7529.0,
+        46
+      ],
+      [
+        7795.1,
+        48
+      ],
+      [
+        8058.9,
+        50
+      ],
+      [
+        8319.9,
+        55
+      ],
+      [
+        8580.7,
+        58
+      ],
+      [
+        8843.2,
+        60
+      ],
+      [
+        9104.1,
+        62
+      ],
+      [
+        9372.5,
+        68
+      ],
+      [
+        9635.3,
+        70
+      ],
+      [
+        9895.8,
+        72
+      ],
+      [
+        10157.4,
+        75
+      ],
+      [
+        10419.7,
+        83
+      ],
+      [
+        10685.6,
+        85
+      ],
+      [
+        10945.0,
+        87
+      ],
+      [
+        11196.6,
+        95
+      ],
+      [
+        11471.0,
+        99
+      ],
+      [
+        11732.5,
+        101
+      ],
+      [
+        11991.5,
+        103
+      ],
+      [
+        12252.7,
+        107
+      ],
+      [
+        12514.3,
+        109
+      ],
+      [
+        12780.4,
+        111
+      ],
+      [
+        13073.9,
+        114
+      ],
+      [
+        13343.3,
+        123
+      ],
+      [
+        13604.3,
+        125
+      ],
+      [
+        13860.0,
+        127
+      ],
+      [
+        14114.5,
+        132
+      ],
+      [
+        14373.9,
+        135
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSocial media has a big effect on how teenagers see themselves. On apps like Instagram and TikTok, people usually only post the best parts of their lives, like vacations and nice clothes. When teens look at these posts all day, they start to compare themselves to others and feel bad about their own lives. A survey from 2023 found that almost half of teens said social media made them feel worse about their bodies. Social media is not all bad, though, because it also helps people stay in touch with friends and find others with the same interests. Still, I believe that teens should limit how much time they spend on these apps.\n\"\"\"\n\nThe writer tapped the word \"big\" in this sentence (marked with [[ ]]):\nSocial media has a [[big]] effect on how teenagers see themselves.\n\nGive 10 replacements for \"big\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"big\" without changing the rest of the sentence. Do not repeat \"big\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 356,
+  "new_tokens": 39,
+  "finish_reason": "stop",
+  "error": null
+}
