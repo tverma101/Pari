@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "benchmark": "word-studio-v2",
+  "candidate": {
+    "candidate_id": "qwen35-35b-a3b-gptq-int4",
+    "role": "kaggle_large_reference",
+    "family": "Qwen3.5",
+    "model_id": "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",
+    "revision": "3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b",
+    "parameter_count_billions_total": 35,
+    "parameter_count_billions_active": 3,
+    "upstream_weight_files_bytes": 24419939760,
+    "quantization": "GPTQ Int4",
+    "license": {
+      "spdx": "Apache-2.0",
+      "personal_use": "allowed_under_license_terms"
+    },
+    "mlx": {
+      "available": false,
+      "reason": "Reference is 35B total and outside the 16 GiB Mac candidate envelope."
+    },
+    "mac_fit_assessment": "outside_16_gib_candidate_envelope",
+    "kaggle_2xt4_assessment": "plausible_reference_not_run; 24.42 GB of quantized weights split across two T4s leaves estimated memory for a short-context smoke, but loading and generation are unverified",
+    "sources": [
+      {
+        "claim": "35B total/3B active parameter count, GPTQ Int4 format, Apache-2.0 license, and published vLLM support",
+        "url": "https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/tree/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b",
+        "metadata_url": "https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4?blobs=true",
+        "verified_on": "2026-10-16"
+      }
+    ],
+    "listed_in": "bench/candidates.json"
+  },
+  "task_set": "screen",
+  "task_file_sha256": "df7c32ee7e5945f832dc24fd073f5b693d0ffa40e4afeca7ed370ad4f24f24e8",
+  "manifest_sha256": "81e4e9b95b574e533b3782013d54eae84ec40eea82bd45d7ccc453610920f5b1",
+  "prompt_version": "ws2-prompts-v1",
+  "generation": {
+    "do_sample": true,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": 50,
+    "repetition_penalty": 1.0,
+    "samples_per_task": 1,
+    "seed": "first 8 bytes of sha256(task id), big-endian",
+    "thinking": "disabled: enable_thinking=False is passed to every chat template"
+  },
+  "task_limit": 2,
+  "tasks_planned": 2,
+  "repo": {
+    "sha": "e7e99834b175ef7f127d55989d13938e6606ab5f",
+    "dirty_paths": []
+  },
+  "status": "completed",
+  "stage": "done",
+  "started_at": "2026-10-22T19:56:10+00:00",
+  "finished_at": "2026-10-22T20:03:31+00:00",
+  "load": {
+    "warmup_seconds": 5.3,
+    "model_class": "Qwen3_5MoeForConditionalGeneration",
+    "dtype": "float16",
+    "device_map": "auto across both T4s",
+    "devices": [
+      "cuda:0",
+      "cuda:1"
+    ],
+    "unexpected_keys": 0,
+    "parameters": 2894927216,
+    "generation_config": {
+      "max_length": null,
+      "max_new_tokens": null,
+      "min_length": null,
+      "min_new_tokens": null,
+      "early_stopping": null,
+      "max_time": null,
+      "stop_strings": null,
+      "do_sample": true,
+      "num_beams": null,
+      "use_mtp": null,
+      "use_cache": null,
+      "cache_implementation": null,
+      "cache_config": null,
+      "max_cache_len": null,
+      "temperature": 0.7,
+      "top_k": 50,
+      "top_p": 0.9,
+      "min_p": null,
+      "top_h": null,
+      "typical_p": null,
+      "epsilon_cutoff": null,
+      "eta_cutoff": null,
+      "repetition_penalty": 1.0,
+      "encoder_repetition_penalty": null,
+      "length_penalty": null,
+      "no_repeat_ngram_size": null,
+      "bad_words_ids": null,
+      "renormalize_logits": null,
+      "forced_bos_token_id": null,
+      "forced_eos_token_id": null,
+      "remove_invalid_values": null,
+      "exponential_decay_length_penalty": null,
+      "suppress_tokens": null,
+      "begin_suppress_tokens": null,
+      "sequence_bias": null,
+      "token_healing": null,
+      "guidance_scale": null,
+      "watermarking_config": null,
+      "num_return_sequences": null,
+      "output_attentions": null,
+      "output_hidden_states": null,
+      "output_scores": null,
+      "output_logits": null,
+      "return_dict_in_generate": null,
+      "pad_token_id": 248044,
+      "bos_token_id": 248044,
+      "eos_token_id": [
+        248046,
+        248044
+      ],
+      "encoder_no_repeat_ngram_size": null,
+      "decoder_start_token_id": null,
+      "is_assistant": null,
+      "num_assistant_tokens": null,
+      "num_assistant_tokens_schedule": null,
+      "assistant_confidence_threshold": null,
+      "prompt_lookup_num_tokens": null,
+      "max_matching_ngram_size": null,
+      "assistant_early_exit": null,
+      "assistant_lookbehind": null,
+      "target_lookbehind": null,
+      "assistant_ensemble_weight": null,
+      "speculation_type": null,
+      "compile_config": null,
+      "disable_compile": null,
+      "continuous_batching_config": null,
+      "low_memory": null,
+      "penalty_alpha": null,
+      "dola_layers": null,
+      "diversity_penalty": null,
+      "num_beam_groups": null,
+      "constraints": null,
+      "force_words_ids": null,
+      "prefill_chunk_size": null,
+      "_from_model_config": null,
+      "transformers_version": "5.18.0"
+    },
+    "chat_template_sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715",
+    "loader": "gptqmodel",
+    "gptq_format_from_zero_points": "gptq_v2",
+    "experts_forward": "routed_experts_forward",
+    "quant_kernels": [
+      "ExllamaV2Linear"
+    ],
+    "load_seconds": 379.32
+  },
+  "environment": {
+    "python": "3.13.15 (main, Aug  6 2026, 11:06:22) [GCC 13.3.0]",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "packages": {
+      "torch": "2.11.0+cu128",
+      "transformers": "5.18.0",
+      "accelerate": "1.15.0",
+      "tokenizers": "0.23.1",
+      "huggingface_hub": "1.33.0",
+      "safetensors": "0.8.0",
+      "gptqmodel": "7.5.0"
+    },
+    "host_ram_bytes": 33658318848,
+    "cuda": "12.8",
+    "gpus": [
+      "Tesla T4",
+      "Tesla T4"
+    ],
+    "peak_memory": {
+      "cuda:0": 0,
+      "cuda:1": 0
+    },
+    "nvidia_smi": [
+      "Tesla T4, 15360 MiB, 580.178.04",
+      "Tesla T4, 15360 MiB, 580.178.04"
+    ]
+  },
+  "tasks": {
+    "ok": 2,
+    "error": 0,
+    "failed_ids": []
+  },
+  "error": null,
+  "scores": "none: this runner never scores; see v2/RUBRIC.md",
+  "peak_memory": {
+    "cuda:0": 12163481600,
+    "cuda:1": 13101219840
+  },
+  "complete_set": false
+}
