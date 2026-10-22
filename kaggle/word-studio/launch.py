@@ -28,6 +28,9 @@ CANDIDATE_FILES = (REPO_ROOT / "bench" / "candidates.json", REPO_ROOT / "bench" 
 REPO_URL = "https://github.com/tverma101/Pari.git"
 KERNEL_SLUG = "pari-word-studio-v2"
 PIP = ["transformers==5.18.0", "accelerate==1.15.0"]
+#: Extra packages by the candidate's "quantization" field. GPTQModel 7.5 splits
+#: fused MoE experts that Transformers alone cannot fill from a GPTQ checkpoint.
+QUANT_PIP = {"GPTQ Int4": ["gptqmodel==7.5.0"]}
 CONFIG_LINE = "CONFIG = {}  # filled in by launch.py"
 #: Kaggle stops a GPU session at 12 hours; leave room for setup and downloads.
 SESSION_BUDGET_S = 11 * 3600
@@ -37,11 +40,21 @@ def git(*args: str) -> str:
     return subprocess.run(["git", *args], cwd=REPO_ROOT, capture_output=True, text=True, check=True).stdout.strip()
 
 
-def known_candidates() -> set[str]:
-    ids: set[str] = set()
+def candidate_records() -> dict[str, dict]:
+    records: dict[str, dict] = {}
     for path in CANDIDATE_FILES:
-        ids.update(c["candidate_id"] for c in json.loads(path.read_text(encoding="utf-8"))["candidates"])
-    return ids
+        records.update((c["candidate_id"], c) for c in json.loads(path.read_text(encoding="utf-8"))["candidates"])
+    return records
+
+
+def known_candidates() -> set[str]:
+    return set(candidate_records())
+
+
+def pip_for(candidates: list[str]) -> list[str]:
+    records = candidate_records()
+    extra = [pkg for c in candidates for pkg in QUANT_PIP.get(records[c].get("quantization", ""), [])]
+    return PIP + sorted(set(extra))
 
 
 def kaggle_username() -> str:
@@ -112,7 +125,7 @@ def main(argv: list[str] | None = None) -> int:
         "git_sha": sha,
         "task_set": args.set,
         "candidates": candidates,
-        "pip": PIP,
+        "pip": pip_for(candidates),
         "per_candidate_timeout_s": args.timeout_s,
         "dtype": args.dtype,
         "limit": args.limit,

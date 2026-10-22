@@ -44,7 +44,7 @@ from v2 import build_tasks, prompts  # noqa: E402
 from word_studio_output_parser import partial_option_values  # noqa: E402
 
 SCHEMA_VERSION = 1
-PACKAGES = ("torch", "transformers", "accelerate", "tokenizers", "huggingface_hub", "safetensors")
+PACKAGES = ("torch", "transformers", "accelerate", "tokenizers", "huggingface_hub", "safetensors", "gptqmodel")
 
 
 class Backend(Protocol):
@@ -333,20 +333,22 @@ class TransformersBackend:
 
     def load(self) -> dict[str, Any]:
         import torch
-        from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
+        from transformers import AutoTokenizer, GenerationConfig
 
         dtype = getattr(torch, self.dtype_name)
         single = self.weight_bytes is not None and self.weight_bytes < self.SINGLE_GPU_BYTES
         device_map: Any = {"": 0} if single else "auto"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_id, revision=self.revision, trust_remote_code=False)
-        self.model, info = AutoModelForCausalLM.from_pretrained(
-            self.model_id, revision=self.revision, dtype=dtype, device_map=device_map, trust_remote_code=False,
-            output_loading_info=True)
+        self.model, missing, unexpected, extra = self.load_weights(dtype, device_map)
         # Randomly initialised weights would produce garbage that looks like the
         # model's own output. Treat any missing weight as a load failure.
-        missing = sorted(info.get("missing_keys") or [])
         if missing:
             raise RuntimeError(f"{len(missing)} weights missing after load (first: {missing[:5]})")
+        # A model that spills onto the CPU is not served by the T4s, and its timings would mislead.
+        devices = sorted({str(t.device) for t in self.model.state_dict().values()})
+        offloaded = [d for d in devices if not d.startswith("cuda")]
+        if offloaded:
+            raise RuntimeError(f"weights placed off the GPUs ({offloaded}); the model does not fit 2xT4")
         self.model.eval()
         base = self.model.generation_config
         pad = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else base.eos_token_id
@@ -357,7 +359,6 @@ class TransformersBackend:
             do_sample=g["do_sample"], temperature=g["temperature"], top_p=g["top_p"], top_k=g["top_k"],
             repetition_penalty=g["repetition_penalty"], eos_token_id=base.eos_token_id, pad_token_id=pad,
             bos_token_id=base.bos_token_id)
-        placed = getattr(self.model, "hf_device_map", None) or {}
         # One untimed generation first, so CUDA start-up is not charged to the first task.
         started = time.perf_counter()
         self.generate([{"role": "user", "content": "Reply with OK."}], max_new_tokens=8, seed=0,
@@ -368,12 +369,60 @@ class TransformersBackend:
             "model_class": type(self.model).__name__,
             "dtype": self.dtype_name,
             "device_map": "single T4 (cuda:0)" if single else "auto across both T4s",
-            "devices": sorted({str(v) for v in placed.values()}),
-            "unexpected_keys": len(info.get("unexpected_keys") or []),
+            "devices": devices,
+            "unexpected_keys": unexpected,
             "parameters": sum(p.numel() for p in self.model.parameters()),
             "generation_config": self.generation_config.to_dict(),
             "chat_template_sha256": sha256_text(self.tokenizer.chat_template or ""),
+            **extra,
         }
+
+    def load_weights(self, dtype: Any, device_map: Any) -> tuple[Any, list[str], int, dict[str, Any]]:
+        """Return the model, the weights the checkpoint did not fill, the unused checkpoint count, extra load info."""
+        from transformers import AutoModelForCausalLM
+
+        model, info = AutoModelForCausalLM.from_pretrained(
+            self.model_id, revision=self.revision, dtype=dtype, device_map=device_map, trust_remote_code=False,
+            output_loading_info=True)
+        return model, sorted(info.get("missing_keys") or []), len(info.get("unexpected_keys") or []), {}
+
+
+def checkpoint_coverage(model_names: Iterable[str], stored_names: Iterable[str], *,
+                        kernel_buffers: tuple[str, ...] = (), unused_prefixes: tuple[str, ...] = ()
+                        ) -> tuple[list[str], list[str]]:
+    """Model weights the checkpoint does not hold, and checkpoint tensors the model has no slot for."""
+    model_names, stored_names = set(model_names), set(stored_names)
+    missing = sorted(n for n in model_names - stored_names if not n.endswith(kernel_buffers))
+    unused = sorted(n for n in stored_names - model_names if not n.startswith(unused_prefixes))
+    return missing, unused
+
+
+class GPTQModelBackend(TransformersBackend):
+    """A GPTQ checkpoint loaded by GPTQModel, which splits the fused MoE experts Transformers would leave empty.
+
+    GPTQModel loads through accelerate without a strict check, so the model's
+    weight names are compared with the checkpoint index here instead.
+    """
+
+    #: Buffers the GPTQ kernels add after loading; they are not checkpoint weights.
+    KERNEL_BUFFERS = ("g_idx_sort_indices", "workspace")
+    #: Checkpoint tensors generation never uses: the multi-token-prediction head.
+    UNUSED_PREFIXES = ("mtp.",)
+
+    def load_weights(self, dtype: Any, device_map: Any) -> tuple[Any, list[str], int, dict[str, Any]]:
+        from gptqmodel import GPTQModel
+        from huggingface_hub import hf_hub_download
+
+        wrapped = GPTQModel.load(self.model_id, revision=self.revision, device_map=device_map, dtype=dtype,
+                                 trust_remote_code=False)
+        model = wrapped.model
+        index = hf_hub_download(self.model_id, "model.safetensors.index.json", revision=self.revision)
+        stored = json.loads(Path(index).read_text(encoding="utf-8"))["weight_map"]
+        missing, unused = checkpoint_coverage(model.state_dict(), stored, kernel_buffers=self.KERNEL_BUFFERS,
+                                              unused_prefixes=self.UNUSED_PREFIXES)
+        kernels = sorted({type(m).__name__ for m in model.modules()
+                          if type(m).__module__.startswith("gptqmodel.nn_modules.qlinear")})
+        return model, missing, len(unused), {"loader": "gptqmodel", "quant_kernels": kernels}
 
     def generate(self, messages: list[dict[str, str]], *, max_new_tokens: int, seed: int,
                  on_text: Callable[..., None]) -> dict[str, Any]:
@@ -453,8 +502,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--limit", type=int, help="first N tasks only, for smoke tests; the run is marked partial")
     args = parser.parse_args(argv)
     candidate = find_candidate(args.candidate)
-    backend = TransformersBackend(candidate["model_id"], candidate["revision"], dtype=args.dtype,
-                                  weight_bytes=candidate.get("upstream_weight_files_bytes"))
+    gptq = str(candidate.get("quantization", "")).startswith("GPTQ")
+    backend = (GPTQModelBackend if gptq else TransformersBackend)(
+        candidate["model_id"], candidate["revision"], dtype=args.dtype,
+        weight_bytes=candidate.get("upstream_weight_files_bytes"))
     record = run(candidate, args.set, args.out, backend, limit=args.limit)
     print(json.dumps({"candidate": args.candidate, "status": record["status"], "tasks": record["tasks"]}))
     return 0 if record["status"] == "completed" else 2

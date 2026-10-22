@@ -47,6 +47,13 @@ class KaggleKernelTests(unittest.TestCase):
         self.assertIn("control-missing-revision", known)
         self.assertIn("qwen35-4b", known)
 
+    def test_gptq_candidates_get_their_loader_installed(self) -> None:
+        launch = load("launch")
+        self.assertEqual(launch.pip_for(["qwen35-4b"]), launch.PIP)
+        pip = launch.pip_for(["qwen35-35b-a3b-gptq-int4"])
+        self.assertEqual(pip[:len(launch.PIP)], launch.PIP)
+        self.assertTrue(any(p.startswith("gptqmodel==") for p in pip))
+
     def test_launch_refuses_runs_longer_than_a_kaggle_session(self) -> None:
         launch = load("launch")
         with self.assertRaises(SystemExit) as caught:

@@ -108,6 +108,16 @@ class RunnerTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             run_candidate.find_candidate("no-such-model")
 
+    def test_checkpoint_coverage_finds_unfilled_weights(self) -> None:
+        model = ["experts.0.qweight", "experts.0.scales", "experts.0.g_idx_sort_indices", "norm.weight"]
+        stored = ["experts.0.qweight", "experts.0.scales", "mtp.fc.weight", "visual.proj.weight"]
+        missing, unused = run_candidate.checkpoint_coverage(
+            model, stored, kernel_buffers=run_candidate.GPTQModelBackend.KERNEL_BUFFERS,
+            unused_prefixes=run_candidate.GPTQModelBackend.UNUSED_PREFIXES)
+        self.assertEqual(missing, ["norm.weight"])
+        self.assertEqual(unused, ["visual.proj.weight"])
+        self.assertEqual(run_candidate.checkpoint_coverage(stored[:2], stored[:2]), ([], []))
+
     def test_seeds_are_stable_per_task(self) -> None:
         self.assertEqual(run_candidate.task_seed("ws2-screen-p01-tap_word-1"),
                          run_candidate.task_seed("ws2-screen-p01-tap_word-1"))
