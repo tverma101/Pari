@@ -402,6 +402,31 @@ def checkpoint_coverage(model_names: Iterable[str], stored_names: Iterable[str],
     return missing, unused
 
 
+def gptq_zero_format(qzeros_words: Iterable[int], bits: int) -> str:
+    """The GPTQ format a symmetric checkpoint's stored zero points imply.
+
+    Symmetric GPTQ quantizes around the middle code, 2**(bits - 1). The original
+    format (``gptq``) stores that zero minus one and loaders add the one back;
+    ``gptq_v2`` stores it as is. A checkpoint that does not name its format is
+    read as ``gptq``, so a v2 checkpoint loads one quantization step off on every
+    weight and generates nonsense (run 2026-10-22T1909Z-screen-ffbc99d-limit2).
+    """
+    if bits not in (2, 4, 8):
+        raise RuntimeError(f"cannot read packed zero points for {bits}-bit GPTQ")
+    middle = 1 << (bits - 1)
+
+    def word(zero: int) -> int:
+        return sum(zero << (bits * i) for i in range(32 // bits))
+
+    found = {w & 0xFFFFFFFF for w in qzeros_words}
+    if found == {word(middle)}:
+        return "gptq_v2"
+    if found == {word(middle - 1)}:
+        return "gptq"
+    raise RuntimeError(f"symmetric {bits}-bit zero points are neither {word(middle):#x} nor "
+                       f"{word(middle - 1):#x}: {sorted(found)[:4]}")
+
+
 @contextlib.contextmanager
 def lazy_expert_shells() -> Iterator[None]:
     """Split fused MoE experts without copying their placeholder values.
@@ -458,17 +483,40 @@ class GPTQModelBackend(TransformersBackend):
         from gptqmodel import GPTQModel
         from huggingface_hub import hf_hub_download
 
-        with lazy_expert_shells():
-            wrapped = GPTQModel.load(self.model_id, revision=self.revision, device_map=device_map, dtype=dtype,
-                                     backend=self.KERNEL, trust_remote_code=False)
-        model = wrapped.model
         index = hf_hub_download(self.model_id, "model.safetensors.index.json", revision=self.revision)
         stored = json.loads(Path(index).read_text(encoding="utf-8"))["weight_map"]
+        config = json.loads(Path(hf_hub_download(self.model_id, "config.json", revision=self.revision))
+                            .read_text(encoding="utf-8"))
+        quant = config.get("quantization_config") or {}
+        extra: dict[str, Any] = {"loader": "gptqmodel"}
+        options: dict[str, Any] = {}
+        if quant.get("sym") and not ({"format", "checkpoint_format"} & set(quant)):
+            options["format"] = extra["gptq_format_from_zero_points"] = self.stored_zero_format(stored, quant["bits"])
+        with lazy_expert_shells():
+            wrapped = GPTQModel.load(self.model_id, revision=self.revision, device_map=device_map, dtype=dtype,
+                                     backend=self.KERNEL, trust_remote_code=False, **options)
+        model = wrapped.model
         missing, unused = checkpoint_coverage(model.state_dict(), stored, kernel_buffers=self.KERNEL_BUFFERS,
                                               unused_prefixes=self.UNUSED_PREFIXES)
-        kernels = sorted({type(m).__name__ for m in model.modules()
-                          if type(m).__module__.startswith("gptqmodel.nn_modules.qlinear")})
-        return model, missing, len(unused), {"loader": "gptqmodel", "quant_kernels": kernels}
+        extra["quant_kernels"] = sorted({type(m).__name__ for m in model.modules()
+                                         if type(m).__module__.startswith("gptqmodel.nn_modules.qlinear")})
+        return model, missing, len(unused), extra
+
+    def stored_zero_format(self, stored: dict[str, str], bits: int) -> str:
+        """Read every zero point in the first shard that has any and name the format they imply."""
+        from huggingface_hub import hf_hub_download
+        from safetensors import safe_open
+
+        shard = stored[min(n for n in stored if n.endswith(".qzeros"))]
+        names = sorted(n for n, s in stored.items() if s == shard and n.endswith(".qzeros"))
+        path = hf_hub_download(self.model_id, shard, revision=self.revision)
+        formats = set()
+        with safe_open(path, framework="pt") as f:
+            for name in names:
+                formats.add(gptq_zero_format(f.get_tensor(name).flatten().tolist(), bits))
+        if len(formats) != 1:
+            raise RuntimeError(f"{shard} mixes zero-point formats {sorted(formats)}")
+        return formats.pop()
 
     def generate(self, messages: list[dict[str, str]], *, max_new_tokens: int, seed: int,
                  on_text: Callable[..., None]) -> dict[str, Any]:

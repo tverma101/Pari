@@ -118,6 +118,16 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(unused, ["visual.proj.weight"])
         self.assertEqual(run_candidate.checkpoint_coverage(stored[:2], stored[:2]), ([], []))
 
+    def test_gptq_zero_format_reads_the_stored_zero_points(self) -> None:
+        # Signed int32 words, as safetensors returns them: Qwen3.5-35B-A3B-GPTQ-Int4 stores 0x88888888.
+        self.assertEqual(run_candidate.gptq_zero_format([0x88888888 - 2**32] * 3, 4), "gptq_v2")
+        self.assertEqual(run_candidate.gptq_zero_format([0x77777777], 4), "gptq")
+        self.assertEqual(run_candidate.gptq_zero_format([0x80808080 - 2**32], 8), "gptq_v2")
+        with self.assertRaises(RuntimeError):
+            run_candidate.gptq_zero_format([0x88888888, 0x77777777], 4)
+        with self.assertRaises(RuntimeError):
+            run_candidate.gptq_zero_format([0x24924924], 3)
+
     def test_seeds_are_stable_per_task(self) -> None:
         self.assertEqual(run_candidate.task_seed("ws2-screen-p01-tap_word-1"),
                          run_candidate.task_seed("ws2-screen-p01-tap_word-1"))

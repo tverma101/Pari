@@ -95,7 +95,13 @@ placeholder values, so the first smoke (`2026-10-22T1846Z-screen-94c5fca-limit2`
 was killed for host RAM. The runner now does that split without the copy
 (`lazy_expert_shells`). The second smoke (`2026-10-22T1859Z-screen-ac3f270-limit2`)
 loaded past that, but GPTQModel's default Marlin kernel does not compile for
-the T4, so the runner asks for the ExLlamaV2 kernel. The reference answers whether
+the T4, so the runner asks for the ExLlamaV2 kernel. The third smoke
+(`2026-10-22T1909Z-screen-ffbc99d-limit2`) loaded on both GPUs and generated,
+but only multilingual token soup; it is kept as a record and never judged. The
+checkpoint stores its symmetric zero points as 8 (`0x88888888`, the `gptq_v2`
+layout) without naming a format, so GPTQModel read it as `gptq`, added one to
+every zero point and shifted every expert weight down one quantization step. The
+runner now reads the stored zero points and passes the format they imply. The reference answers whether
 a big open model beats the best Mac-sized one by enough to justify
 distillation (#92). Judge it alone with anchors, like any new model.
 
