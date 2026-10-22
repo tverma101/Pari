@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p12-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "98ebc794116f37ebef6cf31789f6208705654e942e596be9c1f2c5dbb712ea28",
+  "seed": 1673435058180536820,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"common\", \"minor\", \"ordinary\", \"everyday\", \"usual\", \"typical\", \"basic\", \"straightforward\", \"commonplace\", \"harmless\"]}",
+  "timing": {
+    "first_text_ms": 4689.3,
+    "option_ms": [
+      5968.1,
+      6766.4,
+      7548.6,
+      8589.2,
+      9357.5,
+      10404.4,
+      11179.4,
+      12220.7,
+      13261.0,
+      14574.5
+    ],
+    "total_ms": 14829.9,
+    "stream": [
+      [
+        4689.3,
+        2
+      ],
+      [
+        4944.0,
+        9
+      ],
+      [
+        5200.7,
+        11
+      ],
+      [
+        5455.4,
+        14
+      ],
+      [
+        5710.9,
+        20
+      ],
+      [
+        5968.1,
+        22
+      ],
+      [
+        6229.0,
+        24
+      ],
+      [
+        6492.5,
+        29
+      ],
+      [
+        6766.4,
+        31
+      ],
+      [
+        7026.4,
+        33
+      ],
+      [
+        7288.0,
+        41
+      ],
+      [
+        7548.6,
+        43
+      ],
+      [
+        7809.7,
+        45
+      ],
+      [
+        8068.4,
+        50
+      ],
+      [
+        8330.7,
+        53
+      ],
+      [
+        8589.2,
+        55
+      ],
+      [
+        8844.5,
+        57
+      ],
+      [
+        9097.6,
+        62
+      ],
+      [
+        9357.5,
+        64
+      ],
+      [
+        9612.5,
+        66
+      ],
+      [
+        9874.8,
+        69
+      ],
+      [
+        10142.9,
+        73
+      ],
+      [
+        10404.4,
+        75
+      ],
+      [
+        10662.1,
+        77
+      ],
+      [
+        10920.2,
+        82
+      ],
+      [
+        11179.4,
+        84
+      ],
+      [
+        11441.3,
+        86
+      ],
+      [
+        11700.6,
+        94
+      ],
+      [
+        11959.0,
+        101
+      ],
+      [
+        12220.7,
+        103
+      ],
+      [
+        12482.3,
+        105
+      ],
+      [
+        12740.1,
+        111
+      ],
+      [
+        12999.2,
+        116
+      ],
+      [
+        13261.0,
+        118
+      ],
+      [
+        13527.6,
+        120
+      ],
+      [
+        13784.7,
+        121
+      ],
+      [
+        14056.8,
+        124
+      ],
+      [
+        14319.4,
+        128
+      ],
+      [
+        14574.5,
+        131
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nAntibiotics are medicines that kill bacteria, and they have saved millions of lives since they were discovered. The problem is that bacteria can change over time so that the medicine does not work on them anymore. This happens faster when people take antibiotics they do not really need, like for a cold, which is caused by a virus. It also happens when people stop taking their pills early because they start to feel better. If this keeps going, simple infections could become deadly again. To stop this, doctors need to be careful about giving out antibiotics, and patients need to finish the whole treatment.\n\"\"\"\n\nThe writer tapped the word \"simple\" in this sentence (marked with [[ ]]):\nIf this keeps going, [[simple]] infections could become deadly again.\n\nGive 10 replacements for \"simple\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"simple\" without changing the rest of the sentence. Do not repeat \"simple\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 345,
+  "new_tokens": 40,
+  "finish_reason": "stop",
+  "error": null
+}

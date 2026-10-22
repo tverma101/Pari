@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p44-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "01d0c941300932d80beee292a69b6a6fee285b79c9437c1dbadd0f1d26a287f5",
+  "seed": 5813088874520935993,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"reason\", \"think\", \"judge\", \"decide\", \"solve\", \"plan\", \"reflect\", \"analyze\", \"process\", \"conclude\"]}",
+  "timing": {
+    "first_text_ms": 4465.5,
+    "option_ms": [
+      5860.5,
+      6675.8,
+      7480.7,
+      8560.9,
+      9365.2,
+      10170.5,
+      10984.8,
+      11809.9,
+      12627.4,
+      13703.4
+    ],
+    "total_ms": 13967.4,
+    "stream": [
+      [
+        4465.5,
+        2
+      ],
+      [
+        4735.4,
+        9
+      ],
+      [
+        5007.9,
+        11
+      ],
+      [
+        5300.9,
+        14
+      ],
+      [
+        5583.6,
+        20
+      ],
+      [
+        5860.5,
+        22
+      ],
+      [
+        6131.0,
+        24
+      ],
+      [
+        6404.1,
+        29
+      ],
+      [
+        6675.8,
+        31
+      ],
+      [
+        6944.0,
+        33
+      ],
+      [
+        7212.5,
+        38
+      ],
+      [
+        7480.7,
+        40
+      ],
+      [
+        7753.3,
+        42
+      ],
+      [
+        8023.3,
+        45
+      ],
+      [
+        8293.4,
+        48
+      ],
+      [
+        8560.9,
+        50
+      ],
+      [
+        8832.4,
+        52
+      ],
+      [
+        9099.3,
+        57
+      ],
+      [
+        9365.2,
+        59
+      ],
+      [
+        9634.7,
+        61
+      ],
+      [
+        9904.1,
+        65
+      ],
+      [
+        10170.5,
+        67
+      ],
+      [
+        10441.5,
+        69
+      ],
+      [
+        10715.4,
+        76
+      ],
+      [
+        10984.8,
+        78
+      ],
+      [
+        11257.3,
+        80
+      ],
+      [
+        11525.4,
+        87
+      ],
+      [
+        11809.9,
+        89
+      ],
+      [
+        12088.0,
+        91
+      ],
+      [
+        12357.3,
+        98
+      ],
+      [
+        12627.4,
+        100
+      ],
+      [
+        12896.2,
+        102
+      ],
+      [
+        13164.0,
+        105
+      ],
+      [
+        13431.7,
+        110
+      ],
+      [
+        13703.4,
+        113
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nArtificial intelligence tools like chatbots are becoming common in schools, and teachers are not sure how to handle them. Some teachers worry that students will use AI to write their essays and never learn how to think for themselves. Others believe AI can be a useful tutor that explains hard ideas in a simple way. In my experience, AI is most helpful when I use it to check my understanding, not to do the work for me. Schools should teach students how to use these tools honestly instead of banning them completely.\n\"\"\"\n\nThe writer selected the phrase \"think for themselves\" in this sentence (marked with [[ ]]):\nSome teachers worry that students will use AI to write their essays and never learn how to [[think for themselves]].\n\nGive 10 single words that can replace \"think for themselves\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 319,
+  "new_tokens": 36,
+  "finish_reason": "stop",
+  "error": null
+}

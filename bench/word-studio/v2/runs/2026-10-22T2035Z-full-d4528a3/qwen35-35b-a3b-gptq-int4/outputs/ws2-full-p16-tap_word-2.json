@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p16-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "b6ab349f37fbf0147b9f38e8261fd1dc5164f7b2f944b0a048d0a6bdddc23359",
+  "seed": 2386472839697562874,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"harmed\", \"damaged\", \"weakened\", \"undermined\", \"struck\", \"affected\", \"suffered\", \"impacted\", \"dealt a blow to\", \"took a toll on\"]}",
+  "timing": {
+    "first_text_ms": 4723.0,
+    "option_ms": [
+      6295.2,
+      7343.1,
+      8657.6,
+      9986.5,
+      11080.1,
+      11874.0,
+      13201.8,
+      14255.1,
+      16106.9,
+      17676.4
+    ],
+    "total_ms": 17940.9,
+    "stream": [
+      [
+        4723.0,
+        2
+      ],
+      [
+        4984.6,
+        9
+      ],
+      [
+        5250.9,
+        11
+      ],
+      [
+        5514.0,
+        14
+      ],
+      [
+        5771.8,
+        17
+      ],
+      [
+        6033.2,
+        20
+      ],
+      [
+        6295.2,
+        22
+      ],
+      [
+        6562.6,
+        24
+      ],
+      [
+        6827.0,
+        27
+      ],
+      [
+        7085.1,
+        31
+      ],
+      [
+        7343.1,
+        33
+      ],
+      [
+        7605.7,
+        35
+      ],
+      [
+        7870.0,
+        37
+      ],
+      [
+        8133.9,
+        41
+      ],
+      [
+        8394.4,
+        43
+      ],
+      [
+        8657.6,
+        45
+      ],
+      [
+        8919.0,
+        47
+      ],
+      [
+        9184.9,
+        52
+      ],
+      [
+        9454.3,
+        55
+      ],
+      [
+        9723.1,
+        57
+      ],
+      [
+        9986.5,
+        59
+      ],
+      [
+        10275.8,
+        61
+      ],
+      [
+        10542.7,
+        64
+      ],
+      [
+        10813.7,
+        67
+      ],
+      [
+        11080.1,
+        69
+      ],
+      [
+        11341.2,
+        71
+      ],
+      [
+        11604.6,
+        79
+      ],
+      [
+        11874.0,
+        81
+      ],
+      [
+        12150.8,
+        83
+      ],
+      [
+        12414.0,
+        84
+      ],
+      [
+        12678.2,
+        89
+      ],
+      [
+        12939.2,
+        91
+      ],
+      [
+        13201.8,
+        93
+      ],
+      [
+        13464.5,
+        95
+      ],
+      [
+        13726.0,
+        98
+      ],
+      [
+        13992.8,
+        103
+      ],
+      [
+        14255.1,
+        105
+      ],
+      [
+        14521.8,
+        107
+      ],
+      [
+        14789.3,
+        109
+      ],
+      [
+        15054.9,
+        112
+      ],
+      [
+        15312.1,
+        114
+      ],
+      [
+        15583.5,
+        119
+      ],
+      [
+        15847.2,
+        122
+      ],
+      [
+        16106.9,
+        124
+      ],
+      [
+        16365.9,
+        126
+      ],
+      [
+        16628.0,
+        130
+      ],
+      [
+        16890.9,
+        132
+      ],
+      [
+        17150.8,
+        137
+      ],
+      [
+        17410.9,
+        140
+      ],
+      [
+        17676.4,
+        143
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Montgomery Bus Boycott was a key event in the civil rights movement. It started in December 1955 when Rosa Parks was arrested for refusing to give up her seat to a white passenger. In response, Black residents of Montgomery stopped riding the city buses for more than a year. Many people walked miles to work every day or set up carpools so that they would not have to use the buses. The boycott hurt the bus company because it lost most of its riders. In 1956, the Supreme Court ruled that segregation on buses was unconstitutional, and the boycott ended in victory.\n\"\"\"\n\nThe writer tapped the word \"hurt\" in this sentence (marked with [[ ]]):\nThe boycott [[hurt]] the bus company because it lost most of its riders.\n\nGive 10 replacements for \"hurt\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"hurt\" without changing the rest of the sentence. Do not repeat \"hurt\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 351,
+  "new_tokens": 51,
+  "finish_reason": "stop",
+  "error": null
+}

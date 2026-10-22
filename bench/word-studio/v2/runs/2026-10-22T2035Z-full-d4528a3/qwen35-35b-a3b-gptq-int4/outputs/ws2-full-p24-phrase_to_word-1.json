@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p24-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "bb631b2788b0e67abee0435bef44ade6c9726c1de50410bb7821e4f5bb2aa6e6",
+  "seed": 8540603052830620490,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"repeatedly\", \"continually\", \"constantly\", \"repeatedly\", \"consistently\", \"persistently\", \"incessantly\", \"recurring\", \"repeatedly\", \"repeatedly\"]}",
+  "timing": {
+    "first_text_ms": 4513.6,
+    "option_ms": [
+      6323.0,
+      7349.6,
+      8381.1,
+      9713.2,
+      11000.8,
+      12035.9,
+      13069.0,
+      14100.6,
+      15394.5,
+      16682.1
+    ],
+    "total_ms": 16940.7,
+    "stream": [
+      [
+        4513.6,
+        2
+      ],
+      [
+        4774.0,
+        9
+      ],
+      [
+        5033.8,
+        11
+      ],
+      [
+        5290.3,
+        14
+      ],
+      [
+        5548.2,
+        16
+      ],
+      [
+        5805.4,
+        22
+      ],
+      [
+        6064.2,
+        24
+      ],
+      [
+        6323.0,
+        26
+      ],
+      [
+        6579.9,
+        28
+      ],
+      [
+        6836.0,
+        34
+      ],
+      [
+        7094.5,
+        39
+      ],
+      [
+        7349.6,
+        41
+      ],
+      [
+        7608.6,
+        43
+      ],
+      [
+        7864.0,
+        48
+      ],
+      [
+        8124.3,
+        53
+      ],
+      [
+        8381.1,
+        55
+      ],
+      [
+        8644.9,
+        57
+      ],
+      [
+        8905.3,
+        59
+      ],
+      [
+        9197.5,
+        65
+      ],
+      [
+        9456.1,
+        67
+      ],
+      [
+        9713.2,
+        69
+      ],
+      [
+        9970.5,
+        71
+      ],
+      [
+        10228.6,
+        75
+      ],
+      [
+        10486.7,
+        78
+      ],
+      [
+        10743.5,
+        83
+      ],
+      [
+        11000.8,
+        85
+      ],
+      [
+        11258.6,
+        87
+      ],
+      [
+        11517.4,
+        94
+      ],
+      [
+        11778.1,
+        99
+      ],
+      [
+        12035.9,
+        101
+      ],
+      [
+        12295.1,
+        103
+      ],
+      [
+        12553.0,
+        109
+      ],
+      [
+        12810.4,
+        114
+      ],
+      [
+        13069.0,
+        116
+      ],
+      [
+        13326.7,
+        118
+      ],
+      [
+        13585.1,
+        120
+      ],
+      [
+        13842.3,
+        127
+      ],
+      [
+        14100.6,
+        129
+      ],
+      [
+        14357.8,
+        131
+      ],
+      [
+        14620.0,
+        133
+      ],
+      [
+        14878.2,
+        139
+      ],
+      [
+        15136.8,
+        141
+      ],
+      [
+        15394.5,
+        143
+      ],
+      [
+        15651.9,
+        145
+      ],
+      [
+        15908.5,
+        147
+      ],
+      [
+        16165.7,
+        153
+      ],
+      [
+        16423.9,
+        155
+      ],
+      [
+        16682.1,
+        158
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Frankenstein, Mary Shelley shows that the creature becomes a monster because of how he is treated. When he is first created, the creature is gentle and wants to be loved. However, every person who sees him is scared of his appearance and attacks him or runs away. Even Victor Frankenstein, the man who made him, abandons him right after bringing him to life. The creature says, \"I was benevolent and good; misery made me a fiend.\" This line shows that his anger comes from being rejected over and over, not from his nature.\n\"\"\"\n\nThe writer selected the phrase \"over and over\" in this sentence (marked with [[ ]]):\nThis line shows that his anger comes from being rejected [[over and over]], not from his nature.\n\nGive 10 single words that can replace \"over and over\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 329,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

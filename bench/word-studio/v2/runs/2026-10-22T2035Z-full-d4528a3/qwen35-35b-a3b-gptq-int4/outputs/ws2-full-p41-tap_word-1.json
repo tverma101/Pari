@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p41-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "6c14f44f5ea2ab55a6526d0aa9a406c438a1d33495bc7e4f6c21472c8bdc5b06",
+  "seed": 7746213344995137475,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"microscopic\", \"very small\", \"minute\", \"minuscule\", \"small\", \"tiny\", \"infinitesimal\", \"small-scale\", \"diminutive\", \"small-sized\"]}",
+  "timing": {
+    "first_text_ms": 4693.9,
+    "option_ms": [
+      6320.7,
+      7373.9,
+      8168.5,
+      9483.8,
+      10275.3,
+      11068.1,
+      12388.4,
+      13431.1,
+      14757.3,
+      15854.1
+    ],
+    "total_ms": 16122.7,
+    "stream": [
+      [
+        4693.9,
+        2
+      ],
+      [
+        4957.5,
+        9
+      ],
+      [
+        5216.4,
+        11
+      ],
+      [
+        5484.1,
+        14
+      ],
+      [
+        5762.5,
+        19
+      ],
+      [
+        6052.4,
+        25
+      ],
+      [
+        6320.7,
+        27
+      ],
+      [
+        6584.5,
+        29
+      ],
+      [
+        6849.0,
+        33
+      ],
+      [
+        7111.1,
+        39
+      ],
+      [
+        7373.9,
+        41
+      ],
+      [
+        7637.1,
+        43
+      ],
+      [
+        7904.2,
+        49
+      ],
+      [
+        8168.5,
+        51
+      ],
+      [
+        8429.7,
+        53
+      ],
+      [
+        8690.2,
+        56
+      ],
+      [
+        8958.1,
+        59
+      ],
+      [
+        9221.6,
+        62
+      ],
+      [
+        9483.8,
+        64
+      ],
+      [
+        9746.7,
+        66
+      ],
+      [
+        10012.3,
+        71
+      ],
+      [
+        10275.3,
+        73
+      ],
+      [
+        10541.5,
+        75
+      ],
+      [
+        10801.6,
+        79
+      ],
+      [
+        11068.1,
+        81
+      ],
+      [
+        11333.1,
+        83
+      ],
+      [
+        11606.5,
+        86
+      ],
+      [
+        11866.1,
+        90
+      ],
+      [
+        12127.1,
+        96
+      ],
+      [
+        12388.4,
+        98
+      ],
+      [
+        12646.9,
+        100
+      ],
+      [
+        12906.0,
+        105
+      ],
+      [
+        13168.8,
+        111
+      ],
+      [
+        13431.1,
+        113
+      ],
+      [
+        13693.1,
+        115
+      ],
+      [
+        13956.7,
+        118
+      ],
+      [
+        14227.8,
+        120
+      ],
+      [
+        14492.3,
+        125
+      ],
+      [
+        14757.3,
+        127
+      ],
+      [
+        15023.8,
+        129
+      ],
+      [
+        15293.0,
+        134
+      ],
+      [
+        15560.2,
+        140
+      ],
+      [
+        15854.1,
+        143
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nEvery year, millions of tons of plastic end up in the ocean. Over time, sunlight and waves break this plastic into tiny pieces called microplastics. These pieces are so small that fish and other sea animals eat them by accident. Scientists have even found microplastics in drinking water, salt, and human blood. We still do not fully understand how they affect our health, but some studies suggest they could cause inflammation. Reducing how much plastic we use is the most important step we can take to fix this problem.\n\"\"\"\n\nThe writer tapped the word \"tiny\" in this sentence (marked with [[ ]]):\nOver time, sunlight and waves break this plastic into [[tiny]] pieces called microplastics.\n\nGive 10 replacements for \"tiny\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"tiny\" without changing the rest of the sentence. Do not repeat \"tiny\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 337,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

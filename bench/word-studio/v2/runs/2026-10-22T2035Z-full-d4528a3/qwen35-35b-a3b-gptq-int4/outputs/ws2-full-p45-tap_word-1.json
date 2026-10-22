@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p45-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "d74d75c798ade8f0140a01ccd0c35d753f1558cae9c302f23438b32f85344198",
+  "seed": 3318079997816993199,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"questioning\", \"hesitating\", \"second-guessing\", \"wondering\", \"vacillating\", \"worrying\", \"struggling\", \"hesitating\", \"wondering\", \"uncertain\"]}",
+  "timing": {
+    "first_text_ms": 4716.1,
+    "option_ms": [
+      6307.0,
+      7370.8,
+      8969.8,
+      10306.6,
+      11660.4,
+      13028.9,
+      14088.4,
+      15153.4,
+      16482.5,
+      17550.8
+    ],
+    "total_ms": 17822.1,
+    "stream": [
+      [
+        4716.1,
+        2
+      ],
+      [
+        4978.8,
+        9
+      ],
+      [
+        5244.9,
+        11
+      ],
+      [
+        5512.3,
+        14
+      ],
+      [
+        5776.1,
+        22
+      ],
+      [
+        6040.2,
+        25
+      ],
+      [
+        6307.0,
+        27
+      ],
+      [
+        6569.9,
+        29
+      ],
+      [
+        6838.1,
+        32
+      ],
+      [
+        7104.2,
+        39
+      ],
+      [
+        7370.8,
+        41
+      ],
+      [
+        7633.7,
+        43
+      ],
+      [
+        7899.6,
+        49
+      ],
+      [
+        8164.8,
+        51
+      ],
+      [
+        8430.4,
+        55
+      ],
+      [
+        8700.2,
+        58
+      ],
+      [
+        8969.8,
+        60
+      ],
+      [
+        9238.5,
+        62
+      ],
+      [
+        9510.7,
+        63
+      ],
+      [
+        9773.8,
+        68
+      ],
+      [
+        10039.5,
+        71
+      ],
+      [
+        10306.6,
+        73
+      ],
+      [
+        10571.9,
+        75
+      ],
+      [
+        10837.1,
+        78
+      ],
+      [
+        11108.2,
+        81
+      ],
+      [
+        11385.2,
+        86
+      ],
+      [
+        11660.4,
+        88
+      ],
+      [
+        11930.1,
+        90
+      ],
+      [
+        12200.9,
+        91
+      ],
+      [
+        12469.2,
+        95
+      ],
+      [
+        12765.2,
+        98
+      ],
+      [
+        13028.9,
+        100
+      ],
+      [
+        13293.9,
+        102
+      ],
+      [
+        13559.7,
+        105
+      ],
+      [
+        13824.6,
+        112
+      ],
+      [
+        14088.4,
+        114
+      ],
+      [
+        14354.2,
+        116
+      ],
+      [
+        14622.5,
+        119
+      ],
+      [
+        14888.3,
+        126
+      ],
+      [
+        15153.4,
+        128
+      ],
+      [
+        15419.3,
+        130
+      ],
+      [
+        15682.1,
+        131
+      ],
+      [
+        15947.1,
+        136
+      ],
+      [
+        16214.4,
+        139
+      ],
+      [
+        16482.5,
+        141
+      ],
+      [
+        16748.4,
+        143
+      ],
+      [
+        17014.5,
+        146
+      ],
+      [
+        17283.9,
+        152
+      ],
+      [
+        17550.8,
+        155
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nHamlet is a character who thinks too much and acts too little. After his father's ghost tells him that Claudius murdered him, Hamlet promises to get revenge. But instead of acting right away, he spends most of the play doubting himself and planning. In his famous speech, he asks, \"To be, or not to be,\" as he wonders whether life is worth the pain. Even when he has a perfect chance to kill Claudius while he is praying, he decides to wait. His delay ends up causing the deaths of many people, including himself.\n\"\"\"\n\nThe writer tapped the word \"doubting\" in this sentence (marked with [[ ]]):\nBut instead of acting right away, he spends most of the play [[doubting]] himself and planning.\n\nGive 10 replacements for \"doubting\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"doubting\" without changing the rest of the sentence. Do not repeat \"doubting\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 358,
+  "new_tokens": 50,
+  "finish_reason": "stop",
+  "error": null
+}

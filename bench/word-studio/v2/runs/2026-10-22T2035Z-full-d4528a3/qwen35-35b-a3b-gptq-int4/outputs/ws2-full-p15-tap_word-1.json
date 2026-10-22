@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p15-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "bc7754b5a8aa811dc9c546762e78f2699c1fe13fa20568e900bf74c5c7963d1c",
+  "seed": 575430368646661047,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"isolated\", \"alone\", \"solitary\", \"by himself\", \"without friends\", \"cut off\", \"on his own\", \"friendless\", \"desolate\", \"in solitude\"]}",
+  "timing": {
+    "first_text_ms": 4667.9,
+    "option_ms": [
+      6231.7,
+      7008.3,
+      8041.3,
+      9080.2,
+      10116.2,
+      11152.9,
+      12480.3,
+      13516.3,
+      14550.3,
+      15583.0
+    ],
+    "total_ms": 15838.5,
+    "stream": [
+      [
+        4667.9,
+        2
+      ],
+      [
+        4932.8,
+        9
+      ],
+      [
+        5192.0,
+        11
+      ],
+      [
+        5454.4,
+        14
+      ],
+      [
+        5714.0,
+        18
+      ],
+      [
+        5974.1,
+        22
+      ],
+      [
+        6231.7,
+        24
+      ],
+      [
+        6489.9,
+        26
+      ],
+      [
+        6746.9,
+        31
+      ],
+      [
+        7008.3,
+        33
+      ],
+      [
+        7265.8,
+        35
+      ],
+      [
+        7526.0,
+        38
+      ],
+      [
+        7783.9,
+        43
+      ],
+      [
+        8041.3,
+        45
+      ],
+      [
+        8299.0,
+        47
+      ],
+      [
+        8561.3,
+        49
+      ],
+      [
+        8820.7,
+        57
+      ],
+      [
+        9080.2,
+        59
+      ],
+      [
+        9339.2,
+        61
+      ],
+      [
+        9598.1,
+        68
+      ],
+      [
+        9857.6,
+        76
+      ],
+      [
+        10116.2,
+        78
+      ],
+      [
+        10373.9,
+        80
+      ],
+      [
+        10631.6,
+        83
+      ],
+      [
+        10892.0,
+        87
+      ],
+      [
+        11152.9,
+        89
+      ],
+      [
+        11415.3,
+        91
+      ],
+      [
+        11680.2,
+        93
+      ],
+      [
+        11964.2,
+        97
+      ],
+      [
+        12222.9,
+        101
+      ],
+      [
+        12480.3,
+        103
+      ],
+      [
+        12738.8,
+        105
+      ],
+      [
+        12999.6,
+        111
+      ],
+      [
+        13258.5,
+        115
+      ],
+      [
+        13516.3,
+        117
+      ],
+      [
+        13774.9,
+        119
+      ],
+      [
+        14033.0,
+        122
+      ],
+      [
+        14291.5,
+        127
+      ],
+      [
+        14550.3,
+        129
+      ],
+      [
+        14812.9,
+        131
+      ],
+      [
+        15073.3,
+        133
+      ],
+      [
+        15328.3,
+        142
+      ],
+      [
+        15583.0,
+        145
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Of Mice and Men, George and Lennie share a dream of owning a small farm together. For George, the dream gives him a reason to keep working hard even though his life is lonely. For Lennie, it is mostly about getting to take care of rabbits. Most of the other workers on the ranch have no one, so they are surprised that the two men travel together. Steinbeck uses their friendship to show how important it is to have someone who cares about you. When the dream falls apart at the end, it shows how hard it was for poor workers to change their lives during the Great Depression.\n\"\"\"\n\nThe writer tapped the word \"lonely\" in this sentence (marked with [[ ]]):\nFor George, the dream gives him a reason to keep working hard even though his life is [[lonely]].\n\nGive 10 replacements for \"lonely\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"lonely\" without changing the rest of the sentence. Do not repeat \"lonely\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 364,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

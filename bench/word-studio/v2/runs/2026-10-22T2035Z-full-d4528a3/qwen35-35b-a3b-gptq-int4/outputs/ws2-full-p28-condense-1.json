@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p28-condense-1",
+  "kind": "condense",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "391826baead13bc9b8e6372f3ff601ac8a700b83bf435034d00bfb5b1f10f6f2",
+  "seed": 2563593597837752565,
+  "max_new_tokens": 640,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Jack prioritizes hunting over the signal fire.\", \"Jack favors hunting to the signal fire.\", \"Jack prefers hunting over maintaining the fire.\", \"Jack chooses hunting over the signal fire.\", \"Jack shifts focus from the fire to hunting.\"]}",
+  "timing": {
+    "first_text_ms": 4586.1,
+    "option_ms": [
+      7730.8,
+      10062.1,
+      12391.9,
+      14728.0,
+      17372.0
+    ],
+    "total_ms": 17882.4,
+    "stream": [
+      [
+        4586.1,
+        2
+      ],
+      [
+        4845.4,
+        9
+      ],
+      [
+        5107.2,
+        11
+      ],
+      [
+        5365.5,
+        14
+      ],
+      [
+        5626.5,
+        18
+      ],
+      [
+        5886.5,
+        26
+      ],
+      [
+        6147.0,
+        30
+      ],
+      [
+        6412.1,
+        38
+      ],
+      [
+        6668.3,
+        43
+      ],
+      [
+        6954.9,
+        47
+      ],
+      [
+        7213.8,
+        54
+      ],
+      [
+        7473.3,
+        59
+      ],
+      [
+        7730.8,
+        62
+      ],
+      [
+        7992.1,
+        64
+      ],
+      [
+        8249.8,
+        68
+      ],
+      [
+        8508.6,
+        75
+      ],
+      [
+        8765.6,
+        83
+      ],
+      [
+        9025.6,
+        86
+      ],
+      [
+        9281.9,
+        90
+      ],
+      [
+        9543.6,
+        97
+      ],
+      [
+        9801.2,
+        102
+      ],
+      [
+        10062.1,
+        105
+      ],
+      [
+        10319.8,
+        107
+      ],
+      [
+        10579.1,
+        111
+      ],
+      [
+        10836.1,
+        119
+      ],
+      [
+        11096.9,
+        127
+      ],
+      [
+        11354.6,
+        132
+      ],
+      [
+        11615.2,
+        144
+      ],
+      [
+        11872.7,
+        148
+      ],
+      [
+        12133.0,
+        153
+      ],
+      [
+        12391.9,
+        156
+      ],
+      [
+        12651.1,
+        158
+      ],
+      [
+        12913.7,
+        162
+      ],
+      [
+        13175.0,
+        170
+      ],
+      [
+        13433.2,
+        178
+      ],
+      [
+        13691.1,
+        183
+      ],
+      [
+        13952.3,
+        187
+      ],
+      [
+        14211.2,
+        194
+      ],
+      [
+        14470.0,
+        199
+      ],
+      [
+        14728.0,
+        202
+      ],
+      [
+        14987.4,
+        204
+      ],
+      [
+        15245.1,
+        208
+      ],
+      [
+        15504.8,
+        215
+      ],
+      [
+        15765.0,
+        221
+      ],
+      [
+        16029.1,
+        226
+      ],
+      [
+        16287.2,
+        230
+      ],
+      [
+        16564.1,
+        235
+      ],
+      [
+        16829.8,
+        238
+      ],
+      [
+        17114.1,
+        246
+      ],
+      [
+        17372.0,
+        248
+      ],
+      [
+        17629.2,
+        250
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Lord of the Flies, a group of boys stranded on an island slowly lose their sense of right and wrong. At first, they choose Ralph as their leader and try to follow rules, like only speaking when they hold the conch shell. As time goes on, Jack becomes more interested in hunting than in keeping the signal fire going. More and more boys join Jack's tribe because it seems more fun than doing chores. By the end, the boys have turned violent, and two of them are dead. Golding uses the story to suggest that people can quickly become savage when there are no rules to control them.\n\"\"\"\n\nThe writer selected this text:\n\"\"\"\nAs time goes on, Jack becomes more interested in hunting than in keeping the signal fire going.\n\"\"\"\n\nGive 5 different rewrites of the selected text that say the same thing in fewer words. Keep every fact, name, number and quotation, and keep the claim exactly as strong or as uncertain as it is. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 332,
+  "new_tokens": 52,
+  "finish_reason": "stop",
+  "error": null
+}

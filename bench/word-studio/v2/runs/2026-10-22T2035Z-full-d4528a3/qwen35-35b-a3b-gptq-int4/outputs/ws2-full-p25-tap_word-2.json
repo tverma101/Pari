@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p25-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "fb5cca7a85b1835801436ba8c86413c6cb9f389667afd86a1cd7af4139a92ffe",
+  "seed": 8379135753144691594,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"dense\", \"so dense\", \"very dense\", \"so thick\", \"extremely thick\", \"so heavy\", \"very heavy\", \"so thick\", \"extremely heavy\", \"very dense\"]}",
+  "timing": {
+    "first_text_ms": 4828.0,
+    "option_ms": [
+      6132.8,
+      7207.8,
+      8245.9,
+      9282.6,
+      10616.2,
+      11685.1,
+      12747.9,
+      13790.2,
+      15088.4,
+      16133.9
+    ],
+    "total_ms": 16391.6,
+    "stream": [
+      [
+        4828.0,
+        2
+      ],
+      [
+        5090.1,
+        9
+      ],
+      [
+        5348.9,
+        11
+      ],
+      [
+        5612.7,
+        14
+      ],
+      [
+        5873.3,
+        19
+      ],
+      [
+        6132.8,
+        21
+      ],
+      [
+        6392.0,
+        23
+      ],
+      [
+        6654.3,
+        25
+      ],
+      [
+        6929.5,
+        31
+      ],
+      [
+        7207.8,
+        33
+      ],
+      [
+        7469.0,
+        35
+      ],
+      [
+        7732.4,
+        39
+      ],
+      [
+        7990.1,
+        45
+      ],
+      [
+        8245.9,
+        47
+      ],
+      [
+        8511.6,
+        49
+      ],
+      [
+        8767.5,
+        51
+      ],
+      [
+        9025.6,
+        57
+      ],
+      [
+        9282.6,
+        59
+      ],
+      [
+        9542.4,
+        61
+      ],
+      [
+        9809.5,
+        64
+      ],
+      [
+        10069.9,
+        70
+      ],
+      [
+        10355.3,
+        76
+      ],
+      [
+        10616.2,
+        78
+      ],
+      [
+        10906.3,
+        80
+      ],
+      [
+        11164.9,
+        82
+      ],
+      [
+        11423.2,
+        88
+      ],
+      [
+        11685.1,
+        90
+      ],
+      [
+        11945.0,
+        92
+      ],
+      [
+        12209.1,
+        96
+      ],
+      [
+        12488.2,
+        102
+      ],
+      [
+        12747.9,
+        104
+      ],
+      [
+        13006.0,
+        106
+      ],
+      [
+        13265.6,
+        108
+      ],
+      [
+        13529.2,
+        114
+      ],
+      [
+        13790.2,
+        116
+      ],
+      [
+        14051.7,
+        118
+      ],
+      [
+        14308.9,
+        121
+      ],
+      [
+        14571.2,
+        127
+      ],
+      [
+        14829.3,
+        133
+      ],
+      [
+        15088.4,
+        135
+      ],
+      [
+        15344.4,
+        137
+      ],
+      [
+        15610.7,
+        141
+      ],
+      [
+        15874.8,
+        147
+      ],
+      [
+        16133.9,
+        150
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Dust Bowl was a period in the 1930s when huge dust storms hit the Great Plains. Farmers had plowed up the grass that held the soil in place, and then a long drought dried everything out. When strong winds came, they picked up the loose dirt and created clouds of dust so thick that people could not see the sun. Crops died, animals got sick, and many families lost their farms. Thousands of people packed up their belongings and moved west to California looking for work. The disaster taught the government that it needed to help farmers protect the land.\n\"\"\"\n\nThe writer tapped the word \"thick\" in this sentence (marked with [[ ]]):\nWhen strong winds came, they picked up the loose dirt and created clouds of dust so [[thick]] that people could not see the sun.\n\nGive 10 replacements for \"thick\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"thick\" without changing the rest of the sentence. Do not repeat \"thick\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 364,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

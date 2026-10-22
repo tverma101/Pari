@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p47-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "004fd90a7bfec0b5ad7371385365f8b9720d703e4c340973120d51cb0af1f67a",
+  "seed": 7008465794620737166,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Completing\", \"Doing\", \"Submitting\", \"Writing\", \"Handling\", \"Starting\", \"Beginning\", \"Processing\", \"Organizing\", \"Managing\"]}",
+  "timing": {
+    "first_text_ms": 4728.2,
+    "option_ms": [
+      6341.3,
+      7135.4,
+      7936.0,
+      8739.6,
+      9517.5,
+      10294.8,
+      11063.8,
+      11867.3,
+      12911.5,
+      13697.6
+    ],
+    "total_ms": 13969.3,
+    "stream": [
+      [
+        4728.2,
+        2
+      ],
+      [
+        4999.7,
+        9
+      ],
+      [
+        5272.5,
+        11
+      ],
+      [
+        5539.0,
+        14
+      ],
+      [
+        5809.6,
+        20
+      ],
+      [
+        6075.9,
+        24
+      ],
+      [
+        6341.3,
+        26
+      ],
+      [
+        6608.5,
+        28
+      ],
+      [
+        6869.2,
+        33
+      ],
+      [
+        7135.4,
+        35
+      ],
+      [
+        7404.9,
+        37
+      ],
+      [
+        7669.1,
+        47
+      ],
+      [
+        7936.0,
+        49
+      ],
+      [
+        8213.0,
+        51
+      ],
+      [
+        8474.2,
+        58
+      ],
+      [
+        8739.6,
+        60
+      ],
+      [
+        8999.7,
+        62
+      ],
+      [
+        9258.7,
+        70
+      ],
+      [
+        9517.5,
+        72
+      ],
+      [
+        9779.3,
+        74
+      ],
+      [
+        10036.0,
+        82
+      ],
+      [
+        10294.8,
+        84
+      ],
+      [
+        10550.3,
+        86
+      ],
+      [
+        10807.7,
+        95
+      ],
+      [
+        11063.8,
+        97
+      ],
+      [
+        11329.4,
+        99
+      ],
+      [
+        11587.0,
+        109
+      ],
+      [
+        11867.3,
+        111
+      ],
+      [
+        12137.7,
+        113
+      ],
+      [
+        12399.3,
+        118
+      ],
+      [
+        12655.4,
+        123
+      ],
+      [
+        12911.5,
+        125
+      ],
+      [
+        13170.8,
+        127
+      ],
+      [
+        13431.0,
+        135
+      ],
+      [
+        13697.6,
+        138
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nI will be the first person in my family to go to college, and that comes with a lot of pressure. My parents did not have the chance to continue their education because they had to start working when they were teenagers. They have always told me that school is the key to a better life. Filling out applications was confusing because no one at home had done it before, so I had to ask my counselor for help with almost every step. Even though the process was hard, it made me more determined to succeed. I want to make my parents proud and show my younger cousins that college is possible for them too.\n\"\"\"\n\nThe writer selected the phrase \"Filling out\" in this sentence (marked with [[ ]]):\n[[Filling out]] applications was confusing because no one at home had done it before, so I had to ask my counselor for help with almost every step.\n\nGive 10 single words that can replace \"Filling out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 352,
+  "new_tokens": 36,
+  "finish_reason": "stop",
+  "error": null
+}

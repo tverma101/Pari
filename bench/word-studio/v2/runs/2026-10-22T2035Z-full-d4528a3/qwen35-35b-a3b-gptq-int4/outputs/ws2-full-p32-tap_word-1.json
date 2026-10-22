@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p32-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "467a8b7082296ffed22883a864fa4885dffd21dcc56dcaa18d869ebb65c27c8a",
+  "seed": 6864729556324707526,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"afraid\", \"fearful\", \"scared\", \"timid\", \"hesitant\", \"reluctant\", \"apprehensive\", \"nervous\", \"dreadful\", \"unwilling\"]}",
+  "timing": {
+    "first_text_ms": 4612.8,
+    "option_ms": [
+      6171.6,
+      7464.0,
+      8521.7,
+      9554.3,
+      10589.0,
+      11878.9,
+      13162.1,
+      14442.3,
+      15743.1,
+      17022.7
+    ],
+    "total_ms": 17280.0,
+    "stream": [
+      [
+        4612.8,
+        2
+      ],
+      [
+        4876.1,
+        9
+      ],
+      [
+        5131.4,
+        11
+      ],
+      [
+        5389.6,
+        14
+      ],
+      [
+        5650.4,
+        16
+      ],
+      [
+        5914.0,
+        20
+      ],
+      [
+        6171.6,
+        22
+      ],
+      [
+        6428.3,
+        24
+      ],
+      [
+        6687.5,
+        25
+      ],
+      [
+        6946.5,
+        28
+      ],
+      [
+        7201.0,
+        31
+      ],
+      [
+        7464.0,
+        33
+      ],
+      [
+        7726.9,
+        35
+      ],
+      [
+        8011.0,
+        37
+      ],
+      [
+        8265.4,
+        41
+      ],
+      [
+        8521.7,
+        43
+      ],
+      [
+        8782.7,
+        45
+      ],
+      [
+        9040.7,
+        48
+      ],
+      [
+        9298.0,
+        50
+      ],
+      [
+        9554.3,
+        52
+      ],
+      [
+        9815.8,
+        54
+      ],
+      [
+        10073.2,
+        57
+      ],
+      [
+        10330.2,
+        62
+      ],
+      [
+        10589.0,
+        64
+      ],
+      [
+        10849.8,
+        66
+      ],
+      [
+        11105.6,
+        69
+      ],
+      [
+        11362.5,
+        72
+      ],
+      [
+        11620.6,
+        75
+      ],
+      [
+        11878.9,
+        77
+      ],
+      [
+        12133.6,
+        79
+      ],
+      [
+        12391.9,
+        82
+      ],
+      [
+        12649.1,
+        85
+      ],
+      [
+        12907.2,
+        91
+      ],
+      [
+        13162.1,
+        93
+      ],
+      [
+        13418.8,
+        95
+      ],
+      [
+        13674.9,
+        96
+      ],
+      [
+        13931.5,
+        99
+      ],
+      [
+        14185.6,
+        102
+      ],
+      [
+        14442.3,
+        104
+      ],
+      [
+        14702.8,
+        106
+      ],
+      [
+        14973.0,
+        107
+      ],
+      [
+        15227.4,
+        111
+      ],
+      [
+        15484.4,
+        114
+      ],
+      [
+        15743.1,
+        116
+      ],
+      [
+        16000.4,
+        118
+      ],
+      [
+        16253.3,
+        120
+      ],
+      [
+        16510.2,
+        121
+      ],
+      [
+        16767.5,
+        127
+      ],
+      [
+        17022.7,
+        130
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn The Crucible, Arthur Miller shows how fear can make a whole town turn against itself. When a group of girls in Salem start accusing people of witchcraft, the adults believe them without asking for proof. Anyone who disagrees with the court is in danger of being accused too. John Proctor knows the girls are lying, but at first he is afraid to speak up because he has his own secret. In the end, he chooses to die rather than sign a false confession. Miller wrote the play in the 1950s to criticize the way people were being accused of being communists without real evidence.\n\"\"\"\n\nThe writer tapped the word \"afraid\" in this sentence (marked with [[ ]]):\nJohn Proctor knows the girls are lying, but at first he is [[afraid]] to speak up because he has his own secret.\n\nGive 10 replacements for \"afraid\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"afraid\" without changing the rest of the sentence. Do not repeat \"afraid\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 369,
+  "new_tokens": 50,
+  "finish_reason": "stop",
+  "error": null
+}

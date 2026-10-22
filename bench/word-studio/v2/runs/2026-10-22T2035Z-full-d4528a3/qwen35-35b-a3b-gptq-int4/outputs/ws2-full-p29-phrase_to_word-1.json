@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p29-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "b57f5ab5c1ff806f1dc06bd9a495993b1b8e5101d33ec030c8a27cbd392d389c",
+  "seed": 5389832075417500606,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"persist\", \"persevere\", \"strive\", \"endure\", \"press\", \"push\", \"persist\", \"press\", \"strive\", \"struggle\"]}",
+  "timing": {
+    "first_text_ms": 4645.0,
+    "option_ms": [
+      5922.0,
+      6949.3,
+      7974.5,
+      9014.1,
+      9791.4,
+      10581.2,
+      11428.8,
+      12211.7,
+      13236.5,
+      14273.7
+    ],
+    "total_ms": 14533.7,
+    "stream": [
+      [
+        4645.0,
+        2
+      ],
+      [
+        4902.3,
+        9
+      ],
+      [
+        5157.2,
+        11
+      ],
+      [
+        5412.1,
+        14
+      ],
+      [
+        5668.3,
+        21
+      ],
+      [
+        5922.0,
+        23
+      ],
+      [
+        6174.0,
+        25
+      ],
+      [
+        6432.1,
+        30
+      ],
+      [
+        6692.6,
+        34
+      ],
+      [
+        6949.3,
+        36
+      ],
+      [
+        7203.6,
+        38
+      ],
+      [
+        7462.5,
+        41
+      ],
+      [
+        7719.5,
+        44
+      ],
+      [
+        7974.5,
+        46
+      ],
+      [
+        8228.6,
+        48
+      ],
+      [
+        8486.6,
+        51
+      ],
+      [
+        8744.0,
+        54
+      ],
+      [
+        9014.1,
+        56
+      ],
+      [
+        9273.7,
+        58
+      ],
+      [
+        9531.7,
+        63
+      ],
+      [
+        9791.4,
+        65
+      ],
+      [
+        10050.9,
+        67
+      ],
+      [
+        10307.6,
+        71
+      ],
+      [
+        10581.2,
+        73
+      ],
+      [
+        10843.6,
+        75
+      ],
+      [
+        11165.4,
+        82
+      ],
+      [
+        11428.8,
+        84
+      ],
+      [
+        11691.3,
+        86
+      ],
+      [
+        11952.0,
+        91
+      ],
+      [
+        12211.7,
+        93
+      ],
+      [
+        12468.1,
+        95
+      ],
+      [
+        12726.1,
+        98
+      ],
+      [
+        12982.0,
+        101
+      ],
+      [
+        13236.5,
+        103
+      ],
+      [
+        13499.1,
+        105
+      ],
+      [
+        13759.8,
+        108
+      ],
+      [
+        14016.4,
+        113
+      ],
+      [
+        14273.7,
+        116
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe fight for women's right to vote in the United States lasted for more than seventy years. It officially began at the Seneca Falls Convention in 1848, where activists like Elizabeth Cady Stanton demanded equal rights for women. For decades, suffragists gave speeches, marched in parades, and even went to jail for their cause. Many people at the time thought that women were too emotional to make decisions about politics. Finally, in 1920, the 19th Amendment was passed, which gave women the right to vote. This victory showed that ordinary people can change the law if they keep pushing for it.\n\"\"\"\n\nThe writer selected the phrase \"keep pushing for it\" in this sentence (marked with [[ ]]):\nThis victory showed that ordinary people can change the law if they [[keep pushing for it]].\n\nGive 10 single words that can replace \"keep pushing for it\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 346,
+  "new_tokens": 39,
+  "finish_reason": "stop",
+  "error": null
+}

@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p43-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "5f85afdb57cc9638e247f3c36e05b60c8284ab7f1f15def607b278a7b963994b",
+  "seed": 8992909048868353575,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"arming\", \"expanding\", \"growing\", \"strengthening\", \"increasing\", \"enlarging\", \"developing\", \"augmenting\", \"amplifying\", \"escalating\"]}",
+  "timing": {
+    "first_text_ms": 4660.9,
+    "option_ms": [
+      5955.6,
+      6997.4,
+      8034.0,
+      9333.1,
+      10413.9,
+      11735.8,
+      12792.6,
+      13855.1,
+      15181.8,
+      16245.4
+    ],
+    "total_ms": 16513.1,
+    "stream": [
+      [
+        4660.9,
+        2
+      ],
+      [
+        4921.9,
+        9
+      ],
+      [
+        5181.1,
+        11
+      ],
+      [
+        5439.5,
+        14
+      ],
+      [
+        5698.4,
+        20
+      ],
+      [
+        5955.6,
+        22
+      ],
+      [
+        6218.4,
+        24
+      ],
+      [
+        6479.0,
+        27
+      ],
+      [
+        6739.2,
+        33
+      ],
+      [
+        6997.4,
+        35
+      ],
+      [
+        7256.0,
+        37
+      ],
+      [
+        7516.0,
+        38
+      ],
+      [
+        7778.1,
+        44
+      ],
+      [
+        8034.0,
+        46
+      ],
+      [
+        8291.1,
+        48
+      ],
+      [
+        8549.5,
+        52
+      ],
+      [
+        8811.3,
+        58
+      ],
+      [
+        9069.3,
+        61
+      ],
+      [
+        9333.1,
+        63
+      ],
+      [
+        9594.4,
+        65
+      ],
+      [
+        9889.4,
+        70
+      ],
+      [
+        10151.8,
+        75
+      ],
+      [
+        10413.9,
+        77
+      ],
+      [
+        10676.9,
+        79
+      ],
+      [
+        10941.0,
+        81
+      ],
+      [
+        11204.6,
+        85
+      ],
+      [
+        11468.6,
+        88
+      ],
+      [
+        11735.8,
+        90
+      ],
+      [
+        11999.4,
+        92
+      ],
+      [
+        12263.9,
+        99
+      ],
+      [
+        12528.1,
+        102
+      ],
+      [
+        12792.6,
+        104
+      ],
+      [
+        13055.6,
+        106
+      ],
+      [
+        13320.4,
+        113
+      ],
+      [
+        13584.5,
+        116
+      ],
+      [
+        13855.1,
+        118
+      ],
+      [
+        14118.3,
+        120
+      ],
+      [
+        14383.9,
+        122
+      ],
+      [
+        14647.6,
+        124
+      ],
+      [
+        14915.9,
+        130
+      ],
+      [
+        15181.8,
+        132
+      ],
+      [
+        15447.8,
+        134
+      ],
+      [
+        15715.7,
+        139
+      ],
+      [
+        15980.5,
+        144
+      ],
+      [
+        16245.4,
+        147
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nWorld War I had many causes, but the event that started it was the assassination of Archduke Franz Ferdinand in 1914. Before that, the major powers of Europe had already been building up their armies and making alliances with each other. These alliances meant that a fight between two countries could quickly pull in many others. When Austria-Hungary declared war on Serbia, Russia came to Serbia's defense, and then Germany, France, and Britain joined in. Nationalism also played a big role, because many people were proud of their countries and eager to prove their strength.\n\"\"\"\n\nThe writer selected the phrase \"building up\" in this sentence (marked with [[ ]]):\nBefore that, the major powers of Europe had already been [[building up]] their armies and making alliances with each other.\n\nGive 10 single words that can replace \"building up\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 335,
+  "new_tokens": 46,
+  "finish_reason": "stop",
+  "error": null
+}

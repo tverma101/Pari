@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p44-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "0b367d1d34c452f02d1f6eb94aaa32108c09bf9877c88b41bb1d45fe21f86759",
+  "seed": 4412723854144721771,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"manage\", \"deal with\", \"address\", \"cope with\", \"navigate\", \"tackle\", \"regulate\", \"control\", \"respond to\", \"oversee\"]}",
+  "timing": {
+    "first_text_ms": 4630.6,
+    "option_ms": [
+      5954.7,
+      7011.3,
+      7802.6,
+      8884.9,
+      9688.0,
+      10757.9,
+      11867.9,
+      12669.0,
+      13733.4,
+      14801.2
+    ],
+    "total_ms": 15070.2,
+    "stream": [
+      [
+        4630.6,
+        2
+      ],
+      [
+        4894.3,
+        9
+      ],
+      [
+        5157.3,
+        11
+      ],
+      [
+        5417.7,
+        14
+      ],
+      [
+        5688.6,
+        20
+      ],
+      [
+        5954.7,
+        22
+      ],
+      [
+        6219.3,
+        24
+      ],
+      [
+        6483.4,
+        28
+      ],
+      [
+        6750.4,
+        33
+      ],
+      [
+        7011.3,
+        35
+      ],
+      [
+        7273.8,
+        37
+      ],
+      [
+        7537.1,
+        44
+      ],
+      [
+        7802.6,
+        46
+      ],
+      [
+        8069.3,
+        48
+      ],
+      [
+        8340.8,
+        52
+      ],
+      [
+        8611.6,
+        57
+      ],
+      [
+        8884.9,
+        59
+      ],
+      [
+        9154.0,
+        61
+      ],
+      [
+        9419.3,
+        69
+      ],
+      [
+        9688.0,
+        71
+      ],
+      [
+        9952.4,
+        73
+      ],
+      [
+        10222.2,
+        74
+      ],
+      [
+        10489.6,
+        79
+      ],
+      [
+        10757.9,
+        81
+      ],
+      [
+        11028.8,
+        83
+      ],
+      [
+        11312.1,
+        86
+      ],
+      [
+        11595.6,
+        91
+      ],
+      [
+        11867.9,
+        93
+      ],
+      [
+        12134.7,
+        95
+      ],
+      [
+        12401.6,
+        102
+      ],
+      [
+        12669.0,
+        104
+      ],
+      [
+        12934.3,
+        106
+      ],
+      [
+        13199.4,
+        113
+      ],
+      [
+        13463.2,
+        116
+      ],
+      [
+        13733.4,
+        118
+      ],
+      [
+        13995.8,
+        120
+      ],
+      [
+        14263.2,
+        124
+      ],
+      [
+        14531.9,
+        127
+      ],
+      [
+        14801.2,
+        130
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nArtificial intelligence tools like chatbots are becoming common in schools, and teachers are not sure how to handle them. Some teachers worry that students will use AI to write their essays and never learn how to think for themselves. Others believe AI can be a useful tutor that explains hard ideas in a simple way. In my experience, AI is most helpful when I use it to check my understanding, not to do the work for me. Schools should teach students how to use these tools honestly instead of banning them completely.\n\"\"\"\n\nThe writer tapped the word \"handle\" in this sentence (marked with [[ ]]):\nArtificial intelligence tools like chatbots are becoming common in schools, and teachers are not sure how to [[handle]] them.\n\nGive 10 replacements for \"handle\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"handle\" without changing the rest of the sentence. Do not repeat \"handle\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 340,
+  "new_tokens": 40,
+  "finish_reason": "stop",
+  "error": null
+}

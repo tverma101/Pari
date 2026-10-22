@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p40-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "6a7db476d6e41352dd906c4013cb8821e6a110f3bba0274c9cfcc7afacba3bfc",
+  "seed": 5558178546743810183,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"diverse\", \"distinct\", \"varied\", \"disparate\", \"divergent\", \"heterogeneous\", \"dissimilar\", \"alien\", \"unlike\", \"separate\"]}",
+  "timing": {
+    "first_text_ms": 4598.3,
+    "option_ms": [
+      6172.6,
+      6956.8,
+      8009.5,
+      9087.6,
+      10406.5,
+      11469.1,
+      12794.0,
+      13606.6,
+      14677.3,
+      15740.6
+    ],
+    "total_ms": 16003.6,
+    "stream": [
+      [
+        4598.3,
+        2
+      ],
+      [
+        4866.1,
+        9
+      ],
+      [
+        5128.0,
+        11
+      ],
+      [
+        5383.4,
+        14
+      ],
+      [
+        5643.3,
+        17
+      ],
+      [
+        5911.4,
+        21
+      ],
+      [
+        6172.6,
+        23
+      ],
+      [
+        6436.3,
+        25
+      ],
+      [
+        6698.2,
+        33
+      ],
+      [
+        6956.8,
+        35
+      ],
+      [
+        7214.1,
+        37
+      ],
+      [
+        7475.6,
+        40
+      ],
+      [
+        7752.3,
+        43
+      ],
+      [
+        8009.5,
+        45
+      ],
+      [
+        8293.7,
+        47
+      ],
+      [
+        8560.6,
+        50
+      ],
+      [
+        8827.1,
+        56
+      ],
+      [
+        9087.6,
+        58
+      ],
+      [
+        9350.1,
+        60
+      ],
+      [
+        9614.3,
+        63
+      ],
+      [
+        9879.3,
+        66
+      ],
+      [
+        10143.8,
+        69
+      ],
+      [
+        10406.5,
+        71
+      ],
+      [
+        10665.2,
+        73
+      ],
+      [
+        10934.8,
+        78
+      ],
+      [
+        11200.6,
+        86
+      ],
+      [
+        11469.1,
+        88
+      ],
+      [
+        11736.9,
+        90
+      ],
+      [
+        12001.6,
+        91
+      ],
+      [
+        12264.8,
+        94
+      ],
+      [
+        12528.8,
+        100
+      ],
+      [
+        12794.0,
+        102
+      ],
+      [
+        13071.1,
+        104
+      ],
+      [
+        13341.8,
+        109
+      ],
+      [
+        13606.6,
+        111
+      ],
+      [
+        13873.5,
+        113
+      ],
+      [
+        14137.3,
+        115
+      ],
+      [
+        14412.1,
+        119
+      ],
+      [
+        14677.3,
+        121
+      ],
+      [
+        14943.5,
+        123
+      ],
+      [
+        15207.0,
+        125
+      ],
+      [
+        15473.1,
+        131
+      ],
+      [
+        15740.6,
+        134
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Silk Road was not one single road but a network of trade routes that connected China to the Middle East and Europe. Merchants traveled these routes for more than a thousand years, carrying goods like silk, spices, and paper. But the Silk Road did more than move products from one place to another. It also helped spread religions, languages, and inventions between very different cultures. For example, Buddhism traveled from India to China along these routes. In many ways, the Silk Road was an early example of how the world is connected.\n\"\"\"\n\nThe writer selected the phrase \"very different\" in this sentence (marked with [[ ]]):\nIt also helped spread religions, languages, and inventions between [[very different]] cultures.\n\nGive 10 single words that can replace \"very different\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 317,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

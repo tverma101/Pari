@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p21-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "13a08bc33b0867ca99b02fa7938455ffcf22a91fb8557ce29a18581f86a86443",
+  "seed": 5681812807247234726,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"dense\", \"thickly populated\", \"overcrowded\", \"populous\", \"packed\", \"heavily inhabited\", \"thronged\", \"congested\", \"full\", \"thick with people\"]}",
+  "timing": {
+    "first_text_ms": 4724.3,
+    "option_ms": [
+      6015.9,
+      7595.1,
+      8876.9,
+      9928.2,
+      10702.2,
+      12249.9,
+      13542.0,
+      14828.4,
+      15600.5,
+      17156.5
+    ],
+    "total_ms": 17447.4,
+    "stream": [
+      [
+        4724.3,
+        2
+      ],
+      [
+        4984.3,
+        9
+      ],
+      [
+        5242.5,
+        11
+      ],
+      [
+        5500.6,
+        14
+      ],
+      [
+        5758.5,
+        19
+      ],
+      [
+        6015.9,
+        21
+      ],
+      [
+        6275.9,
+        23
+      ],
+      [
+        6535.5,
+        25
+      ],
+      [
+        6794.8,
+        28
+      ],
+      [
+        7059.0,
+        30
+      ],
+      [
+        7322.9,
+        40
+      ],
+      [
+        7595.1,
+        42
+      ],
+      [
+        7849.5,
+        44
+      ],
+      [
+        8104.5,
+        48
+      ],
+      [
+        8359.7,
+        52
+      ],
+      [
+        8615.7,
+        55
+      ],
+      [
+        8876.9,
+        57
+      ],
+      [
+        9152.9,
+        59
+      ],
+      [
+        9411.4,
+        62
+      ],
+      [
+        9667.8,
+        67
+      ],
+      [
+        9928.2,
+        69
+      ],
+      [
+        10184.4,
+        71
+      ],
+      [
+        10443.1,
+        77
+      ],
+      [
+        10702.2,
+        79
+      ],
+      [
+        10961.0,
+        81
+      ],
+      [
+        11219.1,
+        83
+      ],
+      [
+        11478.3,
+        85
+      ],
+      [
+        11735.6,
+        88
+      ],
+      [
+        11994.8,
+        98
+      ],
+      [
+        12249.9,
+        100
+      ],
+      [
+        12508.6,
+        102
+      ],
+      [
+        12765.7,
+        104
+      ],
+      [
+        13023.9,
+        108
+      ],
+      [
+        13283.0,
+        110
+      ],
+      [
+        13542.0,
+        112
+      ],
+      [
+        13798.0,
+        114
+      ],
+      [
+        14055.1,
+        117
+      ],
+      [
+        14312.4,
+        121
+      ],
+      [
+        14571.2,
+        123
+      ],
+      [
+        14828.4,
+        125
+      ],
+      [
+        15087.6,
+        127
+      ],
+      [
+        15344.1,
+        131
+      ],
+      [
+        15600.5,
+        133
+      ],
+      [
+        15859.6,
+        135
+      ],
+      [
+        16117.1,
+        137
+      ],
+      [
+        16375.1,
+        140
+      ],
+      [
+        16634.0,
+        145
+      ],
+      [
+        16899.7,
+        152
+      ],
+      [
+        17156.5,
+        155
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Black Death was a plague that spread across Europe starting in 1347. It was carried by fleas that lived on rats, and it moved quickly along trade routes and through crowded cities. Within just a few years, it killed somewhere between a third and half of Europe's population. Because so many workers died, the people who survived could ask for higher pay, which made the old feudal system weaker. The plague also made a lot of people question the church, since prayers did not seem to stop the disease.\n\"\"\"\n\nThe writer tapped the word \"crowded\" in this sentence (marked with [[ ]]):\nIt was carried by fleas that lived on rats, and it moved quickly along trade routes and through [[crowded]] cities.\n\nGive 10 replacements for \"crowded\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"crowded\" without changing the rest of the sentence. Do not repeat \"crowded\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 349,
+  "new_tokens": 50,
+  "finish_reason": "stop",
+  "error": null
+}

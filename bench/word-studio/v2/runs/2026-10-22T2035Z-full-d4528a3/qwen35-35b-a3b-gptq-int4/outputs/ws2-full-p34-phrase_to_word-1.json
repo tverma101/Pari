@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p34-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "2d66de61a7d55b0305c6df12a6f7b7332b97d31338fc0df4d3f67e1e5fd63b09",
+  "seed": 5000777542145828850,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"earn\", \"generate\", \"produce\", \"yield\", \"bring\", \"raise\", \"make\", \"deliver\", \"secure\", \"fetch\"]}",
+  "timing": {
+    "first_text_ms": 4595.5,
+    "option_ms": [
+      5913.0,
+      6695.1,
+      7502.5,
+      8277.1,
+      9048.3,
+      9840.5,
+      10620.3,
+      11396.0,
+      12176.9,
+      12952.3
+    ],
+    "total_ms": 13213.6,
+    "stream": [
+      [
+        4595.5,
+        2
+      ],
+      [
+        4860.6,
+        9
+      ],
+      [
+        5120.8,
+        11
+      ],
+      [
+        5385.6,
+        14
+      ],
+      [
+        5648.4,
+        18
+      ],
+      [
+        5913.0,
+        20
+      ],
+      [
+        6174.8,
+        22
+      ],
+      [
+        6431.8,
+        30
+      ],
+      [
+        6695.1,
+        32
+      ],
+      [
+        6956.3,
+        34
+      ],
+      [
+        7217.4,
+        41
+      ],
+      [
+        7502.5,
+        43
+      ],
+      [
+        7763.9,
+        45
+      ],
+      [
+        8024.6,
+        50
+      ],
+      [
+        8277.1,
+        52
+      ],
+      [
+        8530.6,
+        54
+      ],
+      [
+        8788.6,
+        59
+      ],
+      [
+        9048.3,
+        61
+      ],
+      [
+        9304.9,
+        63
+      ],
+      [
+        9562.8,
+        68
+      ],
+      [
+        9840.5,
+        70
+      ],
+      [
+        10101.7,
+        72
+      ],
+      [
+        10362.8,
+        76
+      ],
+      [
+        10620.3,
+        78
+      ],
+      [
+        10881.3,
+        80
+      ],
+      [
+        11139.1,
+        87
+      ],
+      [
+        11396.0,
+        89
+      ],
+      [
+        11654.0,
+        91
+      ],
+      [
+        11914.8,
+        97
+      ],
+      [
+        12176.9,
+        99
+      ],
+      [
+        12436.2,
+        101
+      ],
+      [
+        12693.0,
+        106
+      ],
+      [
+        12952.3,
+        109
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nCollege athletes bring in millions of dollars for their schools, but for a long time they were not allowed to earn any of it. Big football and basketball programs sell tickets, jerseys, and TV rights, while the players who make it all possible get nothing except a scholarship. Many athletes spend more than forty hours a week on their sport, which makes it hard to keep a part-time job. In 2021, new rules finally let athletes make money from their name and image. I think this was a fair change, and schools should go even further by sharing some of their profits with players.\n\"\"\"\n\nThe writer selected the phrase \"bring in\" in this sentence (marked with [[ ]]):\nCollege athletes [[bring in]] millions of dollars for their schools, but for a long time they were not allowed to earn any of it.\n\nGive 10 single words that can replace \"bring in\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 342,
+  "new_tokens": 34,
+  "finish_reason": "stop",
+  "error": null
+}

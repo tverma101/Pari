@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p25-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "68aa8d40b8c0343aeebd5d8c338557d0e5519ed02601c4f2d9b06b29577d65cf",
+  "seed": 9055728419246310593,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"seeking\", \"seeking\", \"hunting\", \"pursuing\", \"searching\", \"desiring\", \"wanting\", \"needing\", \"desperate\", \"aiming\"]}",
+  "timing": {
+    "first_text_ms": 4697.0,
+    "option_ms": [
+      6249.9,
+      7281.0,
+      8312.3,
+      9602.6,
+      10634.1,
+      11660.9,
+      12728.5,
+      13758.4,
+      14804.8,
+      15841.0
+    ],
+    "total_ms": 16103.5,
+    "stream": [
+      [
+        4697.0,
+        2
+      ],
+      [
+        4957.6,
+        9
+      ],
+      [
+        5217.4,
+        11
+      ],
+      [
+        5475.9,
+        14
+      ],
+      [
+        5733.9,
+        18
+      ],
+      [
+        5993.1,
+        21
+      ],
+      [
+        6249.9,
+        23
+      ],
+      [
+        6509.0,
+        25
+      ],
+      [
+        6767.1,
+        29
+      ],
+      [
+        7024.6,
+        32
+      ],
+      [
+        7281.0,
+        34
+      ],
+      [
+        7540.1,
+        36
+      ],
+      [
+        7797.1,
+        37
+      ],
+      [
+        8054.3,
+        43
+      ],
+      [
+        8312.3,
+        45
+      ],
+      [
+        8570.0,
+        47
+      ],
+      [
+        8826.9,
+        48
+      ],
+      [
+        9084.7,
+        51
+      ],
+      [
+        9341.9,
+        55
+      ],
+      [
+        9602.6,
+        57
+      ],
+      [
+        9859.0,
+        59
+      ],
+      [
+        10117.8,
+        65
+      ],
+      [
+        10374.9,
+        68
+      ],
+      [
+        10634.1,
+        70
+      ],
+      [
+        10890.5,
+        72
+      ],
+      [
+        11146.9,
+        75
+      ],
+      [
+        11403.1,
+        80
+      ],
+      [
+        11660.9,
+        82
+      ],
+      [
+        11923.9,
+        84
+      ],
+      [
+        12180.2,
+        88
+      ],
+      [
+        12470.0,
+        91
+      ],
+      [
+        12728.5,
+        93
+      ],
+      [
+        12986.3,
+        95
+      ],
+      [
+        13243.1,
+        97
+      ],
+      [
+        13500.0,
+        102
+      ],
+      [
+        13758.4,
+        104
+      ],
+      [
+        14015.7,
+        106
+      ],
+      [
+        14274.2,
+        109
+      ],
+      [
+        14533.1,
+        115
+      ],
+      [
+        14804.8,
+        117
+      ],
+      [
+        15065.2,
+        119
+      ],
+      [
+        15324.1,
+        122
+      ],
+      [
+        15583.8,
+        125
+      ],
+      [
+        15841.0,
+        128
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Dust Bowl was a period in the 1930s when huge dust storms hit the Great Plains. Farmers had plowed up the grass that held the soil in place, and then a long drought dried everything out. When strong winds came, they picked up the loose dirt and created clouds of dust so thick that people could not see the sun. Crops died, animals got sick, and many families lost their farms. Thousands of people packed up their belongings and moved west to California looking for work. The disaster taught the government that it needed to help farmers protect the land.\n\"\"\"\n\nThe writer selected the phrase \"looking for\" in this sentence (marked with [[ ]]):\nThousands of people packed up their belongings and moved west to California [[looking for]] work.\n\nGive 10 single words that can replace \"looking for\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 329,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

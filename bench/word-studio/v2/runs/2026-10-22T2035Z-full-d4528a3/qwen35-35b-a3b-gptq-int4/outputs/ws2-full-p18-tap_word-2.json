@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p18-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "1279569e72c3c52d7cf3522eb983f5c5f129c3864694ee03f9ee2395539a5870",
+  "seed": 4117728654981649582,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"smartest\", \"finest\", \"greatest\", \"most valuable\", \"very best\", \"top\", \"ideal\", \"perfect\", \"most important\", \"wise\"]}",
+  "timing": {
+    "first_text_ms": 4575.5,
+    "option_ms": [
+      6129.5,
+      7166.1,
+      8209.7,
+      9283.7,
+      10336.9,
+      11111.4,
+      11890.9,
+      12688.9,
+      13722.1,
+      14503.0
+    ],
+    "total_ms": 14762.1,
+    "stream": [
+      [
+        4575.5,
+        2
+      ],
+      [
+        4835.6,
+        9
+      ],
+      [
+        5092.9,
+        11
+      ],
+      [
+        5352.5,
+        14
+      ],
+      [
+        5611.3,
+        19
+      ],
+      [
+        5871.2,
+        22
+      ],
+      [
+        6129.5,
+        24
+      ],
+      [
+        6390.4,
+        26
+      ],
+      [
+        6648.9,
+        29
+      ],
+      [
+        6908.1,
+        32
+      ],
+      [
+        7166.1,
+        34
+      ],
+      [
+        7425.6,
+        36
+      ],
+      [
+        7692.7,
+        37
+      ],
+      [
+        7951.9,
+        44
+      ],
+      [
+        8209.7,
+        46
+      ],
+      [
+        8473.8,
+        48
+      ],
+      [
+        8734.3,
+        52
+      ],
+      [
+        9009.4,
+        61
+      ],
+      [
+        9283.7,
+        63
+      ],
+      [
+        9559.2,
+        65
+      ],
+      [
+        9817.5,
+        69
+      ],
+      [
+        10076.6,
+        74
+      ],
+      [
+        10336.9,
+        76
+      ],
+      [
+        10594.9,
+        78
+      ],
+      [
+        10854.6,
+        81
+      ],
+      [
+        11111.4,
+        83
+      ],
+      [
+        11369.6,
+        85
+      ],
+      [
+        11630.9,
+        90
+      ],
+      [
+        11890.9,
+        92
+      ],
+      [
+        12165.4,
+        94
+      ],
+      [
+        12428.9,
+        101
+      ],
+      [
+        12688.9,
+        103
+      ],
+      [
+        12948.0,
+        105
+      ],
+      [
+        13204.5,
+        109
+      ],
+      [
+        13463.1,
+        119
+      ],
+      [
+        13722.1,
+        121
+      ],
+      [
+        13983.5,
+        123
+      ],
+      [
+        14244.4,
+        127
+      ],
+      [
+        14503.0,
+        130
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nJoining the robotics team in tenth grade was one of the best choices I ever made. Our first competition was a disaster because our robot stopped working in the middle of the match. I felt embarrassed, and I wanted to quit the team right then. Instead, our coach told us to figure out what went wrong and try again. We spent weeks testing every part until we found a loose wire in the motor. At our next competition, the robot worked perfectly and we made it to the finals. That experience taught me that failing is just part of getting better.\n\"\"\"\n\nThe writer tapped the word \"best\" in this sentence (marked with [[ ]]):\nJoining the robotics team in tenth grade was one of the [[best]] choices I ever made.\n\nGive 10 replacements for \"best\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"best\" without changing the rest of the sentence. Do not repeat \"best\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 345,
+  "new_tokens": 40,
+  "finish_reason": "stop",
+  "error": null
+}

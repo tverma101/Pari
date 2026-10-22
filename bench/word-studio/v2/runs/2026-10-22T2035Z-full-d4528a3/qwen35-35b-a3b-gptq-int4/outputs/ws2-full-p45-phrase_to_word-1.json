@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p45-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "d46d7ae4764e35a459e07e3f81dbbc8fb54604d817c931488ba13e2416d930d1",
+  "seed": 8774857414776484539,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"avenge\", \"revenge\", \"retaliate\", \"punish\", \"repay\", \"exact\", \"settle\", \"strike\", \"strike back\", \"take\"]}",
+  "timing": {
+    "first_text_ms": 4576.4,
+    "option_ms": [
+      6201.1,
+      7254.3,
+      8615.6,
+      9687.7,
+      10747.9,
+      11543.0,
+      12603.2,
+      13401.7,
+      14469.0,
+      15270.7
+    ],
+    "total_ms": 15543.7,
+    "stream": [
+      [
+        4576.4,
+        2
+      ],
+      [
+        4855.5,
+        9
+      ],
+      [
+        5124.7,
+        11
+      ],
+      [
+        5393.0,
+        14
+      ],
+      [
+        5663.1,
+        18
+      ],
+      [
+        5934.0,
+        20
+      ],
+      [
+        6201.1,
+        22
+      ],
+      [
+        6467.7,
+        24
+      ],
+      [
+        6732.1,
+        26
+      ],
+      [
+        6994.6,
+        31
+      ],
+      [
+        7254.3,
+        33
+      ],
+      [
+        7513.7,
+        35
+      ],
+      [
+        7784.5,
+        38
+      ],
+      [
+        8067.8,
+        40
+      ],
+      [
+        8347.4,
+        44
+      ],
+      [
+        8615.6,
+        46
+      ],
+      [
+        8885.1,
+        48
+      ],
+      [
+        9156.5,
+        51
+      ],
+      [
+        9420.5,
+        54
+      ],
+      [
+        9687.7,
+        56
+      ],
+      [
+        9955.8,
+        58
+      ],
+      [
+        10220.9,
+        61
+      ],
+      [
+        10486.1,
+        63
+      ],
+      [
+        10747.9,
+        65
+      ],
+      [
+        11013.8,
+        67
+      ],
+      [
+        11279.7,
+        72
+      ],
+      [
+        11543.0,
+        74
+      ],
+      [
+        11809.5,
+        76
+      ],
+      [
+        12070.0,
+        79
+      ],
+      [
+        12337.4,
+        82
+      ],
+      [
+        12603.2,
+        84
+      ],
+      [
+        12870.7,
+        86
+      ],
+      [
+        13139.1,
+        92
+      ],
+      [
+        13401.7,
+        94
+      ],
+      [
+        13664.9,
+        96
+      ],
+      [
+        13932.9,
+        102
+      ],
+      [
+        14202.7,
+        107
+      ],
+      [
+        14469.0,
+        109
+      ],
+      [
+        14730.6,
+        111
+      ],
+      [
+        15000.1,
+        115
+      ],
+      [
+        15270.7,
+        118
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nHamlet is a character who thinks too much and acts too little. After his father's ghost tells him that Claudius murdered him, Hamlet promises to get revenge. But instead of acting right away, he spends most of the play doubting himself and planning. In his famous speech, he asks, \"To be, or not to be,\" as he wonders whether life is worth the pain. Even when he has a perfect chance to kill Claudius while he is praying, he decides to wait. His delay ends up causing the deaths of many people, including himself.\n\"\"\"\n\nThe writer selected the phrase \"get revenge\" in this sentence (marked with [[ ]]):\nAfter his father's ghost tells him that Claudius murdered him, Hamlet promises to [[get revenge]].\n\nGive 10 single words that can replace \"get revenge\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 329,
+  "new_tokens": 42,
+  "finish_reason": "stop",
+  "error": null
+}

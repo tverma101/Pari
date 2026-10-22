@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p35-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "8113c1031cbcee49c5b60cc78815f579398cf165379a4c90f597edd14b28df9b",
+  "seed": 7888109819201837268,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"cooperate\", \"collaborate\", \"unite\", \"join\", \"combine\", \"pool\", \"band\", \"link\", \"merge\", \"align\"]}",
+  "timing": {
+    "first_text_ms": 4558.0,
+    "option_ms": [
+      6117.0,
+      7440.0,
+      8473.3,
+      9250.8,
+      10034.6,
+      10831.5,
+      11610.2,
+      12386.4,
+      13169.5,
+      13955.7
+    ],
+    "total_ms": 14221.2,
+    "stream": [
+      [
+        4558.0,
+        2
+      ],
+      [
+        4815.3,
+        9
+      ],
+      [
+        5074.4,
+        11
+      ],
+      [
+        5329.0,
+        14
+      ],
+      [
+        5580.4,
+        16
+      ],
+      [
+        5839.7,
+        23
+      ],
+      [
+        6117.0,
+        25
+      ],
+      [
+        6377.0,
+        27
+      ],
+      [
+        6660.9,
+        31
+      ],
+      [
+        6922.0,
+        35
+      ],
+      [
+        7183.8,
+        38
+      ],
+      [
+        7440.0,
+        40
+      ],
+      [
+        7696.9,
+        42
+      ],
+      [
+        7957.4,
+        44
+      ],
+      [
+        8217.7,
+        47
+      ],
+      [
+        8473.3,
+        49
+      ],
+      [
+        8730.8,
+        51
+      ],
+      [
+        8993.2,
+        55
+      ],
+      [
+        9250.8,
+        57
+      ],
+      [
+        9513.2,
+        59
+      ],
+      [
+        9773.2,
+        66
+      ],
+      [
+        10034.6,
+        68
+      ],
+      [
+        10294.9,
+        70
+      ],
+      [
+        10553.1,
+        74
+      ],
+      [
+        10831.5,
+        76
+      ],
+      [
+        11092.9,
+        78
+      ],
+      [
+        11351.3,
+        82
+      ],
+      [
+        11610.2,
+        84
+      ],
+      [
+        11866.6,
+        86
+      ],
+      [
+        12129.3,
+        90
+      ],
+      [
+        12386.4,
+        92
+      ],
+      [
+        12641.5,
+        94
+      ],
+      [
+        12902.3,
+        99
+      ],
+      [
+        13169.5,
+        101
+      ],
+      [
+        13430.2,
+        103
+      ],
+      [
+        13690.1,
+        108
+      ],
+      [
+        13955.7,
+        111
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nOn July 20, 1969, Neil Armstrong became the first person to walk on the moon. The Apollo 11 mission was the result of years of hard work by thousands of scientists, engineers, and astronauts. The United States wanted to beat the Soviet Union in the space race, which was part of the larger Cold War. Millions of people around the world watched the landing live on television. The mission showed what humans can do when they work together toward a big goal. It also led to new technologies that we still use today.\n\"\"\"\n\nThe writer selected the phrase \"work together\" in this sentence (marked with [[ ]]):\nThe mission showed what humans can do when they [[work together]] toward a big goal.\n\nGive 10 single words that can replace \"work together\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 323,
+  "new_tokens": 38,
+  "finish_reason": "stop",
+  "error": null
+}

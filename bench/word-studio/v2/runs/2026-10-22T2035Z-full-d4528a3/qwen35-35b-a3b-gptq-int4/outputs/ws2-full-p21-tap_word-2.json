@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p21-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "a9ab5d4ee5272f4671c9b38320ec1494e78c5797a6ec231e640ebee8d9f3847a",
+  "seed": 5857044829518043120,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"less powerful\", \"less strong\", \"more fragile\", \"more unstable\", \"less secure\", \"less dominant\", \"less entrenched\", \"more vulnerable\", \"less rigid\", \"less firm\"]}",
+  "timing": {
+    "first_text_ms": 4705.5,
+    "option_ms": [
+      6259.8,
+      7291.0,
+      8325.2,
+      9359.1,
+      10441.1,
+      11469.0,
+      12498.3,
+      13536.6,
+      14569.2,
+      15598.2
+    ],
+    "total_ms": 15856.5,
+    "stream": [
+      [
+        4705.5,
+        2
+      ],
+      [
+        4965.6,
+        9
+      ],
+      [
+        5223.2,
+        11
+      ],
+      [
+        5481.7,
+        14
+      ],
+      [
+        5740.2,
+        18
+      ],
+      [
+        5999.6,
+        27
+      ],
+      [
+        6259.8,
+        29
+      ],
+      [
+        6518.0,
+        31
+      ],
+      [
+        6775.2,
+        35
+      ],
+      [
+        7033.8,
+        42
+      ],
+      [
+        7291.0,
+        44
+      ],
+      [
+        7549.7,
+        46
+      ],
+      [
+        7808.5,
+        50
+      ],
+      [
+        8069.5,
+        58
+      ],
+      [
+        8325.2,
+        60
+      ],
+      [
+        8583.3,
+        62
+      ],
+      [
+        8838.4,
+        66
+      ],
+      [
+        9096.2,
+        75
+      ],
+      [
+        9359.1,
+        77
+      ],
+      [
+        9637.8,
+        79
+      ],
+      [
+        9922.4,
+        83
+      ],
+      [
+        10183.1,
+        90
+      ],
+      [
+        10441.1,
+        92
+      ],
+      [
+        10697.1,
+        94
+      ],
+      [
+        10956.0,
+        98
+      ],
+      [
+        11212.2,
+        107
+      ],
+      [
+        11469.0,
+        109
+      ],
+      [
+        11725.0,
+        111
+      ],
+      [
+        11981.6,
+        115
+      ],
+      [
+        12239.9,
+        126
+      ],
+      [
+        12498.3,
+        128
+      ],
+      [
+        12756.0,
+        130
+      ],
+      [
+        13016.7,
+        134
+      ],
+      [
+        13277.1,
+        145
+      ],
+      [
+        13536.6,
+        147
+      ],
+      [
+        13794.7,
+        149
+      ],
+      [
+        14054.5,
+        153
+      ],
+      [
+        14311.7,
+        159
+      ],
+      [
+        14569.2,
+        161
+      ],
+      [
+        14826.0,
+        163
+      ],
+      [
+        15083.1,
+        167
+      ],
+      [
+        15342.1,
+        172
+      ],
+      [
+        15598.2,
+        175
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Black Death was a plague that spread across Europe starting in 1347. It was carried by fleas that lived on rats, and it moved quickly along trade routes and through crowded cities. Within just a few years, it killed somewhere between a third and half of Europe's population. Because so many workers died, the people who survived could ask for higher pay, which made the old feudal system weaker. The plague also made a lot of people question the church, since prayers did not seem to stop the disease.\n\"\"\"\n\nThe writer tapped the word \"weaker\" in this sentence (marked with [[ ]]):\nBecause so many workers died, the people who survived could ask for higher pay, which made the old feudal system [[weaker]].\n\nGive 10 replacements for \"weaker\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"weaker\" without changing the rest of the sentence. Do not repeat \"weaker\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 349,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

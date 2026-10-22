@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p33-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "69b5c08978eff1fff8a7a31c9c9843ec6ec98e7cf474956ee74e48a41563fb3f",
+  "seed": 1649889789222756565,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"demanding\", \"hard\", \"tough\", \"difficult\", \"challenging\", \"overwhelming\", \"exhausting\", \"burdensome\", \"pressing\", \"heavy\"]}",
+  "timing": {
+    "first_text_ms": 4537.1,
+    "option_ms": [
+      6115.1,
+      6890.0,
+      7915.5,
+      8954.7,
+      10256.9,
+      11294.9,
+      12589.6,
+      13887.4,
+      14919.5,
+      15702.7
+    ],
+    "total_ms": 15964.4,
+    "stream": [
+      [
+        4537.1,
+        2
+      ],
+      [
+        4791.1,
+        9
+      ],
+      [
+        5044.3,
+        11
+      ],
+      [
+        5296.4,
+        14
+      ],
+      [
+        5565.6,
+        20
+      ],
+      [
+        5826.6,
+        23
+      ],
+      [
+        6115.1,
+        25
+      ],
+      [
+        6374.2,
+        27
+      ],
+      [
+        6632.7,
+        31
+      ],
+      [
+        6890.0,
+        33
+      ],
+      [
+        7147.2,
+        35
+      ],
+      [
+        7403.6,
+        36
+      ],
+      [
+        7659.3,
+        40
+      ],
+      [
+        7915.5,
+        42
+      ],
+      [
+        8174.0,
+        44
+      ],
+      [
+        8435.8,
+        48
+      ],
+      [
+        8693.4,
+        53
+      ],
+      [
+        8954.7,
+        55
+      ],
+      [
+        9217.1,
+        57
+      ],
+      [
+        9476.4,
+        59
+      ],
+      [
+        9736.5,
+        65
+      ],
+      [
+        9998.6,
+        68
+      ],
+      [
+        10256.9,
+        70
+      ],
+      [
+        10514.7,
+        72
+      ],
+      [
+        10776.6,
+        76
+      ],
+      [
+        11037.0,
+        84
+      ],
+      [
+        11294.9,
+        86
+      ],
+      [
+        11552.7,
+        88
+      ],
+      [
+        11811.6,
+        90
+      ],
+      [
+        12072.0,
+        95
+      ],
+      [
+        12331.0,
+        98
+      ],
+      [
+        12589.6,
+        100
+      ],
+      [
+        12851.4,
+        102
+      ],
+      [
+        13110.6,
+        105
+      ],
+      [
+        13367.7,
+        109
+      ],
+      [
+        13629.3,
+        112
+      ],
+      [
+        13887.4,
+        114
+      ],
+      [
+        14146.2,
+        116
+      ],
+      [
+        14401.5,
+        121
+      ],
+      [
+        14660.7,
+        124
+      ],
+      [
+        14919.5,
+        126
+      ],
+      [
+        15178.8,
+        128
+      ],
+      [
+        15437.0,
+        133
+      ],
+      [
+        15702.7,
+        136
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSince my mom works night shifts at the hospital, I have been taking care of my little brother after school since I was thirteen. I help him with his homework, make him dinner, and make sure he goes to bed on time. Some days it is stressful, especially when I have a big test the next morning. But taking care of him has made me more patient and responsible than most kids my age. I have learned how to manage my time and stay calm when things do not go as planned. My brother looks up to me, and that makes all the hard work worth it.\n\"\"\"\n\nThe writer tapped the word \"stressful\" in this sentence (marked with [[ ]]):\nSome days it is [[stressful]], especially when I have a big test the next morning.\n\nGive 10 replacements for \"stressful\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"stressful\" without changing the rest of the sentence. Do not repeat \"stressful\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 354,
+  "new_tokens": 45,
+  "finish_reason": "stop",
+  "error": null
+}

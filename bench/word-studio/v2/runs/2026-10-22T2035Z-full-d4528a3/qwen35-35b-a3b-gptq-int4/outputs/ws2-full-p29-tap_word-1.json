@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p29-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "e785a706ff729b7d9194a236ec75492963084454613cbd32dff454af3c5eb75a",
+  "seed": 1285037049217466668,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"regular\", \"everyday\", \"common\", \"average\", \"ordinary citizens\", \"regular citizens\", \"common people\", \"average citizens\", \"everyday citizens\", \"regular folk\"]}",
+  "timing": {
+    "first_text_ms": 4710.7,
+    "option_ms": [
+      6018.1,
+      7091.7,
+      7865.8,
+      8640.9,
+      9673.3,
+      10713.7,
+      11748.1,
+      12775.6,
+      14060.1,
+      15090.2
+    ],
+    "total_ms": 15352.1,
+    "stream": [
+      [
+        4710.7,
+        2
+      ],
+      [
+        4971.2,
+        9
+      ],
+      [
+        5233.7,
+        11
+      ],
+      [
+        5492.0,
+        14
+      ],
+      [
+        5753.9,
+        21
+      ],
+      [
+        6018.1,
+        23
+      ],
+      [
+        6279.9,
+        25
+      ],
+      [
+        6570.7,
+        30
+      ],
+      [
+        6832.2,
+        33
+      ],
+      [
+        7091.7,
+        35
+      ],
+      [
+        7351.2,
+        37
+      ],
+      [
+        7608.2,
+        43
+      ],
+      [
+        7865.8,
+        45
+      ],
+      [
+        8123.1,
+        47
+      ],
+      [
+        8382.3,
+        54
+      ],
+      [
+        8640.9,
+        56
+      ],
+      [
+        8898.8,
+        58
+      ],
+      [
+        9154.2,
+        66
+      ],
+      [
+        9412.5,
+        75
+      ],
+      [
+        9673.3,
+        77
+      ],
+      [
+        9933.1,
+        79
+      ],
+      [
+        10195.0,
+        86
+      ],
+      [
+        10456.2,
+        95
+      ],
+      [
+        10713.7,
+        97
+      ],
+      [
+        10974.7,
+        99
+      ],
+      [
+        11233.9,
+        105
+      ],
+      [
+        11492.0,
+        112
+      ],
+      [
+        11748.1,
+        114
+      ],
+      [
+        12005.3,
+        116
+      ],
+      [
+        12264.1,
+        123
+      ],
+      [
+        12520.6,
+        132
+      ],
+      [
+        12775.6,
+        134
+      ],
+      [
+        13031.5,
+        136
+      ],
+      [
+        13287.7,
+        141
+      ],
+      [
+        13544.4,
+        144
+      ],
+      [
+        13801.7,
+        153
+      ],
+      [
+        14060.1,
+        155
+      ],
+      [
+        14317.6,
+        157
+      ],
+      [
+        14575.6,
+        164
+      ],
+      [
+        14832.1,
+        169
+      ],
+      [
+        15090.2,
+        172
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe fight for women's right to vote in the United States lasted for more than seventy years. It officially began at the Seneca Falls Convention in 1848, where activists like Elizabeth Cady Stanton demanded equal rights for women. For decades, suffragists gave speeches, marched in parades, and even went to jail for their cause. Many people at the time thought that women were too emotional to make decisions about politics. Finally, in 1920, the 19th Amendment was passed, which gave women the right to vote. This victory showed that ordinary people can change the law if they keep pushing for it.\n\"\"\"\n\nThe writer tapped the word \"ordinary\" in this sentence (marked with [[ ]]):\nThis victory showed that [[ordinary]] people can change the law if they keep pushing for it.\n\nGive 10 replacements for \"ordinary\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"ordinary\" without changing the rest of the sentence. Do not repeat \"ordinary\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 363,
+  "new_tokens": 42,
+  "finish_reason": "stop",
+  "error": null
+}

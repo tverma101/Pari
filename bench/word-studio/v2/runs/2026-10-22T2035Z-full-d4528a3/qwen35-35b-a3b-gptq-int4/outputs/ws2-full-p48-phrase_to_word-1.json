@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p48-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "95434e98f6a28554233b9c27c8037e7d17bd6a09c226de922cd864461fa0d1e5",
+  "seed": 6735827742434317104,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"back\", \"fund\", \"support\", \"aid\", \"help\", \"sponsor\", \"serve\", \"maintain\", \"protect\", \"champion\"]}",
+  "timing": {
+    "first_text_ms": 4471.0,
+    "option_ms": [
+      5786.5,
+      6600.2,
+      7407.8,
+      8252.8,
+      9070.6,
+      9864.9,
+      10663.5,
+      11728.9,
+      12530.0,
+      13598.5
+    ],
+    "total_ms": 13863.3,
+    "stream": [
+      [
+        4471.0,
+        2
+      ],
+      [
+        4734.6,
+        9
+      ],
+      [
+        4995.1,
+        11
+      ],
+      [
+        5260.3,
+        14
+      ],
+      [
+        5523.7,
+        18
+      ],
+      [
+        5786.5,
+        20
+      ],
+      [
+        6051.0,
+        22
+      ],
+      [
+        6332.4,
+        26
+      ],
+      [
+        6600.2,
+        28
+      ],
+      [
+        6867.1,
+        30
+      ],
+      [
+        7136.5,
+        37
+      ],
+      [
+        7407.8,
+        39
+      ],
+      [
+        7707.1,
+        41
+      ],
+      [
+        7985.9,
+        44
+      ],
+      [
+        8252.8,
+        46
+      ],
+      [
+        8526.6,
+        48
+      ],
+      [
+        8800.0,
+        52
+      ],
+      [
+        9070.6,
+        54
+      ],
+      [
+        9338.7,
+        56
+      ],
+      [
+        9600.0,
+        63
+      ],
+      [
+        9864.9,
+        65
+      ],
+      [
+        10127.8,
+        67
+      ],
+      [
+        10395.7,
+        72
+      ],
+      [
+        10663.5,
+        74
+      ],
+      [
+        10929.1,
+        76
+      ],
+      [
+        11196.2,
+        81
+      ],
+      [
+        11465.2,
+        84
+      ],
+      [
+        11728.9,
+        86
+      ],
+      [
+        11994.4,
+        88
+      ],
+      [
+        12260.5,
+        95
+      ],
+      [
+        12530.0,
+        97
+      ],
+      [
+        12796.7,
+        99
+      ],
+      [
+        13065.2,
+        101
+      ],
+      [
+        13331.6,
+        107
+      ],
+      [
+        13598.5,
+        110
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSome people think public libraries are not needed anymore because everything is online, but I strongly disagree. Libraries give free internet and computers to people who cannot afford them at home. They also offer programs like reading groups for kids, job help for adults, and English classes for immigrants. For many people, the library is one of the only safe and quiet places where they can study. If cities cut library funding, the people who would be hurt the most are the ones who already have the least. That is why we should keep supporting our libraries.\n\"\"\"\n\nThe writer selected the phrase \"keep supporting\" in this sentence (marked with [[ ]]):\nThat is why we should [[keep supporting]] our libraries.\n\nGive 10 single words that can replace \"keep supporting\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 313,
+  "new_tokens": 36,
+  "finish_reason": "stop",
+  "error": null
+}

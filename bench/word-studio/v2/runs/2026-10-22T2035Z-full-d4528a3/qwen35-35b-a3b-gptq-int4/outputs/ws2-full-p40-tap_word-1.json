@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p40-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "15d9a7d13e3d7db887032f545b2f684762f70835387e0561339e052244cdd85b",
+  "seed": 3611120536314508982,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"interlinked\", \"linked\", \"joined\", \"united\", \"bound\", \"tied\", \"woven\", \"integrated\", \"allied\", \"meshed\"]}",
+  "timing": {
+    "first_text_ms": 4700.9,
+    "option_ms": [
+      6311.1,
+      7108.8,
+      7916.6,
+      8963.6,
+      9750.8,
+      10795.4,
+      11833.7,
+      12884.8,
+      13937.7,
+      14988.8
+    ],
+    "total_ms": 15252.3,
+    "stream": [
+      [
+        4700.9,
+        2
+      ],
+      [
+        4967.9,
+        9
+      ],
+      [
+        5237.5,
+        11
+      ],
+      [
+        5505.3,
+        14
+      ],
+      [
+        5778.9,
+        19
+      ],
+      [
+        6042.8,
+        25
+      ],
+      [
+        6311.1,
+        27
+      ],
+      [
+        6577.0,
+        29
+      ],
+      [
+        6843.7,
+        35
+      ],
+      [
+        7108.8,
+        37
+      ],
+      [
+        7375.4,
+        39
+      ],
+      [
+        7639.5,
+        45
+      ],
+      [
+        7916.6,
+        47
+      ],
+      [
+        8176.1,
+        49
+      ],
+      [
+        8436.3,
+        51
+      ],
+      [
+        8699.2,
+        55
+      ],
+      [
+        8963.6,
+        57
+      ],
+      [
+        9223.6,
+        59
+      ],
+      [
+        9485.8,
+        64
+      ],
+      [
+        9750.8,
+        66
+      ],
+      [
+        10021.7,
+        68
+      ],
+      [
+        10277.6,
+        69
+      ],
+      [
+        10535.8,
+        72
+      ],
+      [
+        10795.4,
+        74
+      ],
+      [
+        11053.8,
+        76
+      ],
+      [
+        11312.6,
+        77
+      ],
+      [
+        11574.0,
+        81
+      ],
+      [
+        11833.7,
+        83
+      ],
+      [
+        12107.2,
+        85
+      ],
+      [
+        12367.7,
+        88
+      ],
+      [
+        12624.2,
+        95
+      ],
+      [
+        12884.8,
+        97
+      ],
+      [
+        13149.2,
+        99
+      ],
+      [
+        13412.9,
+        102
+      ],
+      [
+        13671.9,
+        105
+      ],
+      [
+        13937.7,
+        107
+      ],
+      [
+        14201.0,
+        109
+      ],
+      [
+        14462.6,
+        113
+      ],
+      [
+        14725.0,
+        115
+      ],
+      [
+        14988.8,
+        118
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe Silk Road was not one single road but a network of trade routes that connected China to the Middle East and Europe. Merchants traveled these routes for more than a thousand years, carrying goods like silk, spices, and paper. But the Silk Road did more than move products from one place to another. It also helped spread religions, languages, and inventions between very different cultures. For example, Buddhism traveled from India to China along these routes. In many ways, the Silk Road was an early example of how the world is connected.\n\"\"\"\n\nThe writer tapped the word \"connected\" in this sentence (marked with [[ ]]):\nIn many ways, the Silk Road was an early example of how the world is [[connected]].\n\nGive 10 replacements for \"connected\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"connected\" without changing the rest of the sentence. Do not repeat \"connected\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 339,
+  "new_tokens": 41,
+  "finish_reason": "stop",
+  "error": null
+}

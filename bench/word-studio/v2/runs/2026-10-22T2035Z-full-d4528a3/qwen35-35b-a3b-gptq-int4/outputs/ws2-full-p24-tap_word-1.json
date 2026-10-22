@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p24-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "8c02504667cbd9a7444d21f16bd4ffe19c6e5f41957c04549b214c39f154372e",
+  "seed": 2857985773180242796,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"kind\", \"tender\", \"mild\", \"soft-hearted\", \"meek\", \"innocent\", \"benign\", \"harmless\", \"good-natured\", \"peaceable\"]}",
+  "timing": {
+    "first_text_ms": 4610.1,
+    "option_ms": [
+      5920.5,
+      6953.8,
+      7995.7,
+      9027.2,
+      10061.0,
+      11343.2,
+      12403.8,
+      13690.6,
+      15230.0,
+      16264.8
+    ],
+    "total_ms": 16524.8,
+    "stream": [
+      [
+        4610.1,
+        2
+      ],
+      [
+        4868.4,
+        9
+      ],
+      [
+        5127.2,
+        11
+      ],
+      [
+        5388.9,
+        14
+      ],
+      [
+        5661.4,
+        18
+      ],
+      [
+        5920.5,
+        20
+      ],
+      [
+        6181.3,
+        22
+      ],
+      [
+        6438.7,
+        23
+      ],
+      [
+        6696.1,
+        28
+      ],
+      [
+        6953.8,
+        30
+      ],
+      [
+        7214.0,
+        32
+      ],
+      [
+        7470.5,
+        33
+      ],
+      [
+        7727.9,
+        36
+      ],
+      [
+        7995.7,
+        38
+      ],
+      [
+        8254.4,
+        40
+      ],
+      [
+        8511.3,
+        44
+      ],
+      [
+        8770.0,
+        52
+      ],
+      [
+        9027.2,
+        54
+      ],
+      [
+        9286.3,
+        56
+      ],
+      [
+        9544.2,
+        58
+      ],
+      [
+        9802.8,
+        60
+      ],
+      [
+        10061.0,
+        62
+      ],
+      [
+        10316.5,
+        64
+      ],
+      [
+        10573.1,
+        67
+      ],
+      [
+        10829.0,
+        69
+      ],
+      [
+        11085.6,
+        72
+      ],
+      [
+        11343.2,
+        74
+      ],
+      [
+        11606.0,
+        76
+      ],
+      [
+        11861.3,
+        79
+      ],
+      [
+        12145.1,
+        82
+      ],
+      [
+        12403.8,
+        84
+      ],
+      [
+        12663.3,
+        86
+      ],
+      [
+        12918.1,
+        87
+      ],
+      [
+        13175.5,
+        90
+      ],
+      [
+        13433.3,
+        94
+      ],
+      [
+        13690.6,
+        96
+      ],
+      [
+        13945.5,
+        98
+      ],
+      [
+        14200.9,
+        102
+      ],
+      [
+        14456.2,
+        104
+      ],
+      [
+        14713.9,
+        109
+      ],
+      [
+        14969.6,
+        110
+      ],
+      [
+        15230.0,
+        112
+      ],
+      [
+        15490.0,
+        114
+      ],
+      [
+        15749.5,
+        119
+      ],
+      [
+        16007.7,
+        123
+      ],
+      [
+        16264.8,
+        126
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Frankenstein, Mary Shelley shows that the creature becomes a monster because of how he is treated. When he is first created, the creature is gentle and wants to be loved. However, every person who sees him is scared of his appearance and attacks him or runs away. Even Victor Frankenstein, the man who made him, abandons him right after bringing him to life. The creature says, \"I was benevolent and good; misery made me a fiend.\" This line shows that his anger comes from being rejected over and over, not from his nature.\n\"\"\"\n\nThe writer tapped the word \"gentle\" in this sentence (marked with [[ ]]):\nWhen he is first created, the creature is [[gentle]] and wants to be loved.\n\nGive 10 replacements for \"gentle\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"gentle\" without changing the rest of the sentence. Do not repeat \"gentle\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 350,
+  "new_tokens": 47,
+  "finish_reason": "stop",
+  "error": null
+}

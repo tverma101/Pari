@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p12-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "89b442b71506d644677682b23b8b3456bcc5d9ad47882dd8e7f943caf7cc9090",
+  "seed": 8197776874418178534,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"evolve\", \"adapt\", \"develop resistance\", \"become resistant\", \"mutate\", \"alter\", \"shift\", \"transform\", \"change their nature\", \"grow resistant\"]}",
+  "timing": {
+    "first_text_ms": 4690.5,
+    "option_ms": [
+      6247.2,
+      7025.0,
+      8062.6,
+      9364.4,
+      10427.2,
+      11209.7,
+      11995.2,
+      12772.3,
+      14072.6,
+      15107.2
+    ],
+    "total_ms": 15369.4,
+    "stream": [
+      [
+        4690.5,
+        2
+      ],
+      [
+        4953.2,
+        9
+      ],
+      [
+        5213.0,
+        11
+      ],
+      [
+        5470.5,
+        14
+      ],
+      [
+        5731.9,
+        16
+      ],
+      [
+        5990.5,
+        20
+      ],
+      [
+        6247.2,
+        22
+      ],
+      [
+        6504.5,
+        24
+      ],
+      [
+        6766.3,
+        29
+      ],
+      [
+        7025.0,
+        31
+      ],
+      [
+        7284.2,
+        33
+      ],
+      [
+        7542.7,
+        40
+      ],
+      [
+        7804.2,
+        51
+      ],
+      [
+        8062.6,
+        53
+      ],
+      [
+        8317.1,
+        55
+      ],
+      [
+        8574.5,
+        58
+      ],
+      [
+        8836.2,
+        61
+      ],
+      [
+        9102.6,
+        71
+      ],
+      [
+        9364.4,
+        73
+      ],
+      [
+        9653.2,
+        75
+      ],
+      [
+        9912.0,
+        78
+      ],
+      [
+        10170.2,
+        81
+      ],
+      [
+        10427.2,
+        83
+      ],
+      [
+        10688.6,
+        85
+      ],
+      [
+        10948.9,
+        90
+      ],
+      [
+        11209.7,
+        92
+      ],
+      [
+        11467.1,
+        94
+      ],
+      [
+        11735.0,
+        99
+      ],
+      [
+        11995.2,
+        101
+      ],
+      [
+        12252.5,
+        103
+      ],
+      [
+        12509.8,
+        112
+      ],
+      [
+        12772.3,
+        114
+      ],
+      [
+        13033.3,
+        116
+      ],
+      [
+        13292.7,
+        122
+      ],
+      [
+        13553.6,
+        128
+      ],
+      [
+        13813.3,
+        135
+      ],
+      [
+        14072.6,
+        137
+      ],
+      [
+        14326.1,
+        139
+      ],
+      [
+        14580.9,
+        143
+      ],
+      [
+        14845.2,
+        153
+      ],
+      [
+        15107.2,
+        156
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nAntibiotics are medicines that kill bacteria, and they have saved millions of lives since they were discovered. The problem is that bacteria can change over time so that the medicine does not work on them anymore. This happens faster when people take antibiotics they do not really need, like for a cold, which is caused by a virus. It also happens when people stop taking their pills early because they start to feel better. If this keeps going, simple infections could become deadly again. To stop this, doctors need to be careful about giving out antibiotics, and patients need to finish the whole treatment.\n\"\"\"\n\nThe writer tapped the word \"change\" in this sentence (marked with [[ ]]):\nThe problem is that bacteria can [[change]] over time so that the medicine does not work on them anymore.\n\nGive 10 replacements for \"change\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"change\" without changing the rest of the sentence. Do not repeat \"change\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 353,
+  "new_tokens": 42,
+  "finish_reason": "stop",
+  "error": null
+}

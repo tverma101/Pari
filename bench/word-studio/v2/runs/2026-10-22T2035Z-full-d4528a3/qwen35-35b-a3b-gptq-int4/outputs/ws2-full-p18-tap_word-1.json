@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p18-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "45290b3135fdc49533b9a90f8154e26210b4b060059747ffa848d88b9ab0c5df",
+  "seed": 2630490985057060744,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"ashamed\", \"humiliated\", \"mortified\", \"shamed\", \"disgraced\", \"crushed\", \"defeated\", \"dejected\", \"discouraged\", \"upset\"]}",
+  "timing": {
+    "first_text_ms": 4610.7,
+    "option_ms": [
+      6207.8,
+      7244.1,
+      8280.7,
+      9319.2,
+      10618.8,
+      11658.8,
+      12693.7,
+      13729.7,
+      15016.4,
+      16086.8
+    ],
+    "total_ms": 16348.0,
+    "stream": [
+      [
+        4610.7,
+        2
+      ],
+      [
+        4870.8,
+        9
+      ],
+      [
+        5136.8,
+        11
+      ],
+      [
+        5395.5,
+        14
+      ],
+      [
+        5686.1,
+        17
+      ],
+      [
+        5945.0,
+        21
+      ],
+      [
+        6207.8,
+        23
+      ],
+      [
+        6466.9,
+        25
+      ],
+      [
+        6725.7,
+        28
+      ],
+      [
+        6983.2,
+        35
+      ],
+      [
+        7244.1,
+        37
+      ],
+      [
+        7502.9,
+        39
+      ],
+      [
+        7762.6,
+        43
+      ],
+      [
+        8023.0,
+        48
+      ],
+      [
+        8280.7,
+        50
+      ],
+      [
+        8536.4,
+        52
+      ],
+      [
+        8796.6,
+        54
+      ],
+      [
+        9057.5,
+        58
+      ],
+      [
+        9319.2,
+        60
+      ],
+      [
+        9580.2,
+        62
+      ],
+      [
+        9839.5,
+        65
+      ],
+      [
+        10099.8,
+        67
+      ],
+      [
+        10360.1,
+        71
+      ],
+      [
+        10618.8,
+        73
+      ],
+      [
+        10880.2,
+        75
+      ],
+      [
+        11140.8,
+        77
+      ],
+      [
+        11401.2,
+        82
+      ],
+      [
+        11658.8,
+        84
+      ],
+      [
+        11917.5,
+        86
+      ],
+      [
+        12175.4,
+        89
+      ],
+      [
+        12435.2,
+        94
+      ],
+      [
+        12693.7,
+        96
+      ],
+      [
+        12951.8,
+        98
+      ],
+      [
+        13211.3,
+        100
+      ],
+      [
+        13470.2,
+        106
+      ],
+      [
+        13729.7,
+        108
+      ],
+      [
+        13986.8,
+        110
+      ],
+      [
+        14245.7,
+        114
+      ],
+      [
+        14500.8,
+        117
+      ],
+      [
+        14757.6,
+        121
+      ],
+      [
+        15016.4,
+        123
+      ],
+      [
+        15280.4,
+        125
+      ],
+      [
+        15538.3,
+        127
+      ],
+      [
+        15825.8,
+        130
+      ],
+      [
+        16086.8,
+        133
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nJoining the robotics team in tenth grade was one of the best choices I ever made. Our first competition was a disaster because our robot stopped working in the middle of the match. I felt embarrassed, and I wanted to quit the team right then. Instead, our coach told us to figure out what went wrong and try again. We spent weeks testing every part until we found a loose wire in the motor. At our next competition, the robot worked perfectly and we made it to the finals. That experience taught me that failing is just part of getting better.\n\"\"\"\n\nThe writer tapped the word \"embarrassed\" in this sentence (marked with [[ ]]):\nI felt [[embarrassed]], and I wanted to quit the team right then.\n\nGive 10 replacements for \"embarrassed\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"embarrassed\" without changing the rest of the sentence. Do not repeat \"embarrassed\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 350,
+  "new_tokens": 46,
+  "finish_reason": "stop",
+  "error": null
+}

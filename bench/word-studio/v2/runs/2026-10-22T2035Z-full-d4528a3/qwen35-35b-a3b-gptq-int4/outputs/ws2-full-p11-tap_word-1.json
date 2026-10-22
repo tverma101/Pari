@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p11-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "e0a5def9b5d0733e487ea63756359c13c3b4879437f2c2d83bfc4ca0615d5d31",
+  "seed": 6011839581050711061,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"risky\", \"hazardous\", \"unsafe\", \"perilous\", \"treacherous\", \"harmful\", \"risky\", \"deleterious\", \"threatening\", \"feared\"]}",
+  "timing": {
+    "first_text_ms": 4790.9,
+    "option_ms": [
+      6358.3,
+      7678.7,
+      8469.6,
+      9795.4,
+      11106.2,
+      12418.4,
+      13476.1,
+      14843.7,
+      15892.5,
+      16945.9
+    ],
+    "total_ms": 17210.6,
+    "stream": [
+      [
+        4790.9,
+        2
+      ],
+      [
+        5051.7,
+        9
+      ],
+      [
+        5313.9,
+        11
+      ],
+      [
+        5574.2,
+        14
+      ],
+      [
+        5834.2,
+        15
+      ],
+      [
+        6093.0,
+        19
+      ],
+      [
+        6358.3,
+        21
+      ],
+      [
+        6617.1,
+        23
+      ],
+      [
+        6879.3,
+        24
+      ],
+      [
+        7142.3,
+        29
+      ],
+      [
+        7407.4,
+        32
+      ],
+      [
+        7678.7,
+        34
+      ],
+      [
+        7941.6,
+        36
+      ],
+      [
+        8207.6,
+        42
+      ],
+      [
+        8469.6,
+        44
+      ],
+      [
+        8738.8,
+        46
+      ],
+      [
+        9006.2,
+        49
+      ],
+      [
+        9274.2,
+        51
+      ],
+      [
+        9536.4,
+        54
+      ],
+      [
+        9795.4,
+        56
+      ],
+      [
+        10053.8,
+        58
+      ],
+      [
+        10320.0,
+        61
+      ],
+      [
+        10582.3,
+        66
+      ],
+      [
+        10845.6,
+        69
+      ],
+      [
+        11106.2,
+        71
+      ],
+      [
+        11368.1,
+        73
+      ],
+      [
+        11630.0,
+        74
+      ],
+      [
+        11893.8,
+        77
+      ],
+      [
+        12154.1,
+        80
+      ],
+      [
+        12418.4,
+        82
+      ],
+      [
+        12681.7,
+        84
+      ],
+      [
+        12945.6,
+        85
+      ],
+      [
+        13208.6,
+        89
+      ],
+      [
+        13476.1,
+        91
+      ],
+      [
+        13742.5,
+        93
+      ],
+      [
+        14037.7,
+        95
+      ],
+      [
+        14316.2,
+        100
+      ],
+      [
+        14579.2,
+        104
+      ],
+      [
+        14843.7,
+        106
+      ],
+      [
+        15104.0,
+        108
+      ],
+      [
+        15367.4,
+        114
+      ],
+      [
+        15629.6,
+        119
+      ],
+      [
+        15892.5,
+        121
+      ],
+      [
+        16155.2,
+        123
+      ],
+      [
+        16418.6,
+        125
+      ],
+      [
+        16681.1,
+        129
+      ],
+      [
+        16945.9,
+        132
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nDuring the Industrial Revolution, a lot of children worked in factories and mines instead of going to school. Some of them were only six or seven years old, and they often worked twelve hours a day. The conditions were very dangerous, and many children got hurt by the machines or became sick from breathing in dust. Factory owners liked hiring kids because they could pay them less money than adults. Over time, reformers wrote articles and gave speeches about how bad the situation was. In Britain, the Factory Act of 1833 finally set limits on how many hours children could work.\n\"\"\"\n\nThe writer tapped the word \"dangerous\" in this sentence (marked with [[ ]]):\nThe conditions were very [[dangerous]], and many children got hurt by the machines or became sick from breathing in dust.\n\nGive 10 replacements for \"dangerous\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"dangerous\" without changing the rest of the sentence. Do not repeat \"dangerous\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 358,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

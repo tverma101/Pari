@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-full-p15-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-35b-a3b-gptq-int4",
+  "messages_sha256": "e8c3e62513bf98ddd328835c79db59b73f98caf7b437030b9aa6b6f7e462552e",
+  "seed": 7518352634064456490,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"difficult\", \"challenging\", \"tough\", \"arduous\", \"severe\", \"formidable\", \"grueling\", \"exacting\", \"strenuous\", \"daunting\"]}",
+  "timing": {
+    "first_text_ms": 4657.7,
+    "option_ms": [
+      6277.3,
+      7567.3,
+      8603.8,
+      9648.5,
+      10680.0,
+      11716.2,
+      12751.1,
+      13787.3,
+      15086.0,
+      16160.7
+    ],
+    "total_ms": 16421.7,
+    "stream": [
+      [
+        4657.7,
+        2
+      ],
+      [
+        4919.5,
+        9
+      ],
+      [
+        5180.2,
+        11
+      ],
+      [
+        5457.9,
+        14
+      ],
+      [
+        5731.1,
+        18
+      ],
+      [
+        6019.6,
+        23
+      ],
+      [
+        6277.3,
+        25
+      ],
+      [
+        6535.7,
+        27
+      ],
+      [
+        6792.9,
+        29
+      ],
+      [
+        7052.1,
+        35
+      ],
+      [
+        7310.4,
+        38
+      ],
+      [
+        7567.3,
+        40
+      ],
+      [
+        7826.1,
+        42
+      ],
+      [
+        8084.6,
+        43
+      ],
+      [
+        8346.6,
+        47
+      ],
+      [
+        8603.8,
+        49
+      ],
+      [
+        8870.1,
+        51
+      ],
+      [
+        9131.2,
+        54
+      ],
+      [
+        9390.9,
+        58
+      ],
+      [
+        9648.5,
+        60
+      ],
+      [
+        9905.2,
+        62
+      ],
+      [
+        10165.9,
+        64
+      ],
+      [
+        10423.3,
+        68
+      ],
+      [
+        10680.0,
+        70
+      ],
+      [
+        10939.9,
+        72
+      ],
+      [
+        11200.2,
+        76
+      ],
+      [
+        11458.9,
+        82
+      ],
+      [
+        11716.2,
+        84
+      ],
+      [
+        11974.6,
+        86
+      ],
+      [
+        12234.8,
+        88
+      ],
+      [
+        12493.2,
+        94
+      ],
+      [
+        12751.1,
+        96
+      ],
+      [
+        13011.9,
+        98
+      ],
+      [
+        13271.7,
+        100
+      ],
+      [
+        13530.3,
+        106
+      ],
+      [
+        13787.3,
+        108
+      ],
+      [
+        14047.5,
+        110
+      ],
+      [
+        14308.4,
+        112
+      ],
+      [
+        14567.9,
+        115
+      ],
+      [
+        14826.2,
+        119
+      ],
+      [
+        15086.0,
+        121
+      ],
+      [
+        15350.0,
+        123
+      ],
+      [
+        15611.4,
+        125
+      ],
+      [
+        15894.7,
+        131
+      ],
+      [
+        16160.7,
+        134
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Of Mice and Men, George and Lennie share a dream of owning a small farm together. For George, the dream gives him a reason to keep working hard even though his life is lonely. For Lennie, it is mostly about getting to take care of rabbits. Most of the other workers on the ranch have no one, so they are surprised that the two men travel together. Steinbeck uses their friendship to show how important it is to have someone who cares about you. When the dream falls apart at the end, it shows how hard it was for poor workers to change their lives during the Great Depression.\n\"\"\"\n\nThe writer tapped the word \"hard\" in this sentence (marked with [[ ]]):\nWhen the dream falls apart at the end, it shows how [[hard]] it was for poor workers to change their lives during the Great Depression.\n\nGive 10 replacements for \"hard\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"hard\" without changing the rest of the sentence. Do not repeat \"hard\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 367,
+  "new_tokens": 46,
+  "finish_reason": "stop",
+  "error": null
+}
