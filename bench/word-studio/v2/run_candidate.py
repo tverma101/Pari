@@ -17,6 +17,7 @@ Rules this runner enforces:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import copy
 import hashlib
 import json
@@ -30,7 +31,7 @@ import time
 import traceback
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Iterable, Protocol
+from typing import Any, Callable, Iterable, Iterator, Protocol
 
 HERE = Path(__file__).resolve().parent
 WORD_STUDIO = HERE.parent
@@ -316,6 +317,10 @@ class TransformersBackend:
                 packages[name] = None
         env: dict[str, Any] = {"python": sys.version, "platform": platform.platform(), "packages": packages}
         try:
+            env["host_ram_bytes"] = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
+        except (AttributeError, OSError, ValueError):
+            env["host_ram_bytes"] = None
+        try:
             import torch
 
             env["cuda"] = torch.version.cuda
@@ -397,6 +402,43 @@ def checkpoint_coverage(model_names: Iterable[str], stored_names: Iterable[str],
     return missing, unused
 
 
+@contextlib.contextmanager
+def lazy_expert_shells() -> Iterator[None]:
+    """Split fused MoE experts without copying their placeholder values.
+
+    GPTQModel builds the float model on the CPU before swapping in the quantized
+    layers. Defuser splits each fused expert tensor into per-expert Linear layers
+    by copying it, which makes those never-initialised values resident: tens of
+    GB for a 35B MoE, more than Kaggle's host RAM (run
+    2026-10-22T1846Z-screen-94c5fca-limit2 was killed there). Here the split
+    happens on the meta device and each Linear gets an untouched CPU tensor
+    instead. The quantized layers replace them, and the coverage check still
+    fails the load if any is left unfilled.
+    """
+    import torch
+    from defuser.modeling import moe_experts_interface as experts
+
+    original = experts._unfuse_single_projection
+
+    def split(module, proj_name, *args, **kwargs):
+        fused = experts._get_registered_tensor(module, proj_name)
+        on_cpu = fused is not None and fused.device.type == "cpu"
+        if on_cpu:
+            experts._set_registered_tensor_like(module, proj_name, torch.empty_like(fused, device="meta"), fused)
+        linears = original(module, proj_name, *args, **kwargs)
+        for linear in (linears or []) if on_cpu else []:
+            for name, param in list(linear.named_parameters(recurse=False)):
+                setattr(linear, name, torch.nn.Parameter(torch.empty_like(param, device="cpu"),
+                                                         requires_grad=False))
+        return linears
+
+    experts._unfuse_single_projection = split
+    try:
+        yield
+    finally:
+        experts._unfuse_single_projection = original
+
+
 class GPTQModelBackend(TransformersBackend):
     """A GPTQ checkpoint loaded by GPTQModel, which splits the fused MoE experts Transformers would leave empty.
 
@@ -413,8 +455,9 @@ class GPTQModelBackend(TransformersBackend):
         from gptqmodel import GPTQModel
         from huggingface_hub import hf_hub_download
 
-        wrapped = GPTQModel.load(self.model_id, revision=self.revision, device_map=device_map, dtype=dtype,
-                                 trust_remote_code=False)
+        with lazy_expert_shells():
+            wrapped = GPTQModel.load(self.model_id, revision=self.revision, device_map=device_map, dtype=dtype,
+                                     trust_remote_code=False)
         model = wrapped.model
         index = hf_hub_download(self.model_id, "model.safetensors.index.json", revision=self.revision)
         stored = json.loads(Path(index).read_text(encoding="utf-8"))["weight_map"]

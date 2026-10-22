@@ -89,7 +89,11 @@ Transformers alone cannot fill its per-expert weights, so the launcher also
 installs GPTQModel for GPTQ candidates and the runner loads them with it. Since
 GPTQModel does not check for missing weights, the runner compares the loaded
 model with the checkpoint index itself. A model with any weight placed off the
-GPUs fails at load instead of running on the CPU. The reference answers whether
+GPUs fails at load instead of running on the CPU. GPTQModel builds a float
+shell on the CPU first, and splitting its fused experts copied about 43 GB of
+placeholder values, so the first smoke (`2026-10-22T1846Z-screen-94c5fca-limit2`)
+was killed for host RAM. The runner now does that split without the copy
+(`lazy_expert_shells`). The reference answers whether
 a big open model beats the best Mac-sized one by enough to justify
 distillation (#92). Judge it alone with anchors, like any new model.
 

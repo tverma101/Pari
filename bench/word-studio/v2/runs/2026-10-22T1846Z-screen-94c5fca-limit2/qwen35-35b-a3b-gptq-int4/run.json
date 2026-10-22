@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "benchmark": "word-studio-v2",
+  "candidate": {
+    "candidate_id": "qwen35-35b-a3b-gptq-int4",
+    "role": "kaggle_large_reference",
+    "family": "Qwen3.5",
+    "model_id": "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",
+    "revision": "3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b",
+    "parameter_count_billions_total": 35,
+    "parameter_count_billions_active": 3,
+    "upstream_weight_files_bytes": 24419939760,
+    "quantization": "GPTQ Int4",
+    "license": {
+      "spdx": "Apache-2.0",
+      "personal_use": "allowed_under_license_terms"
+    },
+    "mlx": {
+      "available": false,
+      "reason": "Reference is 35B total and outside the 16 GiB Mac candidate envelope."
+    },
+    "mac_fit_assessment": "outside_16_gib_candidate_envelope",
+    "kaggle_2xt4_assessment": "plausible_reference_not_run; 24.42 GB of quantized weights split across two T4s leaves estimated memory for a short-context smoke, but loading and generation are unverified",
+    "sources": [
+      {
+        "claim": "35B total/3B active parameter count, GPTQ Int4 format, Apache-2.0 license, and published vLLM support",
+        "url": "https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/tree/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b",
+        "metadata_url": "https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4?blobs=true",
+        "verified_on": "2026-10-16"
+      }
+    ],
+    "listed_in": "bench/candidates.json"
+  },
+  "task_set": "screen",
+  "task_file_sha256": "df7c32ee7e5945f832dc24fd073f5b693d0ffa40e4afeca7ed370ad4f24f24e8",
+  "manifest_sha256": "81e4e9b95b574e533b3782013d54eae84ec40eea82bd45d7ccc453610920f5b1",
+  "prompt_version": "ws2-prompts-v1",
+  "generation": {
+    "do_sample": true,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": 50,
+    "repetition_penalty": 1.0,
+    "samples_per_task": 1,
+    "seed": "first 8 bytes of sha256(task id), big-endian",
+    "thinking": "disabled: enable_thinking=False is passed to every chat template"
+  },
+  "task_limit": 2,
+  "tasks_planned": 2,
+  "repo": {
+    "sha": "94c5fca91c2cab1b30466857f4db0b5d03096ca5",
+    "dirty_paths": []
+  },
+  "status": "failed",
+  "stage": "load",
+  "started_at": "2026-10-22T18:48:00+00:00",
+  "finished_at": "2026-10-22T18:51:01+00:00",
+  "load": null,
+  "environment": null,
+  "tasks": {
+    "ok": 0,
+    "error": 0,
+    "failed_ids": []
+  },
+  "error": {
+    "type": "ProcessExit",
+    "message": "run_candidate exited with code -9",
+    "recorded_by": "kaggle/word-studio/kernel.py"
+  },
+  "scores": "none: this runner never scores; see v2/RUBRIC.md"
+}

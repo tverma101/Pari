@@ -1,0 +1,171 @@
+[{"stream_name":"stdout","time":5.341034617,"data":"$ git clone --quiet https://github.com/tverma101/Pari.git /tmp/Pari\n"}
+,{"stream_name":"stdout","time":11.529969698,"data":"$ git -C /tmp/Pari checkout --quiet 94c5fca91c2cab1b30466857f4db0b5d03096ca5\n"}
+,{"stream_name":"stdout","time":12.268045162,"data":"$ /usr/bin/python3 -m pip install --quiet transformers==5.18.0 accelerate==1.15.0 gptqmodel==7.5.0\n"}
+,{"stream_name":"stdout","time":13.977202338,"data":"     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 24.1 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":19.897943848,"data":"     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.0/62.0 kB 2.9 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":25.129043513,"data":"     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 218.5/218.5 kB 8.4 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":38.357481714,"data":"     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 116.1/116.1 kB 5.2 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":43.875480441,"data":"     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 65.4/65.4 kB 2.9 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":49.284499679,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.6/12.6 MB 93.8 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":49.320201453,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 394.3/394.3 kB 17.5 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":49.500422364,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.5/16.5 MB 81.5 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":49.536654839,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 846.4/846.4 kB 37.2 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":49.659812658999996,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.5/10.5 MB 94.8 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":49.696327305,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 343.2/343.2 kB 14.3 MB/s eta 0:00:00\n"}
+,{"stream_name":"stdout","time":49.753409969,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.4/3.4 MB 76.5 MB/s eta 0:00:00\n"}
+,{"stream_name":"stderr","time":81.752045889,"data":"ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n"}
+,{"stream_name":"stderr","time":81.752088542,"data":"bigframes 2.48.0 requires google-cloud-bigquery-storage\u003c3.0.0,\u003e=2.30.0, which is not installed.\n"}
+,{"stream_name":"stderr","time":81.752096294,"data":"grpcio-tools 1.71.2 requires protobuf\u003c6.0dev,\u003e=5.26.1, but you have protobuf 7.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":81.752101844,"data":"google-cloud-aiplatform 2.3.0 requires protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,\u003c7.0.0,\u003e=3.20.2, but you have protobuf 7.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":81.752107347,"data":"google-colab 1.0.0 requires jupyter-server==2.20.0, but you have jupyter-server 2.12.5 which is incompatible.\n"}
+,{"stream_name":"stderr","time":81.752121175,"data":"google-colab 1.0.0 requires pandas==2.2.3, but you have pandas 2.3.3 which is incompatible.\n"}
+,{"stream_name":"stderr","time":81.752124747,"data":"google-colab 1.0.0 requires requests==2.32.4, but you have requests 2.34.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":81.752128227,"data":"dopamine-rl 4.1.2 requires gym\u003c=0.25.2, but you have gym 0.26.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":81.752136699,"data":"moviepy 1.0.3 requires decorator\u003c5.0,\u003e=4.0.2, but you have decorator 5.3.1 which is incompatible.\n"}
+,{"stream_name":"stderr","time":81.752139735,"data":"google-ai-generativelanguage 0.6.15 requires protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,\u003c6.0.0dev,\u003e=3.20.2, but you have protobuf 7.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":81.752143246,"data":"ydf 0.15.0 requires protobuf\u003c7.0.0,\u003e=5.29.1, but you have protobuf 7.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":81.752145591,"data":"grpcio-status 1.71.2 requires protobuf\u003c6.0dev,\u003e=5.26.1, but you have protobuf 7.36.2 which is incompatible.\n"}
+,{"stream_name":"stdout","time":83.899644398,"data":"=== qwen35-35b-a3b-gptq-int4 ===\n"}
+,{"stream_name":"stdout","time":114.435450033,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stdout","time":117.105953067,"data":"\n"}
+,{"stream_name":"stdout","time":117.875304276,"data":"\n"}
+,{"stream_name":"stdout","time":117.8753359,"data":"INFO  LogBar: headless/CI mode; progress animations disabled.                   \n"}
+,{"stream_name":"stdout","time":117.881957858,"data":"\n"}
+,{"stream_name":"stdout","time":117.88197845,"data":"WARN  Python GIL is enabled: Multi-gpu quant acceleration for MoE models is sub-optimal and multi-core accelerated cpu packing is also disabled. We recommend Python \u003e= 3.13.3t with Pytorch \u003e 2.8 for mult-gpu quantization and multi-cpu packing with env `PYTHON_GIL=0`.\n"}
+,{"stream_name":"stdout","time":120.803137111,"data":"Failed to load /usr/local/lib/python3.13/dist-packages/torchao/_C_cutlass_90a.abi3.so: Could not load this library: /usr/local/lib/python3.13/dist-packages/torchao/_C_cutlass_90a.abi3.so\n"}
+,{"stream_name":"stdout","time":120.803733246,"data":"Failed to load /usr/local/lib/python3.13/dist-packages/torchao/_C_mxfp8.cpython-310-x86_64-linux-gnu.so: Could not load this library: /usr/local/lib/python3.13/dist-packages/torchao/_C_mxfp8.cpython-310-x86_64-linux-gnu.so\n"}
+,{"stream_name":"stdout","time":121.759993237,"data":"\n"}
+,{"stream_name":"stdout","time":121.760037615,"data":"INFO  ENV: Auto setting PYTORCH_ALLOC_CONF='expandable_segments:True,max_split_size_mb:256,garbage_collection_threshold:0.7' for memory saving.\n"}
+,{"stream_name":"stdout","time":121.760181397,"data":"\n"}
+,{"stream_name":"stdout","time":121.760190207,"data":"INFO  ENV: Auto setting CUDA_DEVICE_ORDER=PCI_BUS_ID for correctness.           \n"}
+,{"stream_name":"stdout","time":123.702987128,"data":"INFO:datasets:TensorFlow version 2.20.0 available.\n"}
+,{"stream_name":"stdout","time":123.705619308,"data":"INFO:datasets:JAX version 0.11.1 available.\n"}
+,{"stream_name":"stdout","time":125.199961916,"data":"\n"}
+,{"stream_name":"stdout","time":125.200004126,"data":"INFO  \n"}
+,{"stream_name":"stdout","time":125.200010196,"data":"\n"}
+,{"stream_name":"stdout","time":125.200014627,"data":"┌─────────────┐    ┌────────────────────────┐    ┌────────────┐    ┌─────────┐\n"}
+,{"stream_name":"stdout","time":125.200032054,"data":"│ GPT-QModel  │ -\u003e │ ▓▓▓▓▓▓▓▓▓▓▓▓ 16bit     │ -\u003e │ ▒▒▒▒ 8bit  │ -\u003e │ ░░ 4bit │\n"}
+,{"stream_name":"stdout","time":125.200042055,"data":"└─────────────┘    └────────────────────────┘    └────────────┘    └─────────┘\n"}
+,{"stream_name":"stdout","time":125.200044851,"data":"GPT-QModel   : 7.5.0\n"}
+,{"stream_name":"stdout","time":125.200047008,"data":"Transformers : 5.18.0\n"}
+,{"stream_name":"stdout","time":125.200049234,"data":"Torch        : 2.11.0+cu128\n"}
+,{"stream_name":"stdout","time":125.200051373,"data":"Triton       : 3.6.0\n"}
+,{"stream_name":"stdout","time":125.322017369,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/tree/main?recursive=true\u0026expand=false \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.408272417,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.426042786,"data":"from_quantized: adapter: None\n"}
+,{"stream_name":"stdout","time":125.507745163,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.626316356,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/tree/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b?recursive=true\u0026expand=false \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.627803461,"data":"\n"}
+,{"stream_name":"stdout","time":125.712519504,"data":"Fetching 28 files:   0%|          | 0/28 [00:00\u003c?, ?it/s]INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/.gitattributes \"HTTP/1.1 307 Temporary Redirect\"\n"}
+,{"stream_name":"stdout","time":125.725935208,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/.gitattributes?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2F.gitattributes=\u0026etag=%22aa7aacd0134a92c3c1943fdecc75cd8b7420cce6%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.734654421,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/generation_config.json \"HTTP/1.1 307 Temporary Redirect\"\n"}
+,{"stream_name":"stdout","time":125.736348184,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/configuration.json \"HTTP/1.1 307 Temporary Redirect\"\n"}
+,{"stream_name":"stdout","time":125.747309241,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/generation_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fgeneration_config.json=\u0026etag=%225ff346d6f85d566dd3e77105e91ce8dcfef766f0%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.748581961,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/configuration.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fconfiguration.json=\u0026etag=%223a6d425685de8896b2bc8b59b671e41aea1d7bf3%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.753126064,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/merges.txt \"HTTP/1.1 307 Temporary Redirect\"\n"}
+,{"stream_name":"stdout","time":125.754525072,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/README.md \"HTTP/1.1 307 Temporary Redirect\"\n"}
+,{"stream_name":"stdout","time":125.755973142,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/LICENSE \"HTTP/1.1 307 Temporary Redirect\"\n"}
+,{"stream_name":"stdout","time":125.765547189,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/merges.txt?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fmerges.txt=\u0026etag=%22a494e019ca1502219fd0128658b979e5f05ae8e8%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.767344867,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/README.md?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2FREADME.md=\u0026etag=%22aa663c238e43dd76271c4239019604965e396a53%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.768200322,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/LICENSE?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2FLICENSE=\u0026etag=%221d5180a42f1c3383ba7c7bd0a50f0837ef0168df%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.806738867,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/.gitattributes?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2F.gitattributes=\u0026etag=%22aa7aacd0134a92c3c1943fdecc75cd8b7420cce6%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.807836055,"data":"\n"}
+,{"stream_name":"stdout","time":125.829877251,"data":"Fetching 28 files:  11%|█         | 3/28 [00:00\u003c00:01, 16.67it/s]INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/generation_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fgeneration_config.json=\u0026etag=%225ff346d6f85d566dd3e77105e91ce8dcfef766f0%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.832385343,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/configuration.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fconfiguration.json=\u0026etag=%223a6d425685de8896b2bc8b59b671e41aea1d7bf3%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.852338283,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/LICENSE?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2FLICENSE=\u0026etag=%221d5180a42f1c3383ba7c7bd0a50f0837ef0168df%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.854148064,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/README.md?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2FREADME.md=\u0026etag=%22aa663c238e43dd76271c4239019604965e396a53%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.854771501,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/merges.txt?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fmerges.txt=\u0026etag=%22a494e019ca1502219fd0128658b979e5f05ae8e8%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":125.913466773,"data":"\n"}
+,{"stream_name":"stdout","time":144.503042265,"data":"Fetching 28 files:  29%|██▊       | 8/28 [00:00\u003c00:00, 30.66it/s]\n"}
+,{"stream_name":"stdout","time":179.986223168,"data":"Fetching 28 files:  29%|██▊       | 8/28 [00:18\u003c00:00, 30.66it/s]\n"}
+,{"stream_name":"stdout","time":180.101821541,"data":"Fetching 28 files:  32%|███▏      | 9/28 [00:54\u003c02:52,  9.08s/it]INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/preprocessor_config.json \"HTTP/1.1 307 Temporary Redirect\"\n"}
+,{"stream_name":"stdout","time":180.117727093,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/preprocessor_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fpreprocessor_config.json=\u0026etag=%222ea84a437d448ff71b08df68fdd949d5cc4ebb64%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":180.195594865,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/preprocessor_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fpreprocessor_config.json=\u0026etag=%222ea84a437d448ff71b08df68fdd949d5cc4ebb64%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":180.196773964,"data":"\n"}
+,{"stream_name":"stdout","time":180.278198999,"data":"Fetching 28 files:  61%|██████    | 17/28 [00:54\u003c00:34,  3.13s/it]INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/video_preprocessor_config.json \"HTTP/1.1 307 Temporary Redirect\"\n"}
+,{"stream_name":"stdout","time":180.290088135,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/video_preprocessor_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fvideo_preprocessor_config.json=\u0026etag=%223ba673a5ad7d4d13f54155ecd38b2a94a6dac8fe%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":180.381120942,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/video_preprocessor_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fvideo_preprocessor_config.json=\u0026etag=%223ba673a5ad7d4d13f54155ecd38b2a94a6dac8fe%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":180.461590227,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/vocab.json \"HTTP/1.1 307 Temporary Redirect\"\n"}
+,{"stream_name":"stdout","time":180.47456539,"data":"INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/vocab.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fvocab.json=\u0026etag=%220aa0ce0658d60ac4a5d609f4eadb0e8e43514176%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":180.56107194,"data":"INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/vocab.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fvocab.json=\u0026etag=%220aa0ce0658d60ac4a5d609f4eadb0e8e43514176%22 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stdout","time":180.650498755,"data":"\n"}
+,{"stream_name":"stdout","time":194.505794622,"data":"Fetching 28 files:  75%|███████▌  | 21/28 [00:55\u003c00:15,  2.17s/it]\n"}
+,{"stream_name":"stdout","time":244.261827508,"data":"Fetching 28 files:  79%|███████▊  | 22/28 [01:08\u003c00:13,  2.17s/it]\n"}
+,{"stream_name":"stdout","time":244.265200158,"data":"Fetching 28 files:  82%|████████▏ | 23/28 [01:58\u003c00:38,  7.67s/it]\n"}
+,{"stream_name":"stdout","time":244.265221086,"data":"Fetching 28 files: 100%|██████████| 28/28 [01:58\u003c00:00,  4.24s/it]\n"}
+,{"stream_name":"stdout","time":244.341120072,"data":"\n"}
+,{"stream_name":"stdout","time":244.341136274,"data":"INFO  QuantizeConfig: Ignoring unknown parameter in the quantization configuration: modules_to_not_convert.\n"}
+,{"stream_name":"stdout","time":244.344742504,"data":"\n"}
+,{"stream_name":"stdout","time":244.344757739,"data":"INFO  QuantizeConfig: `format` is missing from the quantization configuration and is automatically inferred to FORMAT.GPTQ\n"}
+,{"stream_name":"stdout","time":244.345335672,"data":"\n"}
+,{"stream_name":"stdout","time":244.345350383,"data":"INFO  QuantizeConfig: offload_to_disk_path auto set to temporary dir `/tmp/gptqmodel_0bwe7h28`\n"}
+,{"stream_name":"stdout","time":244.345645751,"data":"\n"}
+,{"stream_name":"stdout","time":244.345658317,"data":"INFO  Estimated Quantization BPW (bits per weight): 4.2875 bpw, based on [bits: 4, group_size: 128]\n"}
+,{"stream_name":"stdout","time":245.168919829,"data":"INFO:tokenicer.tokenicer:Tokenicer: Auto fixed pad_token_id=248044 (token='\u003c|endoftext|\u003e').\n"}
+,{"stream_name":"stdout","time":245.390463412,"data":"\n"}
+,{"stream_name":"stdout","time":245.390496179,"data":"INFO  Experts (before replacement) [model.language_model.layers.0.mlp.experts] (Qwen3_5MoeExperts):\n"}
+,{"stream_name":"stdout","time":245.390502458,"data":"Qwen3_5MoeExperts(\n"}
+,{"stream_name":"stdout","time":245.390507569,"data":"  (act_fn): SiLUActivation()\n"}
+,{"stream_name":"stdout","time":245.39051257,"data":")\n"}
+,{"stream_name":"stdout","time":245.391915247,"data":"\n"}
+,{"stream_name":"stdout","time":245.391937296,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":245.99383332,"data":"\n"}
+,{"stream_name":"stdout","time":245.993866537,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":246.882034146,"data":"\n"}
+,{"stream_name":"stdout","time":246.88206894,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":248.088222905,"data":"\n"}
+,{"stream_name":"stdout","time":248.088256073,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":248.661871533,"data":"\n"}
+,{"stream_name":"stdout","time":248.661904543,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":249.254795603,"data":"\n"}
+,{"stream_name":"stdout","time":249.254827946,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":250.420062209,"data":"\n"}
+,{"stream_name":"stdout","time":250.420120099,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":251.014227465,"data":"\n"}
+,{"stream_name":"stdout","time":251.014258902,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":251.630227708,"data":"\n"}
+,{"stream_name":"stdout","time":251.630257576,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":252.798613735,"data":"\n"}
+,{"stream_name":"stdout","time":252.798645615,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":253.383564199,"data":"\n"}
+,{"stream_name":"stdout","time":253.383596793,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":253.970842927,"data":"\n"}
+,{"stream_name":"stdout","time":253.97087443,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":255.147740524,"data":"\n"}
+,{"stream_name":"stdout","time":255.147786199,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":256.085645414,"data":"\n"}
+,{"stream_name":"stdout","time":256.085704204,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":256.692428653,"data":"\n"}
+,{"stream_name":"stdout","time":256.692465436,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":257.911805074,"data":"\n"}
+,{"stream_name":"stdout","time":257.911844679,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":258.532119021,"data":"\n"}
+,{"stream_name":"stdout","time":258.532150859,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":259.158262267,"data":"\n"}
+,{"stream_name":"stdout","time":259.158307878,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":260.339356668,"data":"\n"}
+,{"stream_name":"stdout","time":260.33939276,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":260.991795147,"data":"\n"}
+,{"stream_name":"stdout","time":260.991826471,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":261.668101819,"data":"\n"}
+,{"stream_name":"stdout","time":261.668133459,"data":"DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  \n"}
+,{"stream_name":"stdout","time":265.782721788,"data":"{\n"}
+,{"stream_name":"stdout","time":265.78275516,"data":"  \"qwen35-35b-a3b-gptq-int4\": {\n"}
+,{"stream_name":"stdout","time":265.782764139,"data":"    \"exit_code\": -9,\n"}
+,{"stream_name":"stdout","time":265.782767395,"data":"    \"status\": \"failed\",\n"}
+,{"stream_name":"stdout","time":265.782771708,"data":"    \"tasks\": {\n"}
+,{"stream_name":"stdout","time":265.782789372,"data":"      \"ok\": 0,\n"}
+,{"stream_name":"stdout","time":265.782795732,"data":"      \"error\": 0,\n"}
+,{"stream_name":"stdout","time":265.782800798,"data":"      \"failed_ids\": []\n"}
+,{"stream_name":"stdout","time":265.782816921,"data":"    },\n"}
+,{"stream_name":"stdout","time":265.782820566,"data":"    \"error\": \"run_candidate exited with code -9\",\n"}
+,{"stream_name":"stdout","time":265.782824326,"data":"    \"wall_seconds\": 181.8\n"}
+,{"stream_name":"stdout","time":265.782827858,"data":"  }\n"}
+,{"stream_name":"stdout","time":265.782831226,"data":"}\n"}
+,{"stream_name":"stderr","time":268.568787947,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":268.568837687,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":270.915428206,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":270.91545278,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":272.690512271,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":273.779789436,"data":"[NbConvertApp] Writing 303256 bytes to __results__.html\n"}
+]

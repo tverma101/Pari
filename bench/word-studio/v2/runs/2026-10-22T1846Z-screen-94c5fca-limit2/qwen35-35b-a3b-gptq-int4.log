@@ -1,0 +1,123 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+
+INFO  LogBar: headless/CI mode; progress animations disabled.                   
+
+WARN  Python GIL is enabled: Multi-gpu quant acceleration for MoE models is sub-optimal and multi-core accelerated cpu packing is also disabled. We recommend Python >= 3.13.3t with Pytorch > 2.8 for mult-gpu quantization and multi-cpu packing with env `PYTHON_GIL=0`.
+Failed to load /usr/local/lib/python3.13/dist-packages/torchao/_C_cutlass_90a.abi3.so: Could not load this library: /usr/local/lib/python3.13/dist-packages/torchao/_C_cutlass_90a.abi3.so
+Failed to load /usr/local/lib/python3.13/dist-packages/torchao/_C_mxfp8.cpython-310-x86_64-linux-gnu.so: Could not load this library: /usr/local/lib/python3.13/dist-packages/torchao/_C_mxfp8.cpython-310-x86_64-linux-gnu.so
+
+INFO  ENV: Auto setting PYTORCH_ALLOC_CONF='expandable_segments:True,max_split_size_mb:256,garbage_collection_threshold:0.7' for memory saving.
+
+INFO  ENV: Auto setting CUDA_DEVICE_ORDER=PCI_BUS_ID for correctness.           
+INFO:datasets:TensorFlow version 2.20.0 available.
+INFO:datasets:JAX version 0.11.1 available.
+
+INFO  
+
+┌─────────────┐    ┌────────────────────────┐    ┌────────────┐    ┌─────────┐
+│ GPT-QModel  │ -> │ ▓▓▓▓▓▓▓▓▓▓▓▓ 16bit     │ -> │ ▒▒▒▒ 8bit  │ -> │ ░░ 4bit │
+└─────────────┘    └────────────────────────┘    └────────────┘    └─────────┘
+GPT-QModel   : 7.5.0
+Transformers : 5.18.0
+Torch        : 2.11.0+cu128
+Triton       : 3.6.0
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 "HTTP/1.1 200 OK"
+from_quantized: adapter: None
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/tree/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b?recursive=true&expand=false "HTTP/1.1 200 OK"
+
+Fetching 28 files:   0%|          | 0/28 [00:00<?, ?it/s]INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/.gitattributes "HTTP/1.1 307 Temporary Redirect"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/.gitattributes?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2F.gitattributes=&etag=%22aa7aacd0134a92c3c1943fdecc75cd8b7420cce6%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/generation_config.json "HTTP/1.1 307 Temporary Redirect"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/configuration.json "HTTP/1.1 307 Temporary Redirect"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/generation_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fgeneration_config.json=&etag=%225ff346d6f85d566dd3e77105e91ce8dcfef766f0%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/configuration.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fconfiguration.json=&etag=%223a6d425685de8896b2bc8b59b671e41aea1d7bf3%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/merges.txt "HTTP/1.1 307 Temporary Redirect"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/README.md "HTTP/1.1 307 Temporary Redirect"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/LICENSE "HTTP/1.1 307 Temporary Redirect"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/merges.txt?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fmerges.txt=&etag=%22a494e019ca1502219fd0128658b979e5f05ae8e8%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/README.md?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2FREADME.md=&etag=%22aa663c238e43dd76271c4239019604965e396a53%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/LICENSE?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2FLICENSE=&etag=%221d5180a42f1c3383ba7c7bd0a50f0837ef0168df%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/.gitattributes?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2F.gitattributes=&etag=%22aa7aacd0134a92c3c1943fdecc75cd8b7420cce6%22 "HTTP/1.1 200 OK"
+
+Fetching 28 files:  11%|█         | 3/28 [00:00<00:01, 16.67it/s]INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/generation_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fgeneration_config.json=&etag=%225ff346d6f85d566dd3e77105e91ce8dcfef766f0%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/configuration.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fconfiguration.json=&etag=%223a6d425685de8896b2bc8b59b671e41aea1d7bf3%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/LICENSE?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2FLICENSE=&etag=%221d5180a42f1c3383ba7c7bd0a50f0837ef0168df%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/README.md?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2FREADME.md=&etag=%22aa663c238e43dd76271c4239019604965e396a53%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/merges.txt?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fmerges.txt=&etag=%22a494e019ca1502219fd0128658b979e5f05ae8e8%22 "HTTP/1.1 200 OK"
+
+Fetching 28 files:  29%|██▊       | 8/28 [00:00<00:00, 30.66it/s]
+Fetching 28 files:  29%|██▊       | 8/28 [00:18<00:00, 30.66it/s]
+Fetching 28 files:  32%|███▏      | 9/28 [00:54<02:52,  9.08s/it]INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/preprocessor_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fpreprocessor_config.json=&etag=%222ea84a437d448ff71b08df68fdd949d5cc4ebb64%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/preprocessor_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fpreprocessor_config.json=&etag=%222ea84a437d448ff71b08df68fdd949d5cc4ebb64%22 "HTTP/1.1 200 OK"
+
+Fetching 28 files:  61%|██████    | 17/28 [00:54<00:34,  3.13s/it]INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/video_preprocessor_config.json "HTTP/1.1 307 Temporary Redirect"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/video_preprocessor_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fvideo_preprocessor_config.json=&etag=%223ba673a5ad7d4d13f54155ecd38b2a94a6dac8fe%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/video_preprocessor_config.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fvideo_preprocessor_config.json=&etag=%223ba673a5ad7d4d13f54155ecd38b2a94a6dac8fe%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/resolve/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/vocab.json "HTTP/1.1 307 Temporary Redirect"
+INFO:httpx:HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/vocab.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fvocab.json=&etag=%220aa0ce0658d60ac4a5d609f4eadb0e8e43514176%22 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://huggingface.co/api/resolve-cache/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b/vocab.json?%2FQwen%2FQwen3.5-35B-A3B-GPTQ-Int4%2Fresolve%2F3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b%2Fvocab.json=&etag=%220aa0ce0658d60ac4a5d609f4eadb0e8e43514176%22 "HTTP/1.1 200 OK"
+
+Fetching 28 files:  75%|███████▌  | 21/28 [00:55<00:15,  2.17s/it]
+Fetching 28 files:  79%|███████▊  | 22/28 [01:08<00:13,  2.17s/it]
+Fetching 28 files:  82%|████████▏ | 23/28 [01:58<00:38,  7.67s/it]
+Fetching 28 files: 100%|██████████| 28/28 [01:58<00:00,  4.24s/it]
+
+INFO  QuantizeConfig: Ignoring unknown parameter in the quantization configuration: modules_to_not_convert.
+
+INFO  QuantizeConfig: `format` is missing from the quantization configuration and is automatically inferred to FORMAT.GPTQ
+
+INFO  QuantizeConfig: offload_to_disk_path auto set to temporary dir `/tmp/gptqmodel_0bwe7h28`
+
+INFO  Estimated Quantization BPW (bits per weight): 4.2875 bpw, based on [bits: 4, group_size: 128]
+INFO:tokenicer.tokenicer:Tokenicer: Auto fixed pad_token_id=248044 (token='<|endoftext|>').
+
+INFO  Experts (before replacement) [model.language_model.layers.0.mlp.experts] (Qwen3_5MoeExperts):
+Qwen3_5MoeExperts(
+  (act_fn): SiLUActivation()
+)
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
+
+DEBUG Skipping unfuse for Conv1d: does not support @use_experts_implementation  
