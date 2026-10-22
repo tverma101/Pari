@@ -1,0 +1,35 @@
+{
+  "config": {
+    "candidates": [
+      "qwen35-35b-a3b-gptq-int4"
+    ],
+    "dtype": "float16",
+    "git_sha": "ac3f270c5b3f1d466a4967c9661f5eaa7b56c657",
+    "limit": 2,
+    "per_candidate_timeout_s": 7200,
+    "pip": [
+      "transformers==5.18.0",
+      "accelerate==1.15.0",
+      "gptqmodel==7.5.0"
+    ],
+    "repo_url": "https://github.com/tverma101/Pari.git",
+    "run_id": "2026-10-22T1859Z-screen-ac3f270-limit2",
+    "task_set": "screen"
+  },
+  "git_head": "ac3f270c5b3f1d466a4967c9661f5eaa7b56c657",
+  "started_at": "2026-10-22T19:00:29+00:00",
+  "candidates": {
+    "qwen35-35b-a3b-gptq-int4": {
+      "exit_code": 2,
+      "status": "failed",
+      "tasks": {
+        "ok": 0,
+        "error": 0,
+        "failed_ids": []
+      },
+      "error": "Marlin torch.ops kernels are not properly installed. Error: Marlin fp16: failed to build torch.ops JIT extension: Error building extension 'gptqmodel_marlin_fp16_ops': [1/10] c++ -MMD -MF marlin_torch_fp16.o.d -DTORCH_EXTENSION_NAME=gptqmodel_marlin_fp16_ops -DTORCH_API_INCLUDE_EXTENSION_H -I/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin -isystem /usr/local/lib/python3.13/dist-packages/torch/include -isystem /usr/local/lib/python3.13/dist-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -isystem /usr/include/python3.13 -fPIC -std=c++17 -O3 -std=c++17 -DENABLE_BF16 -D_GLIBCXX_USE_CXX11_ABI=1 -c /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_torch_fp16.cpp -o marlin_torch_fp16.o \n[2/10] /usr/local/cuda/bin/nvcc -MD -MF kernel_fp16_kfe4m3fn.cuda.o.d -DTORCH_EXTENSION_NAME=gptqmodel_marlin_fp16_ops -DTORCH_API_INCLUDE_EXTENSION_H -I/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin -isystem /usr/local/lib/python3.13/dist-packages/torch/include -isystem /usr/local/lib/python3.13/dist-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -isystem /usr/include/python3.13 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ --expt-relaxed-constexpr -gencode=arch=compute_75,code=compute_75 -gencode=arch=compute_75,code=sm_75 --compiler-options '-fPIC' -static-global-template-stub=false -O3 -std=c++17 -DENABLE_BF16 -D_GLIBCXX_USE_CXX11_ABI=1 --threads 8 --optimize=3 -Xptxas -O3,-dlcm=ca -lineinfo -Xfatbin -compress-all -diag-suppress=179,39,177 -c /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_kfe4m3fn.cu -o kernel_fp16_kfe4m3fn.cuda.o \nFAILED: [code=255] kernel_fp16_kfe4m3fn.cuda.o \n/usr/local/cuda/bin/nvcc -MD -MF kernel_fp16_kfe4m3fn.cuda.o.d -DTORCH_EXTENSION_NAME=gptqmodel_marlin_fp16_ops -DTORCH_API_INCLUDE_EXTENSION_H -I/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin -isystem /usr/local/lib/python3.13/dist-packages/torch/include -isystem /usr/local/lib/python3.13/dist-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -isystem /usr/include/python3.13 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ --expt-relaxed-constexpr -gencode=arch=compute_75,code=compute_75 -gencode=arch=compute_75,code=sm_75 --compiler-options '-fPIC' -static-global-template-stub=false -O3 -std=c++17 -DENABLE_BF16 -D_GLIBCXX_USE_CXX11_ABI=1 --threads 8 --optimize=3 -Xptxas -O3,-dlcm=ca -lineinfo -Xfatbin -compress-all -diag-suppress=179,39,177 -c /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_kfe4m3fn.cu -o kernel_fp16_kfe4m3fn.cuda.o \n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): error: identifier \"dequant\" is undefined\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n      ^\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): error: type name is not allowed\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n              ^\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1144): error: identifier \"dequant_fp8_scales\" is undefined\n        dequant_fp8_scales<scalar_t2, s_type_id>(\n        ^\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1144): error: type name is not allowed\n        dequant_fp8_scales<scalar_t2, s_type_id>(\n                           ^\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1146): error: type name is not allowed\n        dequant_fp8_scales<scalar_t2, s_type_id>(\n                           ^\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): warning #174-D: expression has no effect\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n   ",
+      "wall_seconds": 410.8
+    }
+  },
+  "finished_at": "2026-10-22T19:07:20+00:00"
+}

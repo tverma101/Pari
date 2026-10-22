@@ -450,6 +450,9 @@ class GPTQModelBackend(TransformersBackend):
     KERNEL_BUFFERS = ("g_idx_sort_indices", "workspace")
     #: Checkpoint tensors generation never uses: the multi-token-prediction head.
     UNUSED_PREFIXES = ("mtp.",)
+    #: GPTQModel 7.5.0 picks Marlin, whose sm75 build fails on the T4 (run
+    #: 2026-10-22T1859Z-screen-ac3f270-limit2); ExLlamaV2 compiled there.
+    KERNEL = "gptq_exllama_v2"
 
     def load_weights(self, dtype: Any, device_map: Any) -> tuple[Any, list[str], int, dict[str, Any]]:
         from gptqmodel import GPTQModel
@@ -457,7 +460,7 @@ class GPTQModelBackend(TransformersBackend):
 
         with lazy_expert_shells():
             wrapped = GPTQModel.load(self.model_id, revision=self.revision, device_map=device_map, dtype=dtype,
-                                     trust_remote_code=False)
+                                     backend=self.KERNEL, trust_remote_code=False)
         model = wrapped.model
         index = hf_hub_download(self.model_id, "model.safetensors.index.json", revision=self.revision)
         stored = json.loads(Path(index).read_text(encoding="utf-8"))["weight_map"]

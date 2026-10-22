@@ -93,7 +93,9 @@ GPUs fails at load instead of running on the CPU. GPTQModel builds a float
 shell on the CPU first, and splitting its fused experts copied about 43 GB of
 placeholder values, so the first smoke (`2026-10-22T1846Z-screen-94c5fca-limit2`)
 was killed for host RAM. The runner now does that split without the copy
-(`lazy_expert_shells`). The reference answers whether
+(`lazy_expert_shells`). The second smoke (`2026-10-22T1859Z-screen-ac3f270-limit2`)
+loaded past that, but GPTQModel's default Marlin kernel does not compile for
+the T4, so the runner asks for the ExLlamaV2 kernel. The reference answers whether
 a big open model beats the best Mac-sized one by enough to justify
 distillation (#92). Judge it alone with anchors, like any new model.
 

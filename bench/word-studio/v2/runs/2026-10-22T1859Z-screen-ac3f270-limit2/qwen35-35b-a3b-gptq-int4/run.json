@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "benchmark": "word-studio-v2",
+  "candidate": {
+    "candidate_id": "qwen35-35b-a3b-gptq-int4",
+    "role": "kaggle_large_reference",
+    "family": "Qwen3.5",
+    "model_id": "Qwen/Qwen3.5-35B-A3B-GPTQ-Int4",
+    "revision": "3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b",
+    "parameter_count_billions_total": 35,
+    "parameter_count_billions_active": 3,
+    "upstream_weight_files_bytes": 24419939760,
+    "quantization": "GPTQ Int4",
+    "license": {
+      "spdx": "Apache-2.0",
+      "personal_use": "allowed_under_license_terms"
+    },
+    "mlx": {
+      "available": false,
+      "reason": "Reference is 35B total and outside the 16 GiB Mac candidate envelope."
+    },
+    "mac_fit_assessment": "outside_16_gib_candidate_envelope",
+    "kaggle_2xt4_assessment": "plausible_reference_not_run; 24.42 GB of quantized weights split across two T4s leaves estimated memory for a short-context smoke, but loading and generation are unverified",
+    "sources": [
+      {
+        "claim": "35B total/3B active parameter count, GPTQ Int4 format, Apache-2.0 license, and published vLLM support",
+        "url": "https://huggingface.co/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4/tree/3af5ca2972faf6de1fd6f4efc4d8d319ca751e8b",
+        "metadata_url": "https://huggingface.co/api/models/Qwen/Qwen3.5-35B-A3B-GPTQ-Int4?blobs=true",
+        "verified_on": "2026-10-16"
+      }
+    ],
+    "listed_in": "bench/candidates.json"
+  },
+  "task_set": "screen",
+  "task_file_sha256": "df7c32ee7e5945f832dc24fd073f5b693d0ffa40e4afeca7ed370ad4f24f24e8",
+  "manifest_sha256": "81e4e9b95b574e533b3782013d54eae84ec40eea82bd45d7ccc453610920f5b1",
+  "prompt_version": "ws2-prompts-v1",
+  "generation": {
+    "do_sample": true,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": 50,
+    "repetition_penalty": 1.0,
+    "samples_per_task": 1,
+    "seed": "first 8 bytes of sha256(task id), big-endian",
+    "thinking": "disabled: enable_thinking=False is passed to every chat template"
+  },
+  "task_limit": 2,
+  "tasks_planned": 2,
+  "repo": {
+    "sha": "ac3f270c5b3f1d466a4967c9661f5eaa7b56c657",
+    "dirty_paths": []
+  },
+  "status": "failed",
+  "stage": "load",
+  "started_at": "2026-10-22T19:00:30+00:00",
+  "finished_at": "2026-10-22T19:07:12+00:00",
+  "load": null,
+  "environment": {
+    "python": "3.13.15 (main, Aug  6 2026, 11:06:22) [GCC 13.3.0]",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "packages": {
+      "torch": "2.11.0+cu128",
+      "transformers": "5.18.0",
+      "accelerate": "1.15.0",
+      "tokenizers": "0.23.1",
+      "huggingface_hub": "1.33.0",
+      "safetensors": "0.8.0",
+      "gptqmodel": "7.5.0"
+    },
+    "host_ram_bytes": 33658314752,
+    "cuda": "12.8",
+    "gpus": [
+      "Tesla T4",
+      "Tesla T4"
+    ],
+    "peak_memory": {
+      "cuda:0": 0,
+      "cuda:1": 0
+    },
+    "nvidia_smi": [
+      "Tesla T4, 15360 MiB, 580.178.04",
+      "Tesla T4, 15360 MiB, 580.178.04"
+    ]
+  },
+  "tasks": {
+    "ok": 0,
+    "error": 0,
+    "failed_ids": []
+  },
+  "error": {
+    "type": "ModuleNotFoundError",
+    "message": "Marlin torch.ops kernels are not properly installed. Error: Marlin fp16: failed to build torch.ops JIT extension: Error building extension 'gptqmodel_marlin_fp16_ops': [1/10] c++ -MMD -MF marlin_torch_fp16.o.d -DTORCH_EXTENSION_NAME=gptqmodel_marlin_fp16_ops -DTORCH_API_INCLUDE_EXTENSION_H -I/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin -isystem /usr/local/lib/python3.13/dist-packages/torch/include -isystem /usr/local/lib/python3.13/dist-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -isystem /usr/include/python3.13 -fPIC -std=c++17 -O3 -std=c++17 -DENABLE_BF16 -D_GLIBCXX_USE_CXX11_ABI=1 -c /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_torch_fp16.cpp -o marlin_torch_fp16.o \n[2/10] /usr/local/cuda/bin/nvcc -MD -MF kernel_fp16_kfe4m3fn.cuda.o.d -DTORCH_EXTENSION_NAME=gptqmodel_marlin_fp16_ops -DTORCH_API_INCLUDE_EXTENSION_H -I/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin -isystem /usr/local/lib/python3.13/dist-packages/torch/include -isystem /usr/local/lib/python3.13/dist-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -isystem /usr/include/python3.13 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ --expt-relaxed-constexpr -gencode=arch=compute_75,code=compute_75 -gencode=arch=compute_75,code=sm_75 --compiler-options '-fPIC' -static-global-template-stub=false -O3 -std=c++17 -DENABLE_BF16 -D_GLIBCXX_USE_CXX11_ABI=1 --threads 8 --optimize=3 -Xptxas -O3,-dlcm=ca -lineinfo -Xfatbin -compress-all -diag-suppress=179,39,177 -c /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_kfe4m3fn.cu -o kernel_fp16_kfe4m3fn.cuda.o \nFAILED: [code=255] kernel_fp16_kfe4m3fn.cuda.o \n/usr/local/cuda/bin/nvcc -MD -MF kernel_fp16_kfe4m3fn.cuda.o.d -DTORCH_EXTENSION_NAME=gptqmodel_marlin_fp16_ops -DTORCH_API_INCLUDE_EXTENSION_H -I/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin -isystem /usr/local/lib/python3.13/dist-packages/torch/include -isystem /usr/local/lib/python3.13/dist-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -isystem /usr/include/python3.13 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ --expt-relaxed-constexpr -gencode=arch=compute_75,code=compute_75 -gencode=arch=compute_75,code=sm_75 --compiler-options '-fPIC' -static-global-template-stub=false -O3 -std=c++17 -DENABLE_BF16 -D_GLIBCXX_USE_CXX11_ABI=1 --threads 8 --optimize=3 -Xptxas -O3,-dlcm=ca -lineinfo -Xfatbin -compress-all -diag-suppress=179,39,177 -c /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_kfe4m3fn.cu -o kernel_fp16_kfe4m3fn.cuda.o \n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): error: identifier \"dequant\" is undefined\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n      ^\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): error: type name is not allowed\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n              ^\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1144): error: identifier \"dequant_fp8_scales\" is undefined\n        dequant_fp8_scales<scalar_t2, s_type_id>(\n        ^\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1144): error: type name is not allowed\n        dequant_fp8_scales<scalar_t2, s_type_id>(\n                           ^\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1146): error: type name is not allowed\n        dequant_fp8_scales<scalar_t2, s_type_id>(\n                           ^\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): warning #174-D: expression has no effect\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n   ",
+    "traceback": "hread_n_blocks=8, thread_k_blocks=4, m_block_size_8=false, stages=4, group_blocks=4, is_zp_float=false]\" at line 101 of /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_ku4.cu\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): warning #174-D: expression has no effect\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n                                                       ^\n          detected during instantiation of \"void marlin::Marlin<scalar_t,w_type_id,s_type_id,threads,thread_m_blocks,thread_n_blocks,thread_k_blocks,m_block_size_8,stages,group_blocks,is_zp_float>(const int4 *, const int4 *, int4 *, int4 *, const int4 *, const int4 *, const float *, const int4 *, const int *, int, int, int, int, int, int *, __nv_bool, __nv_bool, __nv_bool, int) [with scalar_t=half, w_type_id=1125899906843648L, s_type_id=1125899906910725L, threads=128, thread_m_blocks=3, thread_n_blocks=8, thread_k_blocks=4, m_block_size_8=false, stages=4, group_blocks=4, is_zp_float=true]\" at line 102 of /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_ku4.cu\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): error: operand types are incompatible (\"__nv_bool\" and \"scalar_t2 *\" (aka \"__half2 *\"))\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n                                                     ^\n          detected during instantiation of \"void marlin::Marlin<scalar_t,w_type_id,s_type_id,threads,thread_m_blocks,thread_n_blocks,thread_k_blocks,m_block_size_8,stages,group_blocks,is_zp_float>(const int4 *, const int4 *, int4 *, int4 *, const int4 *, const int4 *, const float *, const int4 *, const int *, int, int, int, int, int, int *, __nv_bool, __nv_bool, __nv_bool, int) [with scalar_t=half, w_type_id=1125899906843648L, s_type_id=1125899906910725L, threads=128, thread_m_blocks=3, thread_n_blocks=8, thread_k_blocks=4, m_block_size_8=false, stages=4, group_blocks=4, is_zp_float=true]\" at line 102 of /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_ku4.cu\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): warning #174-D: expression has no effect\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n                                                       ^\n          detected during instantiation of \"void marlin::Marlin<scalar_t,w_type_id,s_type_id,threads,thread_m_blocks,thread_n_blocks,thread_k_blocks,m_block_size_8,stages,group_blocks,is_zp_float>(const int4 *, const int4 *, int4 *, int4 *, const int4 *, const int4 *, const float *, const int4 *, const int *, int, int, int, int, int, int *, __nv_bool, __nv_bool, __nv_bool, int) [with scalar_t=half, w_type_id=1125899906843648L, s_type_id=1125899906910725L, threads=128, thread_m_blocks=3, thread_n_blocks=4, thread_k_blocks=8, m_block_size_8=false, stages=2, group_blocks=4, is_zp_float=false]\" at line 103 of /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_ku4.cu\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): error: operand types are incompatible (\"__nv_bool\" and \"scalar_t2 *\" (aka \"__half2 *\"))\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n                                                     ^\n          detected during instantiation of \"void marlin::Marlin<scalar_t,w_type_id,s_type_id,threads,thread_m_blocks,thread_n_blocks,thread_k_blocks,m_block_size_8,stages,group_blocks,is_zp_float>(const int4 *, const int4 *, int4 *, int4 *, const int4 *, const int4 *, const float *, const int4 *, const int *, int, int, int, int, int, int *, __nv_bool, __nv_bool, __nv_bool, int) [with scalar_t=half, w_type_id=1125899906843648L, s_type_id=1125899906910725L, threads=128, thread_m_blocks=3, thread_n_blocks=4, thread_k_blocks=8, m_block_size_8=false, stages=2, group_blocks=4, is_zp_float=false]\" at line 103 of /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_ku4.cu\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): warning #174-D: expression has no effect\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n                                                       ^\n          detected during instantiation of \"void marlin::Marlin<scalar_t,w_type_id,s_type_id,threads,thread_m_blocks,thread_n_blocks,thread_k_blocks,m_block_size_8,stages,group_blocks,is_zp_float>(const int4 *, const int4 *, int4 *, int4 *, const int4 *, const int4 *, const float *, const int4 *, const int *, int, int, int, int, int, int *, __nv_bool, __nv_bool, __nv_bool, int) [with scalar_t=half, w_type_id=1125899906843648L, s_type_id=1125899906910725L, threads=128, thread_m_blocks=3, thread_n_blocks=4, thread_k_blocks=8, m_block_size_8=false, stages=4, group_blocks=4, is_zp_float=false]\" at line 104 of /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_ku4.cu\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): error: operand types are incompatible (\"__nv_bool\" and \"scalar_t2 *\" (aka \"__half2 *\"))\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n                                                     ^\n          detected during instantiation of \"void marlin::Marlin<scalar_t,w_type_id,s_type_id,threads,thread_m_blocks,thread_n_blocks,thread_k_blocks,m_block_size_8,stages,group_blocks,is_zp_float>(const int4 *, const int4 *, int4 *, int4 *, const int4 *, const int4 *, const float *, const int4 *, const int *, int, int, int, int, int, int *, __nv_bool, __nv_bool, __nv_bool, int) [with scalar_t=half, w_type_id=1125899906843648L, s_type_id=1125899906910725L, threads=128, thread_m_blocks=3, thread_n_blocks=4, thread_k_blocks=8, m_block_size_8=false, stages=4, group_blocks=4, is_zp_float=false]\" at line 104 of /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_ku4.cu\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): warning #174-D: expression has no effect\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n                                                       ^\n          detected during instantiation of \"void marlin::Marlin<scalar_t,w_type_id,s_type_id,threads,thread_m_blocks,thread_n_blocks,thread_k_blocks,m_block_size_8,stages,group_blocks,is_zp_float>(const int4 *, const int4 *, int4 *, int4 *, const int4 *, const int4 *, const float *, const int4 *, const int *, int, int, int, int, int, int *, __nv_bool, __nv_bool, __nv_bool, int) [with scalar_t=half, w_type_id=1125899906843648L, s_type_id=1125899906910725L, threads=128, thread_m_blocks=3, thread_n_blocks=4, thread_k_blocks=8, m_block_size_8=false, stages=2, group_blocks=4, is_zp_float=true]\" at line 105 of /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_ku4.cu\n\n/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/marlin_template.h(1105): error: operand types are incompatible (\"__nv_bool\" and \"scalar_t2 *\" (aka \"__half2 *\"))\n      dequant<scalar_t2, w_type_id, dequant_skip_flop>(q, frag_b_ptr);\n                                                     ^\n          detected during instantiation of \"void marlin::Marlin<scalar_t,w_type_id,s_type_id,threads,thread_m_blocks,thread_n_blocks,thread_k_blocks,m_block_size_8,stages,group_blocks,is_zp_float>(const int4 *, const int4 *, int4 *, int4 *, const int4 *, const int4 *, const float *, const int4 *, const int *, int, int, int, int, int, int *, __nv_bool, __nv_bool, __nv_bool, int) [with scalar_t=half, w_type_id=1125899906843648L, s_type_id=1125899906910725L, threads=128, thread_m_blocks=3, thread_n_blocks=4, thread_k_blocks=8, m_block_size_8=false, stages=2, group_blocks=4, is_zp_float=true]\" at line 105 of /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_ku4.cu\n\nError limit reached.\n100 errors detected in the compilation of \"/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/kernel_fp16_ku4.cu\".\nCompilation terminated.\n[5/10] /usr/local/cuda/bin/nvcc -MD -MF awq_marlin_repack.cuda.o.d -DTORCH_EXTENSION_NAME=gptqmodel_marlin_fp16_ops -DTORCH_API_INCLUDE_EXTENSION_H -I/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin -isystem /usr/local/lib/python3.13/dist-packages/torch/include -isystem /usr/local/lib/python3.13/dist-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -isystem /usr/include/python3.13 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ --expt-relaxed-constexpr -gencode=arch=compute_75,code=compute_75 -gencode=arch=compute_75,code=sm_75 --compiler-options '-fPIC' -static-global-template-stub=false -O3 -std=c++17 -DENABLE_BF16 -D_GLIBCXX_USE_CXX11_ABI=1 --threads 8 --optimize=3 -Xptxas -O3,-dlcm=ca -lineinfo -Xfatbin -compress-all -diag-suppress=179,39,177 -c /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/awq_marlin_repack.cu -o awq_marlin_repack.cuda.o \n[6/10] /usr/local/cuda/bin/nvcc -MD -MF gptq_marlin_repack.cuda.o.d -DTORCH_EXTENSION_NAME=gptqmodel_marlin_fp16_ops -DTORCH_API_INCLUDE_EXTENSION_H -I/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin -isystem /usr/local/lib/python3.13/dist-packages/torch/include -isystem /usr/local/lib/python3.13/dist-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -isystem /usr/include/python3.13 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ --expt-relaxed-constexpr -gencode=arch=compute_75,code=compute_75 -gencode=arch=compute_75,code=sm_75 --compiler-options '-fPIC' -static-global-template-stub=false -O3 -std=c++17 -DENABLE_BF16 -D_GLIBCXX_USE_CXX11_ABI=1 --threads 8 --optimize=3 -Xptxas -O3,-dlcm=ca -lineinfo -Xfatbin -compress-all -diag-suppress=179,39,177 -c /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/gptq_marlin_repack.cu -o gptq_marlin_repack.cuda.o \n[7/10] /usr/local/cuda/bin/nvcc -MD -MF gptq_marlin_fp16.cuda.o.d -DTORCH_EXTENSION_NAME=gptqmodel_marlin_fp16_ops -DTORCH_API_INCLUDE_EXTENSION_H -I/usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin -isystem /usr/local/lib/python3.13/dist-packages/torch/include -isystem /usr/local/lib/python3.13/dist-packages/torch/include/torch/csrc/api/include -isystem /usr/local/cuda/include -isystem /usr/include/python3.13 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ --expt-relaxed-constexpr -gencode=arch=compute_75,code=compute_75 -gencode=arch=compute_75,code=sm_75 --compiler-options '-fPIC' -static-global-template-stub=false -O3 -std=c++17 -DENABLE_BF16 -D_GLIBCXX_USE_CXX11_ABI=1 --threads 8 --optimize=3 -Xptxas -O3,-dlcm=ca -lineinfo -Xfatbin -compress-all -diag-suppress=179,39,177 -c /usr/local/lib/python3.13/dist-packages/gptqmodel_ext/marlin/gptq_marlin_fp16.cu -o gptq_marlin_fp16.cuda.o \nninja: build stopped: subcommand failed.\n | build_root=/root/.cache/gptqmodel/torch_extensions/marlin_fp16/f4e4a8e7392ae6d7 | base_build_root=/root/.cache/gptqmodel/torch_extensions/marlin_fp16 | python=3.13.15 | pid=285 | TORCH_EXTENSIONS_DIR= | GPTQMODEL_TORCH_EXTENSIONS_DIR= | candidate_binaries=/root/.cache/gptqmodel/torch_extensions/marlin_fp16/f4e4a8e7392ae6d7/gptqmodel_marlin_fp16_ops.so:missing, /root/.cache/gptqmodel/torch_extensions/marlin_fp16/f4e4a8e7392ae6d7/gptqmodel_marlin_fp16_ops.pyd:missing, /root/.cache/gptqmodel/torch_extensions/marlin_fp16/f4e4a8e7392ae6d7/gptqmodel_marlin_fp16_ops.dylib:missing, /root/.cache/gptqmodel/torch_extensions/marlin_fp16/f4e4a8e7392ae6d7/gptqmodel_marlin_fp16_ops.dll:missing | build_root_entries=[.ninja_deps, .ninja_log, awq_marlin_repack.cuda.o, build.ninja, gptq_marlin_fp16.cuda.o, gptq_marlin_repack.cuda.o, marlin_torch_fp16.o]\n"
+  },
+  "scores": "none: this runner never scores; see v2/RUBRIC.md"
+}
