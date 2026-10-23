@@ -1,0 +1,249 @@
+"""Code checks run on every option before Claude judges it (#87).
+
+A ``fail`` flag means the option breaks a rule the prompt states plainly, so it
+is below the relevance bar without being judged. A ``warn`` flag is shown to the
+judge but decides nothing: a paraphrase can drop "not" and stay correct ("will
+not be able" -> "will be unable"), so only the judge can say.
+
+These checks never read a model name and never produce a quality score.
+"""
+from __future__ import annotations
+
+import json
+import re
+import sys
+from pathlib import Path
+from typing import Any
+
+WORD_STUDIO = Path(__file__).resolve().parent.parent
+if str(WORD_STUDIO) not in sys.path:
+    sys.path.insert(0, str(WORD_STUDIO))
+
+from v2.prompts import SENTENCE_KINDS  # noqa: E402
+from word_studio_output_parser import (  # noqa: E402
+    WORD_RE,
+    comparison_key,
+    near_duplicate_keys,
+    parse_document,
+    word_count,
+)
+
+CHECKS_VERSION = "ws2-hard-checks-v3"
+
+#: Flags that put an option below the bar without judging. Everything else warns.
+FAIL_FLAGS = {
+    "empty": "the option is empty",
+    "beyond_requested": "the option comes after the number of options the task asked for",
+    "duplicate": "the same as, or a near copy of, an earlier option in this list",
+    "echo": "repeats the selected text unchanged",
+    "too_many_words": "tap_word allows at most three words, phrase_to_word exactly one",
+    "missing_word": "word_sentences option does not contain the target word or a form of it",
+    "not_shorter": "condense option is not shorter than the original",
+    "quote_dropped": "a quotation in the original is missing or altered in the option",
+}
+#: Numbers only warn: "19th" -> "Nineteenth" or "1,800" -> "over 1800" keeps the fact,
+#: and only the judge can tell that from a changed or invented statistic.
+WARN_FLAGS = {
+    "number_changed": "a number in the original does not appear in the option, as digits or words",
+    "invented_number": "the option has a number that is not in the paragraph, as digits or words",
+    "negation_changed": "the original and the option disagree on negation words",
+    "name_dropped": "a capitalised name in the original is missing from the option",
+    "length_off": "paraphrase length is under half or over 1.75 times the original",
+    "new_quotation": "the option has quoted text that is not in the paragraph",
+    "copies_paragraph": "the option repeats a sentence already in the paragraph",
+}
+
+TAP_MAX_WORDS = 3
+NUMBER_RE = re.compile(r"\d+(?:[.:/]\d+)*")
+NUMBER_WORDS = {
+    word: str(value)
+    for value, names in enumerate([
+        ("zero",), ("one", "first", "once"), ("two", "second", "twice"), ("three", "third"), ("four", "fourth"),
+        ("five", "fifth"), ("six", "sixth"), ("seven", "seventh"), ("eight", "eighth"), ("nine", "ninth"),
+        ("ten", "tenth"), ("eleven", "eleventh"), ("twelve", "twelfth"), ("thirteen", "thirteenth"),
+        ("fourteen", "fourteenth"), ("fifteen", "fifteenth"), ("sixteen", "sixteenth"),
+        ("seventeen", "seventeenth"), ("eighteen", "eighteenth"), ("nineteen", "nineteenth"),
+        ("twenty", "twentieth")])
+    for word in names
+}
+NUMBER_WORDS.update({"thirty": "30", "forty": "40", "fifty": "50", "sixty": "60", "seventy": "70",
+                     "eighty": "80", "ninety": "90", "hundred": "100", "thousand": "1000", "dozen": "12"})
+NEGATIONS = frozenset({"not", "no", "never", "none", "nobody", "nothing", "neither", "nor", "nowhere",
+                       "cannot", "without", "unable", "inability", "impossible", "fail", "fails", "failed",
+                       "failing", "failure", "lack", "lacks", "lacked", "lacking"})
+QUOTED_RE = re.compile(r"[\"“”]([^\"“”]{3,})[\"“”]")
+SENTENCE_SPLIT_RE = re.compile(r"(?:(?<=[.!?])|(?<=[.!?][\"”’)]))\s+")
+
+
+def words(text: str) -> list[str]:
+    return WORD_RE.findall(comparison_key(text))
+
+
+def numbers(text: str) -> list[str]:
+    """Digit numbers, with thousands separators dropped: "1,800" -> "1800", "19th" -> "19", "10%" -> "10"."""
+    return NUMBER_RE.findall(re.sub(r"(?<=\d),(?=\d{3}\b)", "", text))
+
+
+def number_forms(text: str) -> set[str]:
+    """Every number in ``text`` as digits, including small numbers written as words."""
+    found = set(numbers(text))
+    for token in re.split(r"[\s-]+", comparison_key(text)):
+        token = token.strip(".,;:!?\"'“”’()")
+        if token in NUMBER_WORDS:
+            found.add(NUMBER_WORDS[token])
+    return found
+
+
+def has_negation(text: str) -> bool:
+    tokens = words(text)
+    return any(t in NEGATIONS or t.endswith("n't") or t.endswith("n’t") for t in tokens)
+
+
+def unquote(text: str) -> str:
+    return comparison_key(text.replace("“", '"').replace("”", '"').replace("’", "'").replace("‘", "'"))
+
+
+def names(sentence: str) -> list[str]:
+    """Capitalised words that are not the first word of the sentence."""
+    tokens = WORD_RE.findall(sentence)
+    return [t for t in tokens[1:] if t[0].isupper() and t[1:].islower() and t != "I"]
+
+
+SUFFIXES = sorted(["ations", "ation", "ition", "ments", "ment", "ness", "ities", "ity", "ence", "ance", "ent",
+                   "ant", "ive", "ing", "ies", "ied", "ed", "es", "al", "ly", "s", "e", "y"], key=len, reverse=True)
+
+
+def stem(word: str) -> str:
+    """Strip one common suffix, keeping at least four letters: "deprivation" and "deprived" -> "depriv"."""
+    key = comparison_key(word)
+    for suffix in SUFFIXES:
+        if key.endswith(suffix) and len(key) - len(suffix) >= 4:
+            return key[: -len(suffix)]
+    return key
+
+
+def uses_word(text: str, word: str) -> bool:
+    """True if ``text`` has ``word`` or a form of it. Lenient on purpose: the judge checks the usage."""
+    target = stem(word)
+    return any(t.startswith(target) or stem(t) == target for t in words(text))
+
+
+def json_prefix_options(raw: str) -> list[str] | None:
+    """Options from a complete JSON object that opens the output, ignoring any text after it.
+
+    Models often add a note after valid JSON, or a stray closing brace. The
+    object itself is what a client would read, so it counts, as ``lenient``.
+    Malformed JSON is not repaired.
+    """
+    body = (raw or "").strip()
+    if body.startswith("```"):
+        body = body.split("\n", 1)[1] if "\n" in body else ""
+    body = body.lstrip()
+    if not body.startswith("{"):
+        return None
+    try:
+        obj, _end = json.JSONDecoder().raw_decode(body)
+    except ValueError:
+        return None
+    if not isinstance(obj, dict) or not isinstance(obj.get("options"), list):
+        return None
+    return [v for v in obj["options"] if isinstance(v, str)]
+
+
+def parse(raw: str) -> tuple[list[str], str, str]:
+    """Return ``(options, format, parse_mode)`` for a raw completion."""
+    doc = parse_document(raw)
+    if doc.mode in ("json_object", "json_array"):
+        return doc.options, format_of(doc), doc.mode
+    prefix = json_prefix_options(raw)
+    if prefix is not None:
+        return prefix, ("lenient" if prefix else "unparseable"), "json_object_then_text"
+    return doc.options, format_of(doc), doc.mode
+
+
+def format_of(doc: Any) -> str:
+    if not doc.options:
+        return "unparseable"
+    clean = (doc.mode == "json_object" and not doc.fenced and not doc.leading_prose and not doc.trailing_prose
+             and not doc.invalid_entries)
+    return "strict" if clean else "lenient"
+
+
+def option_flags(task: dict[str, Any], text: str, earlier: list[str]) -> list[str]:
+    kind = task["kind"]
+    flags: list[str] = []
+    key = comparison_key(text)
+    if not key:
+        return ["empty"]
+    if any(key == e or near_duplicate_keys(key, e) for e in earlier):
+        flags.append("duplicate")
+    selected = (task.get("selection") or {}).get("text")
+    if selected and key == comparison_key(selected):
+        flags.append("echo")
+    if kind == "tap_word" and word_count(text) > TAP_MAX_WORDS:
+        flags.append("too_many_words")
+    if kind == "phrase_to_word" and word_count(text) != 1:
+        flags.append("too_many_words")
+    if kind == "word_sentences":
+        if not uses_word(text, task["word"]):
+            flags.append("missing_word")
+    if kind in SENTENCE_KINDS and selected:
+        if kind == "condense" and word_count(text) >= word_count(selected):
+            flags.append("not_shorter")
+        option_numbers = number_forms(text)
+        if any(n not in option_numbers for n in numbers(selected)):
+            flags.append("number_changed")
+        for quote in task.get("quotes") or []:
+            if unquote(quote["text"]) in unquote(selected) and unquote(quote["text"]) not in unquote(text):
+                flags.append("quote_dropped")
+                break
+        if has_negation(selected) != has_negation(text):
+            flags.append("negation_changed")
+        option_key = unquote(text)
+        if any(unquote(n) not in option_key for n in names(selected)):
+            flags.append("name_dropped")
+        if kind == "paraphrase":
+            ratio = word_count(text) / max(1, word_count(selected))
+            if ratio < 0.5 or ratio > 1.75:
+                flags.append("length_off")
+    paragraph = task["paragraph"]
+    if any(n not in number_forms(paragraph) for n in numbers(text)):
+        flags.append("invented_number")
+    if kind in SENTENCE_KINDS or kind == "word_sentences":
+        paragraph_key = unquote(paragraph)
+        if any(unquote(q) not in paragraph_key for q in QUOTED_RE.findall(text)):
+            flags.append("new_quotation")
+    if kind == "word_sentences":
+        sentences = {comparison_key(s) for s in SENTENCE_SPLIT_RE.split(paragraph)}
+        if key in sentences:
+            flags.append("copies_paragraph")
+    return flags
+
+
+def check(task: dict[str, Any], output: dict[str, Any] | None) -> dict[str, Any]:
+    """Check one candidate's output for one task. ``output`` is the runner's output record."""
+    requested = task["requested_options"]
+    result: dict[str, Any] = {"checks_version": CHECKS_VERSION, "task_id": task["id"], "requested": requested}
+    if output is None or output.get("status") != "ok":
+        result.update(format="no_output", parse_mode=None, returned=0, truncated=False, options=[],
+                      error=(output or {}).get("error"))
+        return result
+    texts, fmt, mode = parse(output.get("raw_text") or "")
+    options = []
+    earlier: list[str] = []
+    for index, text in enumerate(texts):
+        flags = option_flags(task, text, earlier)
+        if index >= requested:
+            flags.insert(0, "beyond_requested")
+        earlier.append(comparison_key(text))
+        fail = [f for f in flags if f in FAIL_FLAGS]
+        warn = [f for f in flags if f in WARN_FLAGS]
+        options.append({"index": index, "text": text, "fail": fail, "warn": warn, "judge": not fail})
+    result.update(
+        format=fmt,
+        parse_mode=mode,
+        returned=len(texts),
+        truncated=output.get("finish_reason") == "length",
+        options=options,
+    )
+    return result

@@ -1,0 +1,59 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] This model config has set a `rope_parameters['original_max_position_embeddings']` field, to be used together with `max_position_embeddings` to determine a scaling factor. Please set the `factor` field of `rope_parameters`with this ratio instead -- we recommend the use of this field over `original_max_position_embeddings`, as it is compatible with most model architectures.
+
+Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]
+Fetching 2 files:  50%|█████     | 1/2 [00:39<00:39, 39.79s/it]
+Fetching 2 files: 100%|██████████| 2/2 [00:39<00:00, 19.90s/it]
+
+Loading weights:   0%|          | 0/194 [00:00<?, ?it/s]
+Loading weights:   1%|          | 1/194 [00:02<06:47,  2.11s/it]
+Loading weights:  39%|███▊      | 75/194 [00:02<00:02, 46.41it/s]
+Loading weights:  56%|█████▌    | 109/194 [00:02<00:01, 51.33it/s]
+Loading weights:  68%|██████▊   | 131/194 [00:03<00:01, 51.51it/s]
+Loading weights:  75%|███████▌  | 146/194 [00:03<00:00, 54.81it/s]
+Loading weights:  82%|████████▏ | 159/194 [00:03<00:00, 55.96it/s]
+Loading weights:  88%|████████▊ | 170/194 [00:03<00:00, 56.69it/s]
+Loading weights:  92%|█████████▏| 179/194 [00:04<00:00, 55.17it/s]
+Loading weights:  97%|█████████▋| 189/194 [00:04<00:00, 59.57it/s]
+Loading weights: 100%|██████████| 194/194 [00:04<00:00, 46.53it/s]
+[phi4-mini-instruct] 1/40 ws2-screen-p01-academic-1 ok 5.4s options_seen=8
+[phi4-mini-instruct] 2/40 ws2-screen-p01-condense-1 ok 3.7s options_seen=8
+[phi4-mini-instruct] 3/40 ws2-screen-p01-tap_word-1 ok 2.1s options_seen=10
+[phi4-mini-instruct] 4/40 ws2-screen-p01-tap_word-2 ok 2.1s options_seen=10
+[phi4-mini-instruct] 5/40 ws2-screen-p01-word_sentences-1 ok 4.2s options_seen=8
+[phi4-mini-instruct] 6/40 ws2-screen-p02-academic-1 ok 6.3s options_seen=8
+[phi4-mini-instruct] 7/40 ws2-screen-p02-paraphrase-1 ok 5.1s options_seen=8
+[phi4-mini-instruct] 8/40 ws2-screen-p02-phrase_to_word-1 ok 2.5s options_seen=10
+[phi4-mini-instruct] 9/40 ws2-screen-p02-tap_word-1 ok 2.3s options_seen=10
+[phi4-mini-instruct] 10/40 ws2-screen-p02-word_sentences-1 ok 6.5s options_seen=5
+[phi4-mini-instruct] 11/40 ws2-screen-p03-academic-1 ok 7.7s options_seen=5
+[phi4-mini-instruct] 12/40 ws2-screen-p03-condense-1 ok 3.8s options_seen=8
+[phi4-mini-instruct] 13/40 ws2-screen-p03-paraphrase-1 ok 4.6s options_seen=5
+[phi4-mini-instruct] 14/40 ws2-screen-p03-tap_word-1 ok 2.6s options_seen=10
+[phi4-mini-instruct] 15/40 ws2-screen-p03-tap_word-2 ok 2.2s options_seen=10
+[phi4-mini-instruct] 16/40 ws2-screen-p04-condense-1 ok 3.9s options_seen=8
+[phi4-mini-instruct] 17/40 ws2-screen-p04-paraphrase-1 ok 4.5s options_seen=8
+[phi4-mini-instruct] 18/40 ws2-screen-p04-phrase_to_word-1 ok 2.4s options_seen=10
+[phi4-mini-instruct] 19/40 ws2-screen-p04-tap_word-1 ok 3.3s options_seen=13
+[phi4-mini-instruct] 20/40 ws2-screen-p04-word_sentences-1 ok 5.6s options_seen=5
+[phi4-mini-instruct] 21/40 ws2-screen-p05-paraphrase-1 ok 3.4s options_seen=5
+[phi4-mini-instruct] 22/40 ws2-screen-p05-phrase_to_word-1 ok 2.4s options_seen=10
+[phi4-mini-instruct] 23/40 ws2-screen-p05-tap_word-1 ok 2.3s options_seen=10
+[phi4-mini-instruct] 24/40 ws2-screen-p05-tap_word-2 ok 2.5s options_seen=10
+[phi4-mini-instruct] 25/40 ws2-screen-p05-word_sentences-1 ok 5.8s options_seen=5
+[phi4-mini-instruct] 26/40 ws2-screen-p06-academic-1 ok 6.5s options_seen=5
+[phi4-mini-instruct] 27/40 ws2-screen-p06-condense-1 ok 3.7s options_seen=5
+[phi4-mini-instruct] 28/40 ws2-screen-p06-phrase_to_word-1 ok 2.4s options_seen=10
+[phi4-mini-instruct] 29/40 ws2-screen-p06-tap_word-1 ok 2.1s options_seen=10
+[phi4-mini-instruct] 30/40 ws2-screen-p06-word_sentences-1 ok 5.8s options_seen=5
+[phi4-mini-instruct] 31/40 ws2-screen-p07-academic-1 ok 6.4s options_seen=5
+[phi4-mini-instruct] 32/40 ws2-screen-p07-condense-1 ok 2.9s options_seen=5
+[phi4-mini-instruct] 33/40 ws2-screen-p07-phrase_to_word-1 ok 2.5s options_seen=10
+[phi4-mini-instruct] 34/40 ws2-screen-p07-tap_word-1 ok 2.5s options_seen=10
+[phi4-mini-instruct] 35/40 ws2-screen-p07-tap_word-2 ok 2.6s options_seen=11
+[phi4-mini-instruct] 36/40 ws2-screen-p08-condense-1 ok 5.0s options_seen=5
+[phi4-mini-instruct] 37/40 ws2-screen-p08-paraphrase-1 ok 5.5s options_seen=5
+[phi4-mini-instruct] 38/40 ws2-screen-p08-phrase_to_word-1 ok 2.3s options_seen=10
+[phi4-mini-instruct] 39/40 ws2-screen-p08-tap_word-1 ok 2.8s options_seen=10
+[phi4-mini-instruct] 40/40 ws2-screen-p08-word_sentences-1 ok 3.9s options_seen=5
+{"candidate": "phi4-mini-instruct", "status": "completed", "tasks": {"ok": 40, "error": 0, "failed_ids": []}}

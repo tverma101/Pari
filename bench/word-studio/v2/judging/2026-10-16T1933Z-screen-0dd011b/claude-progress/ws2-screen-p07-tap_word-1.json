@@ -1,0 +1,124 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "ed1f35bb-2ee5-49f8-9d72-a13ab0a3626c",
+  "packet_hash": "e9aca899aeb84b1684086ded55a644494249db7e217580606691b10825009f70",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.088882,
+    "duration_ms": 20367,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4976,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 2430
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 2,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 1,
+        "6": 2
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 2,
+        "register": 4,
+        "variety": 2,
+        "usefulness": 3
+      },
+      "note": "Option 2 'forces' overstates. Macbeth 'finally agrees', so he is not forced, and the meaning changes. Option 3 'demands him to kill' is ungrammatical in place. Option 4 'inspires' has the wrong positive sense, which changes the meaning. Options 7-10 are duplicate fails."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 1,
+        "2": 0,
+        "3": 1,
+        "4": 1,
+        "5": 2,
+        "6": 1,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 2,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 3
+      },
+      "note": "Option 2 'insists him to kill' is ungrammatical. Option 7 'compels' overstates and contradicts 'he finally agrees'. Option 8 'dissuades' means the opposite. Option 9 'coaxes him' doubles 'him' in the sentence. Option 10 'presses upon him to kill' is ungrammatical."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 1,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 4,
+        "variety": 2,
+        "usefulness": 3
+      },
+      "note": "Option 5 'compels' overstates and contradicts 'he finally agrees'. Options 6-9 are duplicate fails and option 10 is an echo fail."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 0,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 1,
+        "8": 0,
+        "9": 0,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 3,
+        "register": 3,
+        "variety": 4,
+        "usefulness": 4
+      },
+      "note": "Option 3 'instigates him to kill' is an odd, archaic construction for this essay. Option 5 'compels' overstates and contradicts 'agrees'. Option 8 'motives' is a noun and ungrammatical. Option 9 'stimulates him to kill' uses the wrong sense and reads oddly. Option 10 'pushes forward' echoes 'pushes' and is ungrammatical in place."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 0,
+        "5": 1,
+        "6": 1,
+        "8": 0,
+        "9": 0,
+        "10": 2
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 4,
+        "register": 3,
+        "variety": 4,
+        "usefulness": 4
+      },
+      "note": "Option 4 'nagging' is the wrong verb form and ungrammatical. Option 8 'stimulates him to kill' uses the wrong sense and reads oddly. Option 9 'incentivizes' has the wrong sense (offering a reward) and the wrong register. Option 7 is a duplicate fail."
+    }
+  ]
+}

@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p04-phrase_to_word-1",
+  "kind": "phrase_to_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "13a5e2fc1b123dd0092636d764a471112ce4edef541199036532ee5521e4f891",
+  "seed": 8245519685520265586,
+  "max_new_tokens": 256,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"anxious\", \"frustrated\", \"irritated\", \"upset\", \"tense\", \"distressed\", \"agitated\", \"worried\", \"uneasy\", \"turbulent\"]}",
+  "timing": {
+    "first_text_ms": 197.3,
+    "option_ms": [
+      519.7,
+      747.8,
+      975.2,
+      1158.0,
+      1342.8,
+      1526.5,
+      1710.7,
+      1894.3,
+      2079.3,
+      2311.5
+    ],
+    "total_ms": 2405.0,
+    "stream": [
+      [
+        197.3,
+        2
+      ],
+      [
+        244.4,
+        9
+      ],
+      [
+        290.6,
+        11
+      ],
+      [
+        337.0,
+        14
+      ],
+      [
+        383.0,
+        16
+      ],
+      [
+        428.5,
+        17
+      ],
+      [
+        473.7,
+        21
+      ],
+      [
+        519.7,
+        23
+      ],
+      [
+        565.4,
+        25
+      ],
+      [
+        610.9,
+        27
+      ],
+      [
+        656.3,
+        31
+      ],
+      [
+        702.1,
+        35
+      ],
+      [
+        747.8,
+        37
+      ],
+      [
+        793.1,
+        39
+      ],
+      [
+        838.3,
+        41
+      ],
+      [
+        884.2,
+        44
+      ],
+      [
+        929.9,
+        48
+      ],
+      [
+        975.2,
+        50
+      ],
+      [
+        1020.5,
+        52
+      ],
+      [
+        1066.5,
+        54
+      ],
+      [
+        1112.4,
+        57
+      ],
+      [
+        1158.0,
+        59
+      ],
+      [
+        1206.0,
+        61
+      ],
+      [
+        1251.6,
+        64
+      ],
+      [
+        1297.2,
+        66
+      ],
+      [
+        1342.8,
+        68
+      ],
+      [
+        1389.0,
+        70
+      ],
+      [
+        1435.3,
+        74
+      ],
+      [
+        1481.1,
+        80
+      ],
+      [
+        1526.5,
+        82
+      ],
+      [
+        1573.0,
+        84
+      ],
+      [
+        1619.3,
+        86
+      ],
+      [
+        1665.2,
+        92
+      ],
+      [
+        1710.7,
+        94
+      ],
+      [
+        1756.9,
+        96
+      ],
+      [
+        1802.7,
+        99
+      ],
+      [
+        1848.6,
+        103
+      ],
+      [
+        1894.3,
+        105
+      ],
+      [
+        1940.8,
+        107
+      ],
+      [
+        1987.0,
+        110
+      ],
+      [
+        2032.6,
+        113
+      ],
+      [
+        2079.3,
+        115
+      ],
+      [
+        2125.8,
+        117
+      ],
+      [
+        2171.9,
+        118
+      ],
+      [
+        2218.8,
+        121
+      ],
+      [
+        2265.4,
+        126
+      ],
+      [
+        2311.5,
+        128
+      ],
+      [
+        2357.4,
+        129
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nTeenagers need about eight to ten hours of sleep every night, but most of them get a lot less. One reason is that their body clocks change during puberty, so they do not feel tired until late at night. On top of that, many teens stay up looking at their phones, and the blue light makes it even harder to fall asleep. Not getting enough sleep is bad for the brain because it makes it hard to remember things and focus in class. It can also make teens more moody and stressed out. Scientists have found that students who sleep more usually get better grades. This is why some experts think schools should start later in the morning.\n\"\"\"\n\nThe writer selected the phrase \"stressed out\" in this sentence (marked with [[ ]]):\nIt can also make teens more moody and [[stressed out]].\n\nGive 10 single words that can replace \"stressed out\" in this sentence with the same meaning. Each option must be exactly one word and must fit the sentence without changing the rest of it. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 322,
+  "new_tokens": 49,
+  "finish_reason": "stop",
+  "error": null
+}

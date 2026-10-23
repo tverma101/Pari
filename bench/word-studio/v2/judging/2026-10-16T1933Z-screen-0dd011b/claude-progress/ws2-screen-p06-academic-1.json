@@ -1,0 +1,108 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "5bd9c4e2-e494-4b88-aeea-0567207ce9b0",
+  "packet_hash": "3d89299318813a916946b0faadbadcdc2ae63254b220d218de79a65d1f100fc3",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.12520599999999998,
+    "duration_ms": 35591,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5489,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 4041
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 2,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 1 is 0: it changes 'feel worse about their bodies' to the broader 'negative self-perceptions', and 'approximately 50%' loses the 'almost'. Option 2 is 0: 'felt adversely about' is not idiomatic, 'after engaging' turns cause into sequence, and 'teenage population' overgeneralizes from the survey. Option 3 is 0: 'demonstrated ... experienced detrimental effects as a result of' turns the teens' self-report into an established causal fact, which raises the certainty. Option 4: 'nearly 50%' keeps the fact, so the invented_number warning is a false alarm, but 'after using' is weaker than 'made them'. Option 5: 'the teens' and 'felt negatively' are slightly loose."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 2,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 1 is 0: it drops social media as the cause and loses 'worse'. Option 2 is 0: it also drops social media, so the claim changes. Option 3 is 0: it broadens 'bodies' to 'self-image', and 'suggests' hedges the certainty of 'found'. Option 4 is accurate but plain. Option 5 needs edits: 'The' should be 'A', 'feel bad' loses 'worse', and 'teen population' overgeneralizes."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 2,
+        "2": 0,
+        "3": 0,
+        "4": 1,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 1,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 2 is 0: it invents 'over 45%' and changes bodies to self-esteem. Option 3 is 0: it invents '49%'. Option 5 is 0: it invents '48%'. Option 4 is awkward ('respondents among teenagers') but usable. Option 1 is strong."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 2
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 3
+      },
+      "note": "No zeros. Option 1: 'nearly 50%' equals 'almost half', so the warning is a false alarm, but 'feeling negatively' loses 'worse'. Option 2: 'contributed to' slightly softens 'made'. Option 3 is close to the original. Option 4: 'claimed' hints at doubt. The best option is last."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 1,
+        "2": 2,
+        "3": 1,
+        "4": 2
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 5,
+        "register": 4,
+        "variety": 2,
+        "usefulness": 3
+      },
+      "note": "No zeros among the judged options. Option 5 failed the duplicate check and was not judged. The options all use the same 'A 2023 survey ... teenagers reported' frame, so there is little variety. Option 1 is clunky ('self-perception of their bodies'). Option 3 repeats felt/feel and stays close to the original."
+    }
+  ]
+}

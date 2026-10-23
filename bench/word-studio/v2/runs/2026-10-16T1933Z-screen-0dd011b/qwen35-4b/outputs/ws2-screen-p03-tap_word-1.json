@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p03-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-4b",
+  "messages_sha256": "98748371b51a05d8394e2148941e09ee3f10bb27176ce8b5d9d261f129b1fcce",
+  "seed": 453847461072182515,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"travelled\", \"circulated\", \"disseminated\", \"moved\", \"traveled\", \"flowed\", \"went\", \"traveled\", \"propagated\", \"broke out\"]}\n",
+  "timing": {
+    "first_text_ms": 543.6,
+    "option_ms": [
+      919.1,
+      1160.1,
+      1465.1,
+      1651.1,
+      1899.4,
+      2142.8,
+      2324.2,
+      2573.9,
+      2886.7,
+      3189.9
+    ],
+    "total_ms": 3369.2,
+    "stream": [
+      [
+        543.6,
+        2
+      ],
+      [
+        609.5,
+        9
+      ],
+      [
+        672.3,
+        11
+      ],
+      [
+        735.2,
+        14
+      ],
+      [
+        797.0,
+        20
+      ],
+      [
+        858.8,
+        23
+      ],
+      [
+        919.1,
+        25
+      ],
+      [
+        979.3,
+        27
+      ],
+      [
+        1039.8,
+        31
+      ],
+      [
+        1099.2,
+        37
+      ],
+      [
+        1160.1,
+        39
+      ],
+      [
+        1221.1,
+        41
+      ],
+      [
+        1281.7,
+        44
+      ],
+      [
+        1342.4,
+        46
+      ],
+      [
+        1404.5,
+        53
+      ],
+      [
+        1465.1,
+        55
+      ],
+      [
+        1526.0,
+        57
+      ],
+      [
+        1589.0,
+        62
+      ],
+      [
+        1651.1,
+        64
+      ],
+      [
+        1711.5,
+        66
+      ],
+      [
+        1773.2,
+        68
+      ],
+      [
+        1834.9,
+        74
+      ],
+      [
+        1899.4,
+        76
+      ],
+      [
+        1961.4,
+        78
+      ],
+      [
+        2021.8,
+        82
+      ],
+      [
+        2083.0,
+        84
+      ],
+      [
+        2142.8,
+        86
+      ],
+      [
+        2203.1,
+        88
+      ],
+      [
+        2264.1,
+        92
+      ],
+      [
+        2324.2,
+        94
+      ],
+      [
+        2386.4,
+        96
+      ],
+      [
+        2447.7,
+        102
+      ],
+      [
+        2509.1,
+        104
+      ],
+      [
+        2573.9,
+        106
+      ],
+      [
+        2637.6,
+        108
+      ],
+      [
+        2699.9,
+        112
+      ],
+      [
+        2763.4,
+        114
+      ],
+      [
+        2825.4,
+        118
+      ],
+      [
+        2886.7,
+        120
+      ],
+      [
+        2949.0,
+        122
+      ],
+      [
+        3009.3,
+        123
+      ],
+      [
+        3070.5,
+        127
+      ],
+      [
+        3130.2,
+        131
+      ],
+      [
+        3189.9,
+        134
+      ],
+      [
+        3308.9,
+        135
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nThe printing press was one of the most important inventions in history. Before Johannes Gutenberg built his press around 1440, books had to be copied by hand, which took a really long time. Because of this, books were very expensive and only rich people and churches could have them. After the press was invented, books could be made much faster and for a lot less money. More people started learning how to read, and new ideas spread across Europe quickly. Some historians say that the press helped cause big changes like the Reformation and the Scientific Revolution. Without it, the world we live in today would probably be very different.\n\"\"\"\n\nThe writer tapped the word \"spread\" in this sentence (marked with [[ ]]):\nMore people started learning how to read, and new ideas [[spread]] across Europe quickly.\n\nGive 10 replacements for \"spread\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"spread\" without changing the rest of the sentence. Do not repeat \"spread\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 359,
+  "new_tokens": 47,
+  "finish_reason": "stop",
+  "error": null
+}

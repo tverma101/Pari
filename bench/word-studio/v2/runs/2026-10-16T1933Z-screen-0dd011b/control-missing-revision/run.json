@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "benchmark": "word-studio-v2",
+  "candidate": {
+    "candidate_id": "control-missing-revision",
+    "role": "broken_control",
+    "family": "control",
+    "model_id": "HuggingFaceTB/SmolLM3-3B",
+    "revision": "0000000000000000000000000000000000000000",
+    "expected": "failed at load: the revision does not exist on the Hugging Face Hub",
+    "listed_in": "bench/word-studio/v2/controls.json"
+  },
+  "task_set": "screen",
+  "task_file_sha256": "df7c32ee7e5945f832dc24fd073f5b693d0ffa40e4afeca7ed370ad4f24f24e8",
+  "manifest_sha256": "81e4e9b95b574e533b3782013d54eae84ec40eea82bd45d7ccc453610920f5b1",
+  "prompt_version": "ws2-prompts-v1",
+  "generation": {
+    "do_sample": true,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": 50,
+    "repetition_penalty": 1.0,
+    "samples_per_task": 1,
+    "seed": "first 8 bytes of sha256(task id), big-endian",
+    "thinking": "disabled: enable_thinking=False is passed to every chat template"
+  },
+  "task_limit": null,
+  "tasks_planned": 40,
+  "repo": {
+    "sha": "0dd011b8aaf4b58f32fa44d7a4accbb26d07d779",
+    "dirty_paths": []
+  },
+  "status": "failed",
+  "stage": "load",
+  "started_at": "2026-10-16T19:54:20+00:00",
+  "finished_at": "2026-10-16T19:54:31+00:00",
+  "load": null,
+  "environment": {
+    "python": "3.13.15 (main, Aug  6 2026, 11:06:22) [GCC 13.3.0]",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "packages": {
+      "torch": "2.11.0+cu128",
+      "transformers": "5.18.0",
+      "accelerate": "1.15.0",
+      "tokenizers": "0.23.1",
+      "huggingface_hub": "1.33.0",
+      "safetensors": "0.8.0"
+    },
+    "cuda": "12.8",
+    "gpus": [
+      "Tesla T4",
+      "Tesla T4"
+    ],
+    "peak_memory": {
+      "cuda:0": 0,
+      "cuda:1": 0
+    },
+    "nvidia_smi": [
+      "Tesla T4, 15360 MiB, 580.178.04",
+      "Tesla T4, 15360 MiB, 580.178.04"
+    ]
+  },
+  "tasks": {
+    "ok": 0,
+    "error": 0,
+    "failed_ids": []
+  },
+  "error": {
+    "type": "RevisionNotFoundError",
+    "message": "404 Client Error. (Request ID: Root=1-6ad280f7-5621c9316fcdc9ce1981b602;b4171813-d9b5-4314-a14f-59fa71853f1b)\n\nRevision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false&expand=false.\nInvalid rev id: 0000000000000000000000000000000000000000",
+    "traceback": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.13/dist-packages/huggingface_hub/utils/_http.py\", line 836, in hf_raise_for_status\n    response.raise_for_status()\n    ~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/local/lib/python3.13/dist-packages/httpx/_models.py\", line 829, in raise_for_status\n    raise HTTPStatusError(message, request=request, response=self)\nhttpx.HTTPStatusError: Client error '404 Not Found' for url 'https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false&expand=false'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/tmp/Pari/bench/word-studio/v2/run_candidate.py\", line 186, in run\n    run_record[\"load\"] = backend.load()\n                         ~~~~~~~~~~~~^^\n  File \"/tmp/Pari/bench/word-studio/v2/run_candidate.py\", line 341, in load\n    self.tokenizer = AutoTokenizer.from_pretrained(self.model_id, revision=self.revision, trust_remote_code=False)\n                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.13/dist-packages/transformers/models/auto/tokenization_auto.py\", line 990, in from_pretrained\n    return tokenizer_class.from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.13/dist-packages/transformers/tokenization_utils_base.py\", line 1670, in from_pretrained\n    for template in list_repo_templates(\n                    ~~~~~~~~~~~~~~~~~~~^\n        pretrained_model_name_or_path,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n        token=token,\n        ^^^^^^^^^^^^\n    ):\n    ^\n  File \"/usr/local/lib/python3.13/dist-packages/transformers/utils/hub.py\", line 150, in list_repo_templates\n    for entry in hf_api().list_repo_tree(\n                 ~~~~~~~~~~~~~~~~~~~~~~~^\n        repo_id=repo_id,\n        ^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n        token=token,\n        ^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/local/lib/python3.13/dist-packages/huggingface_hub/hf_api.py\", line 4103, in list_repo_tree\n    for path_info in paginate(path=tree_url, headers=headers, params={\"recursive\": recursive, \"expand\": expand}):\n                     ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.13/dist-packages/huggingface_hub/utils/_pagination.py\", line 37, in paginate\n    hf_raise_for_status(r)\n    ~~~~~~~~~~~~~~~~~~~^^^\n  File \"/usr/local/lib/python3.13/dist-packages/huggingface_hub/utils/_http.py\", line 852, in hf_raise_for_status\n    raise _format(RevisionNotFoundError, message, response, repo_type=repo_type, repo_id=repo_id) from e\nhuggingface_hub.errors.RevisionNotFoundError: 404 Client Error. (Request ID: Root=1-6ad280f7-5621c9316fcdc9ce1981b602;b4171813-d9b5-4314-a14f-59fa71853f1b)\n\nRevision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false&expand=false.\nInvalid rev id: 0000000000000000000000000000000000000000\n"
+  },
+  "scores": "none: this runner never scores; see v2/RUBRIC.md"
+}

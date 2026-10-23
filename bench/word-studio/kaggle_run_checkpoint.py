@@ -38,6 +38,7 @@ from typing import Any, Callable, Iterable, Sequence
 
 SCHEMA_VERSION = 1
 CHECKPOINT_SUFFIX = ".checkpoint.json"
+BENCHMARK_RELEVANT_PREFIX = "bench/word-studio/"
 
 #: Every terminal status a candidate-stage summary is allowed to end in.
 TERMINAL_STATUSES = frozenset({
@@ -78,11 +79,8 @@ TELEMETRY_SAMPLE_INTERVAL_SECONDS = 30.0
 #: not poison the clean-tree policy (Issue #40 test case 6). Each entry matches a
 #: path prefix; anything not listed still counts as a relevant change.
 IGNORED_GENERATED_PREFIXES = (
-    "open-local-phraser-v1/benchmarks/english-studio-v3/__pycache__/",
-    "open-local-phraser-v1/benchmarks/english-studio-v3/studio_backend/__pycache__/",
-    "open-local-phraser-v1/benchmarks/english-studio-v3/english-core-shadow",
-    "open-local-phraser-v1/benchmarks/english-studio-v3/english-core-prompt-robustness",
-    "open-local-phraser-v1/benchmarks/english-studio-v3/english-core-choice-order-robustness",
+    "bench/word-studio/__pycache__/",
+    "bench/word-studio/studio_backend/__pycache__/",
 )
 
 #: Generated benchmark *inputs* a Kaggle job legitimately materializes into the
@@ -319,7 +317,7 @@ def verify_git_identity(
     repo_root: Path | str,
     declared_revision: str,
     *,
-    relevant_prefix: str = "open-local-phraser-v1/benchmarks/english-studio-v3",
+    relevant_prefix: str = BENCHMARK_RELEVANT_PREFIX,
     require_clean: bool = True,
     preparation_receipt: Path | str | None = None,
 ) -> GitIdentity:

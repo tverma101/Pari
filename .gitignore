@@ -29,3 +29,6 @@ __pycache__/
 .agents/
 *.private-review.json
 .playwright-cli/
+
+# Word Studio v2 kernel logs are run evidence (#86)
+!bench/word-studio/v2/runs/**/*.log

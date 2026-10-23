@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p08-condense-1",
+  "kind": "condense",
+  "candidate_id": "minicpm5-2b",
+  "messages_sha256": "f6131863372f69da6fe93d5b77a09b546c844e86d7fbe8cc45d0e7e9de7cb84a",
+  "seed": 579191129874694310,
+  "max_new_tokens": 640,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Pizza rush was intense.\", \"Late food caused anger.\", \"Dozens of pizzas in few hours.\", \"Rush led to customer upset.\", \"Fast pizza making caused upset.\"]}",
+  "timing": {
+    "first_text_ms": 129.9,
+    "option_ms": [
+      567.3,
+      852.2,
+      1287.5,
+      1678.0,
+      2040.6
+    ],
+    "total_ms": 2137.3,
+    "stream": [
+      [
+        129.9,
+        2
+      ],
+      [
+        178.5,
+        9
+      ],
+      [
+        225.9,
+        11
+      ],
+      [
+        275.0,
+        14
+      ],
+      [
+        324.0,
+        15
+      ],
+      [
+        373.1,
+        19
+      ],
+      [
+        420.6,
+        24
+      ],
+      [
+        468.7,
+        28
+      ],
+      [
+        517.9,
+        36
+      ],
+      [
+        567.3,
+        39
+      ],
+      [
+        615.1,
+        41
+      ],
+      [
+        663.2,
+        45
+      ],
+      [
+        710.4,
+        50
+      ],
+      [
+        757.4,
+        57
+      ],
+      [
+        804.5,
+        63
+      ],
+      [
+        852.2,
+        66
+      ],
+      [
+        901.1,
+        68
+      ],
+      [
+        948.5,
+        70
+      ],
+      [
+        996.5,
+        74
+      ],
+      [
+        1045.2,
+        77
+      ],
+      [
+        1093.0,
+        84
+      ],
+      [
+        1141.7,
+        87
+      ],
+      [
+        1190.8,
+        91
+      ],
+      [
+        1239.1,
+        97
+      ],
+      [
+        1287.5,
+        100
+      ],
+      [
+        1335.9,
+        102
+      ],
+      [
+        1384.6,
+        103
+      ],
+      [
+        1432.7,
+        106
+      ],
+      [
+        1486.8,
+        110
+      ],
+      [
+        1535.2,
+        113
+      ],
+      [
+        1582.2,
+        122
+      ],
+      [
+        1629.9,
+        128
+      ],
+      [
+        1678.0,
+        131
+      ],
+      [
+        1727.5,
+        133
+      ],
+      [
+        1775.1,
+        137
+      ],
+      [
+        1822.8,
+        143
+      ],
+      [
+        1871.4,
+        150
+      ],
+      [
+        1939.3,
+        157
+      ],
+      [
+        1992.7,
+        163
+      ],
+      [
+        2040.6,
+        165
+      ],
+      [
+        2088.0,
+        167
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<s><|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nLast summer I got my first job working at a small pizza restaurant near my house. At first I thought it would be easy, but I quickly found out that it was a lot of work. On busy nights we had to make dozens of pizzas in just a few hours, and customers got upset if their food was late. My manager, Tony, taught me how to stay calm and do one thing at a time. I also learned how to talk to people who were angry without getting angry myself. The job was tiring, but it showed me that I can handle stress better than I thought. These skills will help me in college and in any job I have in the future.\n\"\"\"\n\nThe writer selected this text:\n\"\"\"\nOn busy nights we had to make dozens of pizzas in just a few hours, and customers got upset if their food was late.\n\"\"\"\n\nGive 5 different rewrites of the selected text that say the same thing in fewer words. Keep every fact, name, number and quotation, and keep the claim exactly as strong or as uncertain as it is. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 348,
+  "new_tokens": 42,
+  "finish_reason": "stop",
+  "error": null
+}

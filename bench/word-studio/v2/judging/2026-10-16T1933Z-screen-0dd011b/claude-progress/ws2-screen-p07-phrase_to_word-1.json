@@ -1,0 +1,125 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "3325df96-2b12-425a-83e2-75ed104193a2",
+  "packet_hash": "cb3653f93bc824748ff9cda7ab271f4a7d0b6c2d97c829f01a5b44cff961d4a9",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.09756200000000001,
+    "duration_ms": 26013,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4956,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 2872
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "criteria": {
+        "fit": 1,
+        "meaning": 1,
+        "register": 2,
+        "variety": 2,
+        "usefulness": 1
+      },
+      "note": "All judged options are 0. Each is a gerund with no object, so it drops both 'power' and 'too much'. Options 1 (craving), 3 (desiring), 7 (yearning) and 8 (longing) become generic desire and lose the meaning. Option 2 (coveting) reads awkwardly with no object. Options 4 (seeking), 5 (hunting) and 6 (chasing) are ungrammatical in place and lose the meaning. Options 9 and 10 are duplicates and failed the code checks."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 1,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 1,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 2,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 2 (lust): on its own it reads as sexual desire, the wrong sense. Option 3 (desire): generic, drops power and excess. Option 6 (lustiness) means vigor, the wrong sense. Option 7 (dread) is the wrong meaning. Option 8 (foolishness) is the wrong meaning. Option 9 (obsession) and option 10 (excess) drop power and change the claim. Option 4 (ambition) is the strong pick, and the paragraph's own word, but it sits in fourth place."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 2,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 1
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 2,
+        "register": 3,
+        "variety": 2,
+        "usefulness": 2
+      },
+      "note": "Option 4 (desire): generic, loses power and excess. Option 5 (covet) is a verb, ungrammatical in place. Option 6 (lust): wrong sense when used alone. Options 7 (craving) and 8 (yearning) are generic desire and lose the meaning. Option 9 (covetous) is an adjective, ungrammatical in place. Covet, covetous and covetousness repeat the same root."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 2,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 3
+      },
+      "note": "Option 3 (arrogance) and option 8 (hubris) mean pride, not wanting power. Option 4 (desire) and option 5 (passion) are generic and lose the meaning. Option 6 (will) and option 7 (drive) are neutral or positive and lose 'too much'. Option 9 (avarice) is greed for wealth, the wrong sense. Option 10 (lust): wrong sense when used alone. The best option comes first."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "7": 0
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 2,
+        "register": 3,
+        "variety": 2,
+        "usefulness": 2
+      },
+      "note": "Option 7 (ambitious) is an adjective, ungrammatical in place. Seven of the 10 options failed the code checks as multi-word phrases or duplicates, but the best option comes first."
+    }
+  ]
+}

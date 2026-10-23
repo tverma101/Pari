@@ -2,6 +2,32 @@
 
 Newest first. Each entry says what was decided, by whom, and why.
 
+## 2026-10-20: Claude Opus judges the #87 screen (owner)
+
+- The owner allowed Claude Opus at high effort for the blind judging, with a
+  modest number of calls. The Claude CLI is now signed in, so the screen is
+  judged as the plan says: `v2.claude_batch_judge` with `claude-opus-5-5`, one
+  fresh call per task (40), each seeing only the rubric and one packet.
+- The 2026-10-19 GPT 6.1 Sol judgment was not imported. It stays in T3 and
+  could later serve as a second, cross-family opinion.
+- Results now show error bars clustered by source paragraph and the paired
+  gap to the leader (Miller 2024, arXiv:2411.00640). This was added before any
+  score was read. A gap whose interval includes 0 goes to the full set.
+
+## 2026-10-18: issue #87 judge substitution for this run (owner)
+
+- The plan names Claude as the blind judge. The owner directed GPT 6.1 Sol at
+  high effort through T3 Code for the existing frozen #87 screen, because the
+  available Claude CLI was not authenticated.
+- This is scoped to this run; future benchmark runs still follow the plan's
+  Claude requirement unless the owner changes it. The score header and
+  `judge-session-receipt.json` must name GPT/T3 accurately, including its
+  provider instance, delegated task and child run.
+- Keep the rubric, packet index and anonymized packets unchanged. Treat the
+  ranking as unverified until the response passes import and full aggregation
+  against the raw-output hashes. No score is calibrated or replaced with a
+  fallback.
+
 ## 2026-10-15: plan reset (owner)
 
 Recorded in [`PLAN.md`](PLAN.md) and pinned issue #93. It supersedes #71.

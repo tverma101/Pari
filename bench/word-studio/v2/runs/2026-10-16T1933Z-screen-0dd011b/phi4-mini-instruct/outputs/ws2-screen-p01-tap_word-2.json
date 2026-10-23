@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p01-tap_word-2",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "28de61dda656892a92a143e71a37eb0b94cd54b62fb819f5bf44ee11d5c2f96c",
+  "seed": 1391277841205885292,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"worse\", \"serious\", \"detrimental\", \"negative\", \"unfortunate\", \"critical\", \"adverse\", \"disastrous\", \"grave\", \"harmful\"]}",
+  "timing": {
+    "first_text_ms": 180.4,
+    "option_ms": [
+      451.5,
+      630.6,
+      854.7,
+      989.3,
+      1179.3,
+      1315.0,
+      1495.9,
+      1721.8,
+      1857.9,
+      2038.4
+    ],
+    "total_ms": 2129.2,
+    "stream": [
+      [
+        180.4,
+        2
+      ],
+      [
+        227.3,
+        9
+      ],
+      [
+        272.8,
+        11
+      ],
+      [
+        317.3,
+        14
+      ],
+      [
+        363.3,
+        15
+      ],
+      [
+        407.4,
+        19
+      ],
+      [
+        451.5,
+        21
+      ],
+      [
+        496.2,
+        23
+      ],
+      [
+        540.8,
+        26
+      ],
+      [
+        585.8,
+        30
+      ],
+      [
+        630.6,
+        32
+      ],
+      [
+        674.9,
+        34
+      ],
+      [
+        720.1,
+        35
+      ],
+      [
+        765.1,
+        38
+      ],
+      [
+        810.1,
+        45
+      ],
+      [
+        854.7,
+        47
+      ],
+      [
+        899.4,
+        49
+      ],
+      [
+        944.5,
+        57
+      ],
+      [
+        989.3,
+        59
+      ],
+      [
+        1038.7,
+        61
+      ],
+      [
+        1087.0,
+        63
+      ],
+      [
+        1134.9,
+        72
+      ],
+      [
+        1179.3,
+        74
+      ],
+      [
+        1224.3,
+        76
+      ],
+      [
+        1270.1,
+        84
+      ],
+      [
+        1315.0,
+        86
+      ],
+      [
+        1361.0,
+        88
+      ],
+      [
+        1405.7,
+        90
+      ],
+      [
+        1450.8,
+        95
+      ],
+      [
+        1495.9,
+        97
+      ],
+      [
+        1540.9,
+        99
+      ],
+      [
+        1586.0,
+        102
+      ],
+      [
+        1631.6,
+        106
+      ],
+      [
+        1676.8,
+        109
+      ],
+      [
+        1721.8,
+        111
+      ],
+      [
+        1766.6,
+        113
+      ],
+      [
+        1812.3,
+        118
+      ],
+      [
+        1857.9,
+        120
+      ],
+      [
+        1902.9,
+        122
+      ],
+      [
+        1947.8,
+        126
+      ],
+      [
+        1993.0,
+        129
+      ],
+      [
+        2038.4,
+        131
+      ],
+      [
+        2083.6,
+        132
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nMany schools are thinking about banning phones during class, and I think this is a good idea. When students have their phones out, they get distracted really easily and stop listening to the teacher. A lot of kids say they only use their phones to check the time, but most of the time they are actually on social media. In my opinion, I think that a ban would help students do better on tests because they would pay attention more. Some parents are worried that they will not be able to reach their kids in an emergency. However, the school office can always call a parent if something bad happens. Overall, a phone ban is a good way to make classrooms better places to learn.\n\"\"\"\n\nThe writer tapped the word \"bad\" in this sentence (marked with [[ ]]):\nHowever, the school office can always call a parent if something [[bad]] happens.\n\nGive 10 replacements for \"bad\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"bad\" without changing the rest of the sentence. Do not repeat \"bad\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 349,
+  "new_tokens": 44,
+  "finish_reason": "stop",
+  "error": null
+}

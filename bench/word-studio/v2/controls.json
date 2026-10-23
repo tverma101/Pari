@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "Deliberately broken candidates. A correct runner records each one as failed, with its error, and writes no outputs or numbers for it (#86).",
+  "candidates": [
+    {
+      "candidate_id": "control-missing-revision",
+      "role": "broken_control",
+      "family": "control",
+      "model_id": "HuggingFaceTB/SmolLM3-3B",
+      "revision": "0000000000000000000000000000000000000000",
+      "expected": "failed at load: the revision does not exist on the Hugging Face Hub"
+    }
+  ]
+}

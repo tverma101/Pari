@@ -1,0 +1,133 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "f2a2376b-127d-4b79-a4af-492be85a7d86",
+  "packet_hash": "25b2694472734d035d1eb053cae98395a2b31d51af7cea4ec3b2ccfe62eb2ad1",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.09565399999999999,
+    "duration_ms": 26763,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 4800,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 2839
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 0,
+        "6": 0,
+        "8": 1,
+        "9": 2,
+        "10": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 2,
+        "usefulness": 4
+      },
+      "note": "Option 5 'loyal' needs an object and shifts the meaning from conviction to allegiance. Option 6 'unalterable' describes things, not people, and reads oddly in 'Atticus is unalterable'. Option 7 is a duplicate that failed the code check and was not judged. Many options are near copies. Strong picks are near the top."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 1,
+        "7": 0,
+        "8": 2,
+        "9": 0,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "Option 7 'insistent' means repeatedly demanding, which is the wrong sense. Option 9 'intransigent' is too rare and pejorative for this essay. Option 10 'stubborn' adds a negative judgment that conflicts with the paragraph's praise. Several strong options, but the plainer 'persistent' and 'determined' come before 'resolute' and 'steadfast'."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 2,
+        "4": 1,
+        "5": 2,
+        "6": 1,
+        "7": 1,
+        "8": 2,
+        "9": 0,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 3
+      },
+      "note": "Option 9 'conscientious' means careful or dutiful, which is a different meaning. Option 10 'devoted' needs an object ('devoted to...') and is incomplete in this sentence. 'stalwart' and 'perseverant' are stiff or rare, and the best option, 'steadfast', is only third."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 1,
+        "meaning": 2,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 1
+      },
+      "note": "All 10 options are nouns. 'Atticus is determination', 'courage', 'resilience', 'perseverance', 'stubbornness', 'independence', 'resolve', 'tenacity', 'grit' and 'faith' are all ungrammatical in place, and adding an article does not fix them. 'independence' and 'faith' also change the meaning, and 'stubbornness' is pejorative."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 2,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 2,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 1 'brave' and option 2 'strong' name different or vague qualities, not holding to beliefs. Options 7 'faithful', 8 'loyal' and 9 'true' need an object and shift to allegiance. Option 10 'kind' has an unrelated meaning. The only strong option, 'resolute', is sixth."
+    }
+  ]
+}

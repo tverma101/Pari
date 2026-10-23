@@ -1,0 +1,109 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "5081b010-9a1a-43cf-b8c3-56f772f37aa6",
+  "packet_hash": "2b1da7c069e5da642113907fd38900b2acf90e04d80367bf222a4ff96998443a",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.08718639999999998,
+    "duration_ms": 37472,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 648,
+    "cache_read_input_tokens": 6872,
+    "output_tokens": 4031
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 1,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "Option 2 is 0 because it softens 'will not be able to reach' to 'the difficulty of reaching', which changes the certainty (this matches the negation_changed warn), and 'emergency situation' is redundant. Option 1 is usable but 'their inability' states the inability as a fact rather than a fear. Option 5's 'harbor fears' makes the worry slightly stronger. Options 3 and 4 are clean, formal and faithful."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 1,
+        "2": 0,
+        "3": 1,
+        "4": 0,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 2,
+        "meaning": 3,
+        "register": 2,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 2 is 0: it drops 'Some', so the claim now covers all parents, and 'offspring' is odd for this essay. Option 4 is 0: it drops 'Some', which generalises the claim, and 'kids' is too informal for an academic rewrite. Option 5 is 0: 'offspring' (with 'guardians') is a thesaurus-style word too odd for a school essay. Option 1 is usable but shifts to present-tense 'cannot' and broadens to 'guardians'. Option 3's 'families' and 'fail to connect' drift slightly."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 0,
+        "4": 2,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 3,
+        "register": 3,
+        "variety": 2,
+        "usefulness": 2
+      },
+      "note": "Option 3 is 0: the clumsy 'Concern exists ... concerning' repetition and vague 'the ability' are something a teacher would mark. Option 5 is 0: 'The concern of some parents involves the ability' is awkward and vague, and the negation is lost. Options 1 and 2 drop the explicit inability (negation_changed warn), but the concern still implies it, so they are usable. Option 4 is the cleanest and keeps the meaning, but it is placed last. The options repeat each other a lot."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 2,
+        "2": 0,
+        "3": 0,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 3
+      },
+      "note": "Option 2 is 0: 'A significant number' overstates 'Some'. Option 3 is 0: it drops 'Some', so the claim covers parents in general. Option 4 is usable but 'a worry among parents' loosens the quantifier and reads plainly. Option 5 is a near-copy of the original. Option 1 is strong and placed first."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 0,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 3
+      },
+      "note": "Option 4 is 0 because 'potential difficulty in contacting' softens the inability in the original and so changes the certainty (negation_changed warn). Option 2 is wordy and the plural 'apprehensions' is slightly odd. Option 3's 'in case of emergencies' is a little loose. Option 5's 'subset' and 'articulated anxieties' are stiff. Option 1 is strong and placed first."
+    }
+  ]
+}

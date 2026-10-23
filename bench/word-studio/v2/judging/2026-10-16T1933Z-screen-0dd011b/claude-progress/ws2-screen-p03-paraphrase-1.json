@@ -1,0 +1,97 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "d9c4c6af-ec3b-45a3-a56f-baf30dc1cff5",
+  "packet_hash": "3bb6ac0543bec5bb42e0023862aa4528ef9abc87d92b239dd7881caf83ddb8e8",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.080166,
+    "duration_ms": 15748,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5164,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 1919
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 2,
+        "2": 0,
+        "3": 1,
+        "4": 1,
+        "5": 2
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 4
+      },
+      "note": "Option 2 gets 0 because it adds a claim the paragraph never makes (books were 'heavy') and changes the sentence to a negation. Option 3's 'copying books' fits poorly next to the paragraph's 'copied by hand'. Option 4's 'cost improved' is vague about direction."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 5,
+        "register": 4,
+        "variety": 2,
+        "usefulness": 4
+      },
+      "note": "Every option is accurate, but they are near copies of each other. Option 3 has an awkward 'it allowed'. Option 4 stays very close to the original."
+    },
+    {
+      "label": "C",
+      "relevance": {},
+      "criteria": null,
+      "note": "No options were judged. All five failed the code checks (echo or duplicate), so each counts as relevance 0."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 2,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 3
+      },
+      "note": "Most options drop the 'much' intensifier, which weakens the claim a little. The best option, 3, is placed third. Option 2 adds a mild 'than ever before'."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "4": 0,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 4
+      },
+      "note": "Option 4 gets 0 because 'Post-invention' is awkward, it adds a 'mass production' claim, and it drops the speed point. Option 3 is shorter than the original."
+    }
+  ]
+}

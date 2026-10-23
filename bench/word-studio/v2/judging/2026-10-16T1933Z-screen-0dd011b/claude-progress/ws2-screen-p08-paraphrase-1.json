@@ -1,0 +1,107 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "45fac61f-3a5b-4735-9fd1-2c9b67a55335",
+  "packet_hash": "114ec7e46aa5e0e022b448e44dbd9a64c11e7cc230d18dd4f577072b6bde2a63",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.11170999999999999,
+    "duration_ms": 28544,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5937,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 3187
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 3
+      },
+      "note": "All five are usable but none is strong. Option 1 ('workload was substantial') is stiff for a personal essay. Option 2 drops 'quickly' and 'a lot of effort' reads awkwardly. Option 4 is wordy. Option 5 overstates 'easy' as 'effortless' and repeats 'pizza restaurant' from the sentence before."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 0,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "Option 4 is 0: it changes the claim from 'a lot of work' (workload) to 'quite tiring' (fatigue), and it repeats the paragraph's later sentence 'The job was tiring'. Option 1 is a clean, strong rewrite placed first. Option 5's 'I first believed' is a little awkward."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 5,
+        "register": 4,
+        "variety": 2,
+        "usefulness": 3
+      },
+      "note": "Every option keeps the meaning, but options 3 to 5 are near copies of the original and of each other, swapping only one or two words. Option 1 is the only strong pick. 'Quickly understood' in option 2 is slightly off."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 0
+      },
+      "criteria": {
+        "fit": 1,
+        "meaning": 2,
+        "register": 2,
+        "variety": 1,
+        "usefulness": 1
+      },
+      "note": "Option 1 is 0: it rewrites the whole paragraph instead of the selected sentence, is far too long, and drops facts ('Last summer', 'small', 'than I thought'). Option 2 is 0: it rewrites several sentences, so putting it in place of the selection would duplicate the rest of the paragraph. Option 3 is 0: it copies the whole paragraph with almost no change and is far too long. Options 4 and 5 are code-check fails (duplicates) and were not judged."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 3
+      },
+      "note": "Option 4, the strongest, is placed fourth, so the best option is buried. Option 1's 'underestimated the task' slightly mislabels the job. Option 2's 'required more than I thought' is vague. Option 3's 'a breeze' is casual and longer than the original. Option 5 shifts 'a lot of work' to 'quite difficult'."
+    }
+  ]
+}

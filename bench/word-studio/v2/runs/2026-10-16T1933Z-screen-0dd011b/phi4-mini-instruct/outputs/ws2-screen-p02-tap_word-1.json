@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p02-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "phi4-mini-instruct",
+  "messages_sha256": "759cefb8739040b6e7f9e7c97a128e71dc776975deb056e46c43c9d5e014197e",
+  "seed": 7447245182115885959,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"illustrates\", \"demonstrates\", \"provides evidence\", \"exemplifies\", \"depicts\", \"proves\", \"indicates\", \"reveals\", \"signifies\", \"underscores\"]}",
+  "timing": {
+    "first_text_ms": 193.3,
+    "option_ms": [
+      469.1,
+      696.3,
+      923.7,
+      1152.3,
+      1335.9,
+      1519.1,
+      1703.1,
+      1886.6,
+      2070.0,
+      2255.1
+    ],
+    "total_ms": 2348.0,
+    "stream": [
+      [
+        193.3,
+        2
+      ],
+      [
+        241.4,
+        9
+      ],
+      [
+        287.6,
+        11
+      ],
+      [
+        333.0,
+        14
+      ],
+      [
+        378.0,
+        21
+      ],
+      [
+        423.6,
+        25
+      ],
+      [
+        469.1,
+        27
+      ],
+      [
+        514.3,
+        29
+      ],
+      [
+        559.5,
+        32
+      ],
+      [
+        605.3,
+        37
+      ],
+      [
+        650.9,
+        41
+      ],
+      [
+        696.3,
+        43
+      ],
+      [
+        741.4,
+        45
+      ],
+      [
+        787.2,
+        51
+      ],
+      [
+        832.9,
+        53
+      ],
+      [
+        878.4,
+        62
+      ],
+      [
+        923.7,
+        64
+      ],
+      [
+        969.5,
+        66
+      ],
+      [
+        1015.1,
+        68
+      ],
+      [
+        1060.6,
+        72
+      ],
+      [
+        1106.0,
+        77
+      ],
+      [
+        1152.3,
+        79
+      ],
+      [
+        1198.3,
+        81
+      ],
+      [
+        1244.6,
+        84
+      ],
+      [
+        1289.9,
+        88
+      ],
+      [
+        1335.9,
+        90
+      ],
+      [
+        1381.8,
+        92
+      ],
+      [
+        1427.6,
+        95
+      ],
+      [
+        1473.2,
+        98
+      ],
+      [
+        1519.1,
+        100
+      ],
+      [
+        1565.0,
+        102
+      ],
+      [
+        1610.6,
+        105
+      ],
+      [
+        1657.0,
+        111
+      ],
+      [
+        1703.1,
+        113
+      ],
+      [
+        1749.0,
+        115
+      ],
+      [
+        1794.7,
+        119
+      ],
+      [
+        1840.9,
+        122
+      ],
+      [
+        1886.6,
+        124
+      ],
+      [
+        1932.4,
+        126
+      ],
+      [
+        1977.9,
+        130
+      ],
+      [
+        2024.1,
+        135
+      ],
+      [
+        2070.0,
+        137
+      ],
+      [
+        2115.9,
+        139
+      ],
+      [
+        2161.8,
+        145
+      ],
+      [
+        2208.0,
+        150
+      ],
+      [
+        2255.1,
+        152
+      ],
+      [
+        2300.9,
+        153
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|system|>You are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|end|><|user|>Paragraph:\n\"\"\"\nIn To Kill a Mockingbird, Atticus Finch shows that doing the right thing is not always easy. He agrees to defend Tom Robinson even though he knows that most people in Maycomb will be angry at him. Atticus is someone who never gives up on what he believes, even when his own children get bullied at school because of it. He tells Scout that you never really understand a person until you look at things from their point of view. This shows that he wants his kids to be fair to everyone, not just people who are like them. Atticus is a good example of a person who stays brave when it would be easier to stay quiet.\n\"\"\"\n\nThe writer tapped the word \"shows\" in this sentence (marked with [[ ]]):\nIn To Kill a Mockingbird, Atticus Finch [[shows]] that doing the right thing is not always easy.\n\nGive 10 replacements for \"shows\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"shows\" without changing the rest of the sentence. Do not repeat \"shows\" itself. Put the best options first.<|end|><|assistant|>",
+  "prompt_tokens": 351,
+  "new_tokens": 48,
+  "finish_reason": "stop",
+  "error": null
+}

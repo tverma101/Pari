@@ -1,0 +1,109 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "d2ec87c5-557b-4896-b081-0c64d726ed07",
+  "packet_hash": "57acd33b211a9b60e516cef9524ddd6e1ac5cdfcffe114ef3235d122cabfac08",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.11144199999999999,
+    "duration_ms": 32918,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5016,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 3542
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 0,
+        "2": 2,
+        "3": 0,
+        "4": 2,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 2,
+        "register": 3,
+        "variety": 4,
+        "usefulness": 2
+      },
+      "note": "Option 1 is 0: 'leads to' turns a correlation into a cause and drops 'usually', so the claim becomes more certain. Option 3 is 0: 'helps students' claims a cause and drops 'usually'. Option 5 is 0: it claims a cause and drops the hedge in the same way, and the passive 'It has been found by scientists' is awkward. The best options, 2 and 4, are in the middle of the list."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 1,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 1,
+        "meaning": 1,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 1
+      },
+      "note": "Option 1 is 0: it is off topic, about extending the school day, and adds a claim. Option 2 is 0: it changes the claim to staying up later and doing worse on tests. Option 3 is 0: it rewrites the next sentence (later start times) instead of the selected one. Option 5 is 0: it says schools should start earlier, which goes against the paragraph, and it puts the opinion on scientists. Option 4 is usable, but 'The study' points to a study the paragraph never mentions; changing the article fixes it."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 2,
+        "2": 1,
+        "3": 0,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "Option 3 is 0: 'students who sleep more frequently' attaches the adverb to 'sleep', so it reads as sleeping more often, and the meaning changes. Option 4 says 'demonstrates', which is slightly more certain, and the phrasing is heavier than the original. Option 5 says 'suggest', which is slightly weaker than 'have found'."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 0,
+        "4": 0,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 3,
+        "register": 4,
+        "variety": 2,
+        "usefulness": 3
+      },
+      "note": "Option 3 is 0: 'students who sleep more often receive' is ambiguous and naturally reads as sleeping more often, which changes the meaning. Option 4 is 0: 'sleep more frequently' has the same misreading, and 'improved grades' suggests the grades changed over time. The options have very similar structure. Option 5's 'Observations show' is a little odd."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 1,
+        "2": 0,
+        "3": 1,
+        "4": 1,
+        "5": 2
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 3,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 3
+      },
+      "note": "Option 2 is 0: 'prioritize sleep' adds a behaviour the original does not mention, where the original only says students sleep more. Options 1 and 4 change 'more sleep' to 'adequate' or 'sufficient' sleep, and 'improved' suggests a change over time. Option 3 is stiff. The strongest option, 5, comes last."
+    }
+  ]
+}

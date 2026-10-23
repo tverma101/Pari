@@ -1,0 +1,5 @@
+[control-missing-revision] FAILED to load: RevisionNotFoundError: 404 Client Error. (Request ID: Root=1-6ad27b2b-2ef0b3fc5f01cec858add5c4;e2bbe6cd-de4e-420b-95d6-7abf66b07056)
+
+Revision Not Found for url: https://huggingface.co/api/models/HuggingFaceTB/SmolLM3-3B/tree/0000000000000000000000000000000000000000/additional_chat_templates?recursive=false&expand=false.
+
+{"candidate": "control-missing-revision", "status": "failed", "tasks": {"ok": 0, "error": 0, "failed_ids": []}}

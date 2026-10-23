@@ -1,0 +1,73 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]
+Fetching 2 files:  50%|█████     | 1/2 [00:10<00:10, 10.32s/it]
+Fetching 2 files: 100%|██████████| 2/2 [00:31<00:00, 16.93s/it]
+Fetching 2 files: 100%|██████████| 2/2 [00:31<00:00, 15.94s/it]
+
+Loading weights:   0%|          | 0/326 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/326 [00:00<01:54,  2.84it/s]
+Loading weights:   9%|▉         | 30/326 [00:00<00:03, 83.58it/s]
+Loading weights:  14%|█▍        | 46/326 [00:00<00:02, 97.37it/s]
+Loading weights:  19%|█▊        | 61/326 [00:00<00:02, 96.45it/s]
+Loading weights:  23%|██▎       | 75/326 [00:00<00:02, 102.56it/s]
+Loading weights:  27%|██▋       | 88/326 [00:00<00:02, 108.57it/s]
+Loading weights:  31%|███       | 101/326 [00:01<00:02, 110.87it/s]
+Loading weights:  35%|███▍      | 114/326 [00:01<00:02, 105.33it/s]
+Loading weights:  39%|███▊      | 126/326 [00:01<00:01, 102.04it/s]
+Loading weights:  42%|████▏     | 138/326 [00:01<00:01, 102.49it/s]
+Loading weights:  46%|████▌     | 149/326 [00:01<00:01, 100.55it/s]
+Loading weights:  51%|█████     | 165/326 [00:01<00:01, 110.11it/s]
+Loading weights:  54%|█████▍    | 177/326 [00:01<00:01, 103.52it/s]
+Loading weights:  59%|█████▉    | 192/326 [00:01<00:01, 104.04it/s]
+Loading weights:  62%|██████▏   | 203/326 [00:02<00:01, 104.76it/s]
+Loading weights:  67%|██████▋   | 219/326 [00:02<00:01, 103.55it/s]
+Loading weights:  73%|███████▎  | 237/326 [00:02<00:00, 107.21it/s]
+Loading weights:  78%|███████▊  | 255/326 [00:02<00:00, 119.14it/s]
+Loading weights:  82%|████████▏ | 268/326 [00:02<00:00, 107.38it/s]
+Loading weights:  87%|████████▋ | 282/326 [00:02<00:00, 105.66it/s]
+Loading weights:  90%|████████▉ | 293/326 [00:02<00:00, 101.30it/s]
+Loading weights:  95%|█████████▍| 309/326 [00:03<00:00, 104.10it/s]
+Loading weights: 100%|██████████| 326/326 [00:03<00:00, 103.58it/s]
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+[smollm3-3b] 1/40 ws2-screen-p01-academic-1 ok 5.0s options_seen=5
+[smollm3-3b] 2/40 ws2-screen-p01-condense-1 ok 4.2s options_seen=5
+[smollm3-3b] 3/40 ws2-screen-p01-tap_word-1 ok 2.0s options_seen=10
+[smollm3-3b] 4/40 ws2-screen-p01-tap_word-2 ok 4.3s options_seen=10
+[smollm3-3b] 5/40 ws2-screen-p01-word_sentences-1 ok 3.8s options_seen=5
+[smollm3-3b] 6/40 ws2-screen-p02-academic-1 ok 5.1s options_seen=5
+[smollm3-3b] 7/40 ws2-screen-p02-paraphrase-1 ok 5.1s options_seen=5
+[smollm3-3b] 8/40 ws2-screen-p02-phrase_to_word-1 ok 2.3s options_seen=10
+[smollm3-3b] 9/40 ws2-screen-p02-tap_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 10/40 ws2-screen-p02-word_sentences-1 ok 9.6s options_seen=5
+[smollm3-3b] 11/40 ws2-screen-p03-academic-1 ok 6.8s options_seen=5
+[smollm3-3b] 12/40 ws2-screen-p03-condense-1 ok 4.2s options_seen=5
+[smollm3-3b] 13/40 ws2-screen-p03-paraphrase-1 ok 5.9s options_seen=5
+[smollm3-3b] 14/40 ws2-screen-p03-tap_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 15/40 ws2-screen-p03-tap_word-2 ok 1.9s options_seen=10
+[smollm3-3b] 16/40 ws2-screen-p04-condense-1 ok 4.4s options_seen=5
+[smollm3-3b] 17/40 ws2-screen-p04-paraphrase-1 ok 3.4s options_seen=5
+[smollm3-3b] 18/40 ws2-screen-p04-phrase_to_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 19/40 ws2-screen-p04-tap_word-1 ok 2.4s options_seen=10
+[smollm3-3b] 20/40 ws2-screen-p04-word_sentences-1 ok 12.1s options_seen=5
+[smollm3-3b] 21/40 ws2-screen-p05-paraphrase-1 ok 3.3s options_seen=5
+[smollm3-3b] 22/40 ws2-screen-p05-phrase_to_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 23/40 ws2-screen-p05-tap_word-1 ok 2.3s options_seen=10
+[smollm3-3b] 24/40 ws2-screen-p05-tap_word-2 ok 2.3s options_seen=10
+[smollm3-3b] 25/40 ws2-screen-p05-word_sentences-1 ok 4.8s options_seen=5
+[smollm3-3b] 26/40 ws2-screen-p06-academic-1 ok 6.4s options_seen=5
+[smollm3-3b] 27/40 ws2-screen-p06-condense-1 ok 4.0s options_seen=5
+[smollm3-3b] 28/40 ws2-screen-p06-phrase_to_word-1 ok 2.2s options_seen=10
+[smollm3-3b] 29/40 ws2-screen-p06-tap_word-1 ok 1.9s options_seen=10
+[smollm3-3b] 30/40 ws2-screen-p06-word_sentences-1 ok 6.0s options_seen=5
+[smollm3-3b] 31/40 ws2-screen-p07-academic-1 ok 6.3s options_seen=5
+[smollm3-3b] 32/40 ws2-screen-p07-condense-1 ok 2.9s options_seen=5
+[smollm3-3b] 33/40 ws2-screen-p07-phrase_to_word-1 ok 2.5s options_seen=10
+[smollm3-3b] 34/40 ws2-screen-p07-tap_word-1 ok 2.3s options_seen=10
+[smollm3-3b] 35/40 ws2-screen-p07-tap_word-2 ok 4.0s options_seen=10
+[smollm3-3b] 36/40 ws2-screen-p08-condense-1 ok 6.4s options_seen=5
+[smollm3-3b] 37/40 ws2-screen-p08-paraphrase-1 ok 5.3s options_seen=5
+[smollm3-3b] 38/40 ws2-screen-p08-phrase_to_word-1 ok 2.1s options_seen=10
+[smollm3-3b] 39/40 ws2-screen-p08-tap_word-1 ok 2.4s options_seen=10
+[smollm3-3b] 40/40 ws2-screen-p08-word_sentences-1 ok 3.5s options_seen=5
+{"candidate": "smollm3-3b", "status": "completed", "tasks": {"ok": 40, "error": 0, "failed_ids": []}}

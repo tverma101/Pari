@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p06-condense-1",
+  "kind": "condense",
+  "candidate_id": "minicpm5-2b",
+  "messages_sha256": "349bcffc07fb0ebe03f753203c611bb9ba7b69056a2e24cfc21baf636f294e84",
+  "seed": 7360354672614167410,
+  "max_new_tokens": 640,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"Teens compare themselves to others and feel bad.\", \"Comparing leads to feeling bad.\", \"Teens feel bad when comparing.\", \"Comparing makes teens feel bad.\", \"Comparing others makes teens feel bad.\"]}",
+  "timing": {
+    "first_text_ms": 124.3,
+    "option_ms": [
+      759.8,
+      1106.6,
+      1499.0,
+      1857.9,
+      2263.0
+    ],
+    "total_ms": 2361.9,
+    "stream": [
+      [
+        124.3,
+        2
+      ],
+      [
+        173.3,
+        9
+      ],
+      [
+        221.5,
+        11
+      ],
+      [
+        270.7,
+        14
+      ],
+      [
+        319.4,
+        16
+      ],
+      [
+        368.0,
+        19
+      ],
+      [
+        416.6,
+        27
+      ],
+      [
+        465.2,
+        38
+      ],
+      [
+        516.1,
+        41
+      ],
+      [
+        564.5,
+        48
+      ],
+      [
+        612.2,
+        52
+      ],
+      [
+        660.9,
+        57
+      ],
+      [
+        710.7,
+        61
+      ],
+      [
+        759.8,
+        64
+      ],
+      [
+        809.0,
+        66
+      ],
+      [
+        857.6,
+        75
+      ],
+      [
+        907.6,
+        81
+      ],
+      [
+        957.4,
+        84
+      ],
+      [
+        1005.6,
+        92
+      ],
+      [
+        1057.2,
+        96
+      ],
+      [
+        1106.6,
+        99
+      ],
+      [
+        1154.7,
+        101
+      ],
+      [
+        1203.3,
+        103
+      ],
+      [
+        1251.6,
+        106
+      ],
+      [
+        1300.1,
+        111
+      ],
+      [
+        1348.5,
+        115
+      ],
+      [
+        1397.8,
+        120
+      ],
+      [
+        1447.0,
+        130
+      ],
+      [
+        1499.0,
+        133
+      ],
+      [
+        1550.7,
+        135
+      ],
+      [
+        1601.9,
+        144
+      ],
+      [
+        1655.6,
+        150
+      ],
+      [
+        1706.5,
+        156
+      ],
+      [
+        1756.8,
+        161
+      ],
+      [
+        1807.6,
+        165
+      ],
+      [
+        1857.9,
+        168
+      ],
+      [
+        1909.3,
+        170
+      ],
+      [
+        1960.3,
+        179
+      ],
+      [
+        2009.4,
+        186
+      ],
+      [
+        2060.8,
+        192
+      ],
+      [
+        2112.0,
+        198
+      ],
+      [
+        2162.1,
+        203
+      ],
+      [
+        2212.8,
+        207
+      ],
+      [
+        2263.0,
+        209
+      ],
+      [
+        2312.1,
+        211
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<s><|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nSocial media has a big effect on how teenagers see themselves. On apps like Instagram and TikTok, people usually only post the best parts of their lives, like vacations and nice clothes. When teens look at these posts all day, they start to compare themselves to others and feel bad about their own lives. A survey from 2023 found that almost half of teens said social media made them feel worse about their bodies. Social media is not all bad, though, because it also helps people stay in touch with friends and find others with the same interests. Still, I believe that teens should limit how much time they spend on these apps.\n\"\"\"\n\nThe writer selected this text:\n\"\"\"\nWhen teens look at these posts all day, they start to compare themselves to others and feel bad about their own lives.\n\"\"\"\n\nGive 5 different rewrites of the selected text that say the same thing in fewer words. Keep every fact, name, number and quotation, and keep the claim exactly as strong or as uncertain as it is. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 338,
+  "new_tokens": 46,
+  "finish_reason": "stop",
+  "error": null
+}

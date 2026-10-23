@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "ws2-screen-p07-tap_word-1",
+  "kind": "tap_word",
+  "candidate_id": "qwen35-2b",
+  "messages_sha256": "81ffc208a431026409c856ee73bf47f0bb2d1404964cd66d872833b3e8bf17e7",
+  "seed": 3299988612405679893,
+  "max_new_tokens": 320,
+  "status": "ok",
+  "raw_text": "{\"options\": [\"encourages\", \"urges\", \"presses\", \"drives\", \"compels\", \"presses\", \"compels\", \"urges\", \"drives\", \"pushes\"]}\n",
+  "timing": {
+    "first_text_ms": 360.8,
+    "option_ms": [
+      692.6,
+      881.8,
+      1074.8,
+      1263.8,
+      1454.4,
+      1643.2,
+      1833.8,
+      2026.1,
+      2215.2,
+      2400.2
+    ],
+    "total_ms": 2538.8,
+    "stream": [
+      [
+        360.8,
+        2
+      ],
+      [
+        409.3,
+        9
+      ],
+      [
+        456.3,
+        11
+      ],
+      [
+        505.0,
+        14
+      ],
+      [
+        551.2,
+        17
+      ],
+      [
+        598.0,
+        20
+      ],
+      [
+        645.5,
+        24
+      ],
+      [
+        692.6,
+        26
+      ],
+      [
+        739.1,
+        28
+      ],
+      [
+        786.7,
+        30
+      ],
+      [
+        834.3,
+        33
+      ],
+      [
+        881.8,
+        35
+      ],
+      [
+        930.3,
+        37
+      ],
+      [
+        977.3,
+        42
+      ],
+      [
+        1027.2,
+        44
+      ],
+      [
+        1074.8,
+        46
+      ],
+      [
+        1121.7,
+        48
+      ],
+      [
+        1168.7,
+        50
+      ],
+      [
+        1216.7,
+        54
+      ],
+      [
+        1263.8,
+        56
+      ],
+      [
+        1311.6,
+        58
+      ],
+      [
+        1358.9,
+        62
+      ],
+      [
+        1405.7,
+        65
+      ],
+      [
+        1454.4,
+        67
+      ],
+      [
+        1501.6,
+        69
+      ],
+      [
+        1548.8,
+        74
+      ],
+      [
+        1596.3,
+        76
+      ],
+      [
+        1643.2,
+        78
+      ],
+      [
+        1689.7,
+        80
+      ],
+      [
+        1736.5,
+        84
+      ],
+      [
+        1785.8,
+        87
+      ],
+      [
+        1833.8,
+        89
+      ],
+      [
+        1881.2,
+        91
+      ],
+      [
+        1929.5,
+        93
+      ],
+      [
+        1977.2,
+        96
+      ],
+      [
+        2026.1,
+        98
+      ],
+      [
+        2073.8,
+        100
+      ],
+      [
+        2120.6,
+        102
+      ],
+      [
+        2166.8,
+        106
+      ],
+      [
+        2215.2,
+        108
+      ],
+      [
+        2261.1,
+        110
+      ],
+      [
+        2308.1,
+        114
+      ],
+      [
+        2354.2,
+        116
+      ],
+      [
+        2400.2,
+        119
+      ],
+      [
+        2492.1,
+        120
+      ]
+    ],
+    "note": "Milliseconds from the generate call, timed per generated token. option_ms[i] is when option i+1 was complete in the stream; an option the parser can only close at the end of the output gets total_ms."
+  },
+  "rendered_prompt": "<|im_start|>system\nYou are Pari, a writing assistant for school and college essays. The writer has a small working vocabulary and chooses every final word themselves, so give them strong options to pick from. Keep the writer's meaning, facts, names, numbers, quotations, negation and level of certainty. Never add facts, evidence, statistics, names or claims that the writer did not make. Reply with JSON only, exactly in this form: {\"options\": [\"...\", \"...\"]}. No commentary, no explanations, no numbering.<|im_end|>\n<|im_start|>user\nParagraph:\n\"\"\"\nIn Macbeth, Shakespeare shows how wanting power too much can destroy a person. At the start of the play, Macbeth is a loyal soldier who fights bravely for King Duncan. After the witches tell him he will be king, he cannot stop thinking about it. Lady Macbeth pushes him to kill Duncan, and he finally agrees even though he feels guilty. Once he becomes king, he keeps killing people because he is afraid of losing what he has. By the end, Macbeth says that life is \"a tale told by an idiot,\" which shows how empty he feels. His story is a warning about what happens when ambition gets out of control.\n\"\"\"\n\nThe writer tapped the word \"pushes\" in this sentence (marked with [[ ]]):\nLady Macbeth [[pushes]] him to kill Duncan, and he finally agrees even though he feels guilty.\n\nGive 10 replacements for \"pushes\" that fit this sentence and keep its meaning, in a clear essay register. Each option must be one word or a short phrase of at most three words that can replace \"pushes\" without changing the rest of the sentence. Do not repeat \"pushes\" itself. Put the best options first.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "prompt_tokens": 371,
+  "new_tokens": 47,
+  "finish_reason": "stop",
+  "error": null
+}

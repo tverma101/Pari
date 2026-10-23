@@ -1,0 +1,19 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Loading weights:   0%|          | 0/381 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/381 [00:00<05:59,  1.06it/s]
+Loading weights:   1%|          | 2/381 [00:01<02:57,  2.13it/s]
+Loading weights:  30%|██▉       | 113/381 [00:01<00:01, 169.52it/s]
+Loading weights:  43%|████▎     | 163/381 [00:01<00:01, 190.99it/s]
+Loading weights:  53%|█████▎    | 203/381 [00:01<00:00, 194.81it/s]
+Loading weights:  62%|██████▏   | 236/381 [00:01<00:00, 209.49it/s]
+Loading weights:  70%|███████   | 267/381 [00:01<00:00, 207.19it/s]
+Loading weights:  77%|███████▋  | 295/381 [00:01<00:00, 210.45it/s]
+Loading weights:  84%|████████▍ | 321/381 [00:02<00:00, 208.98it/s]
+Loading weights:  91%|█████████ | 345/381 [00:02<00:00, 212.14it/s]
+Loading weights:  97%|█████████▋| 369/381 [00:02<00:00, 216.67it/s]
+Loading weights: 100%|██████████| 381/381 [00:02<00:00, 161.27it/s]
+[transformers] Passing `generation_config` together with generation-related arguments=({'max_new_tokens'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+[minicpm5-2b] 1/2 ws2-screen-p01-academic-1 ok 5.1s options_seen=5
+[minicpm5-2b] 2/2 ws2-screen-p01-condense-1 ok 2.5s options_seen=5
+{"candidate": "minicpm5-2b", "status": "completed", "tasks": {"ok": 2, "error": 0, "failed_ids": []}}

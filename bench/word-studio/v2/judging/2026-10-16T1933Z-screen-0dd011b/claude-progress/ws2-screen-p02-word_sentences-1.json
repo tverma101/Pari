@@ -1,0 +1,109 @@
+{
+  "model": "claude-opus-5-5",
+  "effort_level": "high",
+  "session": "d9deee5f-48d9-4f33-b161-ea285c0cd362",
+  "packet_hash": "024dbec5615aeef9399ea2b4377ca69a3063681888ee51ff88f31e2c646986f5",
+  "template_hash": "ad31f4f3b9e6ef67346482fe38c99e2c1e72d37778f0671175339055f83a0ade",
+  "rubric_hash": "3640fb0e70fdfcbbc7d2ee5d0c879d2438117dab68c8509baa7cbb3f3396f825",
+  "usage": {
+    "total_cost_usd": 0.101642,
+    "duration_ms": 36093,
+    "num_turns": 2,
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 5306,
+    "cache_read_input_tokens": 2330,
+    "output_tokens": 2936
+  },
+  "scores": [
+    {
+      "label": "A",
+      "relevance": {
+        "1": 1,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "criteria": {
+        "fit": 1,
+        "meaning": 2,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 1
+      },
+      "note": "Only option 1 is about Atticus, and it is vague ('a lesson we carry'). Option 2: 'doubt' is not an idea in the paragraph; the paragraph is about anger and bullying. Option 3: a vague new claim that is off the argument. Option 4: 'keeping integrity' is unidiomatic, 'true person' is odd, and the sentence is a generic maxim. Option 5: 'conscience' is a new idea and the sentence is off the paragraph's argument."
+    },
+    {
+      "label": "B",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 4,
+        "register": 4,
+        "variety": 4,
+        "usefulness": 5
+      },
+      "note": "Options 1 and 2 are strong and tied closely to the paragraph's points. Option 3 stretches 'integrity' to cover empathy. Option 4 is somewhat generic. Option 5 drifts slightly: the paragraph says Atticus wants his kids to be fair, not that he himself is fair to all."
+    },
+    {
+      "label": "C",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 0,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 4,
+        "meaning": 4,
+        "register": 5,
+        "variety": 4,
+        "usefulness": 4
+      },
+      "note": "Option 3 is 0: it adds the name 'Jem', which the paragraph never mentions (the instruction forbids new names), and 'insistence' overstates the advice. Option 4 shifts to the past tense and is generic. Option 5's 'throughout the novel' goes beyond what the paragraph says. Options 1 and 2 are strong."
+    },
+    {
+      "label": "D",
+      "relevance": {
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 5,
+        "meaning": 5,
+        "register": 4,
+        "variety": 3,
+        "usefulness": 4
+      },
+      "note": "Options 1 and 2 are strong and faithful. Option 3 is wordy and stretches 'integrity' toward empathy. Option 4 adds 'necessary'. Option 5 nearly repeats option 1, which lowers variety."
+    },
+    {
+      "label": "E",
+      "relevance": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 1
+      },
+      "criteria": {
+        "fit": 3,
+        "meaning": 2,
+        "register": 3,
+        "variety": 3,
+        "usefulness": 2
+      },
+      "note": "Option 1: 'might be unpopular' weakens the paragraph's certainty (he knows most people will be angry), and 'the most integrity' adds a superlative claim. Option 2: 'the innocent' adds a claim the paragraph does not make, and 'stood up for him' has a confused referent. Option 3: refusing to judge by background is a new idea and does not match the paragraph's point. Option 5 is awkward but usable."
+    }
+  ]
+}
