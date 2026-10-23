@@ -52,7 +52,19 @@ import {
   splitEditorSpanText,
   joinEditorSpanText,
   type EditorDomSelection,
+  type EditorSpanSelection,
 } from "@/lib/editor/spanSelection";
+import {
+  buildCondenseOptions,
+  buildPhraseToOneWordOptions,
+  wordLabWordFitsContext,
+  WORD_LAB_SAFE_SOURCES,
+} from "@/lib/editor/wordLab";
+import {
+  WordLabPanel,
+  type WordLabTransformKind,
+  type WordLabView,
+} from "@/WordLabPanel";
 import {
   appendStudioDecision,
   markParagraphSavedInLog,
@@ -495,6 +507,7 @@ function SynonymPopover({
   onJoin,
   canSplit,
   canJoin,
+  onOpenWordLab,
 }: {
   token: RewriteToken;
   results: RankingResult[];
@@ -514,6 +527,7 @@ function SynonymPopover({
   onJoin?: () => void;
   canSplit?: boolean;
   canJoin?: boolean;
+  onOpenWordLab: () => void;
 }) {
   return (
     <div
@@ -633,6 +647,13 @@ function SynonymPopover({
             Join with neighbor
           </button>
         )}
+        <button
+          type="button"
+          onClick={onOpenWordLab}
+          className="synonym-action rounded-full px-2.5 py-1 text-[10px]"
+        >
+          Word Lab
+        </button>
         <button
           type="button"
           onClick={onCopySentence}
@@ -861,6 +882,10 @@ export default function App() {
   const [contextualAlternatives, setContextualAlternatives] = useState<Record<string, CandidateOption[]>>({});
   const [contextualLoadingTokenId, setContextualLoadingTokenId] = useState<string | null>(null);
   const [visibleSynonymCount, setVisibleSynonymCount] = useState(INITIAL_VISIBLE_SYNONYMS);
+  const [wordLabOpen, setWordLabOpen] = useState(false);
+  const [wordLabView, setWordLabView] = useState<WordLabView>("word");
+  const [wordLabSelection, setWordLabSelection] = useState<EditorSpanSelection | null>(null);
+  const [wordLabTransformKind, setWordLabTransformKind] = useState<WordLabTransformKind>("condense");
   const [harperIssues, setHarperIssues] = useState<GrammarIssue[]>([]);
   const [harperStatus, setHarperStatus] = useState<"idle" | "checking" | "ready" | "unavailable">("idle");
 
@@ -899,7 +924,13 @@ export default function App() {
 
   const handleSelectSpan = useCallback((domSelection: EditorDomSelection) => {
     if (!sessionRef.current) return;
-    setAnchorRect(domSelection.range.getBoundingClientRect());
+    setWordLabSelection(domSelection.span);
+    setWordLabView(domSelection.span.kind === "word" ? "word" : "sentence");
+    setWordLabOpen(true);
+    setActiveTokenId(null);
+    setActiveTokenWord(null);
+    setAnchorRect(null);
+    activeAnchorRef.current = null;
   }, []);
 
   const clearStrengthRegeneration = () => {
@@ -1110,6 +1141,167 @@ export default function App() {
     return rankCandidatesByMemory(ranked, activeToken.originalText, preferenceMemory).slice(0, SYNONYM_LIMIT);
   }, [activeToken, engineStrength, preferenceMemory, session?.currentEditedText]);
 
+  const wordLabSelectionIsCurrent = Boolean(
+    wordLabSelection && session &&
+    session.currentEditedText.slice(wordLabSelection.start, wordLabSelection.end) === wordLabSelection.text
+  );
+  const wordLabCurrentSelection = wordLabSelectionIsCurrent ? wordLabSelection : null;
+
+  const wordLabActiveToken = useMemo(() => {
+    if (!wordLabOpen || !wordLabSelection || wordLabSelection.kind !== "word" || !preview) return null;
+    return preview.tokens.find((token) =>
+      token.isWord && token.start === wordLabSelection.start && token.end === wordLabSelection.end
+    ) ?? null;
+  }, [preview, wordLabOpen, wordLabSelection]);
+
+  const wordLabWordResults = useMemo(() => {
+    if (!wordLabActiveToken || !session) return [];
+    const sentence = getSentenceForRange(
+      session.currentEditedText,
+      wordLabActiveToken.start,
+      wordLabActiveToken.end,
+    );
+    const ranked = rankCandidatesByRule(wordLabActiveToken.alternatives, {
+      fullText: session.currentEditedText,
+      sentence: sentence.text,
+      selectedText: wordLabActiveToken.text,
+      mode: "formal",
+      strength: percentToStrengthLevel(engineStrength),
+      freezeWords: [],
+      partOfSpeech: wordLabActiveToken.partOfSpeech,
+      selectionStart: wordLabActiveToken.start,
+      selectionEnd: wordLabActiveToken.end,
+      sentenceStart: sentence.start,
+    });
+    return rankCandidatesByMemory(ranked, wordLabActiveToken.originalText, preferenceMemory)
+      .filter((result) => WORD_LAB_SAFE_SOURCES.has(result.option.source))
+      .filter((result) => result.risk === "low" && result.option.replacement.toLowerCase() !== wordLabActiveToken.text.toLowerCase())
+      .filter((result) => result.warnings.length === 0 && countWords(result.option.replacement) === 1)
+      .filter((result) => wordLabWordFitsContext(
+        session.currentEditedText,
+        wordLabActiveToken.end,
+        wordLabActiveToken.partOfSpeech,
+        result.option.replacement,
+      ))
+      .slice(0, 5);
+  }, [engineStrength, preferenceMemory, session, wordLabActiveToken]);
+
+  const wordLabWordExamples = useMemo(() => {
+    if (!wordLabActiveToken || !session || !wordLabSelectionIsCurrent) return [];
+    const sentence = getSentenceForRange(
+      session.currentEditedText,
+      wordLabActiveToken.start,
+      wordLabActiveToken.end,
+    );
+    const localStart = wordLabActiveToken.start - sentence.start;
+    const localEnd = wordLabActiveToken.end - sentence.start;
+    return wordLabWordResults.map((result) => ({
+      id: result.option.id,
+      replacement: result.option.replacement,
+      label: result.option.label ?? "essay-fit",
+      sentence: replaceRange(sentence.text, localStart, localEnd, result.option.replacement),
+    }));
+  }, [session, wordLabActiveToken, wordLabSelectionIsCurrent, wordLabWordResults]);
+
+  const wordLabPhraseCandidates = useMemo(() => {
+    if (!wordLabOpen || !wordLabCurrentSelection) return [];
+    const phraseRewrite = rewriteText(
+      wordLabCurrentSelection.text,
+      { mode: "formal", strength: 100, freezeWords: "", disableAutomaticRewrites: true },
+    );
+    return phraseRewrite.tokens
+      .filter((token) => token.isPhrase)
+      .flatMap((token) => token.alternatives)
+      .filter((option) => WORD_LAB_SAFE_SOURCES.has(option.source) && option.risk !== "high");
+  }, [wordLabCurrentSelection, wordLabOpen]);
+
+  const wordLabTransformOptions = useMemo(() => {
+    if (
+      !wordLabOpen || !wordLabCurrentSelection || wordLabCurrentSelection.kind === "word" ||
+      !session || !preview
+    ) return [];
+
+    const selectedText = wordLabCurrentSelection.text;
+    if (wordLabTransformKind === "condense" || wordLabTransformKind === "one-word") {
+      const variants = wordLabTransformKind === "condense"
+        ? buildCondenseOptions(selectedText, wordLabPhraseCandidates)
+        : buildPhraseToOneWordOptions(selectedText, wordLabPhraseCandidates);
+      return variants.map((replacement, index) => ({
+        id: `${wordLabTransformKind}-${index}-${replacement}`,
+        label: wordLabTransformKind === "condense" ? "Condense" : "Phrase → one word",
+        replacement,
+      }));
+    }
+
+    const output: Array<{ id: string; label: string; replacement: string }> = [];
+    const seen = new Set<string>();
+    const spanTokens = preview.tokens.filter((token) =>
+      token.isWord && !token.frozen && token.start >= wordLabCurrentSelection.start &&
+      token.end <= wordLabCurrentSelection.end && token.alternatives.length > 0
+    );
+    for (const token of spanTokens) {
+      const sentence = getSentenceForRange(session.currentEditedText, token.start, token.end);
+      const ranked = rankCandidatesByRule(token.alternatives, {
+        fullText: session.currentEditedText,
+        sentence: sentence.text,
+        selectedText: token.text,
+        mode: wordLabTransformKind === "academic" ? "formal" : engineMode,
+        strength: percentToStrengthLevel(engineStrength),
+        freezeWords: [],
+        partOfSpeech: token.partOfSpeech,
+        selectionStart: token.start,
+        selectionEnd: token.end,
+        sentenceStart: sentence.start,
+      });
+      const ordered = rankCandidatesByMemory(ranked, token.originalText, preferenceMemory);
+      for (const result of ordered) {
+        const option = result.option;
+        if (!WORD_LAB_SAFE_SOURCES.has(option.source) || result.risk !== "low" || result.warnings.length > 0) continue;
+        if (countWords(option.replacement) !== countWords(token.text)) continue;
+        if (!wordLabWordFitsContext(session.currentEditedText, token.end, token.partOfSpeech, option.replacement)) continue;
+        if (wordLabTransformKind === "academic" &&
+          !(/formal|academic/i.test(option.label ?? "") || option.modePreference?.includes("formal"))) continue;
+        const candidate = replaceRange(
+          selectedText,
+          token.start - wordLabCurrentSelection.start,
+          token.end - wordLabCurrentSelection.start,
+          option.replacement,
+        );
+        if (candidate === selectedText || countWords(candidate) !== countWords(selectedText)) continue;
+        const fullCandidate = replaceRange(
+          session.currentEditedText,
+          wordLabCurrentSelection.start,
+          wordLabCurrentSelection.end,
+          candidate,
+        );
+        if (!validateProtectedContent(session.originalText, fullCandidate, session.protectedSpans).safe) continue;
+        const key = candidate.toLocaleLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        output.push({
+          id: `${wordLabTransformKind}-${token.id}-${option.id}`,
+          label: wordLabTransformKind === "academic"
+            ? `More academic · ${option.label ?? "essay register"}`
+            : `Same length · ${option.label ?? "essay-fit"}`,
+          replacement: candidate,
+        });
+        if (output.length >= 6) return output;
+      }
+    }
+    return output;
+  }, [
+    engineMode,
+    engineStrength,
+    preferenceMemory,
+    preview,
+    session,
+    wordLabCurrentSelection,
+    wordLabOpen,
+    wordLabPhraseCandidates,
+    wordLabTransformKind,
+  ]);
+
+
   const activeSentenceCanRevert = useMemo(() => {
     if (!activeToken || !session) return false;
     const currentSentence = getSentenceForRange(session.currentEditedText, activeToken.start, activeToken.end);
@@ -1121,6 +1313,119 @@ export default function App() {
     const originalSentence = sentenceIndex >= 0 ? originalSentences[sentenceIndex] : undefined;
     return Boolean(originalSentence && currentSentence.text !== originalSentence.text);
   }, [activeToken, session]);
+
+  const handleOpenWordLab = () => {
+    if (activeToken && session) {
+      setWordLabSelection({
+        start: activeToken.start,
+        end: activeToken.end,
+        text: activeToken.text,
+        kind: "word",
+      });
+      setWordLabView("word");
+      setWordLabOpen(true);
+      closeTokenTools();
+      return;
+    }
+    if (wordLabOpen) {
+      setWordLabOpen(false);
+      return;
+    }
+    setWordLabView(wordLabSelection?.kind === "word" ? "word" : "sentence");
+    setWordLabOpen(true);
+  };
+
+  const handleWordLabWordPick = (replacement: string) => {
+    const current = sessionRef.current;
+    const selection = wordLabSelection;
+    const picked = wordLabWordResults.find((result) => result.option.replacement === replacement);
+    if (!current || !selection || selection.kind !== "word" || !picked) return;
+    if (current.currentEditedText.slice(selection.start, selection.end) !== selection.text) {
+      notify("The essay changed. Select this word again before applying a choice.", "error");
+      return;
+    }
+
+    const nextText = replaceRange(current.currentEditedText, selection.start, selection.end, replacement);
+    const validation = validateProtectedContent(current.originalText, nextText, current.protectedSpans);
+    if (!validation.safe) {
+      notify(validation.reason ?? "Protected text must stay unchanged.", "error");
+      return;
+    }
+
+    const optionsShown = wordLabWordExamples.map((example) => example.replacement);
+    appendStudioDecision({
+      id: `decision-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      paragraphId: String(current.startedAt),
+      paragraphHash: hashParagraph(current.originalText),
+      saved: false,
+      selectionText: selection.text,
+      selectionRange: { start: selection.start, end: selection.end },
+      operation: "word-lab-word",
+      optionsShown,
+      optionPicked: replacement,
+      optionsSkipped: optionsShown.filter((option) => option !== replacement),
+      modelId: current.generationMetadata.source,
+      adapterId: null,
+      timestamp: new Date().toISOString(),
+    });
+    applyEditedText(nextText, "synonym", {
+      type: "synonym-replacement",
+      originalFragment: selection.text,
+      replacementFragment: replacement,
+    });
+    setWordLabSelection({
+      start: selection.start,
+      end: selection.start + replacement.length,
+      text: replacement,
+      kind: "word",
+    });
+  };
+
+  const handleWordLabTransformPick = (picked: { id: string; label: string; replacement: string }) => {
+    const current = sessionRef.current;
+    const selection = wordLabSelection;
+    if (!current || !selection || selection.kind === "word") return;
+    if (current.currentEditedText.slice(selection.start, selection.end) !== selection.text) {
+      notify("The essay changed. Select this text again before applying a version.", "error");
+      return;
+    }
+
+    const nextText = replaceRange(current.currentEditedText, selection.start, selection.end, picked.replacement);
+    const validation = validateProtectedContent(current.originalText, nextText, current.protectedSpans);
+    if (!validation.safe) {
+      notify(validation.reason ?? "Protected text must stay unchanged.", "error");
+      return;
+    }
+
+    const optionsShown = wordLabTransformOptions.map((option) => option.replacement);
+    appendStudioDecision({
+      id: `decision-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      paragraphId: String(current.startedAt),
+      paragraphHash: hashParagraph(current.originalText),
+      saved: false,
+      selectionText: selection.text,
+      selectionRange: { start: selection.start, end: selection.end },
+      operation: `word-lab-${wordLabTransformKind}`,
+      optionsShown,
+      optionPicked: picked.replacement,
+      optionsSkipped: optionsShown.filter((option) => option !== picked.replacement),
+      modelId: current.generationMetadata.source,
+      adapterId: null,
+      timestamp: new Date().toISOString(),
+    });
+    applyEditedText(nextText, "sentence_rephrase", {
+      type: "sentence-rephrase",
+      originalFragment: selection.text,
+      replacementFragment: picked.replacement,
+    });
+    setWordLabSelection({
+      start: selection.start,
+      end: selection.start + picked.replacement.length,
+      text: picked.replacement,
+      kind: selection.kind,
+    });
+  };
+
   const canRevertParagraph = Boolean(session && session.currentEditedText !== session.generatedText);
   const hasDraft = input.trim().length > 0;
   const hasOutput = Boolean(session && preview);
@@ -1262,6 +1567,8 @@ export default function App() {
     const value = requested.length > MAX_INPUT_CHARS ? requested.slice(0, MAX_INPUT_CHARS) : requested;
     const truncatedBy = requested.length - value.length;
     clearStrengthRegeneration();
+    setWordLabOpen(false);
+    setWordLabSelection(null);
     contextualRequestRef.current += 1;
     setContextualLoadingTokenId(null);
     setContextualAlternatives({});
@@ -1738,7 +2045,15 @@ export default function App() {
           />
         </section>
 
-        <section className="grid items-stretch gap-4 lg:grid-cols-[minmax(320px,0.92fr)_minmax(460px,1.08fr)]" aria-label="Paraphrase workspace">
+        <section
+          className={cn(
+            "grid items-stretch gap-4",
+            wordLabOpen
+              ? "lg:grid-cols-[minmax(260px,0.84fr)_minmax(360px,1.08fr)_minmax(300px,0.8fr)]"
+              : "lg:grid-cols-[minmax(320px,0.92fr)_minmax(460px,1.08fr)]",
+          )}
+          aria-label="Paraphrase workspace"
+        >
           <div className="app-panel workspace-panel-a flex min-h-[320px] flex-col rounded-[18px]">
             <div className="panel-header flex items-start justify-between gap-3 px-4 py-3 sm:px-5">
               <div className="min-w-0">
@@ -1846,15 +2161,25 @@ export default function App() {
                   </div>
                 )}
               </div>
-              <button
-                type="button"
-                onClick={() => void handleCopy()}
-                disabled={!hasOutput || isCopying}
-                aria-busy={isCopying}
-                className="text-action flex-none rounded-full px-2.5 py-1 text-[12px]"
-              >
-                {isCopying ? "Copying…" : copied ? "Copied" : "Copy"}
-              </button>
+              <div className="flex flex-none items-center gap-1">
+                <button
+                  type="button"
+                  onClick={handleOpenWordLab}
+                  aria-pressed={wordLabOpen}
+                  className="word-lab-open rounded-full px-2.5 py-1 text-[11px] font-[600]"
+                >
+                  Word Lab
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleCopy()}
+                  disabled={!hasOutput || isCopying}
+                  aria-busy={isCopying}
+                  className="text-action rounded-full px-2.5 py-1 text-[12px]"
+                >
+                  {isCopying ? "Copying…" : copied ? "Copied" : "Copy"}
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-auto px-4 py-4 sm:px-5">
@@ -1964,6 +2289,20 @@ export default function App() {
               </div>
             </div>
           </div>
+          {wordLabOpen && (
+            <WordLabPanel
+              view={wordLabView}
+              onViewChange={setWordLabView}
+              selection={wordLabCurrentSelection}
+              wordExamples={wordLabWordExamples}
+              transformKind={wordLabTransformKind}
+              onTransformKindChange={setWordLabTransformKind}
+              transformOptions={wordLabTransformOptions}
+              onApplyWordExample={handleWordLabWordPick}
+              onApplyTransform={handleWordLabTransformPick}
+              onClose={() => setWordLabOpen(false)}
+            />
+          )}
         </section>
 
         {/* One closing statement, not two. The save/discard reassurance only
@@ -1997,6 +2336,7 @@ export default function App() {
               onClose={closeTokenTools}
               onSplit={handleSplit}
               onJoin={handleJoin}
+              onOpenWordLab={handleOpenWordLab}
               canSplit={Boolean(session && session.currentEditedText.includes(","))}
               canJoin={Boolean(session && splitSentences(session.currentEditedText).length >= 2)}
             />,
