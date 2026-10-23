@@ -4,6 +4,29 @@
 #93. It replaces #71 and the 2026-10-07 plan. Decisions are logged in
 [`DECISIONS.md`](DECISIONS.md).
 
+## Implementation status (2026-10-23; does not change owner decisions)
+
+- **Merged:** repo cleanup (#83), pinned candidate catalog (#84), essay-fit tap-word
+  popover (#89), and Word Studio v2 benchmark infrastructure and real screened
+  results (#85, #86, #87; [PR #99](https://github.com/tverma101/Pari/pull/99),
+  merged as `30ab0e7`). Claude Opus 5.5 scored 200 anonymized screen outputs
+  against 40 tasks with preserved raw Kaggle outputs and audited SHA receipts.
+- **Screen is not final selection.** Qwen3.5-4B, SmolLM3-3B and Phi-4 Mini are
+  statistically non-separated in the 40-task screen. Run these three on the
+  previously frozen disjoint 200-task `full` set, blind-score again and compare
+  paired intervals. The 35B 2×T4 reference has no Word Studio v2 quality score;
+  retain that explicit missing state until a real attempt.
+- **Mac gate is still open:** 4-bit MLX latency, unified-memory fit, quality loss
+  and long-session stability on the actual 16 GB Mac (#88, #31), *before*
+  production model promotion. Do not transplant Kaggle FP16 speed numbers.
+- **App:** Word Lab [PR #97](https://github.com/tverma101/Pari/pull/97)
+  passes deterministic CI but remains a draft pending real native-app
+  screenshot/recording. Adaptive pre-compute (#91) is not complete.
+- **Execution:** Follow [issue #34](https://github.com/tverma101/Pari/issues/34)
+  for the current v2 full finalist workflow. The older English-Core/Bonsai
+  instructions are archived and must not replace this approved plan.
+
+
 ## What Pari is
 
 Pari is a Mac writing assistant for school and college essays. The writer's
@@ -77,7 +100,7 @@ is a local model.
 - No fallback or "calibrated" values, ever.
 - A run that fails is recorded as failed.
 
-PR #82 broke this rule, and its results are being removed.
+PR #82 broke this rule; its fabricated results were removed in PR #94.
 
 ## Distillation (owner-locked, probably unused)
 
